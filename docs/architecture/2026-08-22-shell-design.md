@@ -1,7 +1,7 @@
 # Jugnu shell — design
 
 **Date:** 2026-08-22
-**Status:** Draft for review
+**Status:** Approved
 **Scope:** Shell architecture, addon packages, registry, v0
 **Out of scope here:** Deep UI/visual system (separate discussion); clipboard/window product design
 
