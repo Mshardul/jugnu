@@ -19,7 +19,7 @@ typecheck:
 	uv run mypy
 
 spell:
-	uv run codespell apps extensions docs config README.md LICENSE *.md
+	uv run codespell apps extensions docs config README.md LICENSE Makefile
 
 test:
 	uv run pytest

@@ -1,7 +1,7 @@
 # Ticket backlog — floating-note
 
-**Root id:** T-017  
-**Publish:** github  
+**Root id:** T-017
+**Publish:** github
 **License:** MIT (repo root)
 
 Always-on-top tkinter scratchpad saving to a local file.

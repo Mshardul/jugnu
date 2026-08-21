@@ -1,7 +1,7 @@
 # Ticket backlog — airdrop-folder
 
-**Root id:** T-091  
-**Publish:** github  
+**Root id:** T-091
+**Publish:** github
 **License:** MIT (repo root)
 
 Open AirDrop sharing for selected files/folders (Finder Quick Action helper).

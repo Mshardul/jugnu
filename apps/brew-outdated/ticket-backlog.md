@@ -1,7 +1,7 @@
 # Ticket backlog — brew-outdated
 
-**Root id:** T-092  
-**Publish:** github  
+**Root id:** T-092
+**Publish:** github
 **License:** MIT (repo root)
 
 CLI report of outdated Homebrew packages (count + list; JSON/filters). Menu-bar later.

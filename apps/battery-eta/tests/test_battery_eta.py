@@ -156,10 +156,13 @@ class FetchAndMainTests(unittest.TestCase):
                 self.assertEqual(out.getvalue(), PMSET_AC_CHARGED)
 
     def test_main_pmset_error(self):
-        with mock.patch(
-            "battery_eta.fetch_pmset_batt",
-            side_effect=OSError("pmset missing"),
-        ), mock.patch("sys.stderr", new_callable=io.StringIO) as err:
+        with (
+            mock.patch(
+                "battery_eta.fetch_pmset_batt",
+                side_effect=OSError("pmset missing"),
+            ),
+            mock.patch("sys.stderr", new_callable=io.StringIO) as err,
+        ):
             code = main([])
             self.assertNotEqual(code, 0)
             self.assertTrue(err.getvalue().startswith("battery-eta:"))

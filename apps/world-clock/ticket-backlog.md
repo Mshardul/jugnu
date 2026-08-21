@@ -1,7 +1,7 @@
 # Ticket backlog — world-clock
 
-**Root id:** T-047  
-**Publish:** github  
+**Root id:** T-047
+**Publish:** github
 **License:** MIT (repo root)
 
 Print current times for configured IANA zones (CLI nursery; menu-bar later).

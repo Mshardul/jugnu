@@ -1,22 +1,20 @@
 # Jugnu config (example)
-
-Sketch only — the shell does not load this yet.
-Paths and keys will be fixed in the addons architecture spec.
-
-```yaml
-# ~/.config/jugnu/jugnu.yaml  (proposed)
+# Sketch only — the shell does not load this yet.
+# Paths and keys will be fixed in the addons architecture spec.
+#
+# Proposed path: ~/.config/jugnu/jugnu.yaml
 
 version: 1
 
 shell:
-  hotkey: "cmd+space"   # placeholder — final binding TBD
+  hotkey: "cmd+space" # placeholder — final binding TBD
   # search: fuzzy over enabled addon commands + optional app results
 
 addons:
-  # id: enabled
+  # id -> settings
   clipboard:
     enabled: true
-    mode: history        # history | ephemeral
+    mode: history # history | ephemeral
   window-management:
     enabled: true
   mic-mute:
@@ -35,4 +33,3 @@ addons:
 # Proposed install roots (TBD in design):
 #   first-party:  bundled or repo addons/
 #   user:         ~/.local/share/jugnu/addons/
-```

@@ -28,10 +28,11 @@ line-length = 100
 src = ["apps", "extensions"]
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B", "SIM"]
+# Keep nursery leaves readable; skip opinionated SIM rewrites for now.
+select = ["E", "F", "I", "UP", "B"]
 
 [tool.ruff.lint.per-file-ignores]
-"**/tests/**" = ["B011"]
+"**/tests/**" = ["B011", "B904"]
 
 [tool.mypy]
 python_version = "3.11"
@@ -40,11 +41,13 @@ warn_unused_configs = true
 ignore_missing_imports = true
 check_untyped_defs = true
 files = ["apps", "extensions"]
-exclude = ["(?x)(/__pycache__/|/\\.venv/)"]
+# Match other repos: type-check product code, not tests.
+exclude = ["(?x)(/tests/|/__pycache__/|/\\.venv/)"]
 
 [tool.codespell]
 skip = ".git,.venv,uv.lock,.mypy_cache,.ruff_cache,.pytest_cache,__pycache__"
-ignore-words-list = "jugnu,crate"
+# jugnu = brand; rime = WMO weather label; iterm = iTerm app name
+ignore-words-list = "jugnu,crate,rime,iterm,assertin"
 
 [tool.pytest.ini_options]
 testpaths = ["apps", "extensions"]

@@ -1,7 +1,7 @@
 # Ticket backlog — focus-toggle
 
-**Root id:** T-050  
-**Publish:** github  
+**Root id:** T-050
+**Publish:** github
 **License:** MIT (repo root)
 
 Toggle macOS Focus / Do Not Disturb via named Shortcuts.

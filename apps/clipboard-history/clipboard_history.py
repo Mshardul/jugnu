@@ -92,7 +92,10 @@ class HistoryStore:
             (when, text),
         )
         self._conn.commit()
-        return int(cur.lastrowid)
+        row_id = cur.lastrowid
+        if row_id is None:
+            raise RuntimeError("insert did not return a row id")
+        return int(row_id)
 
     def get(self, entry_id: int) -> dict[str, Any]:
         row = self._conn.execute(

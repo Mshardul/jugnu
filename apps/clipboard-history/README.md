@@ -29,7 +29,7 @@ Local searchable clipboard history with pins. Text-first CLI for the Tools nurse
 .venv/bin/python apps/clipboard-history/clipboard_history.py unpin 42
 ```
 
-Default store: `~/.local/share/tools/clipboard-history/history.db`  
+Default store: `~/.local/share/tools/clipboard-history/history.db`
 Override with `--db PATH`. Consecutive identical clips are deduped; entries over ~200KB are skipped.
 
 Importable API: `HistoryStore`, `watch_clipboard`, `default_db_path`, `main`.

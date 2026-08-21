@@ -170,10 +170,13 @@ class FetchAndMainTests(unittest.TestCase):
                 self.assertEqual(payload["formulae"], [])
 
     def test_main_brew_missing(self):
-        with mock.patch(
-            "brew_outdated.fetch_brew_outdated_json",
-            side_effect=FileNotFoundError(2, "No such file or directory", "brew"),
-        ), mock.patch("sys.stderr", new_callable=io.StringIO) as err:
+        with (
+            mock.patch(
+                "brew_outdated.fetch_brew_outdated_json",
+                side_effect=FileNotFoundError(2, "No such file or directory", "brew"),
+            ),
+            mock.patch("sys.stderr", new_callable=io.StringIO) as err,
+        ):
             code = main([])
             self.assertEqual(code, 1)
             self.assertTrue(err.getvalue().startswith("brew-outdated:"))

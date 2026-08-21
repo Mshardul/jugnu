@@ -1,7 +1,7 @@
 # Ticket backlog — quarantine-clear
 
-**Root id:** T-088  
-**Publish:** github  
+**Root id:** T-088
+**Publish:** github
 **License:** MIT (repo root)
 
 Clear Gatekeeper quarantine on a file.

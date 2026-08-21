@@ -1,7 +1,7 @@
 # Ticket backlog — weather-bar
 
-**Root id:** T-094  
-**Publish:** github  
+**Root id:** T-094
+**Publish:** github
 **License:** MIT (repo root)
 
 CLI-first local weather one-liner (Open-Meteo); menu-bar host later.

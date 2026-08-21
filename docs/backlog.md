@@ -14,16 +14,16 @@ Status legend for staged leaves: **active** = runnable code; **stub** = README o
 
 Not yet staged as leaves. Candidates after shell MVP:
 
-1. Audio output switcher  
-2. Caffeine / keep-awake  
-3. Webcam mute  
-4. AirPods / BT battery bar  
-5. Claude/agent mission control (lite)  
-6. Dev-server / common-ports bar  
-7. Screenshot inbox  
-8. Paste plain / strip formatting (or fold into paste-transform)  
-9. Kill hung app picker  
-10. Disk pressure bar  
+1. Audio output switcher
+2. Caffeine / keep-awake
+3. Webcam mute
+4. AirPods / BT battery bar
+5. Claude/agent mission control (lite)
+6. Dev-server / common-ports bar
+7. Screenshot inbox
+8. Paste plain / strip formatting (or fold into paste-transform)
+9. Kill hung app picker
+10. Disk pressure bar
 
 ## Staged leaves — `apps/`
 

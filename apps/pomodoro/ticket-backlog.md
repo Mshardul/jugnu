@@ -1,7 +1,7 @@
 # Ticket backlog — pomodoro
 
-**Root id:** T-093  
-**Publish:** github  
+**Root id:** T-093
+**Publish:** github
 **License:** MIT (repo root)
 
 CLI-first 25/5 focus timer with state file and optional macOS notifications.

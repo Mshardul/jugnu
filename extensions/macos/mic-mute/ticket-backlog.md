@@ -1,7 +1,7 @@
 # Ticket backlog — mic-mute
 
-**Root id:** T-049  
-**Publish:** github  
+**Root id:** T-049
+**Publish:** github
 **License:** MIT (repo root)
 
 Mute/unmute/toggle macOS mic input volume via AppleScript.

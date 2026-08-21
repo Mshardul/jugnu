@@ -1,7 +1,7 @@
 # Ticket backlog — clipboard-history
 
-**Root id:** T-018  
-**Publish:** github  
+**Root id:** T-018
+**Publish:** github
 **License:** MIT (repo root)
 
 Local searchable clipboard history with pins. Image OCR is deferred.

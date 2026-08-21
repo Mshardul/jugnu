@@ -1,7 +1,7 @@
 # Ticket backlog — open-terminal-here
 
-**Root id:** T-089  
-**Publish:** github  
+**Root id:** T-089
+**Publish:** github
 **License:** MIT (repo root)
 
 Open Terminal (or iTerm) at a folder; Finder Quick Action install notes.

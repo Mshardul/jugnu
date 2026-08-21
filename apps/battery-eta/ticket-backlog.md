@@ -1,7 +1,7 @@
 # Ticket backlog — battery-eta
 
-**Root id:** T-048  
-**Publish:** github  
+**Root id:** T-048
+**Publish:** github
 **License:** MIT (repo root)
 
 macOS battery status/ETA from `pmset` (CLI nursery; menu-bar later).

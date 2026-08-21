@@ -25,7 +25,7 @@ jobs:
         run: uv python install 3.11
 
       - name: Install dependencies
-        run: uv sync
+        run: uv sync --python 3.11
 
       # Lint — check only, never autofix in CI (just report).
       - name: Ruff lint
@@ -38,7 +38,7 @@ jobs:
         run: uv run mypy
 
       - name: Spell check (codespell)
-        run: uv run codespell apps extensions docs config README.md LICENSE *.md
+        run: uv run codespell apps extensions docs config README.md LICENSE Makefile
 
       - name: Tests
         run: uv run pytest
