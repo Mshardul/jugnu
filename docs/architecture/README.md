@@ -1,12 +1,12 @@
 # Architecture specs
 
-Design documents for Jugnu subsystems land here **after** collaborative design and approval.
+Design documents for Jugnu subsystems. Write specs **before** scaffolding runtimes.
 
-Expected first specs (order):
+| Spec | Status |
+|---|---|
+| [2026-08-22 Shell design](./2026-08-22-shell-design.md) | Draft — awaiting review |
+| Addons packaging (detail) | Follow-on if needed beyond shell spec §2 |
+| Clipboard | Later |
+| Window management | Later |
 
-1. `shell` — hotkey palette, search model, process model, addon lifecycle
-2. `addons` — YAML enablement, install/uninstall paths, contracts
-3. `clipboard` — ephemeral vs history, privacy rules
-4. `window-management` — feature set and UX
-
-No specs written yet. Do not scaffold `shell/` or `addons/` runtimes until the shell design is approved.
+Process: brainstorm → section approval → write spec here → human review → implementation plan → code.

@@ -1,35 +1,27 @@
 # Jugnu config (example)
-# Sketch only — the shell does not load this yet.
-# Paths and keys will be fixed in the addons architecture spec.
-#
+# Aligned with docs/architecture/2026-08-22-shell-design.md
 # Proposed path: ~/.config/jugnu/jugnu.yaml
+# Shell does not load this until implemented.
 
 version: 1
 
 shell:
-  hotkey: "cmd+space" # placeholder — final binding TBD
-  # search: fuzzy over enabled addon commands + optional app results
+  hotkey: "option+space" # default; first-run may opt in to cmd+space
 
 addons:
-  # id -> settings
-  clipboard:
-    enabled: true
-    mode: history # history | ephemeral
-  window-management:
-    enabled: true
+  # Only listed + enabled addons appear in palette search.
+  # Install path: ~/.local/share/jugnu/addons/<id>/
   mic-mute:
     enabled: true
   focus-toggle:
     enabled: true
-  brew-outdated:
-    enabled: true
-  port-picker:
+  paste-plain:
     enabled: false
-  meeting-bar:
-    enabled: false
-  # app-launcher: icebox — Jugnu is the launcher
-  # snippet-expand: later
 
-# Proposed install roots (TBD in design):
-#   first-party:  bundled or repo addons/
-#   user:         ~/.local/share/jugnu/addons/
+ui: {}
+# Reserved for later (first screen, theme, …).
+
+# Dev only (optional): load unpacked addon sources without a Release zip
+# dev:
+#   addon_paths:
+#     - /path/to/jugnu/addons

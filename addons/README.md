@@ -1,7 +1,11 @@
-# Addons (reserved)
+# Addons
 
-First-party Jugnu addons land here after the shell addon contract exists.
+First-party addon **sources** live here. Each addon builds to **one zip** published via GitHub Releases; the catalog is `registry/addons.json`.
 
-Staged inventory today: `../apps/` and `../extensions/macos/`. Those leaves graduate or get thin wrappers here; they are not the runtime layout yet.
+Nothing here is bundled inside `Jugnu.app`. Users install zips into `~/.local/share/jugnu/addons/<id>/`.
 
-**Do not scaffold** addon packages until YAML + loader design is approved.
+Design: [`docs/architecture/2026-08-22-shell-design.md`](../docs/architecture/2026-08-22-shell-design.md)
+
+Staging nursery (pre-graduation): `../apps/`, `../extensions/macos/`.
+
+No addon packages scaffolded until the shell spec is approved and packaging is planned.
