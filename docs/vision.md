@@ -35,6 +35,29 @@ Do not invent a second product name or collapse the Tools nursery into Jugnu wit
 - Prefer focused addons over one binary of unrelated jobs
 - Tools nursery (`cli/`, etc.) stays separate; Jugnu may wrap those tools as addons rather than merging source trees
 
+### Catalog hierarchy (user POV — locked intent)
+
+Think like a user browsing Jugnu, not like a repo of one-line scripts.
+
+| Level | What the user sees | Ship / install unit | Example |
+|---|---|---|---|
+| **Category** | Browse/group in the app (and registry) | Taxonomy only — not a zip | Clipboard, Meeting, Appearance, Converters, Play |
+| **Addon** | An installable tool with a clear job | **One zip** / one YAML enable key | Dark Mode, Clip Tools, Unit Convert, Play Shelf |
+| **Commands** | Actions inside that addon (palette entries) | `commands` in `addon.yaml` — not their own zip | Toggle appearance; Format JSON; JSON → CSV; Roll 2d6 |
+
+**Packaging rules (user mental model):**
+
+1. **One job → one addon.** Inverse or paired actions share an addon (e.g. light mode + dark mode = **Dark Mode** with toggle/set commands — never two installables).
+2. **Same shape of work → multiple commands on one addon.** Converters/formatters belong together (JSON pretty/minify, JSON ↔ CSV, Base64, slugify, timestamps, …) — not a separate zip per transformation.
+3. **Do not club unrelated jobs** just because they are all “toggles” or all “small.” Dock autohide and mic mute are different user jobs; split or group only when a user would expect one tool.
+4. **Shared capability between addons — pick one:**
+   - If the user would want that capability **on its own** → it is (or becomes) **its own addon**; other addons depend on / invoke it, or the user installs both.
+   - If the user would **not** need it as a separate installable → keep it as **shared source** that is **copied/included into each consuming addon’s zip** at package time (not a hidden second product in the registry).
+5. Shell **search** lists commands; **install / enable** is per addon; **browse** can use categories.
+6. **Name the job** in ids/titles — what the user searches for — not the scenario you pictured while inventing it (`mute-all`, not `call-mute-all`).
+
+Category names and exact addon boundaries can evolve; Category → Addon → Commands should not. Shared-code packaging (rule 4) is locked intent; exact build plumbing can follow later.
+
 ## Relationship to Tools
 
 Jugnu lives in its **own** repo. Staging leaves under `apps/` and `extensions/macos/` were moved or copied from Tools planning. Small independent CLIs remain in Tools unless graduated; Jugnu integrates them as dependencies/wrappers when needed.

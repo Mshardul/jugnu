@@ -33,7 +33,7 @@ CI: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) (ruff, mypy, codespel
 4. **First-party addons** — meeting/device QoL, file triage, etc.
 5. **Dev ops in the menu bar** — ports, brew, agents, disk pressure, and similar
 
-Focused addons over one mega-binary. Unrelated Tools nursery CLIs stay in their own repo; Jugnu may wrap them as addons.
+Focused **addons** (one zip each) over one mega-binary; related actions are **commands** inside an addon; **categories** organize browse. See [vision — Catalog hierarchy](docs/vision.md). Unrelated Tools nursery CLIs stay in their own repo; Jugnu may wrap them as addons.
 
 ## Repo layout
 
