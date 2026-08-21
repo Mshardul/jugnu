@@ -10,3 +10,6 @@ __pycache__/
 *.xcuserdata/
 DerivedData/
 .pre-commit/
+
+# Git worktrees (local isolation)
+.worktrees/
