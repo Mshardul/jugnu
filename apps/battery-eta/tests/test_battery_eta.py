@@ -7,7 +7,7 @@ import json
 import unittest
 from unittest import mock
 
-from battery_eta import format_status, main, parse_pmset_batt, fetch_pmset_batt
+from battery_eta import fetch_pmset_batt, format_status, main, parse_pmset_batt
 
 PMSET_AC_CHARGED = """\
 Now drawing from 'AC Power'
@@ -159,11 +159,10 @@ class FetchAndMainTests(unittest.TestCase):
         with mock.patch(
             "battery_eta.fetch_pmset_batt",
             side_effect=OSError("pmset missing"),
-        ):
-            with mock.patch("sys.stderr", new_callable=io.StringIO) as err:
-                code = main([])
-                self.assertNotEqual(code, 0)
-                self.assertTrue(err.getvalue().startswith("battery-eta:"))
+        ), mock.patch("sys.stderr", new_callable=io.StringIO) as err:
+            code = main([])
+            self.assertNotEqual(code, 0)
+            self.assertTrue(err.getvalue().startswith("battery-eta:"))
 
 
 if __name__ == "__main__":

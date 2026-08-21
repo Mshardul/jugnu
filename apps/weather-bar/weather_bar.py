@@ -10,8 +10,9 @@ import sys
 import urllib.error
 import urllib.parse
 import urllib.request
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 SLUG = "weather-bar"
 DEFAULT_CONFIG_PATH = Path.home() / ".config" / "tools" / "weather-bar.yaml"
@@ -188,7 +189,12 @@ def resolve_location(
 
     cfg_lat = config.get("lat")
     cfg_lon = config.get("lon")
-    if cfg_lat is not None and cfg_lon is not None and str(cfg_lat).strip() and str(cfg_lon).strip():
+    if (
+        cfg_lat is not None
+        and cfg_lon is not None
+        and str(cfg_lat).strip()
+        and str(cfg_lon).strip()
+    ):
         name = (config.get("location") or f"{cfg_lat},{cfg_lon}").strip()
         return float(cfg_lat), float(cfg_lon), name
 

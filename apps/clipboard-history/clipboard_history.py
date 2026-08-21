@@ -10,8 +10,9 @@ import sqlite3
 import subprocess
 import sys
 import time
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable, TextIO
+from typing import Any, TextIO
 
 MAX_TEXT_BYTES = 200_000  # ~200KB
 DEFAULT_POLL_INTERVAL = 1.0
@@ -59,9 +60,7 @@ class HistoryStore:
             )
             """
         )
-        self._conn.execute(
-            "CREATE INDEX IF NOT EXISTS idx_entries_ts ON entries(ts DESC)"
-        )
+        self._conn.execute("CREATE INDEX IF NOT EXISTS idx_entries_ts ON entries(ts DESC)")
         self._conn.commit()
 
     def close(self) -> None:
@@ -129,22 +128,17 @@ class HistoryStore:
 
     def pin(self, entry_id: int) -> None:
         self.get(entry_id)  # raises KeyError if missing
-        self._conn.execute(
-            "UPDATE entries SET pinned = 1 WHERE id = ?", (entry_id,)
-        )
+        self._conn.execute("UPDATE entries SET pinned = 1 WHERE id = ?", (entry_id,))
         self._conn.commit()
 
     def unpin(self, entry_id: int) -> None:
         self.get(entry_id)
-        self._conn.execute(
-            "UPDATE entries SET pinned = 0 WHERE id = ?", (entry_id,)
-        )
+        self._conn.execute("UPDATE entries SET pinned = 0 WHERE id = ?", (entry_id,))
         self._conn.commit()
 
     def list_pins(self) -> list[dict[str, Any]]:
         rows = self._conn.execute(
-            "SELECT id, ts, text, pinned FROM entries "
-            "WHERE pinned = 1 ORDER BY ts DESC, id DESC"
+            "SELECT id, ts, text, pinned FROM entries WHERE pinned = 1 ORDER BY ts DESC, id DESC"
         ).fetchall()
         return [self._row_to_dict(r) for r in rows]
 
@@ -252,10 +246,7 @@ def main(
     try:
         try:
             if args.command == "watch":
-                if (
-                    clipboard_read_fn is None
-                    and platform.system() != "Darwin"
-                ):
+                if clipboard_read_fn is None and platform.system() != "Darwin":
                     _err(
                         "watch uses pbpaste by default (Darwin); "
                         "inject read_fn for other platforms",

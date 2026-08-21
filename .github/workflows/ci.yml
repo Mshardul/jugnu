@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Cancel superseded runs on the same ref.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.11
+
+      - name: Install dependencies
+        run: uv sync
+
+      # Lint — check only, never autofix in CI (just report).
+      - name: Ruff lint
+        run: uv run ruff check apps extensions conftest.py
+
+      - name: Ruff format check
+        run: uv run ruff format --check apps extensions conftest.py
+
+      - name: Type check (mypy)
+        run: uv run mypy
+
+      - name: Spell check (codespell)
+        run: uv run codespell apps extensions docs config README.md LICENSE *.md
+
+      - name: Tests
+        run: uv run pytest
+
+  semgrep:
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Semgrep scan
+        run: |
+          semgrep scan --error --config=p/security-audit --config=p/python \
+            --exclude-rule python.lang.security.audit.logging.logger-credential-leak.python-logger-credential-disclosure \
+            apps extensions

@@ -6,7 +6,7 @@ import json
 import os
 import tempfile
 import unittest
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from unittest import mock
 
@@ -48,7 +48,7 @@ class ResolveZonesTests(unittest.TestCase):
 
 class FormatClockTests(unittest.TestCase):
     def test_iso_local_times(self):
-        now = datetime(2026, 8, 22, 12, 0, 0, tzinfo=timezone.utc)
+        now = datetime(2026, 8, 22, 12, 0, 0, tzinfo=UTC)
         rows = format_clock(now, ["UTC", "America/New_York", "Asia/Kolkata"])
         self.assertEqual(len(rows), 3)
         self.assertEqual(rows[0]["zone"], "UTC")
@@ -60,12 +60,12 @@ class FormatClockTests(unittest.TestCase):
         self.assertEqual(rows[2]["time"], "2026-08-22T17:30:00+05:30")
 
     def test_custom_strftime(self):
-        now = datetime(2026, 1, 15, 18, 30, 0, tzinfo=timezone.utc)
+        now = datetime(2026, 1, 15, 18, 30, 0, tzinfo=UTC)
         rows = format_clock(now, ["UTC"], fmt="%H:%M %Z")
         self.assertEqual(rows[0]["time"], "18:30 UTC")
 
     def test_labels_in_output(self):
-        now = datetime(2026, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+        now = datetime(2026, 1, 1, 0, 0, 0, tzinfo=UTC)
         rows = format_clock(
             now,
             ["America/Los_Angeles"],
@@ -75,7 +75,7 @@ class FormatClockTests(unittest.TestCase):
         self.assertEqual(rows[0]["zone"], "America/Los_Angeles")
 
     def test_invalid_zone_raises(self):
-        now = datetime(2026, 1, 1, tzinfo=timezone.utc)
+        now = datetime(2026, 1, 1, tzinfo=UTC)
         with self.assertRaises(ValueError) as ctx:
             format_clock(now, ["Not/A_Zone"])
         self.assertIn("Not/A_Zone", str(ctx.exception))
@@ -107,9 +107,7 @@ class LoadConfigTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "world-clock.yaml"
             path.write_text(
-                "zones:\n"
-                "  - UTC\n"
-                "  - Europe/London\n",
+                "zones:\n  - UTC\n  - Europe/London\n",
                 encoding="utf-8",
             )
             cfg = load_config(path)
@@ -118,7 +116,7 @@ class LoadConfigTests(unittest.TestCase):
 
 class MainCliTests(unittest.TestCase):
     def test_json_output(self):
-        now = datetime(2026, 8, 22, 12, 0, 0, tzinfo=timezone.utc)
+        now = datetime(2026, 8, 22, 12, 0, 0, tzinfo=UTC)
         with mock.patch("world_clock._now_utc", return_value=now):
             with mock.patch("sys.stdout", new_callable=__import__("io").StringIO) as out:
                 code = main(["--zone", "UTC", "--json"])
@@ -134,16 +132,14 @@ class MainCliTests(unittest.TestCase):
             self.assertTrue(err.getvalue().startswith("world-clock:"))
 
     def test_config_env(self):
-        now = datetime(2026, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+        now = datetime(2026, 1, 1, 0, 0, 0, tzinfo=UTC)
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "cfg.yaml"
             path.write_text("zones: [UTC]\n", encoding="utf-8")
             env = {**os.environ, "TOOLS_WORLD_CLOCK_CONFIG": str(path)}
             with mock.patch.dict(os.environ, env, clear=True):
                 with mock.patch("world_clock._now_utc", return_value=now):
-                    with mock.patch(
-                        "sys.stdout", new_callable=__import__("io").StringIO
-                    ) as out:
+                    with mock.patch("sys.stdout", new_callable=__import__("io").StringIO) as out:
                         code = main(["--json"])
                         self.assertEqual(code, 0)
                         payload = json.loads(out.getvalue())

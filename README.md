@@ -9,6 +9,21 @@ Jugnu (Hindi: *firefly*) is a Mac command platform — meant to replace Spotligh
 | **App** | Jugnu |
 | **Repo / CLI** | `jugnu` |
 | **Status** | Pre-shell — staging inventory + docs |
+| **License** | [MIT](LICENSE) |
+
+## Dev tooling
+
+```bash
+# once
+uv sync
+uv run pre-commit install   # or: make hooks
+
+make precommit   # local hooks on all files
+make ci          # ruff + mypy + codespell + pytest (matches CI check job)
+make test
+```
+
+CI: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) (ruff, mypy, codespell, pytest, semgrep). Pre-commit is the local guardrail; CI is the authoritative gate. Tests are not run on commit.
 
 ## Architecture (target)
 

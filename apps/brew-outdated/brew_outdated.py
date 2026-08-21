@@ -95,9 +95,7 @@ def format_human(report: dict[str, Any]) -> str:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(
-        description="List outdated Homebrew formulae and casks."
-    )
+    parser = argparse.ArgumentParser(description="List outdated Homebrew formulae and casks.")
     parser.add_argument(
         "--json",
         action="store_true",

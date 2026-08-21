@@ -8,8 +8,8 @@ import json
 import subprocess
 import sys
 import time
+from collections.abc import Callable
 from pathlib import Path
-from typing import Callable
 
 DEFAULT_WORK_MIN = 25
 DEFAULT_BREAK_MIN = 5
@@ -190,9 +190,7 @@ def main(argv: list[str] | None = None) -> int:
 
     # work | break
     try:
-        duration = phase_seconds(
-            args.command, args.work_min, args.break_min, args.seconds
-        )
+        duration = phase_seconds(args.command, args.work_min, args.break_min, args.seconds)
     except ValueError as exc:
         print(f"pomodoro: {exc}", file=sys.stderr)
         return 1

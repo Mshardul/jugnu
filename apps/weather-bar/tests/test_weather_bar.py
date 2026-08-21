@@ -219,9 +219,7 @@ class MainTests(unittest.TestCase):
         urlopen = make_urlopen({"api.open-meteo.com": FORECAST_PARTLY})
         with mock.patch("weather_bar.urllib.request.urlopen", urlopen):
             with mock.patch("sys.stdout", new_callable=io.StringIO) as out:
-                code = main(
-                    ["--json", "--lat", "19.07", "--lon", "72.88", "--location", "Mumbai"]
-                )
+                code = main(["--json", "--lat", "19.07", "--lon", "72.88", "--location", "Mumbai"])
         self.assertEqual(code, 0)
         payload = json.loads(out.getvalue())
         self.assertEqual(payload["temp_c"], 12.0)

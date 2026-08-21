@@ -1,0 +1,52 @@
+# Pre-commit hooks — local guardrails. CI (.github/workflows/ci.yml) is the authoritative gate.
+# Install once:  uv run pre-commit install
+# Run on all files:  make precommit
+#
+# Tests are NOT run on commit (kept fast); CI runs the full suite.
+repos:
+  # ── Secrets ─────────────────────────────────────────────────────────────────
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.21.2
+    hooks:
+      - id: gitleaks
+
+  # ── Lint + format (ruff is both linter and formatter) ───────────────────────
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.4
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+        types_or: [python, pyi]
+      - id: ruff-format
+        types_or: [python, pyi]
+
+  # ── Static type checking ────────────────────────────────────────────────────
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.13.0
+    hooks:
+      - id: mypy
+        files: ^(apps|extensions)/
+        additional_dependencies: []
+        pass_filenames: false
+        args: []
+
+  # ── Spelling (code, comments, docs) ─────────────────────────────────────────
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.3.0
+    hooks:
+      - id: codespell
+        additional_dependencies: [tomli]
+        args: ["--toml=pyproject.toml"]
+
+  # ── Hygiene ─────────────────────────────────────────────────────────────────
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-yaml
+      - id: check-toml
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: debug-statements

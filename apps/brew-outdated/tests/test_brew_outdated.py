@@ -130,9 +130,7 @@ class FetchAndMainTests(unittest.TestCase):
         self.assertEqual(text, SAMPLE_JSON)
 
     def test_main_human_default(self):
-        with mock.patch(
-            "brew_outdated.fetch_brew_outdated_json", return_value=SAMPLE_JSON
-        ):
+        with mock.patch("brew_outdated.fetch_brew_outdated_json", return_value=SAMPLE_JSON):
             with mock.patch("sys.stdout", new_callable=io.StringIO) as out:
                 code = main([])
                 self.assertEqual(code, 0)
@@ -142,9 +140,7 @@ class FetchAndMainTests(unittest.TestCase):
                 self.assertIn("firefox", body)
 
     def test_main_json(self):
-        with mock.patch(
-            "brew_outdated.fetch_brew_outdated_json", return_value=SAMPLE_JSON
-        ):
+        with mock.patch("brew_outdated.fetch_brew_outdated_json", return_value=SAMPLE_JSON):
             with mock.patch("sys.stdout", new_callable=io.StringIO) as out:
                 code = main(["--json"])
                 self.assertEqual(code, 0)
@@ -154,9 +150,7 @@ class FetchAndMainTests(unittest.TestCase):
                 self.assertEqual(payload["casks"], ["firefox"])
 
     def test_main_formulae_only(self):
-        with mock.patch(
-            "brew_outdated.fetch_brew_outdated_json", return_value=SAMPLE_JSON
-        ):
+        with mock.patch("brew_outdated.fetch_brew_outdated_json", return_value=SAMPLE_JSON):
             with mock.patch("sys.stdout", new_callable=io.StringIO) as out:
                 code = main(["--formulae-only", "--json"])
                 self.assertEqual(code, 0)
@@ -166,9 +160,7 @@ class FetchAndMainTests(unittest.TestCase):
                 self.assertEqual(payload["casks"], [])
 
     def test_main_casks_only(self):
-        with mock.patch(
-            "brew_outdated.fetch_brew_outdated_json", return_value=SAMPLE_JSON
-        ):
+        with mock.patch("brew_outdated.fetch_brew_outdated_json", return_value=SAMPLE_JSON):
             with mock.patch("sys.stdout", new_callable=io.StringIO) as out:
                 code = main(["--casks-only", "--json"])
                 self.assertEqual(code, 0)
@@ -181,12 +173,11 @@ class FetchAndMainTests(unittest.TestCase):
         with mock.patch(
             "brew_outdated.fetch_brew_outdated_json",
             side_effect=FileNotFoundError(2, "No such file or directory", "brew"),
-        ):
-            with mock.patch("sys.stderr", new_callable=io.StringIO) as err:
-                code = main([])
-                self.assertEqual(code, 1)
-                self.assertTrue(err.getvalue().startswith("brew-outdated:"))
-                self.assertIn("brew", err.getvalue().lower())
+        ), mock.patch("sys.stderr", new_callable=io.StringIO) as err:
+            code = main([])
+            self.assertEqual(code, 1)
+            self.assertTrue(err.getvalue().startswith("brew-outdated:"))
+            self.assertIn("brew", err.getvalue().lower())
 
     def test_main_mutual_exclusive_filters(self):
         with mock.patch("sys.stderr", new_callable=io.StringIO) as err:

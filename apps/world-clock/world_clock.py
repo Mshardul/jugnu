@@ -8,7 +8,7 @@ import json
 import os
 import re
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
@@ -24,7 +24,7 @@ DEFAULT_ZONES = [
 
 
 def _now_utc() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def load_config(path: Path) -> dict:
@@ -109,9 +109,9 @@ def format_clock(
 ) -> list[dict]:
     """Return one dict per zone with local time (ISO or strftime)."""
     if now_utc.tzinfo is None:
-        now_utc = now_utc.replace(tzinfo=timezone.utc)
+        now_utc = now_utc.replace(tzinfo=UTC)
     else:
-        now_utc = now_utc.astimezone(timezone.utc)
+        now_utc = now_utc.astimezone(UTC)
 
     label_map = labels or {}
     rows: list[dict] = []
