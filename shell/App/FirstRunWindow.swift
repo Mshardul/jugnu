@@ -32,18 +32,20 @@ final class FirstRunWindowController {
 
     private func finish(installRecommended: Bool, useCommandSpace: Bool) {
         let roots = Self.recommendedLocalRoots()
-        do {
-            try model.completeFirstRun(
-                installRecommended: installRecommended,
-                useCommandSpace: useCommandSpace,
-                localAddonRoots: roots
-            )
-        } catch {
-            model.statusMessage = String(describing: error)
+        Task { @MainActor in
+            do {
+                try await model.completeFirstRun(
+                    installRecommended: installRecommended,
+                    useCommandSpace: useCommandSpace,
+                    localAddonRoots: roots
+                )
+            } catch {
+                model.statusMessage = String(describing: error)
+            }
+            window?.close()
+            window = nil
+            onDone()
         }
-        window?.close()
-        window = nil
-        onDone()
     }
 
     static func recommendedLocalRoots() -> [URL] {

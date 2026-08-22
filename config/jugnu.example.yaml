@@ -7,6 +7,8 @@ version: 1
 
 shell:
   hotkey: "option+space" # default; first-run may opt in to cmd+space
+  # Catalog the shell fetches for install/update (override if you pin a Release URL)
+  registry_url: "https://raw.githubusercontent.com/Mshardul/jugnu/main/registry/addons.json"
 
 addons:
   # Only listed + enabled addons appear in palette search.

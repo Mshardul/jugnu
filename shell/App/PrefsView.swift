@@ -48,6 +48,21 @@ struct PrefsView: View {
                 }
             }
 
+            Button("Install recommended from registry") {
+                Task {
+                    await model.installRecommendedFromRegistry()
+                    reload()
+                    if let status = model.statusMessage {
+                        errorText = status
+                    }
+                }
+            }
+
+            Text("Registry: \(model.config.shell.registryURL)")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .lineLimit(2)
+
             if let errorText {
                 Text(errorText).foregroundStyle(.red).font(.caption)
             }

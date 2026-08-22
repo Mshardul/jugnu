@@ -11,7 +11,7 @@
 **Spec:** [docs/architecture/2026-08-22-addon-ui-speed-design.md](../../architecture/2026-08-22-addon-ui-speed-design.md)  
 **Prerequisite:** [Shell MVP plan](./2026-08-22-shell-mvp.md) through **AddonRunner** + **Palette** (enough to run a command and show a toast/message). Do not implement P2 (`progress` / `status`) or P3 (context ranking) in this plan.
 
-**Inline progress (2026-08-22):** Core Tasks 1–4 done; `JugnuUI` library (toast/confirm/list/form/skeleton + `CommandInvoke`) built; demo addons under `addons/ui-demo-*` smoke-tested via stdin. **Remaining:** wire `CommandInvoke` into the Jugnu app palette once shell MVP creates the app target (manual UI checklist).
+**Inline progress (2026-08-22):** P1 complete end-to-end — Core protocol + `JugnuUI` + demo addons; app palette wires `CommandInvoke` / `UIHostController` (`shell/App/AppModel.swift`). Manual UI verified working.
 
 ## Global Constraints
 

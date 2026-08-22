@@ -113,10 +113,20 @@ final class AppModel: ObservableObject {
         return kids.map(\.lastPathComponent).sorted()
     }
 
-    func completeFirstRun(installRecommended: Bool, useCommandSpace: Bool, localAddonRoots: [URL]) throws {
+    func completeFirstRun(
+        installRecommended: Bool,
+        useCommandSpace: Bool,
+        localAddonRoots: [URL]
+    ) async throws {
         if installRecommended {
-            for root in localAddonRoots {
-                try installer.installFromDirectory(url: root, enable: true)
+            do {
+                try await installFromRegistry(ids: ShellConfig.recommendedAddonIDs)
+            } catch {
+                if localAddonRoots.isEmpty { throw error }
+                for root in localAddonRoots {
+                    try installer.installFromDirectory(url: root, enable: true)
+                }
+                statusMessage = "Registry install failed; used local addons. (\(error))"
             }
         }
         if useCommandSpace {
@@ -130,6 +140,38 @@ final class AppModel: ObservableObject {
         refreshIndex()
     }
 
+    /// Fetch catalog and install entries by id (sha256-verified zip download).
+    @discardableResult
+    func installFromRegistry(ids: [String]) async throws -> [String] {
+        config = (try? store.loadOrCreateDefaults()) ?? config
+        guard let url = URL(string: config.shell.registryURL) else {
+            throw RegistryInstallError.invalidRegistryURL(config.shell.registryURL)
+        }
+        let entries = try await RegistryClient().fetch(from: url)
+        let wanted = Set(ids)
+        var installed: [String] = []
+        for entry in entries where wanted.contains(entry.id) {
+            guard !entry.url.isEmpty else { continue }
+            try await installer.install(entry: entry, enable: true)
+            installed.append(entry.id)
+        }
+        if installed.isEmpty {
+            throw RegistryInstallError.noMatchingEntries(ids)
+        }
+        refreshIndex()
+        return installed
+    }
+
+    func installRecommendedFromRegistry() async {
+        statusMessage = nil
+        do {
+            let ids = try await installFromRegistry(ids: ShellConfig.recommendedAddonIDs)
+            statusMessage = "Installed from registry: \(ids.joined(separator: ", "))"
+        } catch {
+            statusMessage = String(describing: error)
+        }
+    }
+
     private static func devRoots() -> [URL] {
         var roots: [URL] = []
         if let env = ProcessInfo.processInfo.environment["JUGNU_ADDON_PATH"], !env.isEmpty {
@@ -139,4 +181,9 @@ final class AppModel: ObservableObject {
         }
         return roots
     }
+}
+
+enum RegistryInstallError: Error, Equatable {
+    case invalidRegistryURL(String)
+    case noMatchingEntries([String])
 }

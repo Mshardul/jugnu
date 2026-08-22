@@ -18,6 +18,7 @@ Nothing here is bundled inside `Jugnu.app`. Users install zips into `~/.local/sh
 | `pomodoro` | work / break timer with notification |
 | `floating-note` | always-on-top scratchpad (`note` UI pattern) |
 | `clipboard-history` | searchable clipboard history (background watcher + sqlite) |
+| `ports` | list listening ports (common dev ports first), kill by pid/port |
 | `ui-demo-*` | UI host demos (confirm / list / form) |
 
 Package: `scripts/package-addon.sh addons/<id> dist/`

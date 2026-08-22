@@ -8,7 +8,7 @@ Architecture decisions are recorded in [decisions/](decisions/).
 |---|---|
 | [2026-08-22 Shell design](./2026-08-22-shell-design.md) | Approved |
 | [2026-08-22 Addon UI host + speed](./2026-08-22-addon-ui-speed-design.md) | Approved |
-| [Addon UI host P1 plan](../superpowers/plans/2026-08-22-addon-ui-host-p1.md) | Implementation plan |
+| [Addon UI host P1 plan](../superpowers/plans/2026-08-22-addon-ui-host-p1.md) | Done (app wired) |
 | [Shell MVP plan](../superpowers/plans/2026-08-22-shell-mvp.md) | Done (Core + Xcode app; see [smoke](./shell-smoke.md)) |
 | [Shell smoke checklist](./shell-smoke.md) | Automated items verified; manual UI checklist remains |
 | Context-aware UI (screen/selection) | Later — reserved in UI+speed §7 |

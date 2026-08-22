@@ -1,0 +1,117 @@
+#!/bin/bash
+set -euo pipefail
+
+# Common dev-server ports surfaced first (folds gap "dev-server / common-ports bar").
+COMMON_PORTS=(3000 3001 4000 5000 5173 5174 8000 8080 8081 4200 9000 5432 3306 6379 27017)
+
+STATE_DIR="$HOME/.local/share/jugnu/state/ports"
+PENDING="$STATE_DIR/pending-kill"
+mkdir -p "$STATE_DIR"
+
+req=$(cat)
+
+json_get_str() {
+  printf '%s' "$1" | sed -n -E "s/.*\"$2\"[[:space:]]*:[[:space:]]*\"((\\\\.|[^\"\\\\])*)\".*/\1/p" | head -n1
+}
+
+json_get_bool() {
+  printf '%s' "$1" | grep -q "\"$2\"[[:space:]]*:[[:space:]]*true"
+}
+
+item_id=$(json_get_str "$req" "itemId")
+confirmed=false
+if json_get_bool "$req" "confirmed"; then
+  confirmed=true
+fi
+
+is_common_port() {
+  local p="$1"
+  for c in "${COMMON_PORTS[@]}"; do
+    [[ "$p" == "$c" ]] && return 0
+  done
+  return 1
+}
+
+emit_list() {
+  local lsof_out
+  lsof_out=$(/usr/sbin/lsof -iTCP -sTCP:LISTEN -P -n 2>/dev/null | tail -n +2) || true
+
+  if [[ -z "$lsof_out" ]]; then
+    echo '{"ok":true,"ui":{"pattern":"list","title":"Listening ports","items":[]}}'
+    return
+  fi
+
+  local common_items=()
+  local other_items=()
+  local seen=""
+
+  while IFS= read -r line; do
+    local proc pid port
+    proc=$(awk '{print $1}' <<<"$line")
+    pid=$(awk '{print $2}' <<<"$line")
+    port=$(awk '{print $9}' <<<"$line" | sed -E 's/.*://')
+
+    [[ -z "$pid" || -z "$port" ]] && continue
+
+    local key="${pid}:${port}"
+    [[ "$seen" == *"|${key}|"* ]] && continue
+    seen="${seen}|${key}|"
+
+    local id title subtitle
+    id="${pid}:${port}"
+    title="${proc} — port ${port}"
+    subtitle="pid ${pid}"
+
+    local escaped_title escaped_subtitle
+    escaped_title=$(printf '%s' "$title" | sed 's/\\/\\\\/g; s/"/\\"/g')
+    escaped_subtitle=$(printf '%s' "$subtitle" | sed 's/\\/\\\\/g; s/"/\\"/g')
+
+    local item="{\"id\":\"${id}\",\"title\":\"${escaped_title}\",\"subtitle\":\"${escaped_subtitle}\"}"
+
+    if is_common_port "$port"; then
+      common_items+=("$item")
+    else
+      other_items+=("$item")
+    fi
+  done <<<"$lsof_out"
+
+  local all=("${common_items[@]}" "${other_items[@]}")
+  local items
+  items=$(IFS=,; echo "${all[*]}")
+
+  echo "{\"ok\":true,\"ui\":{\"pattern\":\"list\",\"title\":\"Listening ports\",\"items\":[${items}]}}"
+}
+
+# The confirm follow-up only ever sends {"confirmed":true} — no itemId — so
+# the pid/port picked at select time is stashed to disk and read back here.
+if [[ "$confirmed" == true ]]; then
+  if [[ ! -f "$PENDING" ]]; then
+    echo '{"ok":false,"error":"no pending kill"}'
+    exit 0
+  fi
+  pending=$(cat "$PENDING")
+  rm -f "$PENDING"
+  pid="${pending%%:*}"
+  port="${pending##*:}"
+  if kill -9 "$pid" 2>/dev/null; then
+    echo "{\"ok\":true,\"message\":\"killed pid ${pid} (port ${port})\"}"
+  else
+    echo "{\"ok\":false,\"error\":\"failed to kill pid ${pid}\"}"
+  fi
+  exit 0
+fi
+
+if [[ -n "$item_id" ]]; then
+  if [[ ! "$item_id" =~ ^[0-9]+:[0-9]+$ ]]; then
+    echo '{"ok":false,"error":"invalid itemId"}'
+    exit 0
+  fi
+  pid="${item_id%%:*}"
+  port="${item_id##*:}"
+  printf '%s' "$item_id" > "$PENDING"
+
+  echo "{\"ok\":true,\"ui\":{\"pattern\":\"confirm\",\"title\":\"Kill process?\",\"message\":\"Kill pid ${pid} listening on port ${port}?\",\"confirmLabel\":\"Kill\",\"cancelLabel\":\"Cancel\"}}"
+  exit 0
+fi
+
+emit_list

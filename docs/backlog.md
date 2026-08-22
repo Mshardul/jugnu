@@ -9,7 +9,7 @@ Status legend for staged leaves: **active** = runnable code; **stub** = README o
 | 1 | Shell + YAML addon enablement | Design before scaffold — see `docs/architecture/` |
 | 2 | Dual clipboard modes | Ephemeral vs history; privacy-aware; build on `apps/clipboard-history` |
 | 3 | Robust window management | Absorb `window-layouts` / `layout-save` stubs into a real first-party addon |
-| 4 | Addon **popup UI** host | [UI + speed design](architecture/2026-08-22-addon-ui-speed-design.md) (Approved) · [P1 plan](superpowers/plans/2026-08-22-addon-ui-host-p1.md) |
+| 4 | Addon **popup UI** host | [UI + speed design](architecture/2026-08-22-addon-ui-speed-design.md) (Approved) · [P1 plan](superpowers/plans/2026-08-22-addon-ui-host-p1.md) **done** |
 | 5 | **Speed** budget | Invoke → visible result; budgets in that design §6 |
 | 6 | Context-aware UI (later) | Reserved in UI + speed §7 — after UI host exists |
 
@@ -24,7 +24,7 @@ Not yet staged as leaves. Candidates after shell MVP:
 3. Webcam mute
 4. AirPods / BT battery bar
 5. Claude/agent mission control (lite)
-6. Dev-server / common-ports bar
+6. ~~Dev-server / common-ports bar~~ done → `addons/ports`
 7. Screenshot inbox
 8. Paste plain / strip formatting (or fold into paste-transform) — also accepted as **paste-as-plain** under clip-tools
 9. Kill hung app picker
@@ -90,7 +90,7 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | Meeting | **meeting-join** | clipboard URL → join; **meeting-app-pick** | Join + app chooser form |
 | Network | **hosts** | named blocks on/off; **hosts-backup** / restore | Own power-user job + safety |
 | Network | **ping** | ping host from clipboard/typed | Own or net-info w/ copy-ip |
-| Network | **port-scan-local** | list listeners on this Mac | Overlaps port-picker / gap common-ports — one surface when building |
+| Network | **ports** | list listeners, kill by pid/port (folds port-scan-local, port-picker, gap common-ports) | `addons/ports` — one surface |
 | Network | **http-status** | HEAD/GET status + timing; **http-headers** (+ copy as markdown / other probe views) | Own; may later share **net-probe** w/ ping |
 | Dev | **git-root** | reveal git root of front path | Own or near repo-jumper |
 | Dev | **open-url** | open clipboard URL in chosen browser; **open-url-profile** | Browser + profile chooser |
@@ -153,7 +153,7 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | hosts | Enable/disable named `/etc/hosts` blocks | Own addon |
 | hosts-backup | Snapshot `/etc/hosts` before toggle; restore prior snapshot | **hosts** |
 | ping | Ping host from clipboard or typed input | Own or net-info w/ copy-ip |
-| port-scan-local | List listening ports on this Mac | Prefer merge w/ **port-picker** / gap common-ports when building |
+| port-scan-local | List listening ports on this Mac | Merged into **ports** (`addons/ports`) |
 | git-root | Reveal git root of front Finder/Terminal path | Own or near **repo-jumper** |
 | open-url | Open clipboard URL in a chosen browser | Own addon |
 | open-url-profile | Open URL in a chosen browser *profile* (Chrome/Safari/…) | **open-url** |
@@ -354,7 +354,7 @@ versions here stay as reference implementations, not shipped.
 | layout-save | stub | Fold into window-layouts (feeds layout-undo) |
 | meeting-bar | stub | Meeting/device QoL |
 | paste-transform | stub | Paste plain / transforms; clip-tools host for converters |
-| port-picker | stub | Dev-ops; may wrap Tools `port-tool` |
+| port-picker | superseded | Folded into `addons/ports` (list + kill; no longer wraps Tools `port-tool`) |
 | trash-ui | stub | May wrap Tools `trash`; + trash-put-back |
 | color-eyedropper | stub | Utility addon; absorb color-format commands |
 | qr-clip | stub | May wrap Tools `qr-encode`; + qr-decode |

@@ -10,7 +10,21 @@ final class ConfigStoreTests: XCTestCase {
         let store = ConfigStore(paths: JugnuPaths(home: dir))
         let config = try store.loadOrCreateDefaults()
         XCTAssertEqual(config.shell.hotkey, "option+space")
+        XCTAssertEqual(config.shell.registryURL, ShellConfig.defaultRegistryURL)
         XCTAssertTrue(FileManager.default.fileExists(atPath: store.paths.configFile.path))
+    }
+
+    func testRoundTripRegistryURL() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+
+        let store = ConfigStore(paths: JugnuPaths(home: dir))
+        var config = try store.loadOrCreateDefaults()
+        config.shell.registryURL = "https://example.com/addons.json"
+        try store.save(config)
+        let loaded = try store.load()
+        XCTAssertEqual(loaded.shell.registryURL, "https://example.com/addons.json")
     }
 
     func testRoundTripEnableFlag() throws {
