@@ -53,6 +53,7 @@ Every command maps to one primary pattern (declared or returned):
 | **`confirm`** | Destructive / irreversible | empty-trash, sleep-now, hosts write |
 | **`list`** | Pick one/many from rows (searchable) | process-find, emoji-picker, settings-jump, favorite-folders |
 | **`form`** | Few fields then run | password-options, regex-replace recipe, http-status options |
+| **`note`** | Persistent editable text, stays open across saves | floating-note (added post-P1; ships in `JugnuCore`/`JugnuUI` alongside confirm/list/form) |
 | **`progress`** | Multi-second work with cancel | large-files scan, brew-cleanup, time-machine start |
 | **`status`** | Ongoing menu-bar affordance | mute-status, memory-pressure, brew-outdated |
 

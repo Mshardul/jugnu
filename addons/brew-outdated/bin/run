@@ -1,0 +1,48 @@
+#!/usr/bin/env osascript -l JavaScript
+
+function readStdin() {
+  const data = $.NSFileHandle.fileHandleWithStandardInput.readDataToEndOfFile
+  return ObjC.unwrap($.NSString.alloc.initWithDataEncoding(data, $.NSUTF8StringEncoding))
+}
+
+function run(argv) {
+  readStdin() // request payload unused; brew-outdated takes no args
+
+  const app = Application.currentApplication()
+  app.includeStandardAdditions = true
+
+  let text
+  try {
+    text = app.doShellScript("/opt/homebrew/bin/brew outdated --json=v2 2>/dev/null || /usr/local/bin/brew outdated --json=v2 2>/dev/null")
+  } catch (e) {
+    return JSON.stringify({ ok: false, error: "brew-outdated: " + e.message })
+  }
+
+  let data
+  try {
+    data = JSON.parse(text)
+  } catch (e) {
+    return JSON.stringify({ ok: false, error: "brew-outdated: invalid brew JSON" })
+  }
+
+  const names = (key) => (data[key] || []).map((it) => (it && it.name) ? String(it.name) : String(it))
+  const formulae = names("formulae")
+  const casks = names("casks")
+  const count = formulae.length + casks.length
+
+  if (count === 0) {
+    return JSON.stringify({ ok: true, message: "0 outdated" })
+  }
+
+  const items = formulae.map((n) => ({ id: "formula:" + n, title: n, subtitle: "formula" }))
+    .concat(casks.map((n) => ({ id: "cask:" + n, title: n, subtitle: "cask" })))
+
+  return JSON.stringify({
+    ok: true,
+    ui: {
+      pattern: "list",
+      title: count + " outdated",
+      items: items
+    }
+  })
+}

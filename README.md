@@ -8,7 +8,7 @@ Jugnu (Hindi: *firefly*) is a Mac command platform — meant to replace Spotligh
 |---|---|
 | **App** | Jugnu |
 | **Repo / CLI** | `jugnu` |
-| **Status** | Shell MVP in progress — Core + menu bar app |
+| **Status** | Shell MVP + addon UI host — Core + `Jugnu` app (SPM), 7 native addons shipped |
 | **License** | [MIT](LICENSE) |
 
 ## Shell (Swift)
@@ -17,7 +17,7 @@ Jugnu (Hindi: *firefly*) is a Mac command platform — meant to replace Spotligh
 cd shell
 export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
 swift test
-swift run Jugnu
+swift run Jugnu   # or open Package.swift in Xcode, select the Jugnu scheme
 ```
 
 See [`shell/README.md`](shell/README.md) and smoke checklist [`docs/architecture/shell-smoke.md`](docs/architecture/shell-smoke.md).
@@ -75,11 +75,13 @@ addons/               # first-party addon sources (one zip each)
 
 ## What’s here today
 
-**Implemented (Python CLI / small apps):** clipboard-history, battery-eta, brew-outdated, floating-note, pomodoro, weather-bar, world-clock; macos helpers: airdrop-folder, focus-toggle, mic-mute, open-terminal-here, quarantine-clear.
+**Graduated to native addons** (`addons/`): clipboard-history, battery-eta, brew-outdated, floating-note, pomodoro, weather-bar, world-clock — rewritten as shell/JXA `exec` entrypoints (no user Python) alongside mic-mute, focus-toggle, paste-plain. The `apps/` Python versions remain as reference implementations, not shipped.
+
+**macOS helpers (`extensions/macos/`, active, not yet addon-wrapped):** airdrop-folder, focus-toggle, mic-mute, open-terminal-here, quarantine-clear.
 
 **Stubs (README only):** tools-palette, window-layouts, layout-save, meeting-bar, paste-transform, port-picker, and other planned leaves — see [backlog](docs/backlog.md).
 
-There is **no** hotkey shell, YAML addon runtime, or native app binary yet.
+Hotkey shell, YAML addon runtime, and the addon UI host (toast/confirm/list/form/note) are built and tested (`shell/`); no GitHub Release / registry entries are published yet, so install today is via the dev `JUGNU_ADDON_PATH` override.
 
 ## Out of scope (for now)
 

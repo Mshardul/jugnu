@@ -1,0 +1,38 @@
+#!/bin/bash
+# Background pasteboard watcher. Started/kept alive via launchd (see
+# addon.yaml cleanup.launchd + com.jugnu.clipboard-history.watch.plist).
+set -euo pipefail
+
+DB_DIR="$HOME/.local/share/jugnu/state/clipboard-history"
+DB="$DB_DIR/history.db"
+mkdir -p "$DB_DIR"
+
+sqlite3 "$DB" <<'SQL'
+CREATE TABLE IF NOT EXISTS entries (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  ts REAL NOT NULL,
+  text TEXT NOT NULL,
+  pinned INTEGER NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS idx_entries_ts ON entries(ts DESC);
+SQL
+
+MAX_BYTES=200000
+last_text=""
+first_iteration=1
+
+while true; do
+  text=$(pbpaste 2>/dev/null || true)
+  size=$(printf '%s' "$text" | wc -c | tr -d ' ')
+
+  if [[ "$size" -le "$MAX_BYTES" ]] && [[ -n "$text" ]] && [[ "$text" != "$last_text" || "$first_iteration" == "1" ]]; then
+    if [[ "$text" != "$last_text" ]]; then
+      ts=$(date +%s)
+      escaped=$(printf '%s' "$text" | sed "s/'/''/g")
+      sqlite3 "$DB" "INSERT INTO entries (ts, text, pinned) VALUES (${ts}, '${escaped}', 0);"
+      last_text="$text"
+    fi
+  fi
+  first_iteration=0
+  sleep 1
+done

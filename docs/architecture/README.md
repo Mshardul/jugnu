@@ -9,8 +9,8 @@ Architecture decisions are recorded in [decisions/](decisions/).
 | [2026-08-22 Shell design](./2026-08-22-shell-design.md) | Approved |
 | [2026-08-22 Addon UI host + speed](./2026-08-22-addon-ui-speed-design.md) | Approved |
 | [Addon UI host P1 plan](../superpowers/plans/2026-08-22-addon-ui-host-p1.md) | Implementation plan |
-| [Shell MVP plan](../superpowers/plans/2026-08-22-shell-mvp.md) | Active — Core + app in `shell/` |
-| [Shell smoke checklist](./shell-smoke.md) | Manual verification |
+| [Shell MVP plan](../superpowers/plans/2026-08-22-shell-mvp.md) | Done (Core + Xcode app; see [smoke](./shell-smoke.md)) |
+| [Shell smoke checklist](./shell-smoke.md) | Automated items verified; manual UI checklist remains |
 | Context-aware UI (screen/selection) | Later — reserved in UI+speed §7 |
 | Addons packaging (detail) | Follow-on if needed beyond shell spec §2 |
 | Catalog taxonomy (categories ↔ addons / commands) | Product intent in [vision — Catalog hierarchy](../vision.md); registry `category` field TBD |

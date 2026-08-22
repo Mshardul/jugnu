@@ -1,0 +1,78 @@
+#!/bin/bash
+set -euo pipefail
+# Read and discard JSON request (api 1).
+cat >/dev/null
+
+# Default location: edit lat/lon/label to customize (addon-local config).
+LAT="19.07"
+LON="72.88"
+LABEL="Mumbai"
+
+json_num() {
+  # json_num <json> <key> — extract a bare numeric value for "key":value
+  printf '%s' "$1" | sed -n -E "s/.*\"$2\":(-?[0-9]+(\.[0-9]+)?).*/\1/p" | head -n1
+}
+
+weather_label() {
+  case "$1" in
+    0) echo "Clear sky" ;;
+    1) echo "Mainly clear" ;;
+    2) echo "Partly cloudy" ;;
+    3) echo "Overcast" ;;
+    45) echo "Fog" ;;
+    48) echo "Depositing rime fog" ;;
+    51) echo "Light drizzle" ;;
+    53) echo "Drizzle" ;;
+    55) echo "Dense drizzle" ;;
+    56) echo "Light freezing drizzle" ;;
+    57) echo "Freezing drizzle" ;;
+    61) echo "Rain" ;;
+    63) echo "Moderate rain" ;;
+    65) echo "Heavy rain" ;;
+    66) echo "Light freezing rain" ;;
+    67) echo "Freezing rain" ;;
+    71) echo "Snow" ;;
+    73) echo "Moderate snow" ;;
+    75) echo "Heavy snow" ;;
+    77) echo "Snow grains" ;;
+    80) echo "Rain showers" ;;
+    81) echo "Moderate rain showers" ;;
+    82) echo "Violent rain showers" ;;
+    85) echo "Snow showers" ;;
+    86) echo "Heavy snow showers" ;;
+    95) echo "Thunderstorm" ;;
+    96) echo "Thunderstorm with hail" ;;
+    99) echo "Thunderstorm with heavy hail" ;;
+    *) echo "Unknown" ;;
+  esac
+}
+
+url="https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,weather_code,wind_speed_10m"
+
+if ! body=$(curl -fsS --max-time 10 "$url" 2>/tmp/weather-bar-err); then
+  err=$(cat /tmp/weather-bar-err 2>/dev/null | tr -d '\n' | sed 's/\\/\\\\/g; s/"/\\"/g')
+  echo "{\"ok\":false,\"error\":\"weather-bar: ${err:-request failed}\"}"
+  exit 0
+fi
+
+current=$(printf '%s' "$body" | sed -n -E 's/.*"current":\{([^}]*)\}.*/\1/p')
+if [[ -z "$current" ]]; then
+  echo '{"ok":false,"error":"weather-bar: forecast response missing current block"}'
+  exit 0
+fi
+
+temp_c=$(json_num "$current" "temperature_2m")
+code=$(json_num "$current" "weather_code")
+
+if [[ -z "$temp_c" || -z "$code" ]]; then
+  echo '{"ok":false,"error":"weather-bar: forecast response missing fields"}'
+  exit 0
+fi
+
+temp_rounded=$(printf '%.0f' "$temp_c")
+desc=$(weather_label "${code%.*}")
+
+message="${temp_rounded}°C ${desc} · ${LABEL}"
+escaped=$(printf '%s' "$message" | sed 's/\\/\\\\/g; s/"/\\"/g')
+
+echo "{\"ok\":true,\"message\":\"${escaped}\"}"

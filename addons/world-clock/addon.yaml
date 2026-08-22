@@ -1,0 +1,17 @@
+id: world-clock
+name: World Clock
+version: 1.0.0
+api: 1
+commands:
+  - id: show
+    title: World clock
+    subtitle: Current time across configured zones
+    keywords: [time, clock, zone, timezone, world]
+    ui:
+      pattern: list
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths: []
+  launchd: []

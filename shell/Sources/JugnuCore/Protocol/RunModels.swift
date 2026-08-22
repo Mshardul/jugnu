@@ -4,6 +4,7 @@ public enum UIPattern: String, Codable, Sendable, Equatable {
     case list
     case form
     case confirm
+    case note
 }
 
 /// Minimal JSON value for `args` / `context` / form fields.
@@ -86,6 +87,8 @@ public struct UIDescriptor: Codable, Sendable, Equatable {
     public var fields: [UIFormField]?
     public var confirmLabel: String?
     public var cancelLabel: String?
+    /// `.note` pattern: initial editable text content.
+    public var content: String?
 
     public init(
         pattern: UIPattern,
@@ -95,7 +98,8 @@ public struct UIDescriptor: Codable, Sendable, Equatable {
         items: [UIListItem]? = nil,
         fields: [UIFormField]? = nil,
         confirmLabel: String? = nil,
-        cancelLabel: String? = nil
+        cancelLabel: String? = nil,
+        content: String? = nil
     ) {
         self.pattern = pattern
         self.title = title
@@ -105,6 +109,7 @@ public struct UIDescriptor: Codable, Sendable, Equatable {
         self.fields = fields
         self.confirmLabel = confirmLabel
         self.cancelLabel = cancelLabel
+        self.content = content
     }
 }
 

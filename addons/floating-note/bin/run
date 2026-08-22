@@ -1,0 +1,41 @@
+#!/bin/bash
+set -euo pipefail
+
+NOTE_DIR="$HOME/.local/share/jugnu/state/floating-note"
+NOTE_FILE="$NOTE_DIR/note.txt"
+mkdir -p "$NOTE_DIR"
+
+req=$(cat)
+
+# JSON-escape a string for embedding in a JSON string literal (backslash,
+# double-quote, and embedded newlines only — sufficient for plain-text notes).
+json_escape() {
+  printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g' | awk '{printf "%s\\n", $0}' | sed 's/\\n$//'
+}
+
+# Extract the "content" arg from the incoming request, if present. Values are
+# JSON string-encoded; unescape \" \\ \n minimally (addon-local, no full parser).
+content_arg=$(printf '%s' "$req" | sed -n -E 's/.*"content":"((\\.|[^"\\])*)".*/\1/p')
+
+if [[ -n "${content_arg+x}" && "$req" == *'"content"'* ]]; then
+  # Save path: unescape (order matters — protect \\ with a sentinel before
+  # expanding \n and \", so "\\n" round-trips as a literal backslash-n, not
+  # a newline) and write to file.
+  unescaped=$(printf '%s' "$content_arg" \
+    | sed 's/\\\\/\x01/g' \
+    | sed 's/\\n/\n/g; s/\\"/"/g' \
+    | sed 's/\x01/\\/g')
+  printf '%s' "$unescaped" > "$NOTE_FILE"
+  echo '{"ok":true,"message":"saved"}'
+  exit 0
+fi
+
+# Open path: return current content as a note UI.
+if [[ -f "$NOTE_FILE" ]]; then
+  current=$(cat "$NOTE_FILE")
+else
+  current=""
+fi
+escaped=$(json_escape "$current")
+
+echo "{\"ok\":true,\"ui\":{\"pattern\":\"note\",\"title\":\"Scratch\",\"content\":\"${escaped}\"}}"

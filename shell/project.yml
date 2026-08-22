@@ -1,0 +1,51 @@
+name: Jugnu
+options:
+  bundleIdPrefix: app.jugnu
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+settings:
+  BASE_SDK: macosx
+  SWIFT_VERSION: "5.9"
+packages:
+  JugnuLocal:
+    path: .
+  HotKey:
+    url: https://github.com/soffes/HotKey
+    from: "0.2.0"
+targets:
+  Jugnu:
+    type: application
+    platform: macOS
+    sources:
+      - path: App
+        excludes:
+          - Info.plist
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: app.jugnu.shell
+      PRODUCT_NAME: Jugnu
+      MARKETING_VERSION: "0.1.0"
+      CURRENT_PROJECT_VERSION: "1"
+      GENERATE_INFOPLIST_FILE: NO
+      INFOPLIST_FILE: App/Info.plist
+      LD_RUNPATH_SEARCH_PATHS:
+        - "$(inherited)"
+        - "@executable_path/../Frameworks"
+      ENABLE_HARDENED_RUNTIME: YES
+      CODE_SIGN_IDENTITY: "-"
+      CODE_SIGNING_ALLOWED: YES
+      CODE_SIGNING_REQUIRED: NO
+    dependencies:
+      - package: JugnuLocal
+        product: JugnuCore
+      - package: JugnuLocal
+        product: JugnuUI
+      - package: HotKey
+        product: HotKey
+schemes:
+  Jugnu:
+    build:
+      targets:
+        Jugnu: all
+    run:
+      config: Debug

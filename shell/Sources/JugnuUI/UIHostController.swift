@@ -25,6 +25,8 @@ public final class UIHostController {
                 showList(ui, commandId: commandId, followUp: followUp)
             case .form:
                 showForm(ui, commandId: commandId, followUp: followUp)
+            case .note:
+                showNote(ui, commandId: commandId, followUp: followUp)
             }
             return
         }
@@ -162,6 +164,31 @@ public final class UIHostController {
             },
             onCancel: { [weak self] in
                 self?.dismissActive()
+            }
+        )
+        activePanel = panel
+        panel.orderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+        markPaintAndContent()
+    }
+
+    private func showNote(
+        _ ui: UIDescriptor,
+        commandId: String,
+        followUp: @escaping (RunRequest) async throws -> RunResponse
+    ) {
+        dismissActive(markDismiss: false)
+        let panel = NotePanel(
+            ui: ui,
+            onSave: { content in
+                Task {
+                    let req = RunJSON.followUpRequest(command: commandId, args: ["content": .string(content)])
+                    _ = try? await followUp(req)
+                }
+            },
+            onClose: { [weak self] in
+                self?.activePanel = nil
+                self?.activeTrace?.markDismiss()
             }
         )
         activePanel = panel

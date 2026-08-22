@@ -11,6 +11,13 @@ Nothing here is bundled inside `Jugnu.app`. Users install zips into `~/.local/sh
 | `mic-mute` | toggle mic input volume |
 | `focus-toggle` | Focus / DND (Shortcuts or Control Center) |
 | `paste-plain` | clipboard → plain text |
+| `battery-eta` | battery percent, charging state, ETA |
+| `world-clock` | current time across configured zones |
+| `weather-bar` | current temperature and conditions |
+| `brew-outdated` | outdated Homebrew formulae and casks |
+| `pomodoro` | work / break timer with notification |
+| `floating-note` | always-on-top scratchpad (`note` UI pattern) |
+| `clipboard-history` | searchable clipboard history (background watcher + sqlite) |
 | `ui-demo-*` | UI host demos (confirm / list / form) |
 
 Package: `scripts/package-addon.sh addons/<id> dist/`

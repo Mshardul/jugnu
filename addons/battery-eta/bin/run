@@ -1,0 +1,61 @@
+#!/bin/bash
+set -euo pipefail
+# Read and discard JSON request (api 1).
+cat >/dev/null
+
+text=$(pmset -g batt)
+
+source=$(printf '%s\n' "$text" | sed -n "s/.*Now drawing from '\([^']*\)'.*/\1/p" | head -n1)
+
+battery_line=$(printf '%s\n' "$text" | grep '%;' | head -n1 || true)
+
+percent=""
+status=""
+eta=""
+
+if [[ -n "$battery_line" ]]; then
+  percent=$(printf '%s\n' "$battery_line" | sed -n 's/.*[[:space:]]\([0-9][0-9]*\)%;.*/\1/p')
+  rest=$(printf '%s\n' "$battery_line" | sed -n 's/.*[0-9][0-9]*%;[[:space:]]*\(.*\)/\1/p')
+  rest=$(printf '%s\n' "$rest" | sed -E 's/[[:space:]]*present:[[:space:]]*(true|false)[[:space:]]*$//')
+
+  status=$(printf '%s\n' "$rest" | awk -F';' '{gsub(/^ +| +$/, "", $1); print tolower($1)}')
+
+  mid=$(printf '%s\n' "$rest" | awk -F';' '{if (NF>1) {gsub(/^ +| +$/, "", $2); print $2}}')
+  if [[ -n "$mid" ]]; then
+    if printf '%s' "$mid" | grep -qi 'no estimate'; then
+      eta=""
+    else
+      eta=$(printf '%s\n' "$mid" | sed -n -E 's/.*([0-9]+:[0-9]{2}).*/\1/p')
+    fi
+  fi
+fi
+
+# Build human one-liner (matches format_status logic).
+if [[ -n "$percent" && -n "$status" ]]; then
+  if [[ "$status" == "charging" && -n "$eta" ]]; then
+    core="${percent}% ${status}, ${eta} until full"
+  elif [[ "$status" == "discharging" && -n "$eta" ]]; then
+    core="${percent}% ${status}, ${eta} remaining"
+  else
+    core="${percent}% ${status}"
+  fi
+elif [[ -n "$percent" ]]; then
+  core="${percent}%"
+elif [[ -n "$status" ]]; then
+  core="$status"
+elif [[ -n "$source" ]]; then
+  core="$source"
+else
+  core="unknown"
+fi
+
+if [[ -n "$source" && "$core" != "$source" ]]; then
+  message="${core} (${source})"
+else
+  message="$core"
+fi
+
+# JSON-escape the message (backslash and double-quote only; content is plain ASCII).
+escaped=$(printf '%s' "$message" | sed 's/\\/\\\\/g; s/"/\\"/g')
+
+echo "{\"ok\":true,\"message\":\"${escaped}\"}"

@@ -336,15 +336,19 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 
 ## Staged leaves — `apps/`
 
+7 of these leaves have graduated to native addons under `addons/` (rewritten as
+`exec`/JXA entrypoints — no user Python; see `addons/README.md`). The Python
+versions here stay as reference implementations, not shipped.
+
 | Leaf | Status | Role for Jugnu |
 |---|---|---|
-| clipboard-history | active | Core input for clipboard addon |
-| battery-eta | active | Menu-bar / status candidate |
-| brew-outdated | active | Dev-ops menu bar; brew-services, brew-cleanup, doctor/update siblings |
-| floating-note | active | First-party QoL; + note-pin |
-| pomodoro | active | First-party QoL; skip/extend/log and other session controls |
-| weather-bar | active | Menu-bar candidate |
-| world-clock | active | Menu-bar / palette; + world-overlap |
+| clipboard-history | graduated → `addons/clipboard-history` | Background launchd watcher + sqlite3 CLI store; list UI, copy-back |
+| battery-eta | graduated → `addons/battery-eta` | `pmset` parse; toast |
+| brew-outdated | graduated → `addons/brew-outdated` | JXA (`osascript -l JavaScript`) for real JSON parsing; list UI |
+| floating-note | graduated → `addons/floating-note` | New `note` UI pattern (always-on-top editable panel) added to `JugnuCore`/`JugnuUI` for this |
+| pomodoro | graduated → `addons/pomodoro` | Fire-and-forget background timer + notification; state file |
+| weather-bar | graduated → `addons/weather-bar` | `curl` + Open-Meteo; toast |
+| world-clock | graduated → `addons/world-clock` | Fixed zone list in script; list UI |
 | tools-palette | stub | Nursery CLI runner — evolves into shell search surface or thin addon |
 | window-layouts | stub | Window family; layout-undo, tile-two, and other layout ops |
 | layout-save | stub | Fold into window-layouts (feeds layout-undo) |

@@ -14,22 +14,32 @@ export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
 swift test
 ```
 
-## Run the menu bar app
+## Jugnu.app (Xcode)
+
+Project: `Jugnu.xcodeproj` (generated from `project.yml` via [XcodeGen](https://github.com/yonaskolb/XcodeGen)).
 
 ```bash
 cd shell
-export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
-# Optional: load unpacked addons from the repo during development
-export JUGNU_ADDON_PATH="$(pwd)/../addons/mic-mute:$(pwd)/../addons/focus-toggle:$(pwd)/../addons/paste-plain"
-swift run Jugnu
+# regenerate after editing project.yml:
+xcodegen generate
+open Jugnu.xcodeproj
+# or:
+xcodebuild -project Jugnu.xcodeproj -scheme Jugnu -configuration Debug \
+  CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO build
 ```
 
-Or open `shell/Package.swift` in Xcode, select the **Jugnu** scheme, Run.
+`App/Info.plist` sets `LSUIElement` (agent app, no Dock icon). HotKey is linked from the app target.
 
-`App/Info.plist` sets `LSUIElement` for packaging; the process also uses `.accessory` activation (no Dock icon).
+Dev addons without install:
 
-Point `xcode-select` at Xcode once so `swift test` works without `DEVELOPER_DIR`:
+```bash
+export JUGNU_ADDON_PATH="$(pwd)/../addons/mic-mute:$(pwd)/../addons/focus-toggle:$(pwd)/../addons/paste-plain"
+```
+
+Point `xcode-select` at Xcode once:
 
 ```bash
 sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 ```
+
+Smoke: [`docs/architecture/shell-smoke.md`](../docs/architecture/shell-smoke.md)

@@ -1,0 +1,26 @@
+#!/bin/bash
+set -euo pipefail
+# Read and discard JSON request (api 1).
+cat >/dev/null
+
+# Zones + optional labels: edit this list to customize (addon-local config,
+# no external YAML parser needed for a handful of fixed zones).
+zones=(
+  "UTC|UTC"
+  "America/New_York|New York"
+  "Europe/London|London"
+  "Asia/Kolkata|Mumbai"
+)
+
+items=""
+for entry in "${zones[@]}"; do
+  zone="${entry%%|*}"
+  label="${entry#*|}"
+  time_str=$(TZ="$zone" date "+%Y-%m-%d %H:%M %Z" 2>/dev/null) || continue
+  if [[ -n "$items" ]]; then
+    items+=","
+  fi
+  items+="{\"id\":\"${zone}\",\"title\":\"${label}\",\"subtitle\":\"${time_str}\"}"
+done
+
+echo "{\"ok\":true,\"ui\":{\"pattern\":\"list\",\"title\":\"World Clock\",\"items\":[${items}]}}"

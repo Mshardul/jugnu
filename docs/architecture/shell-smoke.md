@@ -1,9 +1,16 @@
-# Shell MVP — manual smoke checklist
+# Shell MVP — smoke checklist
 
-1. `cd shell && export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer && swift test` — all green  
-2. `swift run Jugnu` — menu bar shows **Jugnu**  
-3. Option+Space (or menu **Open Palette**) opens the palette  
-4. First-run: install recommended addons (or set `JUGNU_ADDON_PATH` to repo `addons/*`) and run mic-mute / focus-toggle / paste-plain  
-5. Preferences: disable removes commands from palette; uninstall removes files + declared cleanup  
+## Automated (verified 2026-08-22)
+
+- [x] `cd shell && export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer && swift test` — 19/19 green  
+- [x] `xcodegen generate` → `Jugnu.xcodeproj`; `xcodebuild -scheme Jugnu` — **BUILD SUCCEEDED**  
+- [x] Launch `Jugnu.app` — process starts (menu bar agent)  
+- [x] Addon CLI (`echo '{"api":1,"op":"run",...}' | ./bin/run`) — mic-mute, focus-toggle, paste-plain return `ok: true`  
+
+## Manual (on your Mac)
+
+- [ ] Option+Space (or menu **Open Palette**) opens the palette  
+- [ ] First-run installs recommended addons (or `JUGNU_ADDON_PATH`) and palette runs the three commands  
+- [ ] Preferences: disable removes from palette; uninstall removes files + declared cleanup  
 
 Registry URLs may stay empty until a GitHub Release; local/first-run install covers v0.

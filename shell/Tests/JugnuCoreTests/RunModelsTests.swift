@@ -20,6 +20,15 @@ final class RunModelsTests: XCTestCase {
         XCTAssertEqual(decoded.ui?.items?.first?.id, "1")
     }
 
+    func testNoteResponseRoundTrip() throws {
+        let json = """
+        {"ok":true,"ui":{"pattern":"note","title":"Scratch","content":"hello world"}}
+        """.data(using: .utf8)!
+        let decoded = try JSONDecoder().decode(RunResponse.self, from: json)
+        XCTAssertEqual(decoded.ui?.pattern, .note)
+        XCTAssertEqual(decoded.ui?.content, "hello world")
+    }
+
     func testRequestEncodesEmptyContext() throws {
         let req = RunRequest(api: 1, op: "run", command: "toggle", args: [:], context: [:])
         let data = try JSONEncoder().encode(req)

@@ -1,0 +1,388 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0C269B59DB0AD928393F514F /* JugnuApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFC6769799C763B68AB9458E /* JugnuApp.swift */; };
+		2EF413B28BA833B1BA5D290B /* PrefsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F65D4A1078835B0D1646C28 /* PrefsView.swift */; };
+		31B5452F7928667E746030F0 /* PalettePanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72943E054458D32AFC64B830 /* PalettePanelController.swift */; };
+		AC65EF4AD2F34CBB13F2E6F9 /* HotKey in Frameworks */ = {isa = PBXBuildFile; productRef = 7EEF6C210640E38020837ACD /* HotKey */; };
+		AD78C530AE4729B3D27FE654 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D00E1FEF0969F288E08FF6 /* AppModel.swift */; };
+		CF46D9EC5366F66E608B763D /* MenuBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE92CF58DD3BE972D2AEC8CB /* MenuBarController.swift */; };
+		CFFE550ED2B1ABABCBF8B52D /* HotkeyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 278F0380D93A6EEE31AD2C2F /* HotkeyController.swift */; };
+		D3584E6337F9B4D089C8193E /* JugnuCore in Frameworks */ = {isa = PBXBuildFile; productRef = 24FB2BFFCBA284CE5BC001B6 /* JugnuCore */; };
+		D46018A13E56874B0C944D88 /* JugnuUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5EA3A420B1701DCC99B5E95F /* JugnuUI */; };
+		F8BD7FCD72AE22D31DA008F7 /* FirstRunWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E983F2778775352830C719C /* FirstRunWindow.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		278F0380D93A6EEE31AD2C2F /* HotkeyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyController.swift; sourceTree = "<group>"; };
+		5E983F2778775352830C719C /* FirstRunWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstRunWindow.swift; sourceTree = "<group>"; };
+		72943E054458D32AFC64B830 /* PalettePanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PalettePanelController.swift; sourceTree = "<group>"; };
+		8F65D4A1078835B0D1646C28 /* PrefsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefsView.swift; sourceTree = "<group>"; };
+		BE92CF58DD3BE972D2AEC8CB /* MenuBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarController.swift; sourceTree = "<group>"; };
+		C5935023FD7BC462A1C14B9A /* shell */ = {isa = PBXFileReference; lastKnownFileType = folder; name = shell; path = .; sourceTree = SOURCE_ROOT; };
+		C92B9A72BEBE9AA2C83556D4 /* Jugnu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Jugnu.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D3D00E1FEF0969F288E08FF6 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		EFC6769799C763B68AB9458E /* JugnuApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JugnuApp.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		3DAF7F5C38AD3211ED1375A4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D3584E6337F9B4D089C8193E /* JugnuCore in Frameworks */,
+				D46018A13E56874B0C944D88 /* JugnuUI in Frameworks */,
+				AC65EF4AD2F34CBB13F2E6F9 /* HotKey in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		B6ED08B0E37EE61AACFA1B60 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				C5935023FD7BC462A1C14B9A /* shell */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		E3FCC502ECCD11B845A6D16F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C92B9A72BEBE9AA2C83556D4 /* Jugnu.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F57367362B9A9A9EFD13E750 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				D3D00E1FEF0969F288E08FF6 /* AppModel.swift */,
+				5E983F2778775352830C719C /* FirstRunWindow.swift */,
+				278F0380D93A6EEE31AD2C2F /* HotkeyController.swift */,
+				EFC6769799C763B68AB9458E /* JugnuApp.swift */,
+				BE92CF58DD3BE972D2AEC8CB /* MenuBarController.swift */,
+				72943E054458D32AFC64B830 /* PalettePanelController.swift */,
+				8F65D4A1078835B0D1646C28 /* PrefsView.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		F882D9721D596D8A438F96BC = {
+			isa = PBXGroup;
+			children = (
+				F57367362B9A9A9EFD13E750 /* App */,
+				B6ED08B0E37EE61AACFA1B60 /* Packages */,
+				E3FCC502ECCD11B845A6D16F /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		AC8E84B6A1740214913C2336 /* Jugnu */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DBD0A392E9FF0E3B2CDC9949 /* Build configuration list for PBXNativeTarget "Jugnu" */;
+			buildPhases = (
+				F75565085121D698824784C3 /* Sources */,
+				3DAF7F5C38AD3211ED1375A4 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Jugnu;
+			packageProductDependencies = (
+				24FB2BFFCBA284CE5BC001B6 /* JugnuCore */,
+				5EA3A420B1701DCC99B5E95F /* JugnuUI */,
+				7EEF6C210640E38020837ACD /* HotKey */,
+			);
+			productName = Jugnu;
+			productReference = C92B9A72BEBE9AA2C83556D4 /* Jugnu.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D00F25E2356E6333CFE8B744 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = B241950593C153E7FBD46BFB /* Build configuration list for PBXProject "Jugnu" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = F882D9721D596D8A438F96BC;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				EF1F612EAE3507A63461EB06 /* XCRemoteSwiftPackageReference "HotKey" */,
+				F8219C418D1CDD24128DABA8 /* XCLocalSwiftPackageReference "." */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = E3FCC502ECCD11B845A6D16F /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AC8E84B6A1740214913C2336 /* Jugnu */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F75565085121D698824784C3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AD78C530AE4729B3D27FE654 /* AppModel.swift in Sources */,
+				F8BD7FCD72AE22D31DA008F7 /* FirstRunWindow.swift in Sources */,
+				CFFE550ED2B1ABABCBF8B52D /* HotkeyController.swift in Sources */,
+				0C269B59DB0AD928393F514F /* JugnuApp.swift in Sources */,
+				CF46D9EC5366F66E608B763D /* MenuBarController.swift in Sources */,
+				31B5452F7928667E746030F0 /* PalettePanelController.swift in Sources */,
+				2EF413B28BA833B1BA5D290B /* PrefsView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		61D07CE4A62E5F748D90902E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGNING_ALLOWED = YES;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.jugnu.shell;
+				PRODUCT_NAME = Jugnu;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		6FC66D0D578296FFDF058A85 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGNING_ALLOWED = YES;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.jugnu.shell;
+				PRODUCT_NAME = Jugnu;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		B8C365ED5B5313A88CE2924D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				BASE_SDK = macosx;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+		C24F1ED13DB606C4CFBDE66E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				BASE_SDK = macosx;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		B241950593C153E7FBD46BFB /* Build configuration list for PBXProject "Jugnu" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B8C365ED5B5313A88CE2924D /* Debug */,
+				C24F1ED13DB606C4CFBDE66E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		DBD0A392E9FF0E3B2CDC9949 /* Build configuration list for PBXNativeTarget "Jugnu" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6FC66D0D578296FFDF058A85 /* Debug */,
+				61D07CE4A62E5F748D90902E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		F8219C418D1CDD24128DABA8 /* XCLocalSwiftPackageReference "." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = .;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		EF1F612EAE3507A63461EB06 /* XCRemoteSwiftPackageReference "HotKey" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/soffes/HotKey";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.2.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		24FB2BFFCBA284CE5BC001B6 /* JugnuCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = JugnuCore;
+		};
+		5EA3A420B1701DCC99B5E95F /* JugnuUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = JugnuUI;
+		};
+		7EEF6C210640E38020837ACD /* HotKey */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EF1F612EAE3507A63461EB06 /* XCRemoteSwiftPackageReference "HotKey" */;
+			productName = HotKey;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = D00F25E2356E6333CFE8B744 /* Project object */;
+}
