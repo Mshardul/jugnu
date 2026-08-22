@@ -1,0 +1,4 @@
+#!/bin/bash
+set -euo pipefail
+req=$(cat)
+echo '{"ok":true,"message":"echo-ok"}'

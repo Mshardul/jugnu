@@ -1,0 +1,10 @@
+--swiftversion 5.9
+--indent 4
+--tabwidth 4
+--maxwidth 100
+--commas inline
+--wraparguments preserve
+--wrapcollections preserve
+--wrapparameters preserve
+--disable redundantSelf
+--exclude .build,DerivedData,.swiftpm

@@ -1,0 +1,79 @@
+import AppKit
+import HotKey
+import JugnuCore
+
+@MainActor
+final class HotkeyController {
+    private let model: AppModel
+    private let onFire: () -> Void
+    private var hotKey: HotKey?
+
+    init(model: AppModel, onFire: @escaping () -> Void) {
+        self.model = model
+        self.onFire = onFire
+    }
+
+    func registerFromConfig() {
+        hotKey = nil
+        guard let combo = Self.parse(model.config.shell.hotkey) else {
+            NSLog("Jugnu: could not parse hotkey '%@'", model.config.shell.hotkey)
+            return
+        }
+        let key = HotKey(keyCombo: combo)
+        key.keyDownHandler = { [onFire] in
+            DispatchQueue.main.async { onFire() }
+        }
+        hotKey = key
+    }
+
+    static func parse(_ raw: String) -> KeyCombo? {
+        let parts = raw.lowercased().split(separator: "+").map(String.init)
+        guard let keyPart = parts.last else { return nil }
+        var modifiers: NSEvent.ModifierFlags = []
+        for part in parts.dropLast() {
+            switch part {
+            case "cmd", "command": modifiers.insert(.command)
+            case "opt", "option", "alt": modifiers.insert(.option)
+            case "ctrl", "control": modifiers.insert(.control)
+            case "shift": modifiers.insert(.shift)
+            default: break
+            }
+        }
+        let key: Key?
+        switch keyPart {
+        case "space": key = .space
+        case "return", "enter": key = .return
+        case "tab": key = .tab
+        case "escape", "esc": key = .escape
+        case "a": key = .a
+        case "b": key = .b
+        case "c": key = .c
+        case "d": key = .d
+        case "e": key = .e
+        case "f": key = .f
+        case "g": key = .g
+        case "h": key = .h
+        case "i": key = .i
+        case "j": key = .j
+        case "k": key = .k
+        case "l": key = .l
+        case "m": key = .m
+        case "n": key = .n
+        case "o": key = .o
+        case "p": key = .p
+        case "q": key = .q
+        case "r": key = .r
+        case "s": key = .s
+        case "t": key = .t
+        case "u": key = .u
+        case "v": key = .v
+        case "w": key = .w
+        case "x": key = .x
+        case "y": key = .y
+        case "z": key = .z
+        default: key = nil
+        }
+        guard let key else { return nil }
+        return KeyCombo(key: key, modifiers: modifiers)
+    }
+}

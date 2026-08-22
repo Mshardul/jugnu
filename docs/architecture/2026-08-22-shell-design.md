@@ -3,7 +3,7 @@
 **Date:** 2026-08-22
 **Status:** Approved
 **Scope:** Shell architecture, addon packages, registry, v0
-**Out of scope here:** Deep UI/visual system (separate discussion); clipboard/window product design
+**Out of scope here:** Full visual design system / illustration language (follow-on); deep clipboard/window product design
 
 ## Locked decisions
 
@@ -14,7 +14,8 @@
 | Addon distribution | One **zip per addon**; catalog in this public repo; packages as **GitHub Release** assets |
 | Addon runtime | No user-installed Python. Entrypoints: bundled exec in zip, JXA, or osascript (system tools) |
 | Protocol | JSON request/response over stdin/stdout (`api: 1`) |
-| UI (v0) | Visual launcher: small command palette + menu-bar icon; UX matters; deep UI later |
+| UI (product) | Addons are **commands + popup UI**, not scripts-only. Shell hosts palette, menu bar, and addon panels/pickers/forms. **Speed** is first-class. Context-aware “right UI for what’s on screen” is **later** (after UI host works). Visual system polish can follow; the **surface** is locked in [vision — Surfaces](../vision.md). |
+| UI (v0 slice) | Visual launcher: command palette + menu-bar icon; enough host chrome to open simple addon popups; deepen UX in follow-ons |
 | Hotkey | Default non-Spotlight (Option+Space); first-run **opt-in** to ⌘Space with Spotlight guidance; never silent steal |
 | Search (v0) | Enabled-addon **commands only** (no apps/files yet; providers pluggable later) |
 | Recommended v0 addons | mic-mute, focus-toggle, paste-plain (installed as separate zips, skippable) |
@@ -111,7 +112,7 @@ Static `commands` are enough for v0. Dynamic `op: list` may be added later under
 
 Failure: `{ "ok": false, "error": "…" }`.
 
-Shell surfaces `message` / `error` lightly (exact chrome deferred to UI discussion). Non-zero exit without JSON is treated as failure.
+Shell surfaces `message` / `error` lightly. Popup patterns, latency budgets, and context hooks: [Addon UI host + speed](./2026-08-22-addon-ui-speed-design.md). Non-zero exit without JSON is treated as failure.
 
 ### Registry entry
 
@@ -239,3 +240,4 @@ Config/env may point at a **local** addon directory (repo `addons/<id>`) so deve
 - [Vision](../vision.md)
 - [Backlog](../backlog.md)
 - [Staging](../staging.md)
+- [Addon UI host + speed](./2026-08-22-addon-ui-speed-design.md)

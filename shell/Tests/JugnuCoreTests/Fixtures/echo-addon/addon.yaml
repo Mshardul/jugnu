@@ -1,0 +1,15 @@
+id: echo-addon
+name: Echo Addon
+version: 1.0.0
+api: 1
+commands:
+  - id: ping
+    title: Ping
+    subtitle: Echo ok
+    keywords: [echo]
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths: []
+  launchd: []

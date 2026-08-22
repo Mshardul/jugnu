@@ -1,0 +1,15 @@
+id: focus-toggle
+name: Focus Toggle
+version: 1.0.0
+api: 1
+commands:
+  - id: toggle
+    title: Toggle Focus
+    subtitle: Switch Do Not Disturb / Focus on or off
+    keywords: [focus, dnd, do not disturb]
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths: []
+  launchd: []

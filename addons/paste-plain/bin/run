@@ -1,0 +1,21 @@
+#!/bin/bash
+set -euo pipefail
+cat >/dev/null
+
+tmp=$(mktemp)
+trap 'rm -f "$tmp"' EXIT
+
+if ! pbpaste >"$tmp" 2>/dev/null; then
+  echo '{"ok":false,"error":"clipboard read failed"}'
+  exit 0
+fi
+
+# Normalize to plain text (strip RTF/HTML if present via textutil when available).
+if command -v textutil >/dev/null 2>&1; then
+  plain=$(textutil -convert txt -stdout "$tmp" 2>/dev/null || cat "$tmp")
+else
+  plain=$(cat "$tmp")
+fi
+
+printf '%s' "$plain" | pbcopy
+echo '{"ok":true,"message":"Clipboard is plain text"}'

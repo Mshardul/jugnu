@@ -1,0 +1,10 @@
+#!/bin/bash
+set -euo pipefail
+INPUT=$(cat)
+if echo "$INPUT" | grep -q '"confirmed"[[:space:]]*:[[:space:]]*true'; then
+  echo '{"ok":true,"message":"Confirmed"}'
+  exit 0
+fi
+cat <<'EOF'
+{"ok":true,"ui":{"pattern":"confirm","title":"Delete demo?","message":"This is a safe demo confirm.","confirmLabel":"Yes","cancelLabel":"No"}}
+EOF

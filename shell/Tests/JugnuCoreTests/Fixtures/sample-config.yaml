@@ -1,0 +1,14 @@
+version: 1
+
+shell:
+  hotkey: "option+space"
+
+addons:
+  mic-mute:
+    enabled: true
+  focus-toggle:
+    enabled: true
+  paste-plain:
+    enabled: false
+
+ui: {}

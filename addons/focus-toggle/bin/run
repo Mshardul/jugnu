@@ -1,0 +1,25 @@
+#!/bin/bash
+set -euo pipefail
+cat >/dev/null
+
+# Toggle Focus via Shortcuts if available; fall back to Control Center menu scripting.
+if shortcuts list 2>/dev/null | grep -qi 'do not disturb\|focus'; then
+  name=$(shortcuts list | grep -iE 'do not disturb|focus' | head -1 | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+  if [[ -n "$name" ]] && shortcuts run "$name" >/dev/null 2>&1; then
+    echo '{"ok":true,"message":"Ran Focus shortcut: '"$name"'"}'
+    exit 0
+  fi
+fi
+
+osascript <<'APPLESCRIPT' >/dev/null || true
+tell application "System Events"
+  tell process "Control Center"
+    -- Best-effort: open Control Center Focus menu if present.
+    try
+      click menu bar item "Focus" of menu bar 1
+    end try
+  end tell
+end tell
+APPLESCRIPT
+
+echo '{"ok":true,"message":"Focus toggle attempted (grant Automation if needed)"}'

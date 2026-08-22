@@ -1,0 +1,17 @@
+id: ui-demo-confirm
+name: UI Demo Confirm
+version: 1.0.0
+api: 1
+commands:
+  - id: demo
+    title: Demo confirm
+    subtitle: Reference confirm pattern
+    keywords: [demo, confirm, ui]
+    ui:
+      pattern: confirm
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths: []
+  launchd: []

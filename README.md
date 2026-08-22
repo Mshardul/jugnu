@@ -8,8 +8,19 @@ Jugnu (Hindi: *firefly*) is a Mac command platform — meant to replace Spotligh
 |---|---|
 | **App** | Jugnu |
 | **Repo / CLI** | `jugnu` |
-| **Status** | Pre-shell — staging inventory + docs |
+| **Status** | Shell MVP in progress — Core + menu bar app |
 | **License** | [MIT](LICENSE) |
+
+## Shell (Swift)
+
+```bash
+cd shell
+export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
+swift test
+swift run Jugnu
+```
+
+See [`shell/README.md`](shell/README.md) and smoke checklist [`docs/architecture/shell-smoke.md`](docs/architecture/shell-smoke.md).
 
 ## Dev tooling
 
@@ -45,12 +56,18 @@ docs/
   vision.md           # product + brand
   backlog.md          # platform, gap list, staged leaves
   architecture/       # design specs (shell first) — none written yet
-shell/                # reserved — no scaffold until shell design is approved
-addons/               # reserved — first-party addons after shell contracts exist
+shell/                # JugnuCore + JugnuUI + Jugnu menu bar app (SPM)
+addons/               # first-party addon sources (one zip each)
 ```
 
 ## Docs
 
+- [Changelog](CHANGELOG.md)
+- [Contributing](CONTRIBUTING.md)
+- [Security policy](SECURITY.md)
+- [Data privacy policy](PRIVACY.md)
+- [Release process](docs/release-process.md)
+- [Addon manifest](docs/addon-manifest.md)
 - [Vision](docs/vision.md)
 - [Backlog](docs/backlog.md)
 - [Staging inventory](docs/staging.md) — how `apps/` / `extensions/` relate to addons

@@ -7,9 +7,25 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 .netlify/
+.pre-commit/
+
+# Swift SPM / Xcode
+.build/
+**/.build/
+.swiftpm/
+**/.swiftpm/
+*.xcuserstate
+xcuserdata/
 *.xcuserdata/
 DerivedData/
-.pre-commit/
+**/DerivedData/
+
+# Addon packaging output (scripts/package-addon.sh)
+dist/
+
+# Agent / plan scratch (local)
+.superpowers/
+.prompts/
 
 # Git worktrees (local isolation)
 .worktrees/

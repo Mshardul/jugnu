@@ -55,3 +55,21 @@ jobs:
           semgrep scan --error --config=p/security-audit --config=p/python \
             --exclude-rule python.lang.security.audit.logging.logger-credential-leak.python-logger-credential-disclosure \
             apps extensions
+
+  swift:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Swift tools
+        run: brew install swiftformat swiftlint
+
+      - name: SwiftFormat check
+        run: swiftformat --lint --config .swiftformat shell/Sources shell/Tests
+
+      - name: SwiftLint
+        run: swiftlint lint --config .swiftlint.yml
+
+      - name: Swift tests
+        working-directory: shell
+        run: swift test

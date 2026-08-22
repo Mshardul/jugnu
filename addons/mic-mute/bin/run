@@ -1,0 +1,22 @@
+#!/bin/bash
+set -euo pipefail
+# Read and discard JSON request (api 1).
+cat >/dev/null
+
+state=$(osascript <<'APPLESCRIPT'
+set vol to input volume of (get volume settings)
+if vol is 0 then
+  set volume input volume 75
+  return "unmuted"
+else
+  set volume input volume 0
+  return "muted"
+end if
+APPLESCRIPT
+)
+
+if [[ "$state" == "muted" ]]; then
+  echo '{"ok":true,"message":"Microphone muted"}'
+else
+  echo '{"ok":true,"message":"Microphone unmuted"}'
+fi

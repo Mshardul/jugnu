@@ -1,0 +1,15 @@
+id: mic-mute
+name: Mic Mute
+version: 1.0.0
+api: 1
+commands:
+  - id: toggle
+    title: Toggle microphone mute
+    subtitle: Mute or unmute input
+    keywords: [mic, mute]
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths: []
+  launchd: []

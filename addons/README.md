@@ -4,6 +4,17 @@ First-party addon **sources** live here. Each addon builds to **one zip** publis
 
 Nothing here is bundled inside `Jugnu.app`. Users install zips into `~/.local/share/jugnu/addons/<id>/`.
 
+## v0 packages
+
+| Addon | Commands |
+|---|---|
+| `mic-mute` | toggle mic input volume |
+| `focus-toggle` | Focus / DND (Shortcuts or Control Center) |
+| `paste-plain` | clipboard → plain text |
+| `ui-demo-*` | UI host demos (confirm / list / form) |
+
+Package: `scripts/package-addon.sh addons/<id> dist/`
+
 ## Hierarchy (user POV)
 
 See [`docs/vision.md`](../docs/vision.md) — **Catalog hierarchy**:
@@ -20,5 +31,3 @@ Design: [`docs/architecture/2026-08-22-shell-design.md`](../docs/architecture/20
 Backlog / packaging map: [`docs/backlog.md`](../docs/backlog.md)
 
 Staging nursery (pre-graduation): `../apps/`, `../extensions/macos/`.
-
-No addon packages scaffolded until the shell MVP path and addon packaging are planned.

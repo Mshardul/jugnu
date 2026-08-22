@@ -1,0 +1,15 @@
+#!/bin/bash
+set -euo pipefail
+INPUT=$(cat)
+# Optional artificial delay for skeleton demos: JUGNU_UI_DEMO_SLEEP=0.5
+if [[ -n "${JUGNU_UI_DEMO_SLEEP:-}" ]]; then
+  sleep "$JUGNU_UI_DEMO_SLEEP"
+fi
+if echo "$INPUT" | grep -q '"itemId"'; then
+  ID=$(echo "$INPUT" | sed -n 's/.*"itemId"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+  printf '{"ok":true,"message":"Chose %s"}\n' "${ID:-unknown}"
+  exit 0
+fi
+cat <<'EOF'
+{"ok":true,"ui":{"pattern":"list","title":"Demo","placeholder":"Filter","items":[{"id":"alpha","title":"Alpha","subtitle":"first"},{"id":"beta","title":"Beta","subtitle":"second"},{"id":"gamma","title":"Gamma","subtitle":"third"}]}}
+EOF

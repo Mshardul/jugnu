@@ -1,0 +1,11 @@
+#!/bin/bash
+set -euo pipefail
+INPUT=$(cat)
+if echo "$INPUT" | grep -q '"name"'; then
+  NAME=$(echo "$INPUT" | sed -n 's/.*"name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+  printf '{"ok":true,"message":"Hello, %s"}\n' "${NAME:-friend}"
+  exit 0
+fi
+cat <<'EOF'
+{"ok":true,"ui":{"pattern":"form","title":"Say hello","fields":[{"id":"name","label":"Name","kind":"text"}]}}
+EOF
