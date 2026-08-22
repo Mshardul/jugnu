@@ -8,6 +8,7 @@ __pycache__/
 .ruff_cache/
 .netlify/
 .pre-commit/
+.env
 
 # Swift SPM / Xcode
 .build/

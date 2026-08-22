@@ -1,5 +1,5 @@
 import XCTest
-@testable import JugnuCore
+import JugnuCore
 
 final class RegistryLiveTests: XCTestCase {
     func testRegistryInstallsMicMuteIntoTempHome() async throws {
@@ -51,11 +51,15 @@ final class RegistryLiveTests: XCTestCase {
         let lifecycle = AddonLifecycle(paths: paths)
         try await installer.install(entry: clip, enable: true)
         XCTAssertTrue(
-            FileManager.default.fileExists(atPath: paths.addonsDir.appendingPathComponent("clipboard-history/addon.yaml").path)
+            FileManager.default.fileExists(
+                atPath: paths.addonsDir.appendingPathComponent("clipboard-history/addon.yaml").path
+            )
         )
         try lifecycle.uninstall(id: "clipboard-history")
         XCTAssertFalse(
-            FileManager.default.fileExists(atPath: paths.addonsDir.appendingPathComponent("clipboard-history").path)
+            FileManager.default.fileExists(
+                atPath: paths.addonsDir.appendingPathComponent("clipboard-history").path
+            )
         )
         XCTAssertFalse(launchctlListsClipboardHistory())
     }

@@ -1,9 +1,12 @@
 included:
   - shell/Sources
   - shell/Tests
+  - shell/TestsExtended
 excluded:
   - shell/.build
   - shell/.swiftpm
+  - shell/TestsExtended/.build
+  - shell/TestsExtended/.swiftpm
   - DerivedData
 
 # Keep rules focused on correctness and maintainability; formatting belongs to SwiftFormat.

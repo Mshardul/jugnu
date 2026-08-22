@@ -2,8 +2,8 @@
 
 ## Automated (verified 2026-08-22; Core suite re-verified 2026-08-23)
 
-- [x] `cd shell && export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer && swift test --filter JugnuCoreTests` — green
-- [x] CI uses `--filter JugnuCoreTests` so `JugnuCoreLiveTests` never runs on GitHub
+- [x] `cd shell && export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer && swift test` — green (same command as CI)
+- [x] Live registry tests live in `shell/TestsExtended/` and are not part of `swift test` / CI
 - [x] `xcodegen generate` → `Jugnu.xcodeproj`; `xcodebuild -scheme Jugnu` — **BUILD SUCCEEDED** (re-run after this epic’s asset/catalog changes)
 - [x] Launch `Jugnu.app` — process starts (menu bar agent)
 - [x] Addon CLI — mic-mute, focus-toggle, paste-plain return `ok: true`
@@ -12,8 +12,8 @@
 Live registry/install (not CI; uses the network and can touch launchd):
 
 ```bash
-make verify-live
-# or: cd shell && swift test --filter JugnuCoreLiveTests
+make test-extended
+# or: cd shell/TestsExtended && swift test
 ```
 
 ## Manual (on your Mac)

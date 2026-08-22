@@ -15,12 +15,36 @@ Jugnu (Hindi: *firefly*) is a Mac command platform — meant to replace Spotligh
 
 ```bash
 cd shell
-export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
 swift test
-swift run Jugnu   # or open Package.swift in Xcode, select the Jugnu scheme
 ```
 
-See [`shell/README.md`](shell/README.md) and smoke checklist [`docs/architecture/shell-smoke.md`](docs/architecture/shell-smoke.md).
+`make` reads `DEVELOPER_DIR` from `.env` (see `.env.example`), defaulting to `/Applications/Xcode.app/Contents/Developer`.
+
+To launch the menu-bar app, see **Run locally** below. More detail: [`shell/README.md`](shell/README.md). Smoke: [`docs/architecture/shell-smoke.md`](docs/architecture/shell-smoke.md).
+
+## Run locally
+
+You do not install Jugnu from a store for this. Config and addons stay where they are (`~/.config/jugnu`, `~/.local/share/jugnu`).
+
+From the repo root:
+
+```bash
+make run
+```
+
+That stops any already-running Jugnu, builds this checkout, and launches the new `.app`.
+
+Or open `shell/Jugnu.xcodeproj` in Xcode and press Run.
+
+Jugnu is a menu-bar agent — **no Dock icon, no window on launch**. `make run` can succeed and still look like “nothing opened.” Look for the firefly on the **right of the menu bar**, then Option+Space (or the menu’s **Open Palette**).
+
+A Debug build from a new folder may need Accessibility turned on again: System Settings → Privacy & Security → Accessibility.
+
+`swift run Jugnu` from `shell/` is a quicker loop for Core logic only. It is **not** the real `.app` (no app icon / menu-bar image). Use `make run` to try this product-pass build.
+
+## Install from the site
+
+Not published yet. When there is a download, install steps will live here.
 
 ## Dev tooling
 

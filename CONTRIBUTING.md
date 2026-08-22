@@ -34,22 +34,26 @@ Swift package checks run from `shell/`:
 
 ```bash
 cd shell
-swift format --in-place --recursive Sources Tests
-swift lint Sources Tests
+swift format --in-place --recursive Sources Tests TestsExtended
+swift lint Sources Tests TestsExtended
 swift test
 ```
 
 The `swift format` and `swift lint` commands require the Swift toolchain's format/lint plugins or equivalent installed tools. When those commands are unavailable, run `swift test` and report the missing tooling rather than silently skipping validation.
 
-For macOS app smoke testing:
+Less-frequent live registry/install checks (network, real side effects; not CI):
 
 ```bash
-cd shell
-export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
-swift run Jugnu
+make test-extended
 ```
 
-Use the checklist in [docs/architecture/shell-smoke.md](docs/architecture/shell-smoke.md).
+For macOS app smoke testing, quit any running Jugnu, then:
+
+```bash
+make run
+```
+
+Use the checklist in [docs/architecture/shell-smoke.md](docs/architecture/shell-smoke.md). Details: [README — Run locally](README.md#run-locally).
 
 ## Swift Conventions
 

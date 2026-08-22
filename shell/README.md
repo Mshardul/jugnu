@@ -10,28 +10,26 @@ This directory is reserved for the shell-only binary — no addon code ships ins
 
 ```bash
 cd shell
-export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
-swift test --filter JugnuCoreTests   # default suite (CI uses this)
+swift test                 # default suite — same as CI
 # live registry/install checks — not CI, uses the network:
-swift test --filter JugnuCoreLiveTests
-# or from repo root: make verify-live
+make test-extended         # from repo root
 ```
 
-## Jugnu.app (Xcode)
+Xcode’s developer dir is `DEVELOPER_DIR` in the repo `.env` / `.env.example` (Makefile default is `/Applications/Xcode.app/Contents/Developer`).
 
-Project: `Jugnu.xcodeproj` (generated from `project.yml` via [XcodeGen](https://github.com/yonaskolb/XcodeGen)).
+## Run locally
 
-```bash
-cd shell
-# regenerate after editing project.yml:
-xcodegen generate
-open Jugnu.xcodeproj
-# or:
-xcodebuild -project Jugnu.xcodeproj -scheme Jugnu -configuration Debug \
-  CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO build
-```
+`make run` from the repo root stops any existing Jugnu, then builds and launches the Xcode `.app` (icon and menu-bar image included). Config and addons on disk are left alone.
 
-`App/Info.plist` sets `LSUIElement` (agent app, no Dock icon). HotKey is linked from the app target.
+Or open `Jugnu.xcodeproj` and press Run. If you changed `project.yml`, run `xcodegen generate` first.
+
+There is no Dock icon and no window on launch (`LSUIElement`). Use the menu-bar firefly or Option+Space. If it “did nothing,” look at the right of the menu bar — that is the app.
+
+`swift run Jugnu` skips `Assets.xcassets` (see `Package.swift`) — fine for logic checks, not for chrome.
+
+The Xcode project is generated from `project.yml` ([XcodeGen](https://github.com/yonaskolb/XcodeGen)). `App/Info.plist` sets `LSUIElement` (agent app). HotKey is linked from the app target.
+
+Published-site install steps will go in the [root README](../README.md) when a download exists.
 
 Dev addons without install:
 

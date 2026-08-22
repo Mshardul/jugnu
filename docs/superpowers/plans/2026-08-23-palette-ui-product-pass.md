@@ -4,7 +4,7 @@
 
 **Goal:** Make Jugnu’s palette and addon UI host feel like one native, themeable, keyboard-first product — fuzzy search, shared tokens, SwiftUI panels, live theme push — without adding new addon jobs or Preferences/catalog scope.
 
-**Architecture:** `JugnuCore` owns config (`theme` / `sound` / `palette`), fuzzy `CommandIndex.search`, runner wait-without-poll, hotkey parse, and user-facing error strings. `JugnuUI` owns tokens, presets, environment theme, and SwiftUI-hosted panels (same `NSPanel` public inits as today). `App/` owns palette chrome, first-run, prefs theme section, icon, and reactive `AppModel` publishing. Live registry tests live in a separate SPM target that default `swift test` / CI must not run.
+**Architecture:** `JugnuCore` owns config (`theme` / `sound` / `palette`), fuzzy `CommandIndex.search`, runner wait-without-poll, hotkey parse, and user-facing error strings. `JugnuUI` owns tokens, presets, environment theme, and SwiftUI-hosted panels (same `NSPanel` public inits as today). `App/` owns palette chrome, first-run, prefs theme section, icon, and reactive `AppModel` publishing. Live registry tests live in a separate SPM package (`shell/TestsExtended`) that default `swift test` / CI must not run.
 
 **Tech Stack:** macOS 14+, Swift 5.9+, JugnuCore + JugnuUI + Jugnu app (SPM), Yams, HotKey, SwiftUI hosted in `NSPanel`, XCTest.
 
@@ -75,12 +75,12 @@ shell/Tests/JugnuCoreTests/
   ConfigStoreTests.swift       # extend
   Fixtures/sample-config.yaml  # add theme/sound/palette
 
-shell/Tests/JugnuCoreLiveTests/   # new target — never in default CI
-  RegistryLiveTests.swift
+shell/TestsExtended/              # separate package — never in default swift test / CI
+  Tests/JugnuCoreLiveTests/RegistryLiveTests.swift
 
-shell/Package.swift            # JugnuCoreLiveTests target
-.github/workflows/ci.yml       # swift test --filter JugnuCoreTests
-Makefile                       # verify-live
+shell/Package.swift            # JugnuCoreTests only (default / CI)
+.github/workflows/ci.yml       # swift test (no filter)
+Makefile                       # test-extended
 config/jugnu.example.yaml
 shell/README.md
 docs/architecture/shell-smoke.md

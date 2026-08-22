@@ -1,4 +1,8 @@
-.PHONY: sync precommit lint format typecheck spell test ci hooks verify-live
+# Local overrides: copy `.env.example` to `.env` (gitignored).
+-include .env
+export DEVELOPER_DIR ?= /Applications/Xcode.app/Contents/Developer
+
+.PHONY: sync precommit lint format typecheck spell test test-extended stop run ci hooks
 
 sync:
 	uv sync
@@ -24,8 +28,33 @@ spell:
 test:
 	uv run pytest
 
-verify-live:
-	cd shell && swift test --filter JugnuCoreLiveTests
+test-extended:
+	cd shell/TestsExtended && swift test
+
+# Quit every Jugnu binary (menu-bar .app and `swift run`), not Cursor helpers.
+stop:
+	@printf 'Stopping old Jugnu processes...\n'
+	@-killall -TERM Jugnu >/dev/null 2>&1
+	@-pkill -TERM -f '/Jugnu.app/Contents/MacOS/Jugnu' >/dev/null 2>&1
+	@n=0; \
+	while pgrep -x Jugnu >/dev/null 2>&1; do \
+		n=$$((n+1)); \
+		if [ $$n -ge 20 ]; then \
+			killall -KILL Jugnu >/dev/null 2>&1 || true; \
+			break; \
+		fi; \
+		sleep 0.15; \
+	done
+
+run: stop
+	cd shell && \
+	xcodebuild -project Jugnu.xcodeproj -scheme Jugnu -configuration Debug \
+	  -derivedDataPath DerivedData \
+	  CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO build && \
+	open -n DerivedData/Build/Products/Debug/Jugnu.app
+	@echo ""
+	@echo "Jugnu is a menu-bar app — it does not appear in the Dock or as a window."
+	@echo "Look on the right of the menu bar for a firefly (or the word Jugnu), then Option+Space."
 
 # Match CI check job (no semgrep locally).
 ci: lint

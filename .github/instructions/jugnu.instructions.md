@@ -68,7 +68,7 @@ Read [docs/vision.md](../../docs/vision.md) for product intent and packaging rul
 - Inject filesystem, process, clock, network, and clipboard dependencies when tests would otherwise depend on macOS state.
 - Keep tests deterministic and platform-aware. Do not make Linux or CI tests require macOS commands such as `osascript`, `pbcopy`, `pmset`, or `shortcuts`.
 - Run the narrowest relevant test immediately after each edit, then run the broader suite when the slice is stable.
-- Swift package checks run from `shell/` with `swift test`.
+- Swift package checks run from `shell/` with `swift test` (same command as CI). Live registry tests are `make test-extended`.
 - Python checks use the repository commands in `Makefile`: `make lint`, `make typecheck`, `make spell`, `make test`, and `make ci`.
 - Run formatting and spelling checks for changed documentation and code.
 
