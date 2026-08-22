@@ -1,1 +1,29 @@
-[]
+[
+  {
+    "id": "mic-mute",
+    "name": "Mic Mute",
+    "version": "1.0.0",
+    "api": 1,
+    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/mic-mute-1.0.0.zip",
+    "sha256": "1ceed5630519d8b66fd267ed049762d81acc1a3fe713fc629b8a1b6f68f94284",
+    "summary": "Toggle microphone mute"
+  },
+  {
+    "id": "focus-toggle",
+    "name": "Focus Toggle",
+    "version": "1.0.0",
+    "api": 1,
+    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/focus-toggle-1.0.0.zip",
+    "sha256": "ce0f0385693827ce00aaba7b8dcd283d22423d09e465bc5caa1c802387f1eaf5",
+    "summary": "Toggle Do Not Disturb / Focus"
+  },
+  {
+    "id": "paste-plain",
+    "name": "Paste Plain",
+    "version": "1.0.0",
+    "api": 1,
+    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/paste-plain-1.0.0.zip",
+    "sha256": "b3c4d78196ff0080478603e3293d7b2c1fe29700e0c18352fa7043a476f02aa6",
+    "summary": "Paste clipboard as plain text"
+  }
+]
