@@ -1,91 +1,129 @@
 import AppKit
 import JugnuCore
+import SwiftUI
 
 @MainActor
-public final class FormPanel: NSPanel {
-    private let onSubmit: ([String: JSONValue]) -> Void
+public final class FormPanel: KeyablePanel {
+    private let errorState = PanelErrorState()
     private let onCancel: () -> Void
-    private let fields: [UIFormField]
-    private var inputs: [String: NSView] = [:]
 
     public init(
         ui: UIDescriptor,
         onSubmit: @escaping ([String: JSONValue]) -> Void,
         onCancel: @escaping () -> Void
     ) {
-        self.onSubmit = onSubmit
         self.onCancel = onCancel
-        self.fields = ui.fields ?? []
         super.init(
-            contentRect: NSRect(x: 0, y: 0, width: 400, height: 200),
-            styleMask: [.titled, .closable],
+            contentRect: NSRect(x: 0, y: 0, width: 400, height: 240),
+            styleMask: [.borderless],
             backing: .buffered,
             defer: false
         )
-        title = ui.title ?? "Form"
         isFloatingPanel = true
         level = .floating
-
-        let stack = NSStackView()
-        stack.orientation = .vertical
-        stack.spacing = 10
-        stack.translatesAutoresizingMaskIntoConstraints = false
-
-        for field in fields {
-            let label = NSTextField(labelWithString: field.label)
-            stack.addArrangedSubview(label)
-            switch field.kind {
-            case "toggle":
-                let toggle = NSSwitch()
-                if case .bool(let b) = field.value { toggle.state = b ? .on : .off }
-                inputs[field.id] = toggle
-                stack.addArrangedSubview(toggle)
-            default:
-                let text = NSTextField(string: {
-                    if case .string(let s) = field.value { return s }
-                    return ""
-                }())
-                text.placeholderString = field.label
-                inputs[field.id] = text
-                stack.addArrangedSubview(text)
+        backgroundColor = .clear
+        isOpaque = false
+        hasShadow = true
+        hidesOnDeactivate = false
+        contentView = NSHostingView(
+            rootView: ThemedPanelBackground {
+                FormPanelView(ui: ui, errorState: errorState, onSubmit: onSubmit, onCancel: onCancel)
             }
-        }
-
-        let buttons = NSStackView()
-        buttons.orientation = .horizontal
-        let cancel = NSButton(title: "Cancel", target: self, action: #selector(cancelTapped))
-        let submit = NSButton(title: "Submit", target: self, action: #selector(submitTapped))
-        submit.keyEquivalent = "\r"
-        buttons.addArrangedSubview(NSView())
-        buttons.addArrangedSubview(cancel)
-        buttons.addArrangedSubview(submit)
-        stack.addArrangedSubview(buttons)
-
-        let root = NSView()
-        root.addSubview(stack)
-        contentView = root
-        NSLayoutConstraint.activate([
-            stack.leadingAnchor.constraint(equalTo: root.leadingAnchor, constant: 16),
-            stack.trailingAnchor.constraint(equalTo: root.trailingAnchor, constant: -16),
-            stack.topAnchor.constraint(equalTo: root.topAnchor, constant: 16),
-            stack.bottomAnchor.constraint(lessThanOrEqualTo: root.bottomAnchor, constant: -16),
-        ])
+        )
         center()
     }
 
-    @objc private func submitTapped() {
+    public func presentError(_ message: String) {
+        errorState.message = message
+    }
+
+    override public func cancelOperation(_ sender: Any?) { onCancel() }
+}
+
+private struct FormPanelView: View {
+    let ui: UIDescriptor
+    @ObservedObject var errorState: PanelErrorState
+    var onSubmit: ([String: JSONValue]) -> Void
+    var onCancel: () -> Void
+
+    @State private var textValues: [String: String] = [:]
+    @State private var boolValues: [String: Bool] = [:]
+    @Environment(\.jugnuTheme) private var theme
+    @ObservedObject private var store = ThemeStore.shared
+
+    private var fields: [UIFormField] { ui.fields ?? [] }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: JugnuTokens.Spacing.row) {
+            Text(ui.title ?? "Form")
+                .font(JugnuTokens.font(presetId: store.presetId, role: .headline))
+            ForEach(fields, id: \.id) { field in
+                Text(field.label)
+                    .font(JugnuTokens.font(presetId: store.presetId, role: .caption))
+                    .foregroundStyle(theme.textSecondary)
+                if field.kind == "toggle" {
+                    Toggle("", isOn: boolBinding(field))
+                        .labelsHidden()
+                } else {
+                    TextField(field.label, text: textBinding(field))
+                        .textFieldStyle(.plain)
+                        .padding(6)
+                        .background(theme.background)
+                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                }
+            }
+            if let message = errorState.message {
+                PanelErrorBanner(message: message)
+            }
+            HStack {
+                Spacer()
+                Button("Cancel", action: onCancel)
+                    .keyboardShortcut(.cancelAction)
+                Button("Submit", action: submit)
+                    .keyboardShortcut(.defaultAction)
+            }
+        }
+        .onAppear(perform: seed)
+    }
+
+    private func seed() {
+        for field in fields {
+            switch field.value {
+            case .bool(let value):
+                boolValues[field.id] = value
+            case .string(let value):
+                textValues[field.id] = value
+            case .number(let value):
+                textValues[field.id] = String(value)
+            default:
+                textValues[field.id] = textValues[field.id] ?? ""
+            }
+        }
+    }
+
+    private func textBinding(_ field: UIFormField) -> Binding<String> {
+        Binding(
+            get: { textValues[field.id] ?? "" },
+            set: { textValues[field.id] = $0 }
+        )
+    }
+
+    private func boolBinding(_ field: UIFormField) -> Binding<Bool> {
+        Binding(
+            get: { boolValues[field.id] ?? false },
+            set: { boolValues[field.id] = $0 }
+        )
+    }
+
+    private func submit() {
         var values: [String: JSONValue] = [:]
         for field in fields {
-            guard let view = inputs[field.id] else { continue }
-            if let toggle = view as? NSSwitch {
-                values[field.id] = .bool(toggle.state == .on)
-            } else if let text = view as? NSTextField {
-                values[field.id] = .string(text.stringValue)
+            if field.kind == "toggle" {
+                values[field.id] = .bool(boolValues[field.id] ?? false)
+            } else {
+                values[field.id] = .string(textValues[field.id] ?? "")
             }
         }
         onSubmit(values)
     }
-
-    @objc private func cancelTapped() { onCancel() }
-    public override func cancelOperation(_ sender: Any?) { onCancel() }
 }

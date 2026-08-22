@@ -1,60 +1,66 @@
 import AppKit
 import JugnuCore
+import SwiftUI
 
 @MainActor
-public final class ConfirmPanel: NSPanel {
-    private let onConfirm: () -> Void
+public final class ConfirmPanel: KeyablePanel {
+    private let errorState = PanelErrorState()
     private let onCancel: () -> Void
 
     public init(ui: UIDescriptor, onConfirm: @escaping () -> Void, onCancel: @escaping () -> Void) {
-        self.onConfirm = onConfirm
         self.onCancel = onCancel
         super.init(
-            contentRect: NSRect(x: 0, y: 0, width: 360, height: 140),
-            styleMask: [.titled, .closable],
+            contentRect: NSRect(x: 0, y: 0, width: 380, height: 180),
+            styleMask: [.borderless],
             backing: .buffered,
             defer: false
         )
-        title = ui.title ?? "Confirm"
         isFloatingPanel = true
         level = .floating
+        backgroundColor = .clear
+        isOpaque = false
+        hasShadow = true
         hidesOnDeactivate = false
-
-        let stack = NSStackView()
-        stack.orientation = .vertical
-        stack.spacing = 12
-        stack.translatesAutoresizingMaskIntoConstraints = false
-
-        let body = NSTextField(wrappingLabelWithString: ui.message ?? "")
-        body.maximumNumberOfLines = 4
-
-        let buttons = NSStackView()
-        buttons.orientation = .horizontal
-        buttons.spacing = 8
-        let cancel = NSButton(title: ui.cancelLabel ?? "Cancel", target: self, action: #selector(cancelTapped))
-        let ok = NSButton(title: ui.confirmLabel ?? "Confirm", target: self, action: #selector(confirmTapped))
-        ok.keyEquivalent = "\r"
-        buttons.addArrangedSubview(NSView())
-        buttons.addArrangedSubview(cancel)
-        buttons.addArrangedSubview(ok)
-
-        stack.addArrangedSubview(body)
-        stack.addArrangedSubview(buttons)
-        contentView = NSView()
-        contentView?.addSubview(stack)
-        if let cv = contentView {
-            NSLayoutConstraint.activate([
-                stack.leadingAnchor.constraint(equalTo: cv.leadingAnchor, constant: 16),
-                stack.trailingAnchor.constraint(equalTo: cv.trailingAnchor, constant: -16),
-                stack.topAnchor.constraint(equalTo: cv.topAnchor, constant: 16),
-                stack.bottomAnchor.constraint(equalTo: cv.bottomAnchor, constant: -16),
-            ])
-        }
+        contentView = NSHostingView(
+            rootView: ThemedPanelBackground {
+                ConfirmView(ui: ui, errorState: errorState, onConfirm: onConfirm, onCancel: onCancel)
+            }
+        )
         center()
     }
 
-    @objc private func confirmTapped() { onConfirm() }
-    @objc private func cancelTapped() { onCancel() }
+    public func presentError(_ message: String) {
+        errorState.message = message
+    }
 
-    public override func cancelOperation(_ sender: Any?) { onCancel() }
+    override public func cancelOperation(_ sender: Any?) { onCancel() }
+}
+
+private struct ConfirmView: View {
+    let ui: UIDescriptor
+    @ObservedObject var errorState: PanelErrorState
+    var onConfirm: () -> Void
+    var onCancel: () -> Void
+    @Environment(\.jugnuTheme) private var theme
+    @ObservedObject private var store = ThemeStore.shared
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: JugnuTokens.Spacing.row) {
+            Text(ui.title ?? "Confirm")
+                .font(JugnuTokens.font(presetId: store.presetId, role: .headline))
+            Text(ui.message ?? "")
+                .font(JugnuTokens.font(presetId: store.presetId, role: .body))
+                .foregroundStyle(theme.textSecondary)
+            if let message = errorState.message {
+                PanelErrorBanner(message: message)
+            }
+            HStack {
+                Spacer()
+                Button(ui.cancelLabel ?? "Cancel", action: onCancel)
+                    .keyboardShortcut(.cancelAction)
+                Button(ui.confirmLabel ?? "Confirm", action: onConfirm)
+                    .keyboardShortcut(.defaultAction)
+            }
+        }
+    }
 }

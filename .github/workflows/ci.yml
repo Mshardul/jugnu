@@ -72,4 +72,4 @@ jobs:
 
       - name: Swift tests
         working-directory: shell
-        run: swift test
+        run: swift test --filter JugnuCoreTests

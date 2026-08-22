@@ -26,7 +26,7 @@ public enum CommandInvoke {
         } catch {
             host.dismissActive(markDismiss: false)
             host.present(
-                response: RunResponse(ok: false, error: String(describing: error)),
+                response: RunResponse(ok: false, error: UserFacingError.message(for: error)),
                 commandId: commandId,
                 trace: trace,
                 followUp: followUp

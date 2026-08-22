@@ -63,16 +63,18 @@ public struct AddonRunner: Sendable {
 
         let requestData = try RunJSON.encodeRequest(request)
 
+        let group = DispatchGroup()
+        group.enter()
+        process.terminationHandler = { _ in group.leave() }
+
         try process.run()
         stdin.fileHandleForWriting.write(requestData)
         try stdin.fileHandleForWriting.close()
 
-        let deadline = Date().addingTimeInterval(timeout)
-        while process.isRunning, Date() < deadline {
-            Thread.sleep(forTimeInterval: 0.05)
-        }
-        if process.isRunning {
+        let waited = group.wait(timeout: .now() + timeout)
+        if waited == .timedOut {
             process.terminate()
+            _ = group.wait(timeout: .now() + 1)
             throw AddonRunnerError.timeout
         }
 

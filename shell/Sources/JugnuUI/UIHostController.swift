@@ -1,11 +1,11 @@
 import AppKit
 import JugnuCore
 
-/// Routes addon `RunResponse` values to shell-owned UI patterns.
 @MainActor
 public final class UIHostController {
     private let toast = ToastPresenter()
     private var activePanel: NSPanel?
+    private var presentError: ((String) -> Void)?
     private var activeTrace: InvokeTrace?
 
     public init() {}
@@ -32,9 +32,9 @@ public final class UIHostController {
         }
 
         if response.ok {
-            toast.show(message: response.message ?? "OK", isError: false)
+            toast.show(message: response.message ?? "Done.", isError: false)
         } else {
-            toast.show(message: response.error ?? "Failed", isError: true)
+            toast.show(message: response.error ?? "Something went wrong. Try again.", isError: true)
         }
         markPaintAndContent()
     }
@@ -44,6 +44,7 @@ public final class UIHostController {
         dismissActive(markDismiss: false)
         let panel = SkeletonPanel(pattern: pattern, title: title ?? "Loading…")
         activePanel = panel
+        presentError = nil
         panel.orderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
         markFirstPaint()
@@ -54,12 +55,18 @@ public final class UIHostController {
         commandId: String,
         followUp: @escaping (RunRequest) async throws -> RunResponse
     ) {
-        present(response: response, commandId: commandId, trace: activeTrace ?? InvokeTrace(commandId: commandId), followUp: followUp)
+        present(
+            response: response,
+            commandId: commandId,
+            trace: activeTrace ?? InvokeTrace(commandId: commandId),
+            followUp: followUp
+        )
     }
 
     public func dismissActive(markDismiss: Bool = true) {
         activePanel?.close()
         activePanel = nil
+        presentError = nil
         if markDismiss {
             activeTrace?.markDismiss()
             #if DEBUG
@@ -91,13 +98,7 @@ public final class UIHostController {
                         command: commandId,
                         args: ["confirmed": .bool(true)]
                     )
-                    do {
-                        let res = try await followUp(req)
-                        self?.dismissActive(markDismiss: false)
-                        self?.present(response: res, commandId: commandId, trace: self?.activeTrace ?? InvokeTrace(commandId: commandId), followUp: followUp)
-                    } catch {
-                        self?.toast.show(message: String(describing: error), isError: true)
-                    }
+                    await self?.handleFollowUp(req, commandId: commandId, followUp: followUp)
                 }
             },
             onCancel: { [weak self] in
@@ -105,6 +106,7 @@ public final class UIHostController {
             }
         )
         activePanel = panel
+        presentError = { [weak panel] message in panel?.presentError(message) }
         panel.orderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
         markPaintAndContent()
@@ -123,13 +125,7 @@ public final class UIHostController {
                     var args: [String: JSONValue] = ["itemId": .string(item.id)]
                     if let action { args["action"] = .string(action) }
                     let req = RunJSON.followUpRequest(command: commandId, args: args)
-                    do {
-                        let res = try await followUp(req)
-                        self?.dismissActive(markDismiss: false)
-                        self?.present(response: res, commandId: commandId, trace: self?.activeTrace ?? InvokeTrace(commandId: commandId), followUp: followUp)
-                    } catch {
-                        self?.toast.show(message: String(describing: error), isError: true)
-                    }
+                    await self?.handleFollowUp(req, commandId: commandId, followUp: followUp)
                 }
             },
             onCancel: { [weak self] in
@@ -137,6 +133,7 @@ public final class UIHostController {
             }
         )
         activePanel = panel
+        presentError = { [weak panel] message in panel?.presentError(message) }
         panel.orderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
         markPaintAndContent()
@@ -153,13 +150,7 @@ public final class UIHostController {
             onSubmit: { [weak self] values in
                 Task { @MainActor in
                     let req = RunJSON.followUpRequest(command: commandId, args: values)
-                    do {
-                        let res = try await followUp(req)
-                        self?.dismissActive(markDismiss: false)
-                        self?.present(response: res, commandId: commandId, trace: self?.activeTrace ?? InvokeTrace(commandId: commandId), followUp: followUp)
-                    } catch {
-                        self?.toast.show(message: String(describing: error), isError: true)
-                    }
+                    await self?.handleFollowUp(req, commandId: commandId, followUp: followUp)
                 }
             },
             onCancel: { [weak self] in
@@ -167,6 +158,7 @@ public final class UIHostController {
             }
         )
         activePanel = panel
+        presentError = { [weak panel] message in panel?.presentError(message) }
         panel.orderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
         markPaintAndContent()
@@ -188,12 +180,43 @@ public final class UIHostController {
             },
             onClose: { [weak self] in
                 self?.activePanel = nil
+                self?.presentError = nil
                 self?.activeTrace?.markDismiss()
             }
         )
         activePanel = panel
+        presentError = nil
         panel.orderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
         markPaintAndContent()
+    }
+
+    private func handleFollowUp(
+        _ req: RunRequest,
+        commandId: String,
+        followUp: @escaping (RunRequest) async throws -> RunResponse
+    ) async {
+        do {
+            let res = try await followUp(req)
+            if res.ok == false, let presenter = presentError, activePanel != nil, res.ui == nil {
+                presenter(res.error ?? UserFacingError.message(for: AddonRunnerError.invalidResponse))
+                playCommandSound(success: false)
+                return
+            }
+            dismissActive(markDismiss: false)
+            present(
+                response: res,
+                commandId: commandId,
+                trace: activeTrace ?? InvokeTrace(commandId: commandId),
+                followUp: followUp
+            )
+        } catch {
+            if let presenter = presentError, activePanel != nil {
+                presenter(UserFacingError.message(for: error))
+                playCommandSound(success: false)
+            } else {
+                toast.show(message: UserFacingError.message(for: error), isError: true)
+            }
+        }
     }
 }

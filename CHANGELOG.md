@@ -22,6 +22,7 @@ The project has not published a release yet. Entries currently describe unreleas
 
 ### App and Tools
 
+- 2026-08-23 — Palette + addon UI product pass: fuzzy search, shared theme tokens, SwiftUI-hosted panels, live theming, starter-set first-run, app icon.
 - 2026-08-22 — Jugnu is a planned native macOS command platform with a hotkey palette and menu-bar shell.
 - 2026-08-22 — `clipboard-history` provides local SQLite-backed clipboard search and pins.
 - 2026-08-22 — `battery-eta` reports macOS battery percentage, charging state, and ETA.

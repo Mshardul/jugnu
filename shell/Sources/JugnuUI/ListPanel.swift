@@ -1,103 +1,121 @@
 import AppKit
 import JugnuCore
+import SwiftUI
 
 @MainActor
-public final class ListPanel: NSPanel, NSTableViewDataSource, NSTableViewDelegate, NSSearchFieldDelegate {
-    private let onSelect: (UIListItem, String?) -> Void
+public final class ListPanel: KeyablePanel {
+    private let errorState = PanelErrorState()
     private let onCancel: () -> Void
-    private var allItems: [UIListItem]
-    private var filtered: [UIListItem]
-    private let table = NSTableView()
-    private let search = NSSearchField()
 
     public init(
         ui: UIDescriptor,
         onSelect: @escaping (UIListItem, String?) -> Void,
         onCancel: @escaping () -> Void
     ) {
-        self.onSelect = onSelect
         self.onCancel = onCancel
-        self.allItems = ui.items ?? []
-        self.filtered = self.allItems
         super.init(
             contentRect: NSRect(x: 0, y: 0, width: 420, height: 360),
-            styleMask: [.titled, .closable, .resizable],
+            styleMask: [.borderless],
             backing: .buffered,
             defer: false
         )
-        title = ui.title ?? "Choose"
         isFloatingPanel = true
         level = .floating
-
-        search.placeholderString = ui.placeholder ?? "Filter"
-        search.delegate = self
-        search.translatesAutoresizingMaskIntoConstraints = false
-
-        let col = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("title"))
-        col.title = "Item"
-        col.width = 380
-        table.addTableColumn(col)
-        table.headerView = nil
-        table.dataSource = self
-        table.delegate = self
-        table.target = self
-        table.doubleAction = #selector(rowActivated)
-        table.translatesAutoresizingMaskIntoConstraints = false
-
-        let scroll = NSScrollView()
-        scroll.documentView = table
-        scroll.hasVerticalScroller = true
-        scroll.translatesAutoresizingMaskIntoConstraints = false
-
-        let root = NSView()
-        root.addSubview(search)
-        root.addSubview(scroll)
-        contentView = root
-        NSLayoutConstraint.activate([
-            search.leadingAnchor.constraint(equalTo: root.leadingAnchor, constant: 12),
-            search.trailingAnchor.constraint(equalTo: root.trailingAnchor, constant: -12),
-            search.topAnchor.constraint(equalTo: root.topAnchor, constant: 12),
-            scroll.leadingAnchor.constraint(equalTo: root.leadingAnchor, constant: 12),
-            scroll.trailingAnchor.constraint(equalTo: root.trailingAnchor, constant: -12),
-            scroll.topAnchor.constraint(equalTo: search.bottomAnchor, constant: 8),
-            scroll.bottomAnchor.constraint(equalTo: root.bottomAnchor, constant: -12),
-        ])
+        backgroundColor = .clear
+        isOpaque = false
+        hasShadow = true
+        hidesOnDeactivate = false
+        contentView = NSHostingView(
+            rootView: ThemedPanelBackground {
+                ListPanelView(ui: ui, errorState: errorState, onSelect: onSelect, onCancel: onCancel)
+            }
+        )
         center()
     }
 
-    public func numberOfRows(in tableView: NSTableView) -> Int { filtered.count }
-
-    public func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
-        let item = filtered[row]
-        let text = item.subtitle.map { "\(item.title) — \($0)" } ?? item.title
-        let view = NSTextField(labelWithString: text)
-        return view
+    public func presentError(_ message: String) {
+        errorState.message = message
     }
 
-    public func controlTextDidChange(_ obj: Notification) {
-        let q = search.stringValue.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        filtered = q.isEmpty
-            ? allItems
-            : allItems.filter {
-                $0.title.lowercased().contains(q) || ($0.subtitle?.lowercased().contains(q) ?? false)
-            }
-        table.reloadData()
-    }
+    override public func cancelOperation(_ sender: Any?) { onCancel() }
+}
 
-    @objc private func rowActivated() {
-        let row = table.clickedRow >= 0 ? table.clickedRow : table.selectedRow
-        guard row >= 0, row < filtered.count else { return }
-        let item = filtered[row]
-        onSelect(item, item.actions?.first ?? "select")
-    }
+private struct ListPanelView: View {
+    let ui: UIDescriptor
+    @ObservedObject var errorState: PanelErrorState
+    var onSelect: (UIListItem, String?) -> Void
+    var onCancel: () -> Void
 
-    public override func keyDown(with event: NSEvent) {
-        if event.keyCode == 36 { // return
-            rowActivated()
-        } else {
-            super.keyDown(with: event)
+    @State private var query = ""
+    @State private var selection = 0
+    @Environment(\.jugnuTheme) private var theme
+    @ObservedObject private var store = ThemeStore.shared
+
+    private var items: [UIListItem] { ui.items ?? [] }
+
+    private var filtered: [UIListItem] {
+        let q = query.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        if q.isEmpty { return items }
+        return items.filter {
+            $0.title.lowercased().contains(q) || ($0.subtitle?.lowercased().contains(q) ?? false)
         }
     }
 
-    public override func cancelOperation(_ sender: Any?) { onCancel() }
+    var body: some View {
+        VStack(alignment: .leading, spacing: JugnuTokens.Spacing.row) {
+            Text(ui.title ?? "Choose")
+                .font(JugnuTokens.font(presetId: store.presetId, role: .headline))
+            TextField(ui.placeholder ?? "Filter", text: $query)
+                .textFieldStyle(.plain)
+                .padding(6)
+                .background(theme.background)
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .onChange(of: query) { _, _ in
+                    selection = 0
+                }
+            if let message = errorState.message {
+                PanelErrorBanner(message: message)
+            }
+            List(Array(filtered.enumerated()), id: \.element.id) { idx, item in
+                Button {
+                    onSelect(item, item.actions?.first ?? "select")
+                } label: {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(item.title)
+                        if let subtitle = item.subtitle, !subtitle.isEmpty {
+                            Text(subtitle)
+                                .font(JugnuTokens.font(presetId: store.presetId, role: .caption))
+                                .foregroundStyle(theme.textSecondary)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.vertical, 2)
+                    .background(idx == selection ? theme.accent.opacity(0.15) : Color.clear)
+                }
+                .buttonStyle(.plain)
+            }
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
+        }
+        .onKeyPress(.escape) {
+            onCancel()
+            return .handled
+        }
+        .onKeyPress(.return) {
+            guard filtered.indices.contains(selection) else { return .handled }
+            let item = filtered[selection]
+            onSelect(item, item.actions?.first ?? "select")
+            return .handled
+        }
+        .onKeyPress(.downArrow) {
+            if !filtered.isEmpty {
+                selection = min(selection + 1, filtered.count - 1)
+            }
+            return .handled
+        }
+        .onKeyPress(.upArrow) {
+            selection = max(selection - 1, 0)
+            return .handled
+        }
+    }
 }

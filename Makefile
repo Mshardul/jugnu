@@ -1,4 +1,4 @@
-.PHONY: sync precommit lint format typecheck spell test ci hooks
+.PHONY: sync precommit lint format typecheck spell test ci hooks verify-live
 
 sync:
 	uv sync
@@ -23,6 +23,9 @@ spell:
 
 test:
 	uv run pytest
+
+verify-live:
+	cd shell && swift test --filter JugnuCoreLiveTests
 
 # Match CI check job (no semgrep locally).
 ci: lint

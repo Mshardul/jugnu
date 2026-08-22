@@ -1,14 +1,32 @@
 # Jugnu config (example)
-# Aligned with docs/architecture/2026-08-22-shell-design.md
-# Proposed path: ~/.config/jugnu/jugnu.yaml
-# Shell does not load this until implemented.
+# Path: ~/.config/jugnu/jugnu.yaml
 
 version: 1
 
 shell:
   hotkey: "option+space" # default; first-run may opt in to cmd+space
-  # Catalog the shell fetches for install/update (override if you pin a Release URL)
   registry_url: "https://raw.githubusercontent.com/Mshardul/jugnu/main/registry/addons.json"
+
+sound: true
+
+palette:
+  first_view: blank   # blank | recent | favorites
+
+theme:
+  light:
+    accent: "#C97A12"
+    background: "#F7F3EA"
+    surface: "#FFFDF8"
+    text_primary: "#2A2417"
+    text_secondary: "#756E5C"
+    error: "#E5484D"
+  dark:
+    accent: "#F5A623"
+    background: "#16130E"
+    surface: "#1F1B13"
+    text_primary: "#EDE6D9"
+    text_secondary: "#8C8577"
+    error: "#E5484D"
 
 addons:
   # Only listed + enabled addons appear in palette search.
@@ -21,9 +39,4 @@ addons:
     enabled: false
 
 ui: {}
-# Reserved for later (first screen, theme, …).
-
-# Dev only (optional): load unpacked addon sources without a Release zip
-# dev:
-#   addon_paths:
-#     - /path/to/jugnu/addons
+# Reserved (do not use for theme — that is the theme: block above).

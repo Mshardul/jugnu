@@ -21,6 +21,25 @@ final class AddonRunnerTests: XCTestCase {
         XCTAssertEqual(response.message, "echo-ok")
     }
 
+    func testEchoCompletesWellUnderTimeout() throws {
+        let bundleRoot = try XCTUnwrap(
+            Bundle.module.url(forResource: "addon", withExtension: "yaml", subdirectory: "Fixtures/echo-addon")?
+                .deletingLastPathComponent()
+        )
+        let work = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: work, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: work) }
+
+        try copyTree(from: bundleRoot, to: work)
+        let runURL = work.appendingPathComponent("bin/run")
+        try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: runURL.path)
+
+        let manifest = try ManifestLoader.load(from: work)
+        let start = Date()
+        _ = try AddonRunner(timeoutSeconds: 2).run(manifest: manifest, addonRoot: work, commandId: "ping")
+        XCTAssertLessThan(Date().timeIntervalSince(start), 1.0)
+    }
+
     func testRunnerDecodesListUI() throws {
         let root = try copyUIHostFixtures()
         defer { try? FileManager.default.removeItem(at: root) }

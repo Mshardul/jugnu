@@ -1,4 +1,5 @@
 import AppKit
+import SwiftUI
 
 @MainActor
 public final class ToastPresenter {
@@ -12,7 +13,7 @@ public final class ToastPresenter {
         window?.close()
 
         let panel = NSPanel(
-            contentRect: NSRect(x: 0, y: 0, width: 320, height: 44),
+            contentRect: NSRect(x: 0, y: 0, width: 320, height: 52),
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false
@@ -20,35 +21,25 @@ public final class ToastPresenter {
         panel.isFloatingPanel = true
         panel.level = .floating
         panel.backgroundColor = .clear
+        panel.isOpaque = false
         panel.hasShadow = true
+        panel.contentView = NSHostingView(rootView: ToastView(message: message, isError: isError))
 
-        let label = NSTextField(labelWithString: message)
-        label.alignment = .center
-        label.textColor = .white
-        label.font = .systemFont(ofSize: 13, weight: .medium)
-        label.translatesAutoresizingMaskIntoConstraints = false
-
-        let box = NSView(frame: .zero)
-        box.wantsLayer = true
-        box.layer?.cornerRadius = 10
-        box.layer?.backgroundColor = (isError ? NSColor.systemRed : NSColor.black.withAlphaComponent(0.82)).cgColor
-        box.translatesAutoresizingMaskIntoConstraints = false
-        box.addSubview(label)
-        NSLayoutConstraint.activate([
-            label.leadingAnchor.constraint(equalTo: box.leadingAnchor, constant: 14),
-            label.trailingAnchor.constraint(equalTo: box.trailingAnchor, constant: -14),
-            label.topAnchor.constraint(equalTo: box.topAnchor, constant: 12),
-            label.bottomAnchor.constraint(equalTo: box.bottomAnchor, constant: -12),
-        ])
-
-        panel.contentView = box
-        if let screen = NSScreen.main {
+        if let screen = NSScreen.screens.first(where: { $0.frame.contains(NSEvent.mouseLocation) }) ?? NSScreen.main {
             let x = screen.visibleFrame.midX - 160
             let y = screen.visibleFrame.maxY - 80
             panel.setFrameOrigin(NSPoint(x: x, y: y))
         }
+        panel.alphaValue = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion ? 1 : 0
         panel.orderFront(nil)
+        if !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion {
+            NSAnimationContext.runAnimationGroup { ctx in
+                ctx.duration = 0.12
+                panel.animator().alphaValue = 1
+            }
+        }
         window = panel
+        playCommandSound(success: !isError)
 
         let reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
         let work = DispatchWorkItem { [weak self] in
@@ -57,5 +48,24 @@ public final class ToastPresenter {
         }
         hideWork = work
         DispatchQueue.main.asyncAfter(deadline: .now() + (reduceMotion ? 1.2 : 1.5), execute: work)
+    }
+}
+
+private struct ToastView: View {
+    let message: String
+    let isError: Bool
+    @Environment(\.colorScheme) private var colorScheme
+    @ObservedObject private var store = ThemeStore.shared
+
+    var body: some View {
+        let theme = JugnuThemeColors(theme: resolvedTheme(from: store.config, colorScheme: colorScheme))
+        Text(message)
+            .font(JugnuTokens.font(presetId: store.presetId, role: .callout))
+            .foregroundStyle(isError ? Color.white : theme.textPrimary)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .frame(maxWidth: .infinity)
+            .background(isError ? theme.error : theme.surface)
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 }

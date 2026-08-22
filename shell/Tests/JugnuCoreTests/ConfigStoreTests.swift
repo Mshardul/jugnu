@@ -11,6 +11,8 @@ final class ConfigStoreTests: XCTestCase {
         let config = try store.loadOrCreateDefaults()
         XCTAssertEqual(config.shell.hotkey, "option+space")
         XCTAssertEqual(config.shell.registryURL, ShellConfig.defaultRegistryURL)
+        XCTAssertEqual(config.theme.dark.accent, "#F5A623")
+        XCTAssertEqual(config.sound, true)
         XCTAssertTrue(FileManager.default.fileExists(atPath: store.paths.configFile.path))
     }
 

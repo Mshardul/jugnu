@@ -36,8 +36,32 @@ final class CommandIndexTests: XCTestCase {
         index.config = config
         try index.rebuild()
         XCTAssertEqual(index.search("mic").count, 1)
-        XCTAssertTrue(index.search("nope").isEmpty)
         XCTAssertEqual(index.search("").count, 1)
+        let suggestions = index.searchHits("nope")
+        XCTAssertEqual(suggestions.count, 1)
+        XCTAssertTrue(suggestions[0].isSuggestion)
+    }
+
+    func testTitleTierBeatsKeywordEvenIfKeywordScoreHigher() {
+        let zoom = IndexedCommand(
+            addonId: "a",
+            commandId: "z",
+            title: "Zoom",
+            subtitle: "",
+            keywords: ["mic mute"],
+            addonRoot: URL(fileURLWithPath: "/tmp")
+        )
+        let mute = IndexedCommand(
+            addonId: "b",
+            commandId: "t",
+            title: "Mic Mute",
+            subtitle: "",
+            keywords: [],
+            addonRoot: URL(fileURLWithPath: "/tmp")
+        )
+        var index = CommandIndex(paths: JugnuPaths(home: URL(fileURLWithPath: "/tmp")), config: JugnuConfig())
+        index.replaceCommandsForTesting([zoom, mute])
+        XCTAssertEqual(index.search("mcmt").first?.title, "Mic Mute")
     }
 
     func testExtraAddonRoots() throws {

@@ -9,7 +9,12 @@ final class MenuBarController {
         proxy = Proxy(onOpenPalette: onOpenPalette, onPreferences: onPreferences, onQuit: onQuit)
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let button = statusItem.button {
-            button.title = "Jugnu"
+            if let image = NSImage(named: "MenuBarIcon") {
+                image.isTemplate = true
+                button.image = image
+            } else {
+                button.title = "Jugnu"
+            }
             button.toolTip = "Jugnu"
         }
 

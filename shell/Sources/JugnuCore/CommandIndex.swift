@@ -93,15 +93,74 @@ public struct CommandIndex: Sendable {
         commands = found.sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
     }
 
+    public mutating func replaceCommandsForTesting(_ commands: [IndexedCommand]) {
+        self.commands = commands
+    }
+
     public func search(_ query: String) -> [IndexedCommand] {
-        let q = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        if q.isEmpty { return all }
-        let needle = q.lowercased()
-        return all.filter { cmd in
-            if cmd.title.lowercased().contains(needle) { return true }
-            if cmd.subtitle.lowercased().contains(needle) { return true }
-            if cmd.qualifiedId.lowercased().contains(needle) { return true }
-            return cmd.keywords.contains { $0.lowercased().contains(needle) }
+        searchHits(query).map(\.command)
+    }
+
+    public func searchHits(_ query: String) -> [SearchHit] {
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty {
+            return all.map { SearchHit(command: $0, tier: .title, score: 0, isSuggestion: false) }
         }
+
+        var hits: [SearchHit] = []
+        for command in commands {
+            if let ranked = rank(command, query: trimmed) {
+                hits.append(ranked)
+            }
+        }
+        hits.sort { lhs, rhs in
+            if lhs.tier != rhs.tier { return lhs.tier < rhs.tier }
+            if lhs.score != rhs.score { return lhs.score > rhs.score }
+            return lhs.command.title.localizedCaseInsensitiveCompare(rhs.command.title) == .orderedAscending
+        }
+        if hits.isEmpty, let suggestion = closest(query: trimmed) {
+            return [suggestion]
+        }
+        return hits
+    }
+
+    private func rank(_ command: IndexedCommand, query: String) -> SearchHit? {
+        let titleScore = Fuzzy.score(query: query, in: command.title)
+        if titleScore > 0 {
+            return SearchHit(command: command, tier: .title, score: titleScore, isSuggestion: false)
+        }
+        let keywordScore = command.keywords.map { Fuzzy.score(query: query, in: $0) }.max() ?? 0
+        if keywordScore > 0 {
+            return SearchHit(command: command, tier: .keyword, score: keywordScore, isSuggestion: false)
+        }
+        let subtitleScore = Fuzzy.score(query: query, in: command.subtitle)
+        if subtitleScore > 0 {
+            return SearchHit(command: command, tier: .subtitle, score: subtitleScore, isSuggestion: false)
+        }
+        return nil
+    }
+
+    private func closest(query: String) -> SearchHit? {
+        var best: SearchHit?
+        var bestDistance = Int.max
+        for command in commands {
+            let titleScore = Fuzzy.score(query: query, in: command.title)
+            let keywordScore = command.keywords.map { Fuzzy.score(query: query, in: $0) }.max() ?? 0
+            let subtitleScore = Fuzzy.score(query: query, in: command.subtitle)
+            let score = max(titleScore, keywordScore, subtitleScore)
+            let distance = Fuzzy.editDistance(Fuzzy.fold(query), Fuzzy.fold(command.title))
+            let candidate = SearchHit(command: command, tier: .title, score: score, isSuggestion: true)
+            let betterScore = score > (best?.score ?? -1)
+            let sameScoreCloser = score == (best?.score ?? -1) && distance < bestDistance
+            let sameScoreSameDistAlpha = score == (best?.score ?? -1)
+                && distance == bestDistance
+                && command.title.localizedCaseInsensitiveCompare(best?.command.title ?? command.title)
+                == .orderedAscending
+            if best == nil || betterScore || sameScoreCloser || sameScoreSameDistAlpha {
+                best = candidate
+                bestDistance = distance
+            }
+        }
+        return best
     }
 }

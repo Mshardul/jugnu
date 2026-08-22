@@ -12,7 +12,7 @@ Status legend for staged leaves: **active** = runnable code; **stub** = README o
 | 4 | Addon **popup UI** host | [UI + speed design](architecture/2026-08-22-addon-ui-speed-design.md) (Approved) · [P1 plan](superpowers/plans/2026-08-22-addon-ui-host-p1.md) **done** |
 | 5 | **Speed** budget | Invoke → visible result; budgets in that design §6 |
 | 6 | Context-aware UI (later) | Reserved in UI + speed §7 — after UI host exists |
-| 7 | Palette + addon UI **product pass** | [2026-08-23 spec](architecture/2026-08-23-palette-ui-product-pass.md) — search quality, AppKit→SwiftUI panel rewrite onto shared design tokens, user-editable light/dark theming, keyboard/motion accessibility, first-run recommended-set refresh, live-verification suite. **In progress** |
+| 7 | Palette + addon UI **product pass** | [2026-08-23 spec](architecture/2026-08-23-palette-ui-product-pass.md) · [plan](superpowers/plans/2026-08-23-palette-ui-product-pass.md) — search quality, AppKit→SwiftUI panel rewrite onto shared design tokens, user-editable light/dark theming, keyboard/motion accessibility, first-run recommended-set refresh, live-verification suite. **Implemented; walk [shell-smoke.md](architecture/shell-smoke.md)** |
 | 8 | Persistent latency logging (future epic) | [Ticket 0001](tickets.md) — JSON-lines, capped retention, timing/ids only, never payload |
 | 9 | Addon management / settings (future epic) | [Ticket 0002](tickets.md) — Preferences redesign, catalog browse, category taxonomy surfaced in-app |
 | 10 | Security audit (future epic) | [Ticket 0003](tickets.md) — seeded with a real zip-slip finding in `AddonInstaller.unzip()`; expect more findings from a full pass on installer/runner/registry-trust |

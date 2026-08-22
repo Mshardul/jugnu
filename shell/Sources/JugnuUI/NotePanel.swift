@@ -1,14 +1,12 @@
 import AppKit
 import JugnuCore
+import SwiftUI
 
-/// Always-on-top scratchpad panel. Unlike Form/List/Confirm, this panel stays
-/// open across saves — closing (or Cmd+S) is what triggers persistence, not a
-/// one-shot submit/dismiss cycle.
 @MainActor
-public final class NotePanel: NSPanel, NSWindowDelegate {
+public final class NotePanel: NSPanel {
     private let onSave: (String) -> Void
     private let onClose: () -> Void
-    private let textView: NSTextView
+    private let model: NoteModel
 
     public init(
         ui: UIDescriptor,
@@ -17,8 +15,7 @@ public final class NotePanel: NSPanel, NSWindowDelegate {
     ) {
         self.onSave = onSave
         self.onClose = onClose
-        let scrollView = NSTextView.scrollableTextView()
-        self.textView = scrollView.documentView as! NSTextView
+        self.model = NoteModel(text: ui.content ?? "")
         super.init(
             contentRect: NSRect(x: 0, y: 0, width: 420, height: 320),
             styleMask: [.titled, .closable, .resizable],
@@ -29,45 +26,50 @@ public final class NotePanel: NSPanel, NSWindowDelegate {
         isFloatingPanel = true
         level = .floating
         hidesOnDeactivate = false
-        delegate = self
-
-        textView.string = ui.content ?? ""
-        textView.isRichText = false
-        textView.allowsUndo = true
-        textView.font = .systemFont(ofSize: 13)
-
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        contentView = NSView()
-        contentView?.addSubview(scrollView)
-        if let cv = contentView {
-            NSLayoutConstraint.activate([
-                scrollView.leadingAnchor.constraint(equalTo: cv.leadingAnchor),
-                scrollView.trailingAnchor.constraint(equalTo: cv.trailingAnchor),
-                scrollView.topAnchor.constraint(equalTo: cv.topAnchor),
-                scrollView.bottomAnchor.constraint(equalTo: cv.bottomAnchor),
-            ])
-        }
+        delegate = model
+        model.onSave = { [weak self] text in self?.onSave(text) }
+        model.onClose = { [weak self] in self?.onClose() }
+        contentView = NSHostingView(rootView: NoteEditorView(model: model))
         center()
     }
 
-    public override func performKeyEquivalent(with event: NSEvent) -> Bool {
+    override public func performKeyEquivalent(with event: NSEvent) -> Bool {
         if event.modifierFlags.contains(.command), event.charactersIgnoringModifiers == "s" {
-            save()
+            onSave(model.text)
             return true
         }
         return super.performKeyEquivalent(with: event)
     }
+}
 
-    private func save() {
-        onSave(textView.string)
+@MainActor
+private final class NoteModel: NSObject, ObservableObject, NSWindowDelegate {
+    @Published var text: String
+    var onSave: ((String) -> Void)?
+    var onClose: (() -> Void)?
+
+    init(text: String) {
+        self.text = text
     }
 
-    public func windowWillClose(_ notification: Notification) {
-        save()
-        onClose()
+    func windowWillClose(_ notification: Notification) {
+        onSave?(text)
+        onClose?()
     }
+}
 
-    public override func cancelOperation(_ sender: Any?) {
-        close()
+private struct NoteEditorView: View {
+    @ObservedObject var model: NoteModel
+    @Environment(\.colorScheme) private var colorScheme
+    @ObservedObject private var store = ThemeStore.shared
+
+    var body: some View {
+        let theme = JugnuThemeColors(theme: resolvedTheme(from: store.config, colorScheme: colorScheme))
+        TextEditor(text: $model.text)
+            .font(JugnuTokens.font(presetId: store.presetId, role: .body))
+            .scrollContentBackground(.hidden)
+            .padding(8)
+            .background(theme.surface)
+            .foregroundStyle(theme.textPrimary)
     }
 }

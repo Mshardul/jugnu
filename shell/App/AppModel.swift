@@ -2,6 +2,7 @@ import Combine
 import Foundation
 import JugnuCore
 import JugnuUI
+import SwiftUI
 
 @MainActor
 final class AppModel: ObservableObject {
@@ -16,6 +17,7 @@ final class AppModel: ObservableObject {
     @Published var config: JugnuConfig
     @Published var state: JugnuState
     @Published var results: [IndexedCommand] = []
+    @Published var lastHits: [SearchHit] = []
     @Published var statusMessage: String?
 
     private var index: CommandIndex
@@ -32,7 +34,10 @@ final class AppModel: ObservableObject {
         self.config = loadedConfig
         self.state = loadedState
         self.index = CommandIndex(paths: paths, config: loadedConfig, extraAddonRoots: Self.devRoots())
+        publishTheme()
     }
+
+    var allCommands: [IndexedCommand] { index.all }
 
     func bootstrap() {
         refreshIndex()
@@ -50,19 +55,47 @@ final class AppModel: ObservableObject {
         do {
             try index.rebuild()
             results = index.all
+            lastHits = index.searchHits("")
         } catch {
-            statusMessage = String(describing: error)
+            statusMessage = UserFacingError.message(for: error)
         }
+        publishTheme()
     }
 
     func search(_ query: String) -> [IndexedCommand] {
-        let hits = index.search(query)
-        results = hits
-        return hits
+        let hits = index.searchHits(query)
+        lastHits = hits
+        results = hits.map(\.command)
+        return results
+    }
+
+    func commandsForFirstView() -> [IndexedCommand] {
+        switch config.palette.firstView {
+        case .blank:
+            return []
+        case .recent:
+            return state.recentCommandIDs.compactMap { id in index.all.first { $0.qualifiedId == id } }
+        case .favorites:
+            return state.favoriteCommandIDs.compactMap { id in index.all.first { $0.qualifiedId == id } }
+        }
+    }
+
+    func toggleFavorite(qualifiedId: String) {
+        state.toggleFavorite(qualifiedId: qualifiedId)
+        try? stateStore.save(state)
+        objectWillChange.send()
+    }
+
+    func isFavorite(qualifiedId: String) -> Bool {
+        state.favoriteCommandIDs.contains(qualifiedId)
     }
 
     func run(_ command: IndexedCommand) async {
         statusMessage = nil
+        if config.palette.firstView == .recent {
+            state.recordRecent(qualifiedId: command.qualifiedId)
+            try? stateStore.save(state)
+        }
         do {
             let manifest = try ManifestLoader.load(from: command.addonRoot)
             await CommandInvoke.run(
@@ -91,7 +124,8 @@ final class AppModel: ObservableObject {
                 }
             )
         } catch {
-            statusMessage = String(describing: error)
+            statusMessage = UserFacingError.message(for: error)
+            playCommandSound(success: false)
         }
     }
 
@@ -113,6 +147,12 @@ final class AppModel: ObservableObject {
         return kids.map(\.lastPathComponent).sorted()
     }
 
+    func saveConfig(_ newConfig: JugnuConfig) throws {
+        try store.save(newConfig)
+        config = newConfig
+        publishTheme()
+    }
+
     func completeFirstRun(
         installRecommended: Bool,
         useCommandSpace: Bool,
@@ -126,21 +166,19 @@ final class AppModel: ObservableObject {
                 for root in localAddonRoots {
                     try installer.installFromDirectory(url: root, enable: true)
                 }
-                statusMessage = "Registry install failed; used local addons. (\(error))"
+                statusMessage = "Couldn’t reach the catalog, so the starter addons were copied from this Mac."
             }
         }
         if useCommandSpace {
             var c = try store.loadOrCreateDefaults()
             c.shell.hotkey = "cmd+space"
-            try store.save(c)
-            config = c
+            try saveConfig(c)
         }
         state.firstRunCompleted = true
         try stateStore.save(state)
         refreshIndex()
     }
 
-    /// Fetch catalog and install entries by id (sha256-verified zip download).
     @discardableResult
     func installFromRegistry(ids: [String]) async throws -> [String] {
         config = (try? store.loadOrCreateDefaults()) ?? config
@@ -166,10 +204,15 @@ final class AppModel: ObservableObject {
         statusMessage = nil
         do {
             let ids = try await installFromRegistry(ids: ShellConfig.recommendedAddonIDs)
-            statusMessage = "Installed from registry: \(ids.joined(separator: ", "))"
+            statusMessage = "Installed \(ids.joined(separator: ", "))."
         } catch {
-            statusMessage = String(describing: error)
+            statusMessage = UserFacingError.message(for: error)
         }
+    }
+
+    private func publishTheme() {
+        ThemeStore.shared.config = config.theme
+        ThemeStore.shared.soundEnabled = config.sound
     }
 
     private static func devRoots() -> [URL] {

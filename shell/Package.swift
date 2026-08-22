@@ -24,12 +24,19 @@ let package = Package(
                 .product(name: "HotKey", package: "HotKey"),
             ],
             path: "App",
-            exclude: ["Info.plist"]
+            exclude: ["Info.plist", "Assets.xcassets"]
         ),
         .testTarget(
             name: "JugnuCoreTests",
-            dependencies: ["JugnuCore"],
+            dependencies: [
+                "JugnuCore",
+                .product(name: "Yams", package: "Yams"),
+            ],
             resources: [.copy("Fixtures")]
+        ),
+        .testTarget(
+            name: "JugnuCoreLiveTests",
+            dependencies: ["JugnuCore"]
         ),
     ]
 )

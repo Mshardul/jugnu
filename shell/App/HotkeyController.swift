@@ -27,24 +27,19 @@ final class HotkeyController {
     }
 
     static func parse(_ raw: String) -> KeyCombo? {
-        let parts = raw.lowercased().split(separator: "+").map(String.init)
-        guard let keyPart = parts.last else { return nil }
+        guard let spec = HotkeySpec.parse(raw) else { return nil }
         var modifiers: NSEvent.ModifierFlags = []
-        for part in parts.dropLast() {
-            switch part {
-            case "cmd", "command": modifiers.insert(.command)
-            case "opt", "option", "alt": modifiers.insert(.option)
-            case "ctrl", "control": modifiers.insert(.control)
-            case "shift": modifiers.insert(.shift)
-            default: break
-            }
-        }
+        if spec.modifiers.contains("command") { modifiers.insert(.command) }
+        if spec.modifiers.contains("option") { modifiers.insert(.option) }
+        if spec.modifiers.contains("control") { modifiers.insert(.control) }
+        if spec.modifiers.contains("shift") { modifiers.insert(.shift) }
+
         let key: Key?
-        switch keyPart {
+        switch spec.key {
         case "space": key = .space
-        case "return", "enter": key = .return
+        case "return": key = .return
         case "tab": key = .tab
-        case "escape", "esc": key = .escape
+        case "escape": key = .escape
         case "a": key = .a
         case "b": key = .b
         case "c": key = .c

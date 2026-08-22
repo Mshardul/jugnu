@@ -10,6 +10,7 @@
 		0C269B59DB0AD928393F514F /* JugnuApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFC6769799C763B68AB9458E /* JugnuApp.swift */; };
 		2EF413B28BA833B1BA5D290B /* PrefsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F65D4A1078835B0D1646C28 /* PrefsView.swift */; };
 		31B5452F7928667E746030F0 /* PalettePanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72943E054458D32AFC64B830 /* PalettePanelController.swift */; };
+		A1EBD9F94A85D7D3946C0860 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EF23787A5713452BFF2A17F8 /* Assets.xcassets */; };
 		AC65EF4AD2F34CBB13F2E6F9 /* HotKey in Frameworks */ = {isa = PBXBuildFile; productRef = 7EEF6C210640E38020837ACD /* HotKey */; };
 		AD78C530AE4729B3D27FE654 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D00E1FEF0969F288E08FF6 /* AppModel.swift */; };
 		CF46D9EC5366F66E608B763D /* MenuBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE92CF58DD3BE972D2AEC8CB /* MenuBarController.swift */; };
@@ -28,6 +29,7 @@
 		C5935023FD7BC462A1C14B9A /* shell */ = {isa = PBXFileReference; lastKnownFileType = folder; name = shell; path = .; sourceTree = SOURCE_ROOT; };
 		C92B9A72BEBE9AA2C83556D4 /* Jugnu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Jugnu.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D3D00E1FEF0969F288E08FF6 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		EF23787A5713452BFF2A17F8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		EFC6769799C763B68AB9458E /* JugnuApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JugnuApp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -65,6 +67,7 @@
 			isa = PBXGroup;
 			children = (
 				D3D00E1FEF0969F288E08FF6 /* AppModel.swift */,
+				EF23787A5713452BFF2A17F8 /* Assets.xcassets */,
 				5E983F2778775352830C719C /* FirstRunWindow.swift */,
 				278F0380D93A6EEE31AD2C2F /* HotkeyController.swift */,
 				EFC6769799C763B68AB9458E /* JugnuApp.swift */,
@@ -92,6 +95,7 @@
 			buildConfigurationList = DBD0A392E9FF0E3B2CDC9949 /* Build configuration list for PBXNativeTarget "Jugnu" */;
 			buildPhases = (
 				F75565085121D698824784C3 /* Sources */,
+				EFE7B3E41F662D1BC8D4FEAD /* Resources */,
 				3DAF7F5C38AD3211ED1375A4 /* Frameworks */,
 			);
 			buildRules = (
@@ -141,6 +145,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		EFE7B3E41F662D1BC8D4FEAD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1EBD9F94A85D7D3946C0860 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		F75565085121D698824784C3 /* Sources */ = {

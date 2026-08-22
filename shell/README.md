@@ -11,7 +11,10 @@ This directory is reserved for the shell-only binary — no addon code ships ins
 ```bash
 cd shell
 export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
-swift test
+swift test --filter JugnuCoreTests   # default suite (CI uses this)
+# live registry/install checks — not CI, uses the network:
+swift test --filter JugnuCoreLiveTests
+# or from repo root: make verify-live
 ```
 
 ## Jugnu.app (Xcode)

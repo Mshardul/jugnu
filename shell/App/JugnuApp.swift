@@ -60,7 +60,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let window = NSWindow(contentViewController: hosting)
         window.title = "Jugnu Preferences"
         window.styleMask = [.titled, .closable]
-        window.setContentSize(NSSize(width: 420, height: 360))
+        window.setContentSize(NSSize(width: 520, height: 560))
         window.center()
         window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)

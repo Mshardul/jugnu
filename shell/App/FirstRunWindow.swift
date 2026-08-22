@@ -40,7 +40,7 @@ final class FirstRunWindowController {
                     localAddonRoots: roots
                 )
             } catch {
-                model.statusMessage = String(describing: error)
+                model.statusMessage = UserFacingError.message(for: error)
             }
             window?.close()
             window = nil
@@ -49,7 +49,7 @@ final class FirstRunWindowController {
     }
 
     static func recommendedLocalRoots() -> [URL] {
-        let ids = ["mic-mute", "focus-toggle", "paste-plain"]
+        let ids = ShellConfig.recommendedAddonIDs
         var roots: [URL] = []
         let candidates = [
             URL(fileURLWithPath: FileManager.default.currentDirectoryPath).appendingPathComponent("addons"),
@@ -83,14 +83,14 @@ struct FirstRunView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Jugnu").font(.largeTitle.weight(.semibold))
-            Text("A light command palette for macOS addons.")
+            Text("A little light for everything on your Mac.")
                 .foregroundStyle(.secondary)
 
-            Toggle("Install recommended addons (mic mute, focus, paste plain)", isOn: $installRecommended)
+            Toggle("Install a starter set of addons", isOn: $installRecommended)
             Toggle("Use ⌘Space (replaces Spotlight — only if you opt in)", isOn: $useCommandSpace)
 
             if useCommandSpace {
-                Text("You’ll need to change Spotlight’s shortcut in System Settings → Keyboard → Keyboard Shortcuts → Spotlight.")
+                Text("Change Spotlight’s shortcut in System Settings → Keyboard → Keyboard Shortcuts → Spotlight.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
