@@ -2,6 +2,10 @@ import AppKit
 import JugnuCore
 import SwiftUI
 
+final class KeyablePanel: NSPanel {
+    override var canBecomeKey: Bool { true }
+}
+
 @MainActor
 final class PalettePanelController {
     private let model: AppModel
@@ -35,9 +39,9 @@ final class PalettePanelController {
             let hosting = NSHostingView(rootView: view)
             self.hosting = hosting
 
-            let panel = NSPanel(
+            let panel = KeyablePanel(
                 contentRect: NSRect(x: 0, y: 0, width: 560, height: 360),
-                styleMask: [.borderless, .nonactivatingPanel],
+                styleMask: [.borderless],
                 backing: .buffered,
                 defer: false
             )
@@ -62,8 +66,9 @@ final class PalettePanelController {
             )
             panel.setFrameOrigin(origin)
         }
-        panel.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
+        panel.makeKeyAndOrderFront(nil)
+        panel.makeFirstResponder(hosting)
     }
 
     func hide() {

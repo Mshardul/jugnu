@@ -1,7 +1,7 @@
 --swiftversion 5.9
 --indent 4
 --tabwidth 4
---maxwidth 100
+--maxwidth 120
 --commas inline
 --wraparguments preserve
 --wrapcollections preserve

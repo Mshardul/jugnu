@@ -5,6 +5,7 @@
 - **Do not run git** unless the user explicitly asks for a specific git action in that message.
 - **Do not** create branches, worktrees, or commits “for isolation” or “to keep main clean.”
 - Work on the **current checkout** as-is. No `feature/*` branches, no `.worktrees/`, no proactive `git status` / commit / push.
+- Same rule for **any GitHub write** (`gh release create/upload/edit`, `gh pr`, `gh issue`, etc.) — read-only `gh` (`view`, `list`) is fine, but writes need an explicit ask in that message too, even mid-task.
 
 ## Addon packaging (user POV)
 

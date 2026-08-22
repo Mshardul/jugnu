@@ -1,0 +1,11 @@
+# Tickets
+
+Lightweight future-work tracker — one row per ticket, not a full spec. A ticket captures intent, why it was split out, and any concrete findings that seeded it, so nothing gets lost between now and whenever it's picked up.
+
+When a ticket is ready to start: brainstorm → write a real spec under [`docs/architecture/`](architecture/README.md) → mark this row **Done** with a link to that spec in Remarks.
+
+| Ticket ID | Summary | Description | Priority | Effort | Depends on | Status | Created on | Last updated on | Remarks |
+|---|---|---|---|---|---|---|---|---|---|
+| 0001 | Persistent invoke latency logging | Every command invoke writes a structured JSON-lines record (addon id, command id, phase timings, pass/fail vs. budget) to a local file, day-capped retention, so a user can later volunteer it for diagnosis. Timing/ids only — never clipboard text or command args; privacy is a hard constraint, not a nice-to-have. | Medium | M | — | Not started | 2026-08-23 | 2026-08-23 | Split from [2026-08-23 product pass](architecture/2026-08-23-palette-ui-product-pass.md) |
+| 0002 | Addon management / settings (Preferences redesign) | Full Preferences surface: browse/discover UI for the whole registry catalog (not just installed addons), category taxonomy per vision's Catalog hierarchy, install-from-browse flow. Today's `PrefsView` is a bare functional stub; the 2026-08-23 epic only adds a minimal theme section to it. | Medium | L | 0001's epic's `JugnuUI` tokens/panels should land first | Not started | 2026-08-23 | 2026-08-23 | Split from [2026-08-23 product pass](architecture/2026-08-23-palette-ui-product-pass.md) |
+| 0003 | Security audit — installer/runner/registry-trust hardening | Dedicated security pass, not a bolt-on fix. Seeded finding: `AddonInstaller.unzip()` (`shell/Sources/JugnuCore/AddonInstaller.swift`) shells out to `/usr/bin/unzip` with no zip-slip/path-traversal protection on extracted entries. Also scope: `AddonRunner` process-spawning safety, and the sha256-only (no code signing) registry trust model already flagged as a v0 non-goal in shell-design.md. | High | M | — | Not started | 2026-08-23 | 2026-08-23 | Split from [2026-08-23 product pass](architecture/2026-08-23-palette-ui-product-pass.md) |

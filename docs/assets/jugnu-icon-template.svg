@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="32" height="32">
+  <!--
+    Jugnu menu-bar template icon — canonical source.
+    Locked 2026-08-23. See docs/architecture/2026-08-23-palette-ui-product-pass.md (§3).
+
+    Render at 16x16pt (32x32px @2x, per Apple's NSStatusItem template image
+    convention: https://developer.apple.com/documentation/appkit/nsimage/1520017-template).
+    Fill must stay pure black (#000) with the alpha/opacity values below —
+    macOS re-tints template images automatically for light/dark menu bars;
+    do not hardcode any other color into this file.
+  -->
+  <circle cx="66" cy="58" r="40" fill="#000000" opacity="0.5"/>
+  <circle cx="66" cy="58" r="11" fill="#000000"/>
+</svg>

@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="1024" height="1024">
+  <!--
+    Jugnu app icon — canonical source, 1024px master.
+    Locked 2026-08-23 during the palette + addon UI product pass epic.
+    See docs/architecture/2026-08-23-palette-ui-product-pass.md (§3, "App icon")
+    for the full design-exploration rationale (why no insect anatomy is drawn).
+
+    IMPORTANT — this is NOT scale-uniformly to every icon size.
+    Small renders (64px and below, and especially the 16px menu-bar size)
+    need the glow radius, stroke width, and dash pattern nudged up so the
+    trail and glow don't visually disappear at small scale. See the
+    per-size stop/radius/stroke-width table in the spec doc §3. The values
+    below are correct for 1024/512/256/128px masters; regenerate smaller
+    sizes using the tuned per-size SVGs preserved in the mockup artifact
+    (linked from the spec doc), not by naively rasterizing this file down.
+  -->
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="20%" stop-color="#fff2d9"/>
+      <stop offset="48%" stop-color="#f5a623"/>
+      <stop offset="80%" stop-color="#c97a12" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#c97a12" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="trail" x1="66" y1="56" x2="20" y2="106" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fff2d9"/>
+      <stop offset="50%" stop-color="#f5a623"/>
+      <stop offset="100%" stop-color="#f5a623" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background: "ink" token, warm near-black, matches Firefly preset's dark background -->
+  <rect width="128" height="128" rx="28" fill="#16130e"/>
+
+  <!-- Flight trail: dashed, gradient bright-near-glow to transparent at tail -->
+  <path d="M20 106 Q 42 78 66 56" stroke="url(#trail)" stroke-width="3"
+        stroke-linecap="round" fill="none" stroke-dasharray="1 6.5"/>
+
+  <!-- Glow -->
+  <circle cx="66" cy="56" r="32" fill="url(#glow)"/>
+
+  <!-- The firefly itself: a small dark speck, not an illustrated body -->
+  <circle cx="66" cy="56" r="6" fill="#0c0906"/>
+</svg>

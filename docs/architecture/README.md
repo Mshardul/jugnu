@@ -2,18 +2,22 @@
 
 Design documents for Jugnu subsystems. Write specs **before** scaffolding runtimes.
 
-Architecture decisions are recorded in [decisions/](decisions/).
+Architecture decisions are recorded in [decisions/](decisions/). Future-work tickets not yet worth a full spec are tracked in [../tickets.md](../tickets.md). Lower-confidence, not-yet-committed ideas live in [../ideas.md](../ideas.md) — no obligation attached, revisited periodically.
 
 | Spec | Status |
 |---|---|
 | [2026-08-22 Shell design](./2026-08-22-shell-design.md) | Approved |
 | [2026-08-22 Addon UI host + speed](./2026-08-22-addon-ui-speed-design.md) | Approved |
+| [2026-08-23 Palette + addon UI product pass](./2026-08-23-palette-ui-product-pass.md) | Approved — epic in progress |
 | [Addon UI host P1 plan](../superpowers/plans/2026-08-22-addon-ui-host-p1.md) | Done (app wired) |
 | [Shell MVP plan](../superpowers/plans/2026-08-22-shell-mvp.md) | Done (Core + Xcode app; see [smoke](./shell-smoke.md)) |
-| [Shell smoke checklist](./shell-smoke.md) | Automated items verified; manual UI checklist remains |
+| [Shell smoke checklist](./shell-smoke.md) | Automated items verified; manual UI checklist in progress ([2026-08-23 epic](./2026-08-23-palette-ui-product-pass.md)) |
 | Context-aware UI (screen/selection) | Later — reserved in UI+speed §7 |
 | Addons packaging (detail) | Follow-on if needed beyond shell spec §2 |
 | Catalog taxonomy (categories ↔ addons / commands) | Product intent in [vision — Catalog hierarchy](../vision.md); registry `category` field TBD |
+| Persistent latency logging | Future epic — [ticket 0001](../tickets.md); JSON-lines, capped retention, timing/ids only, no payload |
+| Addon management / settings (browse, catalog, Preferences redesign) | Future epic — [ticket 0002](../tickets.md) |
+| Security audit (installer/runner/registry-trust hardening) | Future epic — [ticket 0003](../tickets.md); seeded with a real zip-slip finding in `AddonInstaller.unzip()` |
 | Clipboard | Later |
 | Window management | Later |
 
