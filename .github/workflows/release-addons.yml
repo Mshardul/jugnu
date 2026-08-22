@@ -1,0 +1,52 @@
+name: Release addons
+
+on:
+  push:
+    tags:
+      - "addons-v*"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve tag
+        id: tag
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/addons-v* ]]; then
+            echo "name=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=addons-v${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Package addons and build registry
+        run: |
+          scripts/build-registry.sh dist \
+            "https://github.com/${{ github.repository }}/releases/download/${{ steps.tag.outputs.name }}" \
+            > registry/addons.json
+
+      - name: Upload zips to release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.name }}
+          files: dist/*.zip
+          fail_on_unmatched_files: true
+
+      - name: Commit updated registry
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- registry/addons.json; then
+            echo "registry unchanged"
+            exit 0
+          fi
+          git add registry/addons.json
+          git commit -m "chore: regenerate addon registry for ${{ steps.tag.outputs.name }}"
+          git push origin HEAD:main

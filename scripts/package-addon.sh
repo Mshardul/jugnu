@@ -20,7 +20,7 @@ if [[ ! -f "$manifest" ]]; then
 fi
 
 validator="$(dirname "$0")/validate-addon.sh"
-"$validator" "$addon_dir"
+"$validator" "$addon_dir" >&2
 
 id=$(sed -n 's/^id:[[:space:]]*//p' "$manifest" | head -1 | tr -d '"')
 version=$(sed -n 's/^version:[[:space:]]*//p' "$manifest" | head -1 | tr -d '"')

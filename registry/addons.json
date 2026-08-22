@@ -25,5 +25,14 @@
     "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/paste-plain-1.0.0.zip",
     "sha256": "b3c4d78196ff0080478603e3293d7b2c1fe29700e0c18352fa7043a476f02aa6",
     "summary": "Paste clipboard as plain text"
+  },
+  {
+    "id": "ports",
+    "name": "Ports",
+    "version": "1.0.0",
+    "api": 1,
+    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/ports-1.0.0.zip",
+    "sha256": "852a5022f822f93591ed767e58414b456daa9d13e66ff8efef415b2897f1cf44",
+    "summary": "List listening ports and kill by pid"
   }
 ]
