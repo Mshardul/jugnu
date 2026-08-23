@@ -2,13 +2,22 @@
 -include .env
 export DEVELOPER_DIR ?= /Applications/Xcode.app/Contents/Developer
 
-.PHONY: sync precommit lint format typecheck spell test test-extended stop run ci hooks
+.PHONY: sync hooks precommit lint lint-swift format format-swift typecheck spell test test-extended tools-swift stop run ci
 
 sync:
 	uv sync
 
 hooks:
 	uv run pre-commit install
+
+tools-swift:
+	./scripts/ensure-swift-tools.sh
+
+lint-swift: tools-swift
+	./scripts/run-swiftlint.sh
+
+format-swift: tools-swift
+	./scripts/run-swiftformat.sh
 
 precommit:
 	uv run pre-commit run --all-files

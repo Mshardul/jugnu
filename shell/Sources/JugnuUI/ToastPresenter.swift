@@ -59,13 +59,19 @@ private struct ToastView: View {
 
     var body: some View {
         let theme = JugnuThemeColors(theme: resolvedTheme(from: store.config, colorScheme: colorScheme))
-        Text(message)
-            .font(JugnuTokens.font(presetId: store.presetId, role: .callout))
-            .foregroundStyle(isError ? Color.white : theme.textPrimary)
-            .padding(.horizontal, 14)
-            .padding(.vertical, 12)
-            .frame(maxWidth: .infinity)
-            .background(isError ? theme.error : theme.surface)
-            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        HStack(spacing: 8) {
+            Image("AppIcon")
+                .resizable()
+                .frame(width: 18, height: 18)
+                .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+            Text(message)
+                .font(JugnuTokens.font(presetId: store.presetId, role: .callout))
+                .foregroundStyle(isError ? Color.white : theme.textPrimary)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .frame(maxWidth: .infinity)
+        .background(isError ? theme.error : theme.surface)
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 }

@@ -1,5 +1,7 @@
 # Agent notes — Jugnu
 
+Coding standards: [docs/conventions.md](docs/conventions.md). Product intent: [docs/vision.md](docs/vision.md). Workflow: [CONTRIBUTING.md](CONTRIBUTING.md). This file is the only agent-ops doc — do not add a parallel copy under `.github/instructions/` or `.cursor/rules/`.
+
 ## Git (hard rule)
 
 - **Do not run git** unless the user explicitly asks for a specific git action in that message.
@@ -7,16 +9,15 @@
 - Work on the **current checkout** as-is. No `feature/*` branches, no `.worktrees/`, no proactive `git status` / commit / push.
 - Same rule for **any GitHub write** (`gh release create/upload/edit`, `gh pr`, `gh issue`, etc.) — read-only `gh` (`view`, `list`) is fine, but writes need an explicit ask in that message too, even mid-task.
 
+## Change discipline
+
+- Inspect nearby implementations, tests, and current user changes before editing. Make the smallest coherent change.
+- Preserve changes you did not make. Never reset, checkout, or otherwise discard user work.
+- Report what changed, what was validated, and any remaining risks. Never claim an item is complete without executable validation when the environment provides it.
+
 ## Addon packaging (user POV)
 
-Canonical product intent: `[docs/vision.md](docs/vision.md)` → **Catalog hierarchy**.
-
-Use product terms only:
-
-- **Addon** — installable zip / YAML enable unit (commands **and/or** popup UI for one job).
-- **Commands** — palette / menu actions inside that addon (`addon.yaml` `commands`).
-- **UI** — panels, pickers, forms, previews for that addon (same zip).
-- **Category** — browse/group taxonomy only (not a zip).
+Canonical product intent: [docs/vision.md](docs/vision.md) → **Catalog hierarchy**. Use product terms only: **Addon**, **Commands**, **UI**, **Category** (definitions in [docs/conventions.md](docs/conventions.md#vocabulary)).
 
 When proposing or accepting addons:
 
@@ -28,7 +29,7 @@ When proposing or accepting addons:
   - **User would want it alone** → make it **its own addon**.
   - **User would not** → **shared file(s)** included in each consuming zip at package time (not a registry product).
 - Treat **popup UI + speed** as part of every job — not CLI-only scripts. Context-aware “right UI for what’s on screen” is a later platform capability; still design addons as UI-ready.
-- Backlog packaging map: `[docs/backlog.md](docs/backlog.md)` (must stay consistent with vision).
+- Backlog packaging map: [docs/backlog.md](docs/backlog.md) (must stay consistent with vision).
 
 Shell = light Swift host only; addons never bundled in the `.app`. No user Python for published addons.
 

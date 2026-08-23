@@ -2,9 +2,9 @@
 
 ## Before You Start
 
-Read [AGENTS.md](AGENTS.md), [.github/instructions/jugnu.instructions.md](.github/instructions/jugnu.instructions.md), and the relevant documents under [docs/](docs/). Preserve user changes and keep unrelated refactors out of focused work.
+Read [docs/conventions.md](docs/conventions.md) (coding standards), [AGENTS.md](AGENTS.md) if you are an agent, and the relevant documents under [docs/](docs/). Preserve user changes and keep unrelated refactors out of focused work.
 
-Jugnu follows the hierarchy **Category -> Addon -> Commands**. An addon is one installable zip for one user job; related commands and UI belong inside that addon.
+Jugnu follows **Category → Addon → Commands**. An addon is one installable zip for one user job; related commands and UI belong inside that addon. Every change is judged by invoke → visible result — details in the conventions.
 
 ## Development Workflow
 
@@ -30,16 +30,15 @@ make test
 make ci
 ```
 
-Swift package checks run from `shell/`:
+SwiftFormat and SwiftLint match CI. Install once (Homebrew), then lint or format:
 
 ```bash
-cd shell
-swift format --in-place --recursive Sources Tests TestsExtended
-swift lint Sources Tests TestsExtended
-swift test
+make tools-swift      # brew install swiftformat swiftlint if missing
+make lint-swift       # SwiftLint (installs via brew if missing)
+make format-swift     # SwiftFormat in place (optional; not a pre-commit gate)
 ```
 
-The `swift format` and `swift lint` commands require the Swift toolchain's format/lint plugins or equivalent installed tools. When those commands are unavailable, run `swift test` and report the missing tooling rather than silently skipping validation.
+They also run on `git commit` via pre-commit (`make hooks` once): SwiftLint fails the commit if it reports errors. Do not skip when Swift files change.
 
 Less-frequent live registry/install checks (network, real side effects; not CI):
 
@@ -55,21 +54,9 @@ make run
 
 Use the checklist in [docs/architecture/shell-smoke.md](docs/architecture/shell-smoke.md). Details: [README — Run locally](README.md#run-locally).
 
-## Swift Conventions
-
-- Keep `JugnuCore` independent from UI concerns; keep AppKit and SwiftUI code in the UI/app targets.
-- Match the Swift version and macOS deployment target in `shell/Package.swift`.
-- Prefer value types, explicit Codable models, small protocols, and dependency injection at filesystem, process, clock, network, and clipboard boundaries.
-- Use structured concurrency and keep UI mutations on `MainActor`.
-- Do not block the main actor with filesystem, process, archive, network, or addon work.
-- Avoid force unwraps and force casts in product code.
-- Propagate errors; do not discard process failures, decoding errors, cleanup failures, or permission failures.
-- Validate addon paths and manifest fields, and prevent archive path traversal.
-- Keep latency visible in design and tests; target the budgets in [the addon UI and speed design](docs/architecture/2026-08-22-addon-ui-speed-design.md).
-
 ## Pull Requests
 
-A pull request should explain the user-facing behavior, affected architecture boundary, validation run, and any permissions or platform limitations. Keep commits and changes focused. Do not include secrets, generated build output, `.build/`, or local configuration.
+A pull request should explain the user-facing behavior, affected architecture boundary, validation run, and any permissions or platform limitations. Confirm the [conventions review checklist](docs/conventions.md#review-checklist): reuse an existing type, or say why it is wrong. Keep commits and changes focused. Do not include secrets, generated build output, `.build/`, or local configuration.
 
 ## Changelog Convention
 

@@ -2,9 +2,10 @@
 
 ## Automated (verified 2026-08-22; Core suite re-verified 2026-08-23)
 
-- [x] `cd shell && export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer && swift test` — green (same command as CI)
+- [x] `cd shell && swift test` — green, 82 tests, 0 failures. Re-verified 2026-08-23 after shell-surface-presets Tasks 1-15 + a follow-up fix: `xcode-select` was pointed at Command Line Tools only (no XCTest module) even with `Xcode.app` present — fixed via `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer` (system-wide, run by the user). No `DEVELOPER_DIR` override needed anymore.
+- [x] `xcodebuild -scheme Jugnu test` — also green, same 82 tests (58 `JugnuCoreTests` + 24 `JugnuUITests`), run via Xcode's native test runner. Fixed 2026-08-23: `project.yml` previously defined no test target/scheme wiring at all. Correct fix (not a hand-rolled `bundle.unit-test` Xcode target — that duplicates the SPM dependency/resource graph and breaks `Bundle.module`, which the tests rely on): XcodeGen 2.46's native `schemes.<scheme>.test.targets: - package: JugnuLocal/<TestTarget>` syntax, which points the Xcode scheme straight at the SPM package's own test targets. Zero duplicate target definitions to maintain.
 - [x] Live registry tests live in `shell/TestsExtended/` and are not part of `swift test` / CI
-- [x] `xcodegen generate` → `Jugnu.xcodeproj`; `xcodebuild -scheme Jugnu` — **BUILD SUCCEEDED** (re-run after this epic’s asset/catalog changes)
+- [x] `xcodegen generate` → `Jugnu.xcodeproj`; `xcodebuild -scheme Jugnu` — **BUILD SUCCEEDED** (re-verified 2026-08-23 after shell-surface-presets Tasks 1-15; regenerated `project.pbxproj` via `xcodegen generate` first since it still listed the deleted `PalettePanelController.swift` from Task 5 — stale entry is gone post-regen, zero `grep` hits for `PalettePanelController`/`BrowseCatalogWindowController`/`UIHostController`/`SkeletonPanel`/`ConfirmPanel`/`ListPanel`/`FormPanel` class names anywhere in `shell/`)
 - [x] Launch `Jugnu.app` — process starts (menu bar agent)
 - [x] Addon CLI — mic-mute, focus-toggle, paste-plain return `ok: true`
 - [x] Release `addons-v1.0.0` + `registry/addons.json` on `main`

@@ -52,13 +52,15 @@ Not published yet. When there is a download, install steps will live here.
 # once
 uv sync
 uv run pre-commit install   # or: make hooks
+make tools-swift            # brew install swiftformat swiftlint if missing
 
-make precommit   # local hooks on all files
+make precommit   # local hooks on all files (Python + SwiftLint)
+make lint-swift  # SwiftLint (installs tools if missing)
 make ci          # ruff + mypy + codespell + pytest (matches CI check job)
 make test
 ```
 
-CI: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) (ruff, mypy, codespell, pytest, semgrep). Pre-commit is the local guardrail; CI is the authoritative gate. Tests are not run on commit.
+CI: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) (ruff, mypy, codespell, pytest, semgrep, SwiftFormat, SwiftLint, `swift test`). Pre-commit is the local guardrail; CI is the authoritative gate. Tests are not run on commit.
 
 ## Architecture (target)
 
@@ -78,8 +80,9 @@ extensions/macos/     # staged Finder / Shortcuts-style helpers
 config/               # example Jugnu YAML (enable/disable sketch)
 docs/
   vision.md           # product + brand
+  conventions.md      # standing coding standards
   backlog.md          # platform, gap list, staged leaves
-  architecture/       # design specs (shell first) — none written yet
+  architecture/       # design specs (shell first)
 shell/                # JugnuCore + JugnuUI + Jugnu menu bar app (SPM)
 addons/               # first-party addon sources (one zip each)
 ```
@@ -88,6 +91,7 @@ addons/               # first-party addon sources (one zip each)
 
 - [Changelog](CHANGELOG.md)
 - [Contributing](CONTRIBUTING.md)
+- [Coding conventions](docs/conventions.md)
 - [Security policy](SECURITY.md)
 - [Data privacy policy](PRIVACY.md)
 - [Release process](docs/release-process.md)

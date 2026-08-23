@@ -31,7 +31,10 @@ public final class InvokeTrace: @unchecked Sendable {
     public var totalMs: Int? { ms(since: invokeAt, to: dismissAt) }
 
     public var debugDescription: String {
-        "InvokeTrace(\(commandId) firstPaint=\(firstPaintMs.map(String.init) ?? "-")ms content=\(contentMs.map(String.init) ?? "-")ms total=\(totalMs.map(String.init) ?? "-")ms)"
+        let paint = firstPaintMs.map(String.init) ?? "-"
+        let content = contentMs.map(String.init) ?? "-"
+        let total = totalMs.map(String.init) ?? "-"
+        return "InvokeTrace(\(commandId) firstPaint=\(paint)ms content=\(content)ms total=\(total)ms)"
     }
 
     public func exceedsToastTarget() -> Bool {

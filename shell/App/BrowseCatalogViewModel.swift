@@ -15,9 +15,11 @@ final class BrowseCatalogViewModel: ObservableObject, BrowseCatalogViewModelProt
 
     let categories = CatalogTaxonomy.categories
     private let model: AppModel
+    private let shellHost: ShellHost
 
-    init(model: AppModel) {
+    init(model: AppModel, shellHost: ShellHost) {
         self.model = model
+        self.shellHost = shellHost
     }
 
     var filtered: [RegistryEntry] {
@@ -78,7 +80,7 @@ final class BrowseCatalogViewModel: ObservableObject, BrowseCatalogViewModelProt
     }
 
     func uninstall(id: String, name: String) {
-        AddonUninstallPresenter.present(id: id, name: name, model: model) { [weak self] in
+        AddonUninstallPresenter.present(id: id, name: name, model: model, shellHost: shellHost) { [weak self] in
             self?.model.refreshIndex()
         }
     }

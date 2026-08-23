@@ -6,14 +6,13 @@ import JugnuUI
 import SwiftUI
 
 @MainActor
-final class AppModel: ObservableObject {
+final class AppModel: ObservableObject, PaletteModelProtocol {
     let paths: JugnuPaths
     let store: ConfigStore
     let stateStore: StateStore
     let installer: AddonInstaller
     let lifecycle: AddonLifecycle
     let runner: AddonRunner
-    let uiHost = UIHostController()
 
     @Published var config: JugnuConfig
     @Published var state: JugnuState
@@ -22,7 +21,6 @@ final class AppModel: ObservableObject {
     @Published var statusMessage: String?
 
     private var index: CommandIndex
-    private var browseCatalogWindow: BrowseCatalogWindowController<BrowseCatalogViewModel>?
 
     init(paths: JugnuPaths = JugnuPaths()) {
         self.paths = paths
@@ -92,43 +90,33 @@ final class AppModel: ObservableObject {
         state.favoriteCommandIDs.contains(qualifiedId)
     }
 
-    func run(_ command: IndexedCommand) async {
-        statusMessage = nil
-        if config.palette.firstView == .recent {
-            state.recordRecent(qualifiedId: command.qualifiedId)
-            try? stateStore.save(state)
+    /// Presentation-free: records "recent" and runs the addon's binary, returning the raw response
+    /// (or throwing). The caller (`AppDelegate.runCommand`) owns presenting the result via
+    /// `CommandInvoke.run`/`ShellHost`.
+    func runInvocation(for command: IndexedCommand) throws -> (execute: () async throws -> RunResponse, followUp: (RunRequest) async throws -> RunResponse) {
+        state.recordRecent(qualifiedId: command.qualifiedId)
+        try? stateStore.save(state)
+        let manifest = try ManifestLoader.load(from: command.addonRoot)
+        let execute: () async throws -> RunResponse = { [runner] in
+            try await Task.detached {
+                try runner.run(
+                    manifest: manifest,
+                    addonRoot: command.addonRoot,
+                    commandId: command.commandId
+                )
+            }.value
         }
-        do {
-            let manifest = try ManifestLoader.load(from: command.addonRoot)
-            await CommandInvoke.run(
-                host: uiHost,
-                commandId: command.qualifiedId,
-                defaultPattern: command.defaultUIPattern,
-                title: command.title,
-                execute: { [runner] in
-                    try await Task.detached {
-                        try runner.run(
-                            manifest: manifest,
-                            addonRoot: command.addonRoot,
-                            commandId: command.commandId
-                        )
-                    }.value
-                },
-                followUp: { [runner] request in
-                    try await Task.detached {
-                        try runner.run(
-                            addonRoot: command.addonRoot,
-                            entrypoint: manifest.entrypoint,
-                            request: request,
-                            timeout: runner.timeoutSeconds
-                        )
-                    }.value
-                }
-            )
-        } catch {
-            statusMessage = UserFacingError.message(for: error)
-            playCommandSound(success: false)
+        let followUp: (RunRequest) async throws -> RunResponse = { [runner] request in
+            try await Task.detached {
+                try runner.run(
+                    addonRoot: command.addonRoot,
+                    entrypoint: manifest.entrypoint,
+                    request: request,
+                    timeout: runner.timeoutSeconds
+                )
+            }.value
         }
+        return (execute, followUp)
     }
 
     func setEnabled(id: String, enabled: Bool) throws {
@@ -215,19 +203,6 @@ final class AppModel: ObservableObject {
         } catch {
             statusMessage = UserFacingError.message(for: error)
         }
-    }
-
-    func openBrowseCatalog() {
-        if let existing = browseCatalogWindow {
-            existing.window?.makeKeyAndOrderFront(nil)
-            NSApp.activate(ignoringOtherApps: true)
-            return
-        }
-        let vm = BrowseCatalogViewModel(model: self)
-        let controller = BrowseCatalogWindowController(viewModel: vm)
-        browseCatalogWindow = controller
-        controller.window?.makeKeyAndOrderFront(nil)
-        NSApp.activate(ignoringOtherApps: true)
     }
 
     private func publishTheme() {

@@ -28,5 +28,6 @@ Validation commands and results:
 ## Checklist
 
 - [ ] Documentation, backlog, and changelog updated when needed
+- [ ] [Conventions](../docs/conventions.md) review checklist considered (reuse existing type, or explain why not)
 - [ ] No addon payload is bundled into `Jugnu.app`
 - [ ] No unrelated files or user changes were reverted

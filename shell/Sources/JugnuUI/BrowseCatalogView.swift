@@ -23,12 +23,13 @@ public protocol BrowseCatalogViewModelProtocol: ObservableObject {
 
 public struct BrowseCatalogView<VM: BrowseCatalogViewModelProtocol>: View {
     @ObservedObject var viewModel: VM
-    @State private var detailEntry: RegistryEntry?
+    var onSelectCard: (String) -> Void
     @Environment(\.colorScheme) private var colorScheme
     @ObservedObject private var store = ThemeStore.shared
 
-    public init(viewModel: VM) {
+    public init(viewModel: VM, onSelectCard: @escaping (String) -> Void) {
         self.viewModel = viewModel
+        self.onSelectCard = onSelectCard
     }
 
     public var body: some View {
@@ -64,7 +65,7 @@ public struct BrowseCatalogView<VM: BrowseCatalogViewModelProtocol>: View {
                                 onInstall: { Task { await viewModel.install(entry) } },
                                 onEnabledChange: { viewModel.setEnabled(entry.id, enabled: $0) },
                                 onUninstall: { viewModel.uninstall(id: entry.id, name: entry.name) },
-                                onTap: { detailEntry = entry }
+                                onTap: { onSelectCard(entry.id) }
                             )
                         }
                     }
@@ -75,18 +76,6 @@ public struct BrowseCatalogView<VM: BrowseCatalogViewModelProtocol>: View {
         .background(theme.background)
         .frame(minWidth: 720, minHeight: 480)
         .task { await viewModel.load() }
-        .sheet(item: $detailEntry) { entry in
-            AddonDetailView(
-                entry: entry,
-                isInstalled: viewModel.isInstalled(entry.id),
-                isEnabled: viewModel.isEnabled(entry.id),
-                isInstalling: viewModel.installingIDs.contains(entry.id),
-                onInstall: { Task { await viewModel.install(entry) } },
-                onEnabledChange: { viewModel.setEnabled(entry.id, enabled: $0) },
-                onUninstall: { viewModel.uninstall(id: entry.id, name: entry.name) },
-                onClose: { detailEntry = nil }
-            )
-        }
     }
 
     @ViewBuilder

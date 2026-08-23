@@ -1,107 +1,49 @@
 import AppKit
 import JugnuCore
-import JugnuUI
 import SwiftUI
 
 @MainActor
-final class PalettePanelController {
-    private let model: AppModel
-    private var panel: KeyablePanel?
-    private var hosting: NSHostingView<PaletteView>?
+public protocol PaletteModelProtocol: ObservableObject {
+    var allCommands: [IndexedCommand] { get }
+    var lastHits: [SearchHit] { get }
+    var statusMessage: String? { get }
 
-    init(model: AppModel) {
-        self.model = model
-    }
-
-    func toggle() {
-        if panel?.isVisible == true {
-            hide()
-        } else {
-            show()
-        }
-    }
-
-    func show() {
-        hide()
-        let view = PaletteView(
-            model: model,
-            onRun: { [weak self] cmd in
-                Task { @MainActor in
-                    await self?.model.run(cmd)
-                    self?.hide()
-                }
-            },
-            onClose: { [weak self] in self?.hide() },
-            onOpenBrowseCatalog: { [weak self] in self?.model.openBrowseCatalog() }
-        )
-        let hosting = NSHostingView(rootView: view)
-        self.hosting = hosting
-
-        let panel = KeyablePanel(
-            contentRect: NSRect(x: 0, y: 0, width: 560, height: 360),
-            styleMask: [.borderless],
-            backing: .buffered,
-            defer: false
-        )
-        panel.isFloatingPanel = true
-        panel.level = .floating
-        panel.backgroundColor = .clear
-        panel.isOpaque = false
-        panel.hasShadow = true
-        panel.contentView = hosting
-        panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-        self.panel = panel
-
-        model.refreshIndex()
-        let mouse = NSEvent.mouseLocation
-        let frames = NSScreen.screens.map(\.frame)
-        let screen: NSScreen
-        if let idx = PalettePlacement.screenIndex(frames: frames, mouse: mouse),
-           NSScreen.screens.indices.contains(idx) {
-            screen = NSScreen.screens[idx]
-        } else {
-            screen = NSScreen.main ?? NSScreen.screens[0]
-        }
-        let frame = screen.visibleFrame
-        let size = panel.frame.size
-        panel.setFrameOrigin(NSPoint(
-            x: frame.midX - size.width / 2,
-            y: frame.midY - size.height / 2 + 40
-        ))
-
-        let reduce = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
-        panel.alphaValue = reduce ? 1 : 0
-        NSApp.activate(ignoringOtherApps: true)
-        panel.makeKeyAndOrderFront(nil)
-        panel.makeFirstResponder(hosting)
-        if !reduce {
-            NSAnimationContext.runAnimationGroup { ctx in
-                ctx.duration = 0.12
-                panel.animator().alphaValue = 1
-            }
-        }
-    }
-
-    func hide() {
-        panel?.orderOut(nil)
-        panel = nil
-        hosting = nil
-    }
+    func commandsForFirstView() -> [IndexedCommand]
+    func search(_ query: String) -> [IndexedCommand]
+    func isFavorite(qualifiedId: String) -> Bool
+    func toggleFavorite(qualifiedId: String)
 }
 
-struct PaletteView: View {
-    @ObservedObject var model: AppModel
+public struct PaletteView<Model: PaletteModelProtocol>: View {
+    @ObservedObject var model: Model
     var onRun: (IndexedCommand) -> Void
     var onClose: () -> Void
     var onOpenBrowseCatalog: () -> Void
+    var onStateChange: (ShellViewState) -> Void
 
-    @State private var query = ""
+    @State private var query: String
     @State private var selection = 0
     @State private var searchTask: Task<Void, Never>?
     @State private var hintIndex = 0
     @State private var bloom: Double = 0
     @Environment(\.colorScheme) private var colorScheme
     @ObservedObject private var themeStore = ThemeStore.shared
+
+    public init(
+        model: Model,
+        initialQuery: String = "",
+        onRun: @escaping (IndexedCommand) -> Void,
+        onClose: @escaping () -> Void,
+        onOpenBrowseCatalog: @escaping () -> Void,
+        onStateChange: @escaping (ShellViewState) -> Void = { _ in }
+    ) {
+        self.model = model
+        self.onRun = onRun
+        self.onClose = onClose
+        self.onOpenBrowseCatalog = onOpenBrowseCatalog
+        self.onStateChange = onStateChange
+        _query = State(initialValue: initialQuery)
+    }
 
     private var theme: JugnuThemeColors {
         JugnuThemeColors(theme: resolvedTheme(from: themeStore.config, colorScheme: colorScheme))
@@ -129,10 +71,10 @@ struct PaletteView: View {
         guard !commands.isEmpty else { return "Search commands" }
         let cmd = commands[hintIndex % commands.count]
         let hint = cmd.keywords.first ?? cmd.title.split(separator: " ").prefix(2).joined(separator: " ")
-        return "Try ‘\(hint)’…"
+        return "Try '\(hint)'…"
     }
 
-    var body: some View {
+    public var body: some View {
         VStack(alignment: .leading, spacing: JugnuTokens.Spacing.row) {
             TextField(placeholder, text: $query)
                 .textFieldStyle(.plain)
@@ -141,6 +83,7 @@ struct PaletteView: View {
                 .background(theme.background)
                 .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                 .onChange(of: query) { _, newValue in
+                    onStateChange(.launcher(query: newValue, selection: nil, scroll: 0))
                     searchTask?.cancel()
                     searchTask = Task {
                         try? await Task.sleep(nanoseconds: 100_000_000)
@@ -217,7 +160,7 @@ struct PaletteView: View {
         )
         .focusable()
         .onAppear {
-            _ = model.search("")
+            _ = model.search(query)
             if !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion {
                 withAnimation(.easeOut(duration: 0.12)) { bloom = 0.35 }
                 withAnimation(.easeIn(duration: 0.18).delay(0.12)) { bloom = 0 }
@@ -227,10 +170,6 @@ struct PaletteView: View {
             if query.isEmpty, !model.allCommands.isEmpty {
                 hintIndex += 1
             }
-        }
-        .onKeyPress(.escape) {
-            onClose()
-            return .handled
         }
         .onKeyPress(.return) {
             guard displayed.indices.contains(selection) else { return .handled }

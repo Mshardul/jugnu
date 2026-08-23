@@ -5,6 +5,8 @@ import SwiftUI
 
 struct PrefsView: View {
     @ObservedObject var model: AppModel
+    var shellHost: ShellHost
+    var onOpenCatalog: () -> Void
     @State private var ids: [String] = []
     @State private var errorText: String?
     @Environment(\.colorScheme) private var colorScheme
@@ -46,7 +48,7 @@ struct PrefsView: View {
                         .labelsHidden()
                         Button("Uninstall") {
                             AddonUninstallPresenter.present(
-                                id: id, name: model.addonDisplayName(id: id), model: model
+                                id: id, name: model.addonDisplayName(id: id), model: model, shellHost: shellHost
                             ) {
                                 reload()
                             }
@@ -65,7 +67,7 @@ struct PrefsView: View {
                 }
 
                 Button("Browse Catalog…") {
-                    model.openBrowseCatalog()
+                    onOpenCatalog()
                 }
 
                 Divider()
@@ -81,6 +83,8 @@ struct PrefsView: View {
                         .buttonStyle(.bordered)
                     }
                 }
+
+                themePreview(theme)
 
                 themeEditors(theme)
 
@@ -137,6 +141,38 @@ struct PrefsView: View {
                 config.palette.firstView = value
                 try? model.saveConfig(config)
             }
+        )
+    }
+
+    /// Mini launcher-like preview so theme edits are visible while settings replaces the real launcher.
+    private func themePreview(_ theme: JugnuThemeColors) -> some View {
+        HStack(spacing: 8) {
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(theme.background)
+                .frame(width: 120, height: 44)
+                .overlay(
+                    Text("Search…")
+                        .font(JugnuTokens.font(presetId: themeStore.presetId, role: .caption))
+                        .foregroundStyle(theme.textSecondary)
+                )
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(theme.surface)
+                .frame(width: 120, height: 44)
+                .overlay(
+                    Text("Aa")
+                        .font(JugnuTokens.font(presetId: themeStore.presetId, role: .headline))
+                        .foregroundStyle(theme.textPrimary)
+                )
+            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                .fill(theme.accent)
+                .frame(width: 28, height: 28)
+        }
+        .padding(8)
+        .background(theme.surface)
+        .clipShape(RoundedRectangle(cornerRadius: JugnuTokens.Radius.panel, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: JugnuTokens.Radius.panel, style: .continuous)
+                .strokeBorder(theme.accent.opacity(0.2))
         )
     }
 

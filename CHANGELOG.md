@@ -16,6 +16,10 @@ The project has not published a release yet. Entries currently describe unreleas
 
 ### Documentation
 
+- 2026-08-23 — Added a reviewer watchlist (exhaustive switches, UserFacingError mapping, tokens/screens, unit-test isolation).
+- 2026-08-23 — Added reuse-before-invent / reach-for-this-type rules; SwiftLint errors on force unwrap/cast/try and runs via `make lint-swift` and pre-commit.
+- 2026-08-23 — Folded agent-ops copies into `AGENTS.md`; coding standards stay in `docs/conventions.md`.
+- 2026-08-23 — Added standing coding conventions (`docs/conventions.md`) and pointed CONTRIBUTING / agent instructions at them.
 - 2026-08-23 — Drafted the one-panel / preset / stack shell-surface epic (ticket 0008) and filed 0009–0012 from Browse Addons smoke; parked Liquid Glass in ideas.
 - 2026-08-23 — Filed tickets 0005–0007 for Browse Addons palette empty/keyboard, catalog state/errors, and catalog visual follow-up.
 - 2026-08-22 — Documented latency as a product requirement with budgets, non-blocking work, instrumentation, and responsiveness testing.

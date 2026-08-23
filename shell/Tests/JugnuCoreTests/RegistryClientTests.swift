@@ -11,7 +11,11 @@ final class RegistryClientTests: XCTestCase {
     """
 
     func testDecodesWithoutNewFieldsUsingDefaults() throws {
-        let data = Data(("[" + baseJSON.replacingOccurrences(of: "\"summary\": \"A widget\"", with: "\"summary\": \"A widget\", \"category\": \"System\"") + "]").utf8)
+        let patched = baseJSON.replacingOccurrences(
+            of: "\"summary\": \"A widget\"",
+            with: "\"summary\": \"A widget\", \"category\": \"System\""
+        )
+        let data = Data(("[" + patched + "]").utf8)
         let entries = try JSONDecoder().decode([RegistryEntry].self, from: data)
         XCTAssertEqual(entries[0].category, "System")
         XCTAssertNil(entries[0].subcategory)

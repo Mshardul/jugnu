@@ -34,5 +34,9 @@ let package = Package(
             ],
             resources: [.copy("Fixtures")]
         ),
+        .testTarget(
+            name: "JugnuUITests",
+            dependencies: ["JugnuUI"]
+        ),
     ]
 )

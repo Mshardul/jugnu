@@ -2,45 +2,7 @@ import AppKit
 import JugnuCore
 import SwiftUI
 
-@MainActor
-public final class FormPanel: KeyablePanel {
-    private let errorState = PanelErrorState()
-    private let onCancel: () -> Void
-
-    public init(
-        ui: UIDescriptor,
-        onSubmit: @escaping ([String: JSONValue]) -> Void,
-        onCancel: @escaping () -> Void
-    ) {
-        self.onCancel = onCancel
-        super.init(
-            contentRect: NSRect(x: 0, y: 0, width: 400, height: 240),
-            styleMask: [.borderless],
-            backing: .buffered,
-            defer: false
-        )
-        isFloatingPanel = true
-        level = .floating
-        backgroundColor = .clear
-        isOpaque = false
-        hasShadow = true
-        hidesOnDeactivate = false
-        contentView = NSHostingView(
-            rootView: ThemedPanelBackground {
-                FormPanelView(ui: ui, errorState: errorState, onSubmit: onSubmit, onCancel: onCancel)
-            }
-        )
-        center()
-    }
-
-    public func presentError(_ message: String) {
-        errorState.message = message
-    }
-
-    override public func cancelOperation(_ sender: Any?) { onCancel() }
-}
-
-private struct FormPanelView: View {
+public struct FormPanelView: View {
     let ui: UIDescriptor
     @ObservedObject var errorState: PanelErrorState
     var onSubmit: ([String: JSONValue]) -> Void
@@ -51,9 +13,21 @@ private struct FormPanelView: View {
     @Environment(\.jugnuTheme) private var theme
     @ObservedObject private var store = ThemeStore.shared
 
+    public init(
+        ui: UIDescriptor,
+        errorState: PanelErrorState,
+        onSubmit: @escaping ([String: JSONValue]) -> Void,
+        onCancel: @escaping () -> Void
+    ) {
+        self.ui = ui
+        self.errorState = errorState
+        self.onSubmit = onSubmit
+        self.onCancel = onCancel
+    }
+
     private var fields: [UIFormField] { ui.fields ?? [] }
 
-    var body: some View {
+    public var body: some View {
         VStack(alignment: .leading, spacing: JugnuTokens.Spacing.row) {
             Text(ui.title ?? "Form")
                 .font(JugnuTokens.font(presetId: store.presetId, role: .headline))

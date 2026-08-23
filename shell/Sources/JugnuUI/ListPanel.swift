@@ -2,45 +2,7 @@ import AppKit
 import JugnuCore
 import SwiftUI
 
-@MainActor
-public final class ListPanel: KeyablePanel {
-    private let errorState = PanelErrorState()
-    private let onCancel: () -> Void
-
-    public init(
-        ui: UIDescriptor,
-        onSelect: @escaping (UIListItem, String?) -> Void,
-        onCancel: @escaping () -> Void
-    ) {
-        self.onCancel = onCancel
-        super.init(
-            contentRect: NSRect(x: 0, y: 0, width: 420, height: 360),
-            styleMask: [.borderless],
-            backing: .buffered,
-            defer: false
-        )
-        isFloatingPanel = true
-        level = .floating
-        backgroundColor = .clear
-        isOpaque = false
-        hasShadow = true
-        hidesOnDeactivate = false
-        contentView = NSHostingView(
-            rootView: ThemedPanelBackground {
-                ListPanelView(ui: ui, errorState: errorState, onSelect: onSelect, onCancel: onCancel)
-            }
-        )
-        center()
-    }
-
-    public func presentError(_ message: String) {
-        errorState.message = message
-    }
-
-    override public func cancelOperation(_ sender: Any?) { onCancel() }
-}
-
-private struct ListPanelView: View {
+public struct ListPanelView: View {
     let ui: UIDescriptor
     @ObservedObject var errorState: PanelErrorState
     var onSelect: (UIListItem, String?) -> Void
@@ -50,6 +12,18 @@ private struct ListPanelView: View {
     @State private var selection = 0
     @Environment(\.jugnuTheme) private var theme
     @ObservedObject private var store = ThemeStore.shared
+
+    public init(
+        ui: UIDescriptor,
+        errorState: PanelErrorState,
+        onSelect: @escaping (UIListItem, String?) -> Void,
+        onCancel: @escaping () -> Void
+    ) {
+        self.ui = ui
+        self.errorState = errorState
+        self.onSelect = onSelect
+        self.onCancel = onCancel
+    }
 
     private var items: [UIListItem] { ui.items ?? [] }
 
@@ -61,7 +35,7 @@ private struct ListPanelView: View {
         }
     }
 
-    var body: some View {
+    public var body: some View {
         VStack(alignment: .leading, spacing: JugnuTokens.Spacing.row) {
             Text(ui.title ?? "Choose")
                 .font(JugnuTokens.font(presetId: store.presetId, role: .headline))

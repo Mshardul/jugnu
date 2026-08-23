@@ -3,7 +3,7 @@ import XCTest
 
 final class RunJSONTests: XCTestCase {
     func testDecodeIgnoresTrailingWhitespace() throws {
-        let data = "{\"ok\":true,\"message\":\"ok\"}\n".data(using: .utf8)!
+        let data = Data("{\"ok\":true,\"message\":\"ok\"}\n".utf8)
         let r = try RunJSON.decodeResponse(stdout: data)
         XCTAssertEqual(r.message, "ok")
     }

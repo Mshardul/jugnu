@@ -3,7 +3,7 @@ import XCTest
 
 final class RunModelsTests: XCTestCase {
     func testToastResponseRoundTrip() throws {
-        let json = #"{"ok":true,"message":"Microphone muted"}"#.data(using: .utf8)!
+        let json = Data(#"{"ok":true,"message":"Microphone muted"}"#.utf8)
         let decoded = try JSONDecoder().decode(RunResponse.self, from: json)
         XCTAssertTrue(decoded.ok)
         XCTAssertEqual(decoded.message, "Microphone muted")
@@ -11,19 +11,19 @@ final class RunModelsTests: XCTestCase {
     }
 
     func testListResponseRoundTrip() throws {
-        let json = """
+        let json = Data("""
         {"ok":true,"ui":{"pattern":"list","title":"Processes","placeholder":"Filter",
          "items":[{"id":"1","title":"node","subtitle":"PID 1","actions":["quit"]}]}}
-        """.data(using: .utf8)!
+        """.utf8)
         let decoded = try JSONDecoder().decode(RunResponse.self, from: json)
         XCTAssertEqual(decoded.ui?.pattern, .list)
         XCTAssertEqual(decoded.ui?.items?.first?.id, "1")
     }
 
     func testNoteResponseRoundTrip() throws {
-        let json = """
+        let json = Data("""
         {"ok":true,"ui":{"pattern":"note","title":"Scratch","content":"hello world"}}
-        """.data(using: .utf8)!
+        """.utf8)
         let decoded = try JSONDecoder().decode(RunResponse.self, from: json)
         XCTAssertEqual(decoded.ui?.pattern, .note)
         XCTAssertEqual(decoded.ui?.content, "hello world")
@@ -32,7 +32,7 @@ final class RunModelsTests: XCTestCase {
     func testRequestEncodesEmptyContext() throws {
         let req = RunRequest(api: 1, op: "run", command: "toggle", args: [:], context: [:])
         let data = try JSONEncoder().encode(req)
-        let obj = try JSONSerialization.jsonObject(with: data) as! [String: Any]
+        let obj = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
         XCTAssertEqual(obj["api"] as? Int, 1)
         XCTAssertEqual(obj["command"] as? String, "toggle")
         XCTAssertNotNil(obj["context"])

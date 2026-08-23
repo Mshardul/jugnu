@@ -1,4 +1,5 @@
 included:
+  - shell/App
   - shell/Sources
   - shell/Tests
   - shell/TestsExtended
@@ -10,6 +11,9 @@ excluded:
   - DerivedData
 
 # Keep rules focused on correctness and maintainability; formatting belongs to SwiftFormat.
+disabled_rules:
+  - identifier_name
+
 opt_in_rules:
   - empty_count
   - empty_string
@@ -19,16 +23,44 @@ opt_in_rules:
   - private_action
   - private_outlet
   - prohibited_super_call
+  - redundant_discardable_let
   - redundant_nil_coalescing
   - sorted_first_last
   - toggle_bool
+  - unneeded_override
+  - unused_optional_binding
+  - unused_setter_value
+  - orphan_doc_comment
+  - todo
 
 analyzer_rules:
   - unused_declaration
   - unused_import
 
-force_cast: warning
-force_try: warning
+custom_rules:
+  no_process_in_ui:
+    name: "No Process in JugnuUI"
+    regex: '\bProcess\s*\('
+    included: "Sources/JugnuUI"
+    message: "Spawn processes in JugnuCore (AddonRunner), not JugnuUI."
+    severity: error
+  no_urlsession_in_ui:
+    name: "No URLSession in JugnuUI"
+    regex: '\bURLSession\b'
+    included: "Sources/JugnuUI"
+    message: "Network belongs in JugnuCore, not JugnuUI."
+    severity: error
+  no_userdefaults_in_ui:
+    name: "No UserDefaults in JugnuUI"
+    regex: '\bUserDefaults\b'
+    included: "Sources/JugnuUI"
+    message: "Persist via ConfigStore/StateStore in Core, not UserDefaults in views."
+    severity: error
+
+force_unwrapping: error
+force_cast: error
+force_try: error
+implicitly_unwrapped_optional: error
 line_length:
   warning: 120
   error: 160
@@ -44,6 +76,7 @@ function_body_length:
 cyclomatic_complexity:
   warning: 10
   error: 20
+  ignores_case_statements: true
 large_tuple:
   warning: 3
   error: 4

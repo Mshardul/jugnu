@@ -10,12 +10,13 @@ public final class NotePanel: NSPanel {
 
     public init(
         ui: UIDescriptor,
+        persist: Bool,
         onSave: @escaping (String) -> Void,
         onClose: @escaping () -> Void
     ) {
         self.onSave = onSave
         self.onClose = onClose
-        self.model = NoteModel(text: ui.content ?? "")
+        self.model = NoteModel(text: ui.content ?? "", persist: persist)
         super.init(
             contentRect: NSRect(x: 0, y: 0, width: 420, height: 320),
             styleMask: [.titled, .closable, .resizable],
@@ -45,15 +46,19 @@ public final class NotePanel: NSPanel {
 @MainActor
 private final class NoteModel: NSObject, ObservableObject, NSWindowDelegate {
     @Published var text: String
+    let persist: Bool
     var onSave: ((String) -> Void)?
     var onClose: (() -> Void)?
 
-    init(text: String) {
+    init(text: String, persist: Bool) {
         self.text = text
+        self.persist = persist
     }
 
     func windowWillClose(_ notification: Notification) {
-        onSave?(text)
+        if persist {
+            onSave?(text)
+        }
         onClose?()
     }
 }
