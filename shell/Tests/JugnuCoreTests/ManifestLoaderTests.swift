@@ -60,4 +60,79 @@ final class ManifestLoaderTests: XCTestCase {
             XCTAssertEqual(error as? ManifestLoaderError, .unsupportedAPI(99))
         }
     }
+
+    func testLoadsViewTypesAllowList() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+
+        let yaml = """
+        id: demo
+        name: Demo
+        version: 1.0.0
+        api: 1
+        view_types: [board, rows]
+        commands:
+          - id: board
+            title: Snap board
+            view: board
+            ui:
+              pattern: list
+        entrypoint:
+          kind: exec
+          path: bin/run
+        """
+        try yaml.write(to: dir.appendingPathComponent("addon.yaml"), atomically: true, encoding: .utf8)
+        let m = try ManifestLoader.load(from: dir)
+        XCTAssertEqual(m.viewTypes, [.board, .rows])
+        XCTAssertEqual(m.commands.first?.view, .board)
+    }
+
+    func testRejectsUnknownViewType() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+
+        let yaml = """
+        id: bad
+        name: Bad
+        version: 1.0.0
+        api: 1
+        view_types: [wall]
+        commands:
+          - id: x
+            title: X
+        entrypoint:
+          kind: exec
+          path: bin/run
+        """
+        try yaml.write(to: dir.appendingPathComponent("addon.yaml"), atomically: true, encoding: .utf8)
+        XCTAssertThrowsError(try ManifestLoader.load(from: dir)) { error in
+            XCTAssertEqual(error as? ManifestLoaderError, .unknownViewType("wall"))
+        }
+    }
+
+    func testRejectsCommandViewOutsideAllowList() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+
+        let yaml = """
+        id: bad
+        name: Bad
+        version: 1.0.0
+        api: 1
+        commands:
+          - id: x
+            title: X
+            view: board
+        entrypoint:
+          kind: exec
+          path: bin/run
+        """
+        try yaml.write(to: dir.appendingPathComponent("addon.yaml"), atomically: true, encoding: .utf8)
+        XCTAssertThrowsError(try ManifestLoader.load(from: dir)) { error in
+            XCTAssertEqual(error as? ManifestLoaderError, .commandViewNotAllowed(command: "x", view: "board"))
+        }
+    }
 }

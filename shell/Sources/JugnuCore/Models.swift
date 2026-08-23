@@ -266,22 +266,29 @@ public struct CommandDescriptor: Codable, Equatable, Sendable {
     public var subtitle: String
     public var keywords: [String]
     public var ui: CommandUISpec?
+    public var view: ViewType?
 
     public init(
         id: String,
         title: String,
         subtitle: String,
         keywords: [String] = [],
-        ui: CommandUISpec? = nil
+        ui: CommandUISpec? = nil,
+        view: ViewType? = nil
     ) {
         self.id = id
         self.title = title
         self.subtitle = subtitle
         self.keywords = keywords
         self.ui = ui
+        self.view = view
     }
 
     public var defaultUIPattern: UIPattern? { ui?.pattern }
+
+    enum CodingKeys: String, CodingKey {
+        case id, title, subtitle, keywords, ui, view
+    }
 
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -290,6 +297,14 @@ public struct CommandDescriptor: Codable, Equatable, Sendable {
         subtitle = try c.decodeIfPresent(String.self, forKey: .subtitle) ?? ""
         keywords = try c.decodeIfPresent([String].self, forKey: .keywords) ?? []
         ui = try c.decodeIfPresent(CommandUISpec.self, forKey: .ui)
+        if let raw = try c.decodeIfPresent(String.self, forKey: .view) {
+            guard let parsed = ViewType(rawValue: raw) else {
+                throw ManifestLoaderError.unknownViewType(raw)
+            }
+            view = parsed
+        } else {
+            view = nil
+        }
     }
 }
 
@@ -321,6 +336,11 @@ public struct AddonManifest: Codable, Equatable, Sendable {
     public var commands: [CommandDescriptor]
     public var entrypoint: Entrypoint
     public var cleanup: CleanupSpec
+    public var viewTypes: [ViewType]
+
+    public var allowedViewTypes: [ViewType] {
+        viewTypes.isEmpty ? ViewType.shellDefaults : viewTypes
+    }
 
     public init(
         id: String,
@@ -329,7 +349,8 @@ public struct AddonManifest: Codable, Equatable, Sendable {
         api: Int,
         commands: [CommandDescriptor],
         entrypoint: Entrypoint,
-        cleanup: CleanupSpec = CleanupSpec()
+        cleanup: CleanupSpec = CleanupSpec(),
+        viewTypes: [ViewType] = []
     ) {
         self.id = id
         self.name = name
@@ -338,6 +359,12 @@ public struct AddonManifest: Codable, Equatable, Sendable {
         self.commands = commands
         self.entrypoint = entrypoint
         self.cleanup = cleanup
+        self.viewTypes = viewTypes
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id, name, version, api, commands, entrypoint, cleanup
+        case viewTypes = "view_types"
     }
 
     public init(from decoder: Decoder) throws {
@@ -349,5 +376,21 @@ public struct AddonManifest: Codable, Equatable, Sendable {
         commands = try c.decode([CommandDescriptor].self, forKey: .commands)
         entrypoint = try c.decode(Entrypoint.self, forKey: .entrypoint)
         cleanup = try c.decodeIfPresent(CleanupSpec.self, forKey: .cleanup) ?? CleanupSpec()
+        let raw = try c.decodeIfPresent([String].self, forKey: .viewTypes) ?? []
+        viewTypes = try raw.map { token in
+            guard let parsed = ViewType(rawValue: token) else {
+                throw ManifestLoaderError.unknownViewType(token)
+            }
+            return parsed
+        }
+    }
+
+    public func validateViewTypes() throws {
+        let allowed = allowedViewTypes
+        for command in commands {
+            if let view = command.view, !allowed.contains(view) {
+                throw ManifestLoaderError.commandViewNotAllowed(command: command.id, view: view.rawValue)
+            }
+        }
     }
 }

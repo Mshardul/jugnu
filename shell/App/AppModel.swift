@@ -100,20 +100,28 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
         let manifest = try ManifestLoader.load(from: command.addonRoot)
         let execute: () async throws -> RunResponse = { [runner] in
             try await Task.detached {
-                try runner.run(
+                let response = try runner.run(
                     manifest: manifest,
                     addonRoot: command.addonRoot,
                     commandId: command.commandId
+                )
+                return try response.resolvingView(
+                    commandView: command.defaultViewType,
+                    allowed: command.allowedViewTypes
                 )
             }.value
         }
         let followUp: (RunRequest) async throws -> RunResponse = { [runner] request in
             try await Task.detached {
-                try runner.run(
+                let response = try runner.run(
                     addonRoot: command.addonRoot,
                     entrypoint: manifest.entrypoint,
                     request: request,
                     timeout: runner.timeoutSeconds
+                )
+                return try response.resolvingView(
+                    commandView: command.defaultViewType,
+                    allowed: command.allowedViewTypes
                 )
             }.value
         }

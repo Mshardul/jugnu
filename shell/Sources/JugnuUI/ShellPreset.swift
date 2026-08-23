@@ -1,4 +1,5 @@
 import AppKit
+import JugnuCore
 
 public enum ShellPreset: String, Equatable, Sendable {
     case launcher
@@ -10,16 +11,23 @@ public enum ShellPreset: String, Equatable, Sendable {
     case form
 
     /// `compactLauncher` only affects `.launcher`; ignored for other cases.
-    public func size(compactLauncher: Bool) -> NSSize {
+    public func defaultViewType(compactLauncher: Bool) -> ViewType {
         switch self {
-        case .launcher: return compactLauncher ? NSSize(width: 560, height: 120) : NSSize(width: 560, height: 360)
-        case .catalog: return NSSize(width: 800, height: 560)
-        case .settings: return NSSize(width: 520, height: 560)
-        case .detail: return NSSize(width: 560, height: 480)
-        case .confirm: return NSSize(width: 380, height: 180)
-        case .list: return NSSize(width: 420, height: 360)
-        case .form: return NSSize(width: 400, height: 240)
+        case .launcher: return compactLauncher ? .seek : .palette
+        case .catalog: return .grid
+        case .settings, .detail: return .rail
+        case .confirm: return .ask
+        case .list: return .rows
+        case .form: return .fields
         }
+    }
+
+    public func size(
+        compactLauncher: Bool,
+        visibleFrame: NSRect = NSRect(x: 0, y: 0, width: 1440, height: 900)
+    ) -> NSSize {
+        let box = defaultViewType(compactLauncher: compactLauncher).size(in: visibleFrame)
+        return NSSize(width: box.width, height: box.height)
     }
 
     public var hasSidebar: Bool { self == .catalog }

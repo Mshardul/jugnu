@@ -14,8 +14,9 @@ final class ShellPresetTests: XCTestCase {
 
     func test_catalogSize() {
         let size = ShellPreset.catalog.size(compactLauncher: false)
-        XCTAssertEqual(size.width, 800, accuracy: 0.5)
-        XCTAssertEqual(size.height, 560, accuracy: 0.5)
+        XCTAssertEqual(size.width, 640, accuracy: 0.5)
+        XCTAssertEqual(size.height, 400, accuracy: 0.5)
+        XCTAssertEqual(ShellPreset.catalog.defaultViewType(compactLauncher: false), .grid)
     }
 
     func test_detailHasNoSidebar() {

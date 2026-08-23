@@ -22,6 +22,16 @@ public enum UserFacingError {
                 return "This addon’s description couldn’t be read. Try reinstalling it."
             case .unsupportedAPI:
                 return "This addon needs a newer Jugnu."
+            case .unknownViewType, .commandViewNotAllowed:
+                return "This addon’s description couldn’t be read. Try reinstalling it."
+            }
+        }
+        if let view = error as? ViewTypeError {
+            switch view {
+            case .notAllowed:
+                return "This addon asked for a view the shell doesn’t allow."
+            case .unknown:
+                return "The addon didn’t return a result we could use."
             }
         }
         if let runner = error as? AddonRunnerError {

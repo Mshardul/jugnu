@@ -89,6 +89,7 @@ public struct UIDescriptor: Codable, Sendable, Equatable {
     public var cancelLabel: String?
     /// `.note` pattern: initial editable text content.
     public var content: String?
+    public var view: ViewType?
 
     public init(
         pattern: UIPattern,
@@ -99,7 +100,8 @@ public struct UIDescriptor: Codable, Sendable, Equatable {
         fields: [UIFormField]? = nil,
         confirmLabel: String? = nil,
         cancelLabel: String? = nil,
-        content: String? = nil
+        content: String? = nil,
+        view: ViewType? = nil
     ) {
         self.pattern = pattern
         self.title = title
@@ -110,6 +112,7 @@ public struct UIDescriptor: Codable, Sendable, Equatable {
         self.confirmLabel = confirmLabel
         self.cancelLabel = cancelLabel
         self.content = content
+        self.view = view
     }
 }
 
@@ -146,5 +149,17 @@ public struct RunResponse: Codable, Sendable, Equatable {
         self.message = message
         self.error = error
         self.ui = ui
+    }
+
+    public func resolvingView(commandView: ViewType?, allowed: [ViewType]) throws -> RunResponse {
+        guard var ui else { return self }
+        ui.view = try ViewType.resolve(
+            pattern: ui.pattern,
+            requested: ui.view ?? commandView,
+            allowed: allowed
+        )
+        var copy = self
+        copy.ui = ui
+        return copy
     }
 }

@@ -93,15 +93,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         syncCatalogSnapshot()
         shellHost.popTop()
         renderCurrentTop(model: model)
-        let screen = NSScreen.main ?? NSScreen.screens.first
+        let screen = shellHost.currentScreen ?? NSScreen.main ?? NSScreen.screens.first
         guard let screen else { return }
         let compact = shellHost.stack.top.preset == .launcher
         shellHost.morphFrame(to: shellHost.stack.top.preset, compactLauncher: compact, on: screen)
     }
 
-    /// Genuine click outside the app's own windows. Always dismisses, never pops.
+    /// Genuine click outside the app's own windows. Dismisses unless the current view type ignores it.
     private func handleClickOutside() {
-        shellHost?.hide()
+        guard let shellHost, shellHost.dismissesOnOutsideClick else { return }
+        shellHost.hide()
     }
 
     /// Pushing `settings` from `launcher` is a push (child); replacing `catalog` with `settings` is a replace (sibling).

@@ -1,0 +1,9 @@
+#!/bin/bash
+set -euo pipefail
+root="$(cd "$(dirname "$0")/.." && pwd)"
+helper="$root/bin/helper"
+if [[ ! -x "$helper" ]]; then
+  printf '%s\n' '{"ok":false,"error":"Window Layouts helper isn’t built. Run make window-layouts."}'
+  exit 0
+fi
+exec "$helper"

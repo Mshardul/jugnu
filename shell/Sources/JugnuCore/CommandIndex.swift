@@ -8,6 +8,8 @@ public struct IndexedCommand: Equatable, Sendable {
     public var keywords: [String]
     public var addonRoot: URL
     public var defaultUIPattern: UIPattern?
+    public var defaultViewType: ViewType?
+    public var allowedViewTypes: [ViewType]
 
     public init(
         addonId: String,
@@ -16,7 +18,9 @@ public struct IndexedCommand: Equatable, Sendable {
         subtitle: String,
         keywords: [String],
         addonRoot: URL,
-        defaultUIPattern: UIPattern? = nil
+        defaultUIPattern: UIPattern? = nil,
+        defaultViewType: ViewType? = nil,
+        allowedViewTypes: [ViewType] = ViewType.shellDefaults
     ) {
         self.addonId = addonId
         self.commandId = commandId
@@ -25,6 +29,8 @@ public struct IndexedCommand: Equatable, Sendable {
         self.keywords = keywords
         self.addonRoot = addonRoot
         self.defaultUIPattern = defaultUIPattern
+        self.defaultViewType = defaultViewType
+        self.allowedViewTypes = allowedViewTypes
     }
 
     public var qualifiedId: String { "\(addonId).\(commandId)" }
@@ -84,7 +90,9 @@ public struct CommandIndex: Sendable {
                         subtitle: cmd.subtitle,
                         keywords: cmd.keywords,
                         addonRoot: root,
-                        defaultUIPattern: cmd.defaultUIPattern
+                        defaultUIPattern: cmd.defaultUIPattern,
+                        defaultViewType: cmd.view,
+                        allowedViewTypes: manifest.allowedViewTypes
                     )
                 )
             }

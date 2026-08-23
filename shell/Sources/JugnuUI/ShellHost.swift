@@ -39,6 +39,10 @@ public final class ShellHost: ObservableObject {
     /// morph on this screen rather than `NSScreen.main`, matching wherever the panel already is.
     public var currentScreen: NSScreen? { panel?.screen }
 
+    public private(set) var currentViewType: ViewType = .seek
+
+    public var dismissesOnOutsideClick: Bool { currentViewType.dismissesOnOutsideClick }
+
     /// Sets the panel's Esc/Cmd+. handler. Callers should rebind this whenever the hosted content changes.
     public func setOnCancel(_ handler: (() -> Void)?) {
         panel?.escHandler = handler
@@ -72,9 +76,17 @@ public final class ShellHost: ObservableObject {
         outsideClickMonitor = nil
     }
 
-    public func morphFrame(to preset: ShellPreset, compactLauncher: Bool, on screen: NSScreen) {
+    public func morphFrame(
+        to preset: ShellPreset,
+        compactLauncher: Bool,
+        on screen: NSScreen,
+        viewType: ViewType? = nil
+    ) {
         guard let panel else { return }
-        let size = preset.size(compactLauncher: compactLauncher)
+        let type = viewType ?? preset.defaultViewType(compactLauncher: compactLauncher)
+        currentViewType = type
+        let box = type.size(in: screen.visibleFrame)
+        let size = NSSize(width: box.width, height: box.height)
         let target = clampedFrame(size: size, centeredOn: screen.visibleFrame)
         if reduceMotion() {
             panel.setFrame(target, display: true)
@@ -204,7 +216,12 @@ extension ShellHost {
         activeFollowUp = (commandId, followUp, resolvedTrace)
         stack.push(ShellStackEntry(state))
         renderFollowUpContent()
-        morphFrame(to: state.preset, compactLauncher: false, on: screen)
+        morphFrame(
+            to: state.preset,
+            compactLauncher: false,
+            on: screen,
+            viewType: ui.view ?? ui.pattern.defaultViewType
+        )
         resolvedTrace.markFirstPaint()
         resolvedTrace.markContent()
     }

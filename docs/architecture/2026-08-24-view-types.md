@@ -1,7 +1,7 @@
 # Jugnu — view types (viewport catalog)
 
 **Date:** 2026-08-24  
-**Status:** Approved (not implemented)  
+**Status:** Approved — implemented in the shell (ticket 0045)  
 **Tickets:** [0045](../tickets.md) (shell), [0046](../tickets.md) (`window-layouts` consumer)  
 **Depends on:** [Shell surface presets](./2026-08-23-shell-surface-presets.md), [Addon UI host + speed](./2026-08-22-addon-ui-speed-design.md)  
 **Not this spec:** Liquid Glass; addons creating `NSWindow`; per-addon pixel or percent fields; rotating the physical display

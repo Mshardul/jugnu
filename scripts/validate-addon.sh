@@ -38,4 +38,41 @@ entrypoint_path=$(sed -n 's/^  path:[[:space:]]*//p' "$manifest" | head -1 | tr 
 grep -q '^commands:' "$manifest" || { echo "missing commands in addon.yaml" >&2; exit 1; }
 grep -q '^cleanup:' "$manifest" || { echo "missing cleanup in addon.yaml" >&2; exit 1; }
 
+if grep -E '^[[:space:]]*(width|height|percent)[[:space:]]*:' "$manifest" >/dev/null; then
+  echo "addon.yaml must not declare width, height, or percent; use view_types" >&2
+  exit 1
+fi
+
+is_known_view() {
+  case "$1" in
+    seek|palette|ask|fields|rows|grid|board|spread|canvas|rail) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+extract_view_tokens() {
+  awk '
+    $1 == "view_types:" {
+      line = $0
+      sub(/^view_types:[[:space:]]*/, "", line)
+      gsub(/[][,]/, " ", line)
+      n = split(line, parts, /[[:space:]]+/)
+      for (i = 1; i <= n; i++) if (parts[i] != "") print parts[i]
+      next
+    }
+    /^[[:space:]]+-[[:space:]]+id:/ { in_cmd = 1 }
+    in_cmd && $1 == "view:" {
+      print $2
+      in_cmd = 0
+    }
+  ' "$manifest"
+}
+
+while read -r token; do
+  [[ -z "$token" ]] && continue
+  token=${token//\"/}
+  token=${token//\'/}
+  is_known_view "$token" || { echo "unknown view type: $token" >&2; exit 1; }
+done < <(extract_view_tokens)
+
 printf 'valid addon: %s %s (api %s)\n' "$id" "$version" "$api"

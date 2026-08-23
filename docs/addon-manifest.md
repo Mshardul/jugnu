@@ -31,7 +31,7 @@ cleanup:
 - `entrypoint.path`: relative path to the entrypoint; absolute paths and parent traversal are forbidden.
 - `cleanup`: declared addon-owned paths and launchd labels to remove on disable or uninstall.
 
-## View types (accepted; not validated in code yet)
+## View types
 
 Shell-owned viewport ids. Do **not** add `width`, `height`, or `percent` fields.
 
@@ -43,7 +43,9 @@ commands:
     view: rows                    # must be in view_types
 ```
 
-Catalog, defaults, click-outside, and multi-display rules: [view types spec](architecture/2026-08-24-view-types.md). `scripts/validate-addon.sh` should reject unknown ids when ticket 0045 is implemented.
+Omit `view_types` to get the shell defaults (`rows`, `fields`, `ask`). A command `view` must be in that list. Run JSON may set `"view"` on `ui` to override; unknown ids fail load/run and do not morph.
+
+Catalog, click-outside, and multi-display rules: [view types spec](architecture/2026-08-24-view-types.md). `scripts/validate-addon.sh` rejects unknown ids and pixel/percent fields.
 
 ## Validation
 

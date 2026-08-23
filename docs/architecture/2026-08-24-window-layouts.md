@@ -1,7 +1,7 @@
 # Jugnu — window-layouts addon
 
 **Date:** 2026-08-24  
-**Status:** Approved (not implemented; do not scaffold until asked)  
+**Status:** Approved — helper scaffolded (`addons/window-layouts`; ticket 0046)  
 **Ticket:** [0046](../tickets.md)  
 **Depends on:** [View types](./2026-08-24-view-types.md), [Shell design](./2026-08-22-shell-design.md) (Accessibility at addon use), [UI host + speed](./2026-08-22-addon-ui-speed-design.md)  
 **Packaging:** one zip, id `window-layouts`. Absorbs staged `apps/window-layouts` and `apps/layout-save`. **No** `layout-undo`.

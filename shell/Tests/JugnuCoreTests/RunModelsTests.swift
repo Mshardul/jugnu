@@ -29,6 +29,12 @@ final class RunModelsTests: XCTestCase {
         XCTAssertEqual(decoded.ui?.content, "hello world")
     }
 
+    func testUIViewTypeRoundTrip() throws {
+        let json = Data(#"{"ok":true,"ui":{"pattern":"list","title":"Zones","view":"board","items":[]}}"#.utf8)
+        let decoded = try JSONDecoder().decode(RunResponse.self, from: json)
+        XCTAssertEqual(decoded.ui?.view, .board)
+    }
+
     func testRequestEncodesEmptyContext() throws {
         let req = RunRequest(api: 1, op: "run", command: "toggle", args: [:], context: [:])
         let data = try JSONEncoder().encode(req)

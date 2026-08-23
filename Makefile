@@ -2,7 +2,7 @@
 -include .env
 export DEVELOPER_DIR ?= /Applications/Xcode.app/Contents/Developer
 
-.PHONY: sync hooks precommit lint lint-swift format format-swift typecheck spell test test-extended tools-swift stop run ci
+.PHONY: sync hooks precommit lint lint-swift format format-swift typecheck spell test test-extended tools-swift stop run ci window-layouts
 
 sync:
 	uv sync
@@ -39,6 +39,11 @@ test:
 
 test-extended:
 	cd shell/TestsExtended && swift test
+
+window-layouts:
+	cd addons/window-layouts && swift build -c release
+	mkdir -p addons/window-layouts/bin
+	cp addons/window-layouts/.build/release/window-layouts addons/window-layouts/bin/helper
 
 # Quit every Jugnu binary (menu-bar .app and `swift run`), not Cursor helpers.
 stop:

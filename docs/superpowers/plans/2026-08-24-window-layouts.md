@@ -2,7 +2,7 @@
 
 **Spec:** [2026-08-24-window-layouts.md](../../architecture/2026-08-24-window-layouts.md)  
 **Depends on:** [0045 view types](./2026-08-24-view-types.md) at least `board` / `rows` / `fields` / `ask`  
-**Status:** Spec approved — **do not scaffold until the user asks**
+**Status:** Spec approved — helper lives in `addons/window-layouts`
 
 ## Goal
 

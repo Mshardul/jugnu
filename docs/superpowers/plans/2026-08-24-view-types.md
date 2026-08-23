@@ -1,7 +1,7 @@
 # Plan: view types (0045)
 
 **Spec:** [2026-08-24-view-types.md](../../architecture/2026-08-24-view-types.md)  
-**Status:** Spec approved — **do not implement until the user asks**
+**Status:** Spec approved — implemented in the shell
 
 ## Goal
 
