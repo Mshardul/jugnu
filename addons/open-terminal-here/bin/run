@@ -1,0 +1,48 @@
+#!/bin/bash
+set -euo pipefail
+cat >/dev/null
+
+state_dir="${JUGNU_STATE_DIR:-$HOME/.local/share/jugnu/state/open-terminal-here}"
+app="Terminal"
+if [[ -f "$state_dir/app" ]]; then
+  read -r app <"$state_dir/app" || true
+fi
+if [[ -z "$app" ]]; then
+  app="Terminal"
+fi
+
+osa="${OSASCRIPT:-osascript}"
+folder=$("$osa" 2>/dev/null <<'APPLESCRIPT'
+tell application "Finder"
+  if (count of windows) is 0 then error "no window"
+  set sel to selection as list
+  if (count of sel) is greater than 0 then
+    try
+      return POSIX path of (item 1 of sel as alias)
+    end try
+  end if
+  return POSIX path of (target of front window as alias)
+end tell
+APPLESCRIPT
+) || true
+if [[ -z "$folder" ]]; then
+  echo '{"ok":false,"error":"No Finder window"}'
+  exit 0
+fi
+
+folder="${folder%$'\r'}"
+folder="${folder%/}"
+if [[ -f "$folder" ]]; then
+  folder=$(dirname "$folder")
+fi
+
+json_escape() {
+  printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'
+}
+
+if ! open -a "$app" "$folder"; then
+  echo "{\"ok\":false,\"error\":\"Could not open $(json_escape "$app")\"}"
+  exit 0
+fi
+
+echo "{\"ok\":true,\"message\":\"Opened $(json_escape "$app") at $(json_escape "$folder")\"}"

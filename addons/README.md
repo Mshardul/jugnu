@@ -18,8 +18,10 @@ Nothing here is bundled inside `Jugnu.app`. Users install zips into `~/.local/sh
 | `pomodoro` | work / break timer with notification |
 | `floating-note` | always-on-top scratchpad (`note` UI pattern) |
 | `clipboard-history` | searchable clipboard history (background watcher + sqlite) |
-| `ports` | list listening ports (common dev ports first), kill by pid/port |
-| `ui-demo-*` | UI host demos (confirm / list / form) |
+| `ports` | list listening ports and kill by pid |
+| `window-layouts` | snaps, snap board, zones (max 6), Space jump; AX helper |
+| `open-terminal-here` | open last-picked terminal at the front Finder folder |
+| `mute-all` | mute mic + speakers and restore previous volumes |
 
 Package: `scripts/package-addon.sh addons/<id> dist/`
 

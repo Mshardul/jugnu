@@ -85,7 +85,7 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | Files | **recent-files** | recently modified files / filter by folder or extension / reveal or open / copy path | Focused recent-file utility; not full-disk search |
 | Window | **window-layouts** | center, fill-desktop, maximize, hide-others, pin-top, space-jump, stage-toggle, left/right-half, quarters, gather-windows, move-display, app-windows, desktop-name (Jugnu-local label), fullscreen-toggle, minimize-all, show-desktop, **tile-two** (+ swap / other layout ops); **zones** (save/apply, max 6, replace picker). Fold **layout-save**. **No layout-undo.** Snap board + palette commands. Spec: [2026-08-24 window-layouts](architecture/2026-08-24-window-layouts.md) | One window family |
 | Meeting | **screenshare-prep** | hide icons + pause banners; **screenshare-restore** | Orchestrator + one-shot undo |
-| Meeting | **mute-all** | mute mic+speakers / restore; **mute-status** (menu glyph; shared w/ mic-mute) | Mute everything + visible state |
+| Meeting | **mute-all** (`addons/mute-all`) | mute mic+speakers / restore; **mute-status** later (menu glyph) | Mute everything + visible state |
 | Meeting | **display-mirror** | mirror vs extend | Own display job |
 | Meeting | **focus-until** (or on **focus-toggle**) | Focus for duration / until time | Timed Focus |
 | Meeting | **volume-presets** | named output levels | May share audio helpers w/ speaker-mute / audio-output |
@@ -100,7 +100,7 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | Dev | **open-url** | open clipboard URL in chosen browser; **open-url-profile** | Browser + profile chooser |
 | Dev | **brew-outdated** (staged) | brew-services, **brew-cleanup**, doctor/update and other brew ops | One Homebrew job shelf |
 | Dev | **process-find** | process-list, find-by-name, **process-sort** (CPU/mem) (+ force-quit / copy PID variants) | ≠ quit-heavy, ≠ kill-hung |
-| Dev | **open-terminal-here** (staged) | + **term-app-pick** (Terminal / iTerm / Warp / …) | Dev QoL |
+| Dev | **open-terminal-here** (`addons/open-terminal-here`) | last-picked terminal at Finder folder; **term-app-pick** later | Dev QoL |
 | Dev | **app-info** | front app name / bundle id / version / path | Own support blurb |
 | Dev | **relaunch-app** | quit + reopen front app | Own |
 | System | **notify-clear** | clear Notification Center | Own; private API risk |
@@ -355,8 +355,8 @@ versions here stay as reference implementations, not shipped.
 | weather-bar | graduated → `addons/weather-bar` | `curl` + Open-Meteo; toast |
 | world-clock | graduated → `addons/world-clock` | Fixed zone list in script; list UI |
 | tools-palette | stub | Nursery CLI runner — evolves into shell search surface or thin addon |
-| window-layouts | stub | Window family; zones (max 6), tile-two, snap board; **no** layout-undo. Spec [2026-08-24](architecture/2026-08-24-window-layouts.md) |
-| layout-save | stub | Fold into window-layouts **zones** (not undo) |
+| window-layouts | graduated → `addons/window-layouts` | Window family; zones (max 6), tile-two, snap board; **no** layout-undo. Spec [2026-08-24](architecture/2026-08-24-window-layouts.md) |
+| layout-save | folded | Folded into window-layouts **zones** (not undo) |
 | meeting-bar | stub | Meeting/device QoL |
 | paste-transform | stub | Paste plain / transforms; clip-tools host for converters |
 | port-picker | superseded | Folded into `addons/ports` (list + kill; no longer wraps Tools `port-tool`) |
@@ -375,7 +375,7 @@ versions here stay as reference implementations, not shipped.
 | airdrop-folder | active | Finder / share QoL |
 | focus-toggle | active | Meeting/device QoL |
 | mic-mute | active | Meeting/device QoL; shares mute-status indicator w/ mute-all |
-| open-terminal-here | active | Dev QoL; + term-app-pick |
+| open-terminal-here | graduated → `addons/open-terminal-here` | Dev QoL; last-picked app; **term-app-pick** later |
 | quarantine-clear | active | File / Gatekeeper QoL |
 | snippet-expand | stub / later | Prefer clipboard/hotkey paste first |
 

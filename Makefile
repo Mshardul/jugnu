@@ -23,16 +23,16 @@ precommit:
 	uv run pre-commit run --all-files
 
 lint:
-	uv run ruff check apps extensions conftest.py
+	uv run ruff check apps extensions addons conftest.py
 
 format:
-	uv run ruff format apps extensions conftest.py
+	uv run ruff format apps extensions addons conftest.py
 
 typecheck:
 	uv run mypy
 
 spell:
-	uv run codespell apps extensions docs config README.md LICENSE Makefile
+	uv run codespell apps extensions addons docs config README.md LICENSE Makefile
 
 test:
 	uv run pytest

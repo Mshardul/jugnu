@@ -51,3 +51,56 @@ final class ZoneStoreTests: XCTestCase {
         XCTAssertEqual(store.zone(id: "3")?.name, "Desk")
     }
 }
+
+final class ZoneSavePlanTests: XCTestCase {
+    func testFullStoreWithoutReplaceAsksWhichZone() {
+        let store = ZoneStore(zones: (1 ... 6).map { Zone(id: "\($0)", name: "Z\($0)", slots: []) })
+        let plan = ZoneSavePlanner.plan(store: store, name: "Desk", replaceId: nil)
+        guard case let .pickReplacement(zones) = plan else {
+            return XCTFail("expected replace picker")
+        }
+        XCTAssertEqual(zones.count, 6)
+    }
+
+    func testNamedSaveWhenNotFullCommits() {
+        let store = ZoneStore()
+        XCTAssertEqual(ZoneSavePlanner.plan(store: store, name: "Desk", replaceId: nil), .commit(name: "Desk", replacing: nil))
+    }
+
+    func testMissingNameAsksForName() {
+        let store = ZoneStore()
+        XCTAssertEqual(ZoneSavePlanner.plan(store: store, name: nil, replaceId: nil), .askName)
+    }
+}
+
+final class ZoneCaptureTests: XCTestCase {
+    func testSlotsKeepDisplayUUIDAndNormalizedFrame() {
+        let visible = CGRect(x: 0, y: 0, width: 1000, height: 800)
+        let windows = [
+            LiveWindow(frame: CGRect(x: 0, y: 0, width: 500, height: 800), displayUUID: "main", visible: visible),
+        ]
+        let slots = ZoneCapture.slots(from: windows)
+        XCTAssertEqual(slots.count, 1)
+        XCTAssertEqual(slots[0].displayUUID, "main")
+        XCTAssertEqual(slots[0].norm.w, 0.5, accuracy: 0.01)
+    }
+}
+
+final class DesktopLabelsTests: XCTestCase {
+    func testRoundTrip() throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("\(UUID().uuidString).json")
+        var labels = DesktopLabels()
+        labels.bySpaceId["3"] = "Code"
+        try DesktopLabelsIO.save(labels, to: url)
+        let loaded = try DesktopLabelsIO.load(from: url)
+        XCTAssertEqual(loaded.bySpaceId["3"], "Code")
+    }
+}
+
+final class AddonWireTests: XCTestCase {
+    func testSuccessUsesOkKey() throws {
+        let json = AddonWire.encode(ok: true, message: "Moved window")
+        XCTAssertTrue(json.contains("\"ok\":true"))
+        XCTAssertTrue(json.contains("Moved window"))
+    }
+}

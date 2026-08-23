@@ -1,4 +1,5 @@
 import Foundation
+import WindowLayoutCore
 
 enum WindowLayoutsMain {
     static func run() throws {
@@ -12,12 +13,12 @@ enum WindowLayoutsMain {
         do {
             let json = try Router.handle(request)
             FileHandle.standardOutput.write(Data(json.utf8))
-        } catch AXError.notTrusted {
-            FileHandle.standardOutput.write(Data("{\"ok\":false,\"error\":\"Jugnu needs Accessibility to move windows.\"}".utf8))
-        } catch AXError.noFrontWindow {
-            FileHandle.standardOutput.write(Data("{\"ok\":false,\"error\":\"No window to move.\"}".utf8))
+        } catch AXFailure.notTrusted {
+            FileHandle.standardOutput.write(Data(AddonWire.encode(ok: false, error: "Jugnu needs Accessibility to move windows.").utf8))
+        } catch AXFailure.noFrontWindow {
+            FileHandle.standardOutput.write(Data(AddonWire.encode(ok: false, error: "No window to move.").utf8))
         } catch {
-            FileHandle.standardOutput.write(Data("{\"ok\":false,\"error\":\"Couldn’t move that window.\"}".utf8))
+            FileHandle.standardOutput.write(Data(AddonWire.encode(ok: false, error: "Couldn’t move that window.").utf8))
         }
     }
 }
@@ -25,5 +26,5 @@ enum WindowLayoutsMain {
 do {
     try WindowLayoutsMain.run()
 } catch {
-    FileHandle.standardOutput.write(Data("{\"ok\":false,\"error\":\"Couldn’t move that window.\"}".utf8))
+    FileHandle.standardOutput.write(Data(AddonWire.encode(ok: false, error: "Couldn’t move that window.").utf8))
 }

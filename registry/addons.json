@@ -134,6 +134,50 @@
     ]
   },
   {
+    "id": "mute-all",
+    "name": "Mute All",
+    "version": "1.0.0",
+    "api": 1,
+    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/mute-all-1.0.0.zip",
+    "sha256": "c18d51ef4baad63f407f948024970801a66f13785b38bdf4f58efd790428ff6f",
+    "summary": "Mute mic and speakers together",
+    "category": "Focus",
+    "tags": [
+      "toggle"
+    ],
+    "description": "Mutes the microphone and speakers in one shot, then restores the volumes you had. Built for walking into a meeting or stepping away without hunting two separate toggles.",
+    "commands": [
+      {
+        "id": "toggle",
+        "title": "Mute all",
+        "subtitle": "Mute mic and speakers, or restore the previous volumes"
+      }
+    ]
+  },
+  {
+    "id": "open-terminal-here",
+    "name": "Open Terminal Here",
+    "version": "1.0.0",
+    "api": 1,
+    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/open-terminal-here-1.0.0.zip",
+    "sha256": "a91ea641e36362ee59cd168cc81e265f41aee1e9bc7b81ecd2114bcadeebf7e9",
+    "summary": "Open a terminal in the front Finder folder",
+    "category": "System",
+    "subcategory": "Dev Tools",
+    "tags": [
+      "dev-tool",
+      "quick-glance"
+    ],
+    "description": "Opens your last-picked terminal app at the folder showing in Finder. Default is Terminal. A chooser for iTerm, Warp, and friends comes later; until then the last picked app is the only switch.",
+    "commands": [
+      {
+        "id": "open",
+        "title": "Open Terminal here",
+        "subtitle": "Open the last-picked terminal in the front Finder folder"
+      }
+    ]
+  },
+  {
     "id": "paste-plain",
     "name": "Paste Plain",
     "version": "1.0.0",

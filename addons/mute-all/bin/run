@@ -1,0 +1,49 @@
+#!/bin/bash
+set -euo pipefail
+cat >/dev/null
+
+state_dir="${JUGNU_STATE_DIR:-$HOME/.local/share/jugnu/state/mute-all}"
+state_file="$state_dir/volumes"
+
+is_volume() {
+  [[ "$1" =~ ^[0-9]+$ ]] && ((10#$1 >= 0 && 10#$1 <= 100))
+}
+
+osa="${OSASCRIPT:-osascript}"
+
+if [[ -f "$state_file" ]]; then
+  output=$(sed -n '1p' "$state_file")
+  input=$(sed -n '2p' "$state_file")
+  if ! is_volume "$output" || ! is_volume "$input"; then
+    echo '{"ok":false,"error":"Saved mute-all volumes are invalid"}'
+    exit 0
+  fi
+  if ! "$osa" -e "set volume output volume ${output}" -e "set volume input volume ${input}"; then
+    echo '{"ok":false,"error":"Could not restore volume"}'
+    exit 0
+  fi
+  rm -f "$state_file"
+  echo '{"ok":true,"message":"Volumes restored"}'
+  exit 0
+fi
+
+vols=$("$osa" -e 'output volume of (get volume settings)' -e 'input volume of (get volume settings)') || {
+  echo '{"ok":false,"error":"Could not read volume"}'
+  exit 0
+}
+output=$(printf '%s\n' "$vols" | sed -n '1p' | tr -d '[:space:]')
+input=$(printf '%s\n' "$vols" | sed -n '2p' | tr -d '[:space:]')
+if ! is_volume "$output" || ! is_volume "$input"; then
+  echo '{"ok":false,"error":"Could not read volume"}'
+  exit 0
+fi
+
+mkdir -p "$state_dir"
+printf '%s\n%s\n' "$output" "$input" >"$state_file"
+
+if ! "$osa" -e 'set volume output volume 0' -e 'set volume input volume 0'; then
+  echo '{"ok":false,"error":"Could not mute"}'
+  exit 0
+fi
+
+echo '{"ok":true,"message":"Microphone and speakers muted"}'

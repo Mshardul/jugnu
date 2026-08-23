@@ -8,6 +8,8 @@ The project has not published a release yet. Entries currently describe unreleas
 
 ### Added
 
+- 2026-08-24 — First-party `open-terminal-here` addon: open the last-picked terminal at the front Finder folder (default Terminal; no picker yet).
+- 2026-08-24 — First-party `mute-all` addon: mute mic and speakers together, restore saved volumes on the next run.
 - 2026-08-24 — Shell view types: ten viewport ids, screen `visibleFrame` clamps, click-outside ignored for `board`/`spread`/`canvas`, manifest `view_types` / command `view` / `ui.view`.
 - 2026-08-24 — First-party `window-layouts` addon: AX snaps, snap board, zones (max 6), Space jump via system shortcuts. No undo.
 - 2026-08-22 — Added accepted backlog entries for `quick-capture` and `screenshot-inbox`.

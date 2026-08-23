@@ -25,7 +25,7 @@ default-groups = ["dev"]
 [tool.ruff]
 target-version = "py311"
 line-length = 100
-src = ["apps", "extensions"]
+src = ["apps", "extensions", "addons"]
 
 [tool.ruff.lint]
 # Keep nursery leaves readable; skip opinionated SIM rewrites for now.
@@ -50,6 +50,6 @@ skip = ".git,.venv,uv.lock,.mypy_cache,.ruff_cache,.pytest_cache,__pycache__"
 ignore-words-list = "jugnu,crate,rime,iterm,assertin"
 
 [tool.pytest.ini_options]
-testpaths = ["apps", "extensions"]
+testpaths = ["apps", "extensions", "addons"]
 python_files = ["test_*.py"]
 addopts = "-q"

@@ -8,7 +8,7 @@ Jugnu (Hindi: *firefly*) is a Mac command platform — meant to replace Spotligh
 |---|---|
 | **App** | Jugnu |
 | **Repo / CLI** | `jugnu` |
-| **Status** | Shell MVP + addon UI host — Core + `Jugnu` app (SPM), 11 native addons shipped via GitHub Release registry |
+| **Status** | Shell MVP + addon UI host — Core + `Jugnu` app (SPM), 14 native addons in tree (GitHub Release registry still lists the published set) |
 | **Requires** | macOS 14 (Sonoma) or later |
 | **License** | [MIT](LICENSE) |
 
@@ -104,13 +104,13 @@ addons/               # first-party addon sources (one zip each)
 
 ## What’s here today
 
-**Graduated to native addons** (`addons/`): clipboard-history, battery-eta, brew-outdated, floating-note, pomodoro, weather-bar, world-clock, ports — rewritten as shell/JXA `exec` entrypoints (no user Python) alongside mic-mute, focus-toggle, paste-plain. The `apps/` Python versions remain as reference implementations, not shipped.
+**Graduated to native addons** (`addons/`): clipboard-history, battery-eta, brew-outdated, floating-note, pomodoro, weather-bar, world-clock, ports, window-layouts, open-terminal-here, mute-all — rewritten as shell/JXA `exec` entrypoints (no user Python) alongside mic-mute, focus-toggle, paste-plain. The `apps/` Python versions remain as reference implementations, not shipped.
 
-**macOS helpers (`extensions/macos/`, active, not yet addon-wrapped):** airdrop-folder, focus-toggle, mic-mute, open-terminal-here, quarantine-clear.
+**macOS helpers (`extensions/macos/`, active, not yet addon-wrapped):** airdrop-folder, focus-toggle, mic-mute, quarantine-clear.
 
-**Stubs (README only):** tools-palette, window-layouts, layout-save, meeting-bar, paste-transform, port-picker, and other planned leaves — see [backlog](docs/backlog.md).
+**Stubs (README only):** tools-palette, meeting-bar, paste-transform, port-picker, and other planned leaves — see [backlog](docs/backlog.md).
 
-Hotkey shell, YAML addon runtime, and the addon UI host (toast/confirm/list/form/note) are built and tested (`shell/`). All 11 addons above are published as GitHub Release assets under `addons-v1.0.0`, with `registry/addons.json` pointing at real sha256-verified zips — install via the registry, or the dev `JUGNU_ADDON_PATH` override for local addon work.
+Hotkey shell, YAML addon runtime, and the addon UI host (toast/confirm/list/form/note) are built and tested (`shell/`). Published addons are GitHub Release assets under `addons-v1.0.0`, with `registry/addons.json` pointing at sha256-verified zips — install via the registry, or the dev `JUGNU_ADDON_PATH` override for local addon work. `open-terminal-here` and `mute-all` are in-tree and catalogued; their release zips ship with the next addons release.
 
 ## Out of scope (for now)
 
