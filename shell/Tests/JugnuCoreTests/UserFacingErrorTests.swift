@@ -22,4 +22,9 @@ final class UserFacingErrorTests: XCTestCase {
         XCTAssertEqual(UserFacingError.message(for: Odd()), "Something went wrong. Try again.")
         XCTAssertFalse(UserFacingError.message(for: Odd()).contains("Odd"))
     }
+
+    func testRegistryClientHTTPStatusMapsToFriendlyMessage() {
+        let message = UserFacingError.message(for: RegistryClientError.httpStatus(500))
+        XCTAssertEqual(message, "Couldn’t reach the catalog. Check your connection and try again.")
+    }
 }

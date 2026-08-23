@@ -38,12 +38,12 @@ Not yet staged as leaves. Candidates after shell MVP:
 
 Accepted for backlog — still **not** scaffolded. Build later.
 
-**Canonical rules:** [`docs/vision.md`](vision.md) — *Catalog hierarchy* (Category → Addon → Commands/UI), **shared-capability rule**, and **Surfaces** (popup UI + speed; context later).  
+**Canonical rules:** [`docs/vision.md`](vision.md) — *Catalog hierarchy* (Category → Addon → Commands/UI), **shared-capability rule**, and **Surfaces** (popup UI + speed; context later).
 Ids below are **capability / job ids**; several become **commands and UI** on one **addon** zip. Do not treat every row as its own zip — and do not treat rows as CLI-only.
 
 ### Packaging map (preferred addon → commands)
 
-Draft boundaries — refine by user mental model (not “all toggles in one zip”).  
+Draft boundaries — refine by user mental model (not “all toggles in one zip”).
 **Ids name the job** a user would search for — not the scenario you imagined when inventing them (e.g. mute mic+speakers is `mute-all`, not `call-mute-all`).
 
 **Same-shape rule (accepted hosts):** when a host is accepted, ship the natural sibling commands on that zip (converters, brew ops, image ops, layout ops, pomodoro controls, etc.) — do not require a separate accept line for each micro-variant. Rows below name the family; detail tables list representative ids.

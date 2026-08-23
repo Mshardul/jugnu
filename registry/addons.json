@@ -6,7 +6,20 @@
     "api": 1,
     "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/battery-eta-1.0.0.zip",
     "sha256": "0ca8b883c0375c5bb26ad691be0607c50e4bdee45d32179dee8bbae1c6085cc3",
-    "summary": "Battery time remaining / to full"
+    "summary": "Battery time remaining / to full",
+    "category": "System",
+    "subcategory": "Monitoring",
+    "tags": [
+      "quick-glance"
+    ],
+    "description": "Shows an estimated time to full charge or time remaining on battery, updated as you check it, so you always know how much runway you have left.",
+    "commands": [
+      {
+        "id": "status",
+        "title": "Battery status",
+        "subtitle": "Percent, charging state, and time remaining"
+      }
+    ]
   },
   {
     "id": "brew-outdated",
@@ -15,7 +28,22 @@
     "api": 1,
     "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/brew-outdated-1.0.0.zip",
     "sha256": "134486cf93accc2840db395ff5e6376031929882e46e5c67e0502891c5845225",
-    "summary": "List outdated Homebrew packages"
+    "summary": "List outdated Homebrew packages",
+    "category": "System",
+    "subcategory": "Dev Tools",
+    "tags": [
+      "quick-glance",
+      "popup-ui",
+      "dev-tool"
+    ],
+    "description": "Lists every Homebrew formula and cask that's fallen behind its latest version, right from the palette. No terminal, no waiting on `brew outdated` to finish scanning.",
+    "commands": [
+      {
+        "id": "list",
+        "title": "Outdated Homebrew packages",
+        "subtitle": "Formulae and casks with updates available"
+      }
+    ]
   },
   {
     "id": "clipboard-history",
@@ -24,7 +52,20 @@
     "api": 1,
     "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/clipboard-history-1.0.0.zip",
     "sha256": "accf81df817be990fb8367ed3d993439f5ab640b7b60c5e45a4e766e72ca5a44",
-    "summary": "Clipboard history list and copy-back"
+    "summary": "Clipboard history list and copy-back",
+    "category": "Clipboard",
+    "tags": [
+      "background",
+      "popup-ui"
+    ],
+    "description": "Keeps a running list of everything you've copied, so a paste from ten minutes ago is never lost to a stray keystroke. Runs quietly in the background and opens as a searchable list whenever you need it.",
+    "commands": [
+      {
+        "id": "list",
+        "title": "Clipboard history",
+        "subtitle": "Browse and copy recent clipboard entries"
+      }
+    ]
   },
   {
     "id": "floating-note",
@@ -33,7 +74,20 @@
     "api": 1,
     "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/floating-note-1.0.0.zip",
     "sha256": "957a76ee125394c3dd8d7a1c6573f33b2393cd2416d5de03da48520e6901313a",
-    "summary": "Always-on-top scratch note"
+    "summary": "Always-on-top scratch note",
+    "category": "Notes",
+    "tags": [
+      "popup-ui",
+      "recommended"
+    ],
+    "description": "A small always-on-top note for whatever you don't want to lose track of mid-task \u2014 a phone number, a half-formed thought, a checklist. Stays open above other windows until you close it.",
+    "commands": [
+      {
+        "id": "open",
+        "title": "Open scratch note",
+        "subtitle": "Always-on-top scratchpad saved to a local file"
+      }
+    ]
   },
   {
     "id": "focus-toggle",
@@ -42,7 +96,20 @@
     "api": 1,
     "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/focus-toggle-1.0.0.zip",
     "sha256": "ce0f0385693827ce00aaba7b8dcd283d22423d09e465bc5caa1c802387f1eaf5",
-    "summary": "Toggle Do Not Disturb / Focus"
+    "summary": "Toggle Do Not Disturb / Focus",
+    "category": "Focus",
+    "tags": [
+      "toggle",
+      "recommended"
+    ],
+    "description": "Flips macOS Focus / Do Not Disturb on or off with one command, no menu bar hunting. Handy right before a call or a deep-work block.",
+    "commands": [
+      {
+        "id": "toggle",
+        "title": "Toggle Focus",
+        "subtitle": "Switch Do Not Disturb / Focus on or off"
+      }
+    ]
   },
   {
     "id": "mic-mute",
@@ -51,7 +118,20 @@
     "api": 1,
     "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/mic-mute-1.0.0.zip",
     "sha256": "1ceed5630519d8b66fd267ed049762d81acc1a3fe713fc629b8a1b6f68f94284",
-    "summary": "Toggle microphone mute"
+    "summary": "Toggle microphone mute",
+    "category": "Focus",
+    "tags": [
+      "toggle",
+      "recommended"
+    ],
+    "description": "Mutes or unmutes your input device system-wide with a single command \u2014 faster than fumbling for the mute button in whatever call app you're in.",
+    "commands": [
+      {
+        "id": "toggle",
+        "title": "Toggle microphone mute",
+        "subtitle": "Mute or unmute input"
+      }
+    ]
   },
   {
     "id": "paste-plain",
@@ -60,7 +140,20 @@
     "api": 1,
     "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/paste-plain-1.0.0.zip",
     "sha256": "b3c4d78196ff0080478603e3293d7b2c1fe29700e0c18352fa7043a476f02aa6",
-    "summary": "Paste clipboard as plain text"
+    "summary": "Paste clipboard as plain text",
+    "category": "Clipboard",
+    "tags": [
+      "quick-glance",
+      "recommended"
+    ],
+    "description": "Strips fonts, colors, and formatting from whatever's on your clipboard and pastes it as plain text \u2014 no more fighting a document's styles when you paste from a webpage or PDF.",
+    "commands": [
+      {
+        "id": "paste",
+        "title": "Paste as plain text",
+        "subtitle": "Strip rich text from the clipboard"
+      }
+    ]
   },
   {
     "id": "pomodoro",
@@ -69,7 +162,35 @@
     "api": 1,
     "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/pomodoro-1.0.0.zip",
     "sha256": "2a09a4f0453ada113df3a54fa016e16b84dd0b48834af87df47c750e9b2f9001",
-    "summary": "Start / stop a Pomodoro focus session"
+    "summary": "Start / stop a Pomodoro focus session",
+    "category": "Focus",
+    "tags": [
+      "background",
+      "toggle"
+    ],
+    "description": "Runs a standard Pomodoro timer in the background so you can start a focus session and forget about the clock until it's done. Start and stop from the palette, no separate app to babysit.",
+    "commands": [
+      {
+        "id": "work",
+        "title": "Start focus session",
+        "subtitle": "25 minute pomodoro work timer"
+      },
+      {
+        "id": "break",
+        "title": "Start break",
+        "subtitle": "5 minute pomodoro break timer"
+      },
+      {
+        "id": "status",
+        "title": "Pomodoro status",
+        "subtitle": "Time remaining in the current phase"
+      },
+      {
+        "id": "reset",
+        "title": "Reset pomodoro",
+        "subtitle": "Clear the current timer"
+      }
+    ]
   },
   {
     "id": "ports",
@@ -78,7 +199,22 @@
     "api": 1,
     "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/ports-1.0.0.zip",
     "sha256": "2c44a3b7213f0a7aad25fc52cbc19e5d4521c9060bc94d0d7457b4900afbf243",
-    "summary": "List listening ports and kill by pid"
+    "summary": "List listening ports and kill by pid",
+    "category": "System",
+    "subcategory": "Dev Tools",
+    "tags": [
+      "popup-ui",
+      "dev-tool",
+      "recommended"
+    ],
+    "description": "Lists every process listening on a local port and lets you kill one by pid right from the results \u2014 no more `lsof -i` when a dev server won't release its port.",
+    "commands": [
+      {
+        "id": "list",
+        "title": "Listening ports",
+        "subtitle": "List and kill processes on local ports"
+      }
+    ]
   },
   {
     "id": "weather-bar",
@@ -87,7 +223,19 @@
     "api": 1,
     "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/weather-bar-1.0.0.zip",
     "sha256": "ddc5f3051774e3c2c3a86fb1b2e89b5e84ffada71df6de406153dde7ac98c617",
-    "summary": "Current weather via Open-Meteo"
+    "summary": "Current weather via Open-Meteo",
+    "category": "Info",
+    "tags": [
+      "quick-glance"
+    ],
+    "description": "Shows current conditions for a fixed location via Open-Meteo, one command away \u2014 no app switch, no ads, no thirty-second load time.",
+    "commands": [
+      {
+        "id": "status",
+        "title": "Current weather",
+        "subtitle": "Temperature and conditions for your location"
+      }
+    ]
   },
   {
     "id": "world-clock",
@@ -96,6 +244,19 @@
     "api": 1,
     "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/world-clock-1.0.0.zip",
     "sha256": "982148dbc29461f791df3b4580337edfd6991a0bd3a8ff2f09b381479f5c47a8",
-    "summary": "World clock for a fixed zone list"
+    "summary": "World clock for a fixed zone list",
+    "category": "Info",
+    "tags": [
+      "quick-glance",
+      "popup-ui"
+    ],
+    "description": "Shows the current time across a fixed list of time zones in one glance \u2014 built for scheduling across teams without doing the math by hand.",
+    "commands": [
+      {
+        "id": "show",
+        "title": "World clock",
+        "subtitle": "Current time across configured zones"
+      }
+    ]
   }
 ]

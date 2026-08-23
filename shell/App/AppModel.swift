@@ -1,3 +1,4 @@
+import AppKit
 import Combine
 import Foundation
 import JugnuCore
@@ -21,6 +22,7 @@ final class AppModel: ObservableObject {
     @Published var statusMessage: String?
 
     private var index: CommandIndex
+    private var browseCatalogWindow: BrowseCatalogWindowController<BrowseCatalogViewModel>?
 
     init(paths: JugnuPaths = JugnuPaths()) {
         self.paths = paths
@@ -208,6 +210,19 @@ final class AppModel: ObservableObject {
         } catch {
             statusMessage = UserFacingError.message(for: error)
         }
+    }
+
+    func openBrowseCatalog() {
+        if let existing = browseCatalogWindow {
+            existing.window?.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+            return
+        }
+        let vm = BrowseCatalogViewModel(model: self)
+        let controller = BrowseCatalogWindowController(viewModel: vm)
+        browseCatalogWindow = controller
+        controller.window?.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
     }
 
     private func publishTheme() {

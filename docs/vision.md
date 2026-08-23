@@ -12,9 +12,9 @@ A Mac **command platform** that can replace Spotlight + Alfred + Raycast for dai
 
 **Surfaces (locked):** addons are not “palette commands only.” Each job may expose:
 
-1. **Commands** — searchable palette / menu-bar actions  
-2. **Popup UI** — focused panels, pickers, forms, previews, and status chrome that feel native and intentional  
-3. **Speed** — first-class; invoke → visible result must feel instant (no sluggish “script runner” feel)  
+1. **Commands** — searchable palette / menu-bar actions
+2. **Popup UI** — focused panels, pickers, forms, previews, and status chrome that feel native and intentional
+3. **Speed** — first-class; invoke → visible result must feel instant (no sluggish “script runner” feel)
 4. **Context later** — intelligent surfacing: the right popup/command offered from what’s on screen / selection / clipboard (design after v0 primitives exist)
 
 Backlog ids name **jobs**; shipping a job implies designing its **UI + latency**, not only a CLI-shaped action.

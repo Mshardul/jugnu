@@ -32,6 +32,12 @@ public enum UserFacingError {
                 return "Something went wrong. Try again."
             }
         }
+        if let registry = error as? RegistryClientError {
+            switch registry {
+            case .httpStatus:
+                return "Couldn’t reach the catalog. Check your connection and try again."
+            }
+        }
         return "Something went wrong. Try again."
     }
 }

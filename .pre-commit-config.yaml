@@ -30,6 +30,16 @@ repos:
         pass_filenames: false
         files: ^(apps|extensions)/
 
+  # ── Registry commands sync (regenerates on stale, does not re-stage) ───────
+  - repo: local
+    hooks:
+      - id: sync-registry-commands
+        name: sync registry commands
+        entry: scripts/sync-registry-commands.sh
+        language: system
+        files: ^(addons/.*/addon\.yaml|registry/addons\.json)$
+        pass_filenames: false
+
   # ── Spelling (code, comments, docs) ─────────────────────────────────────────
   - repo: https://github.com/codespell-project/codespell
     rev: v2.3.0

@@ -1,0 +1,130 @@
+import SwiftUI
+import JugnuCore
+
+@MainActor
+public protocol BrowseCatalogViewModelProtocol: ObservableObject {
+    var entries: [RegistryEntry] { get }
+    var filtered: [RegistryEntry] { get }
+    var selectedCategory: String? { get set }
+    var selectedTags: Set<String> { get set }
+    var searchText: String { get set }
+    var staleBanner: Bool { get }
+    var errorMessage: String? { get }
+    var installingIDs: Set<String> { get }
+    var categories: [String] { get }
+
+    func isInstalled(_ id: String) -> Bool
+    func isEnabled(_ id: String) -> Bool
+    func load() async
+    func install(_ entry: RegistryEntry) async
+    func setEnabled(_ id: String, enabled: Bool)
+    func uninstall(id: String, name: String)
+}
+
+public struct BrowseCatalogView<VM: BrowseCatalogViewModelProtocol>: View {
+    @ObservedObject var viewModel: VM
+    @State private var detailEntry: RegistryEntry?
+    @Environment(\.colorScheme) private var colorScheme
+    @ObservedObject private var store = ThemeStore.shared
+
+    public init(viewModel: VM) {
+        self.viewModel = viewModel
+    }
+
+    public var body: some View {
+        let theme = JugnuThemeColors(theme: resolvedTheme(from: store.config, colorScheme: colorScheme))
+        HStack(spacing: 0) {
+            sidebar(theme: theme)
+                .frame(width: 160)
+            Divider()
+            VStack(alignment: .leading, spacing: JugnuTokens.Spacing.row) {
+                TextField("Search addons", text: $viewModel.searchText)
+                    .textFieldStyle(.roundedBorder)
+                    .padding([.horizontal, .top])
+
+                tagChips(theme: theme)
+                    .padding(.horizontal)
+
+                if viewModel.staleBanner {
+                    PanelErrorBanner(message: "Showing cached results — offline or registry unreachable")
+                        .padding(.horizontal)
+                }
+                if let errorMessage = viewModel.errorMessage {
+                    PanelErrorBanner(message: errorMessage).padding(.horizontal)
+                }
+
+                ScrollView {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 240), spacing: 12)], spacing: 12) {
+                        ForEach(viewModel.filtered, id: \.id) { entry in
+                            AddonCardView(
+                                entry: entry,
+                                isInstalled: viewModel.isInstalled(entry.id),
+                                isEnabled: viewModel.isEnabled(entry.id),
+                                isInstalling: viewModel.installingIDs.contains(entry.id),
+                                onInstall: { Task { await viewModel.install(entry) } },
+                                onEnabledChange: { viewModel.setEnabled(entry.id, enabled: $0) },
+                                onUninstall: { viewModel.uninstall(id: entry.id, name: entry.name) },
+                                onTap: { detailEntry = entry }
+                            )
+                        }
+                    }
+                    .padding()
+                }
+            }
+        }
+        .background(theme.background)
+        .frame(minWidth: 720, minHeight: 480)
+        .task { await viewModel.load() }
+        .sheet(item: $detailEntry) { entry in
+            AddonDetailView(
+                entry: entry,
+                isInstalled: viewModel.isInstalled(entry.id),
+                isEnabled: viewModel.isEnabled(entry.id),
+                isInstalling: viewModel.installingIDs.contains(entry.id),
+                onInstall: { Task { await viewModel.install(entry) } },
+                onEnabledChange: { viewModel.setEnabled(entry.id, enabled: $0) },
+                onUninstall: { viewModel.uninstall(id: entry.id, name: entry.name) },
+                onClose: { detailEntry = nil }
+            )
+        }
+    }
+
+    @ViewBuilder
+    private func sidebar(theme: JugnuThemeColors) -> some View {
+        List(selection: $viewModel.selectedCategory) {
+            Text("All").tag(String?.none)
+            ForEach(viewModel.categories, id: \.self) { category in
+                let subcats = Set(viewModel.entries.filter { $0.category == category }.compactMap { $0.subcategory })
+                if subcats.count >= 2 {
+                    DisclosureGroup(category) {
+                        ForEach(Array(subcats).sorted(), id: \.self) { sub in
+                            Text(sub).tag(String?.some(category))
+                        }
+                    }
+                } else {
+                    Text(category).tag(String?.some(category))
+                }
+            }
+        }
+        .listStyle(.sidebar)
+    }
+
+    @ViewBuilder
+    private func tagChips(theme: JugnuThemeColors) -> some View {
+        let allTags = ["quick-glance", "toggle", "background", "popup-ui", "dev-tool", "recommended"]
+        HStack {
+            ForEach(allTags, id: \.self) { tag in
+                let selected = viewModel.selectedTags.contains(tag)
+                Text(tag)
+                    .font(.caption)
+                    .padding(.horizontal, 8).padding(.vertical, 4)
+                    .background(selected ? theme.accent.opacity(0.2) : theme.surface)
+                    .clipShape(Capsule())
+                    .overlay(Capsule().strokeBorder(selected ? theme.accent : theme.textSecondary.opacity(0.3)))
+                    .onTapGesture {
+                        if selected { viewModel.selectedTags.remove(tag) } else { viewModel.selectedTags.insert(tag) }
+                    }
+            }
+        }
+    }
+}

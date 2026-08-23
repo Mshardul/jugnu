@@ -8,7 +8,7 @@
 
 **Tech Stack:** macOS 14+, Swift 5.9+, JugnuCore (SPM) + existing Jugnu app target from shell MVP, XCTest for protocol/decode/runner, manual UI checks on macOS.
 
-**Spec:** [docs/architecture/2026-08-22-addon-ui-speed-design.md](../../architecture/2026-08-22-addon-ui-speed-design.md)  
+**Spec:** [docs/architecture/2026-08-22-addon-ui-speed-design.md](../../architecture/2026-08-22-addon-ui-speed-design.md)
 **Prerequisite:** [Shell MVP plan](./2026-08-22-shell-mvp.md) through **AddonRunner** + **Palette** (enough to run a command and show a toast/message). Do not implement P2 (`progress` / `status`) or P3 (context ranking) in this plan.
 
 **Inline progress (2026-08-22):** P1 complete end-to-end — Core protocol + `JugnuUI` + demo addons; app palette wires `CommandInvoke` / `UIHostController` (`shell/App/AppModel.swift`). Manual UI verified working.
@@ -88,7 +88,7 @@ addons/
   - `public enum RunJSON`
   - `static func decodeResponse(stdout: Data) throws -> RunResponse`
   - `static func encodeRequest(_ request: RunRequest) throws -> Data`
-  - `static func followUpRequest(command: String, args: [String: JSONValue]) -> RunRequest`  
+  - `static func followUpRequest(command: String, args: [String: JSONValue]) -> RunRequest`
     → `RunRequest(api: 1, op: "run", command: command, args: args, context: [:])`
 
 - [ ] **Step 1: Failing tests**
@@ -189,9 +189,9 @@ cat <<'EOF'
 EOF
 ```
 
-`echo-toast.sh` → `{"ok":true,"message":"hi"}`  
-`echo-confirm.sh` → confirm UI JSON  
-`echo-form.sh` → form UI JSON  
+`echo-toast.sh` → `{"ok":true,"message":"hi"}`
+`echo-confirm.sh` → confirm UI JSON
+`echo-form.sh` → form UI JSON
 
 `chmod +x` in test setup or store as executable in git.
 
@@ -366,10 +366,10 @@ commands:
 
 - [ ] **Step 1: Verify success criteria**
 
-1. List demo: chrome before content when script sleeps.  
-2. Toast-only path unchanged.  
-3. Confirm / list / form follow-ups use `op: "run"`.  
-4. Esc dismisses panels.  
+1. List demo: chrome before content when script sleeps.
+2. Toast-only path unchanged.
+3. Confirm / list / form follow-ups use `op: "run"`.
+4. Esc dismisses panels.
 5. `swift test` Core filters green.
 
 - [ ] **Step 2: Explicitly defer P2/P3** — do not implement `progress` / `status` / real context population.
@@ -401,9 +401,9 @@ Plan complete and saved to `docs/superpowers/plans/2026-08-22-addon-ui-host-p1.m
 
 **Two execution options:**
 
-1. **Subagent-Driven (recommended)** — fresh subagent per task, review between tasks  
-2. **Inline Execution** — execute tasks in this session with checkpoints  
+1. **Subagent-Driven (recommended)** — fresh subagent per task, review between tasks
+2. **Inline Execution** — execute tasks in this session with checkpoints
 
-**Which approach?**  
+**Which approach?**
 
 Note: if Shell MVP AddonRunner + Palette are not done yet, finish those MVP tasks first (or start with Tasks 1–3 here in parallel on Core).

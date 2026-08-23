@@ -45,11 +45,8 @@ struct PrefsView: View {
                         )
                         .labelsHidden()
                         Button("Uninstall") {
-                            do {
-                                try model.uninstall(id: id)
+                            AddonUninstallPresenter.present(id: id, name: id, model: model) {
                                 reload()
-                            } catch {
-                                errorText = UserFacingError.message(for: error)
                             }
                         }
                     }
@@ -63,6 +60,10 @@ struct PrefsView: View {
                             errorText = status
                         }
                     }
+                }
+
+                Button("Browse Catalog…") {
+                    model.openBrowseCatalog()
                 }
 
                 Divider()

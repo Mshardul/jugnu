@@ -35,7 +35,7 @@ Club paired toggles and similar converters as commands under one addon. Don’t 
 
 **Shared logic:** if two addons need the same capability, either ship that capability as its **own addon** (when users would install it alone) or **include shared files in each zip** (when they would not). See vision packaging rule 4.
 
-Design: [`docs/architecture/2026-08-22-shell-design.md`](../docs/architecture/2026-08-22-shell-design.md)  
+Design: [`docs/architecture/2026-08-22-shell-design.md`](../docs/architecture/2026-08-22-shell-design.md)
 Backlog / packaging map: [`docs/backlog.md`](../docs/backlog.md)
 
 Staging nursery (pre-graduation): `../apps/`, `../extensions/macos/`.

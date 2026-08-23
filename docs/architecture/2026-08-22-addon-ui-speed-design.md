@@ -1,18 +1,18 @@
 # Jugnu — addon UI host + speed
 
-**Date:** 2026-08-22  
-**Status:** Approved  
-**Product lock:** [vision — Surfaces](../vision.md)  
-**Depends on:** [Shell design](./2026-08-22-shell-design.md) (`api: 1` run protocol)  
-**Plan:** [Addon UI host P1](../superpowers/plans/2026-08-22-addon-ui-host-p1.md)  
+**Date:** 2026-08-22
+**Status:** Approved
+**Product lock:** [vision — Surfaces](../vision.md)
+**Depends on:** [Shell design](./2026-08-22-shell-design.md) (`api: 1` run protocol)
+**Plan:** [Addon UI host P1](../superpowers/plans/2026-08-22-addon-ui-host-p1.md)
 **Out of scope here:** Visual brand / illustration system; full context-aware ranking; per-addon custom rendering engines
 
 ## 1. Intent
 
 Addons are **jobs with UI**, not silent scripts. The shell must:
 
-1. Host **popup UI** (panels, pickers, forms, toasts, menu-bar status) consistently.  
-2. Treat **speed** as a hard product constraint.  
+1. Host **popup UI** (panels, pickers, forms, toasts, menu-bar status) consistently.
+2. Treat **speed** as a hard product constraint.
 3. Leave a clean **context hook** for later “right UI for what’s on screen” — without building screen intelligence now.
 
 ## 2. Approach (recommended)
@@ -59,8 +59,8 @@ Every command maps to one primary pattern (declared or returned):
 
 Rules:
 
-- Prefer the **smallest** pattern that finishes the job.  
-- Same-shape siblings share patterns (all clip-tools converters → usually `toast` or tiny `form`).  
+- Prefer the **smallest** pattern that finishes the job.
+- Same-shape siblings share patterns (all clip-tools converters → usually `toast` or tiny `form`).
 - Nested navigation stays inside one panel; do not open a second unmanaged window.
 
 ## 5. Protocol sketch (extends `api: 1`)
@@ -125,19 +125,19 @@ If content needs longer (brew, disk walk), show **`progress`** within the chrome
 
 ### Engineering rules
 
-1. **Shell UI is never blocked on addon I/O** for first chrome: open pattern shell immediately when the command is known to need a panel; fill when JSON returns.  
-2. **Cold start is the enemy.** Prefer tiny execs; avoid bootstrapping heavy runtimes. Long-lived helper processes are a later optimization, not required for the first three toast addons.  
-3. Runner timeout for “feels instant” paths should be much tighter than a generous 5s safety net; keep a separate longer timeout for declared `progress` commands.  
-4. Instrument: `invoke_ts → first_paint_ts → content_ts → dismiss_ts` (log locally; no network).  
+1. **Shell UI is never blocked on addon I/O** for first chrome: open pattern shell immediately when the command is known to need a panel; fill when JSON returns.
+2. **Cold start is the enemy.** Prefer tiny execs; avoid bootstrapping heavy runtimes. Long-lived helper processes are a later optimization, not required for the first three toast addons.
+3. Runner timeout for “feels instant” paths should be much tighter than a generous 5s safety net; keep a separate longer timeout for declared `progress` commands.
+4. Instrument: `invoke_ts → first_paint_ts → content_ts → dismiss_ts` (log locally; no network).
 5. Reduced Motion: respect system setting; motion is hierarchy, not decoration spam.
 
 ## 7. Context hook (later — reserve only)
 
 When context-aware UI lands:
 
-- Shell may populate `context` with **opt-in, local, minimal** fields, e.g. `frontApp`, `hasSelection`, `clipboardKind` (`text` \| `image` \| `empty`), never raw passwords (respect concealed pasteboard).  
-- **No screen capture / OCR of the display by default.** If ever offered, explicit user permission + separate design.  
-- Addons declare needs in `addon.yaml`, e.g. `context: [clipboardKind, frontApp]`. Shell strips undeclared fields.  
+- Shell may populate `context` with **opt-in, local, minimal** fields, e.g. `frontApp`, `hasSelection`, `clipboardKind` (`text` \| `image` \| `empty`), never raw passwords (respect concealed pasteboard).
+- **No screen capture / OCR of the display by default.** If ever offered, explicit user permission + separate design.
+- Addons declare needs in `addon.yaml`, e.g. `context: [clipboardKind, frontApp]`. Shell strips undeclared fields.
 - Ranking “which popup to offer” is a **shell** problem; addons stay job-focused.
 
 Privacy one-liner (product): context stays on-device; users can disable context entirely in prefs.
@@ -155,28 +155,28 @@ Do not block shell MVP on P1 — but **do not** graduate a large backlog of UI-h
 
 ## 9. Non-goals
 
-- Pixel-perfect marketing visual system (follow-on).  
-- Per-addon React/HTML runtimes as the default.  
-- Context-from-screen in P0–P2.  
+- Pixel-perfect marketing visual system (follow-on).
+- Per-addon React/HTML runtimes as the default.
+- Context-from-screen in P0–P2.
 - Replacing the JSON entrypoint with in-process plugin loading (revisit only if budgets fail with honest measurement).
 
 ## 10. Success criteria
 
-1. A `list`-pattern addon opens chrome within budget even when the process is still computing rows (skeleton → content).  
-2. Toast-only addons need **zero** UI code beyond `{ok,message}`.  
-3. Disable/uninstall removes any `status` items the shell created for that addon.  
-4. Protocol remains `api: 1` compatible for toast responses.  
+1. A `list`-pattern addon opens chrome within budget even when the process is still computing rows (skeleton → content).
+2. Toast-only addons need **zero** UI code beyond `{ok,message}`.
+3. Disable/uninstall removes any `status` items the shell created for that addon.
+4. Protocol remains `api: 1` compatible for toast responses.
 5. A future context field can be added to requests without renaming patterns.
 
 ## Open choices (frozen)
 
-- Follow-ups use **`op: "run"`** with richer `args` (e.g. `itemId`, form fields) until a second op is clearly needed.  
-- `addon.yaml` **may** declare default `ui.pattern` per command; optional for P0/P1 — response `ui` wins when present.  
+- Follow-ups use **`op: "run"`** with richer `args` (e.g. `itemId`, form fields) until a second op is clearly needed.
+- `addon.yaml` **may** declare default `ui.pattern` per command; optional for P0/P1 — response `ui` wins when present.
 - Exact skeleton styling — UI kit follow-on; patterns above are structural only.
 
 ## Related
 
-- [Vision — Surfaces](../vision.md)  
-- [Shell design](./2026-08-22-shell-design.md)  
-- [Backlog — Platform](../backlog.md)  
+- [Vision — Surfaces](../vision.md)
+- [Shell design](./2026-08-22-shell-design.md)
+- [Backlog — Platform](../backlog.md)
 - Architecture index: [README](./README.md)

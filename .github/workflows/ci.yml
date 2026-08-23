@@ -70,6 +70,9 @@ jobs:
       - name: SwiftLint
         run: swiftlint lint --config .swiftlint.yml
 
+      - name: Check registry commands are in sync
+        run: ./scripts/sync-registry-commands.sh --check
+
       - name: Swift tests
         working-directory: shell
         run: swift test

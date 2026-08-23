@@ -23,7 +23,12 @@ LADDER = {
         5.5,
         "1 8",
         "M28 100 Q 45 75 66 58",
-        [(0, "#ffffff", None), (26, "#fff2d9", None), (56, "#f5a623", None), (100, "#c97a12", 0.55)],
+        [
+            (0, "#ffffff", None),
+            (26, "#fff2d9", None),
+            (56, "#f5a623", None),
+            (100, "#c97a12", 0.55),
+        ],
     ),
     48: (
         36,
@@ -75,7 +80,10 @@ def write_png(path: Path, width: int, height: int, rgba: bytes) -> None:
     raw = b"".join(b"\x00" + rgba[y * width * 4 : (y + 1) * width * 4] for y in range(height))
     ihdr = struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0)
     path.write_bytes(
-        b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", ihdr) + chunk(b"IDAT", zlib.compress(raw, 9)) + chunk(b"IEND", b"")
+        b"\x89PNG\r\n\x1a\n"
+        + chunk(b"IHDR", ihdr)
+        + chunk(b"IDAT", zlib.compress(raw, 9))
+        + chunk(b"IEND", b"")
     )
 
 

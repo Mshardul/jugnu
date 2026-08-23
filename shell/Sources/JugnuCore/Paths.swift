@@ -15,6 +15,10 @@ public struct JugnuPaths: Sendable {
         home.appendingPathComponent(".config/jugnu/state.json")
     }
 
+    public var registryCacheFile: URL {
+        home.appendingPathComponent(".local/share/jugnu/state/registry-cache.json")
+    }
+
     public init(home: URL = FileManager.default.homeDirectoryForCurrentUser) {
         self.home = home
     }

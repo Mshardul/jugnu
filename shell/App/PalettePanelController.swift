@@ -31,7 +31,8 @@ final class PalettePanelController {
                     self?.hide()
                 }
             },
-            onClose: { [weak self] in self?.hide() }
+            onClose: { [weak self] in self?.hide() },
+            onOpenBrowseCatalog: { [weak self] in self?.model.openBrowseCatalog() }
         )
         let hosting = NSHostingView(rootView: view)
         self.hosting = hosting
@@ -92,6 +93,7 @@ struct PaletteView: View {
     @ObservedObject var model: AppModel
     var onRun: (IndexedCommand) -> Void
     var onClose: () -> Void
+    var onOpenBrowseCatalog: () -> Void
 
     @State private var query = ""
     @State private var selection = 0
@@ -113,6 +115,10 @@ struct PaletteView: View {
             }
         }
         return model.lastHits
+    }
+
+    private var showBrowseCatalogRow: Bool {
+        query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
     private var placeholder: String {
@@ -143,6 +149,27 @@ struct PaletteView: View {
                         selection = 0
                     }
                 }
+
+            if showBrowseCatalogRow {
+                Button {
+                    onOpenBrowseCatalog()
+                    onClose()
+                } label: {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Browse Addons")
+                                .font(JugnuTokens.font(presetId: themeStore.presetId, role: .headline))
+                            Text("Discover, install, and manage addons")
+                                .font(JugnuTokens.font(presetId: themeStore.presetId, role: .caption))
+                                .foregroundStyle(theme.textSecondary)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .padding(.vertical, 2)
+                }
+                .buttonStyle(.plain)
+                Divider()
+            }
 
             List(Array(displayed.enumerated()), id: \.element.command.qualifiedId) { idx, hit in
                 HStack {
