@@ -1,9 +1,9 @@
 # Window layouts
 
-**Backlog:** T-020 · `window-layouts`
+**Backlog:** `window-layouts`  
+**Spec (locked):** [docs/architecture/2026-08-24-window-layouts.md](../../docs/architecture/2026-08-24-window-layouts.md)  
+**Ticket:** [0046](../../docs/tickets.md)
 
-Named multi-display layouts from a config file
+First-party window family: snaps, snap board, zones (max 6, geometry only), Space jump via system shortcuts. **No undo. No scenes.** AX-first compiled helper; SIP on.
 
-Status: planned (`idea`). Implementation not started.
-
-Not for: unrelated jobs — keep this leaf single-purpose (conversions use source/target or mode options inside this tool).
+This leaf is a **stub**. Do not implement here — ship as `addons/window-layouts` when asked. Absorbs `layout-save` into **zones**.

@@ -7,6 +7,7 @@ public protocol PaletteModelProtocol: ObservableObject {
     var allCommands: [IndexedCommand] { get }
     var lastHits: [SearchHit] { get }
     var statusMessage: String? { get }
+    var hiddenShellCommands: Set<String> { get }
 
     func commandsForFirstView() -> [IndexedCommand]
     func search(_ query: String) -> [IndexedCommand]
@@ -19,6 +20,7 @@ public struct PaletteView<Model: PaletteModelProtocol>: View {
     var onRun: (IndexedCommand) -> Void
     var onClose: () -> Void
     var onOpenBrowseCatalog: () -> Void
+    var onOpenPreferences: () -> Void
     var onStateChange: (ShellViewState) -> Void
 
     @State private var query: String
@@ -35,12 +37,14 @@ public struct PaletteView<Model: PaletteModelProtocol>: View {
         onRun: @escaping (IndexedCommand) -> Void,
         onClose: @escaping () -> Void,
         onOpenBrowseCatalog: @escaping () -> Void,
+        onOpenPreferences: @escaping () -> Void,
         onStateChange: @escaping (ShellViewState) -> Void = { _ in }
     ) {
         self.model = model
         self.onRun = onRun
         self.onClose = onClose
         self.onOpenBrowseCatalog = onOpenBrowseCatalog
+        self.onOpenPreferences = onOpenPreferences
         self.onStateChange = onStateChange
         _query = State(initialValue: initialQuery)
     }
@@ -59,8 +63,16 @@ public struct PaletteView<Model: PaletteModelProtocol>: View {
         return model.lastHits
     }
 
-    private var showBrowseCatalogRow: Bool {
+    private var isFirstView: Bool {
         query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    private var showBrowseCatalogRow: Bool {
+        isFirstView && !model.hiddenShellCommands.contains("browse-addons")
+    }
+
+    private var showPreferencesRow: Bool {
+        isFirstView && !model.hiddenShellCommands.contains("preferences")
     }
 
     private var placeholder: String {
@@ -103,6 +115,27 @@ public struct PaletteView<Model: PaletteModelProtocol>: View {
                             Text("Browse Addons")
                                 .font(JugnuTokens.font(presetId: themeStore.presetId, role: .headline))
                             Text("Discover, install, and manage addons")
+                                .font(JugnuTokens.font(presetId: themeStore.presetId, role: .caption))
+                                .foregroundStyle(theme.textSecondary)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .padding(.vertical, 2)
+                }
+                .buttonStyle(.plain)
+                Divider()
+            }
+
+            if showPreferencesRow {
+                Button {
+                    onOpenPreferences()
+                    onClose()
+                } label: {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Preferences")
+                                .font(JugnuTokens.font(presetId: themeStore.presetId, role: .headline))
+                            Text("Theme, hotkey, and shell settings")
                                 .font(JugnuTokens.font(presetId: themeStore.presetId, role: .caption))
                                 .foregroundStyle(theme.textSecondary)
                         }

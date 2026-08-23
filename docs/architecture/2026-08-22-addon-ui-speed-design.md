@@ -62,6 +62,7 @@ Rules:
 - Prefer the **smallest** pattern that finishes the job.
 - Same-shape siblings share patterns (all clip-tools converters → usually `toast` or tiny `form`).
 - Nested navigation stays inside one panel; do not open a second unmanaged window.
+- **Viewport** is a separate [view type](./2026-08-24-view-types.md) id (`seek` … `rail`). Pattern = content; view type = size/aspect. Defaults: `confirm`→`ask`, `list`→`rows`, `form`→`fields`. Spatial UIs set `"view": "board"` (etc.) explicitly. Addons never send pixels.
 
 ## 5. Protocol sketch (extends `api: 1`)
 
@@ -94,6 +95,7 @@ Keep today’s run shape. Extend the **response** (and optionally request) witho
   "ok": true,
   "ui": {
     "pattern": "list",
+    "view": "rows",
     "title": "Processes",
     "placeholder": "Filter by name",
     "items": [
@@ -107,7 +109,7 @@ Keep today’s run shape. Extend the **response** (and optionally request) witho
 
 Failure stays `{ "ok": false, "error": "…" }` → shell error toast/banner.
 
-`addon.yaml` may declare a default pattern per command (optional); response `ui` overrides when present.
+`addon.yaml` may declare a default pattern per command (optional); response `ui` overrides when present. Optional `view` / `ui.view` must be a catalog view-type id on the addon’s allow-list ([view types](./2026-08-24-view-types.md)).
 
 ## 6. Speed (first-class)
 

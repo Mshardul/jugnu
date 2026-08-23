@@ -47,3 +47,15 @@ public func filterCatalog(
     }
     return result
 }
+
+/// Tags present in the current category/subcategory/search scope, ignoring the
+/// tag filter itself so chips reflect what's actually selectable, not the full vocabulary.
+public func availableTags(
+    entries: [RegistryEntry],
+    category: String?,
+    subcategory: String? = nil,
+    search: String
+) -> Set<String> {
+    let scoped = filterCatalog(entries: entries, category: category, subcategory: subcategory, tags: [], search: search)
+    return scoped.reduce(into: Set<String>()) { $0.formUnion($1.tags) }
+}

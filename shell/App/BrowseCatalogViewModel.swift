@@ -12,6 +12,10 @@ final class BrowseCatalogViewModel: ObservableObject, BrowseCatalogViewModelProt
     @Published var staleMessage: String?
     @Published var errorMessage: String?
     @Published var installingIDs: Set<String> = []
+    /// Bumped after install/enable/uninstall mutate `model` so views reading
+    /// `isInstalled`/`isEnabled` (which pull live from `model`, not `@Published`
+    /// state) redraw. Those two methods have no other observable output.
+    @Published private(set) var refreshTick = 0
 
     let categories = CatalogTaxonomy.categories
     private let model: AppModel
@@ -65,23 +69,29 @@ final class BrowseCatalogViewModel: ObservableObject, BrowseCatalogViewModelProt
         do {
             try await model.installer.install(entry: entry, enable: true)
             model.refreshIndex()
+            errorMessage = nil
         } catch {
             errorMessage = UserFacingError.message(for: error)
         }
         installingIDs.remove(entry.id)
+        refreshTick += 1
     }
 
     func setEnabled(_ id: String, enabled: Bool) {
         do {
             try model.setEnabled(id: id, enabled: enabled)
+            errorMessage = nil
         } catch {
             errorMessage = UserFacingError.message(for: error)
         }
+        refreshTick += 1
     }
 
     func uninstall(id: String, name: String) {
         AddonUninstallPresenter.present(id: id, name: name, model: model, shellHost: shellHost) { [weak self] in
             self?.model.refreshIndex()
+            self?.errorMessage = nil
+            self?.refreshTick += 1
         }
     }
 }

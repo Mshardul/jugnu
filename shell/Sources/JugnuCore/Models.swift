@@ -209,6 +209,9 @@ public struct ShellConfig: Codable, Equatable, Sendable {
     public var hotkey: String
     /// Catalog JSON URL (GitHub raw or release-pinned).
     public var registryURL: String
+    /// Shell-native palette commands to hide: "browse-addons", "preferences".
+    /// These are mandatory chrome, not addons, so there is no My Addons toggle for them.
+    public var hiddenShellCommands: Set<String>
 
     public static let defaultRegistryURL =
         "https://raw.githubusercontent.com/Mshardul/jugnu/main/registry/addons.json"
@@ -219,21 +222,25 @@ public struct ShellConfig: Codable, Equatable, Sendable {
 
     public init(
         hotkey: String = "option+space",
-        registryURL: String = ShellConfig.defaultRegistryURL
+        registryURL: String = ShellConfig.defaultRegistryURL,
+        hiddenShellCommands: Set<String> = []
     ) {
         self.hotkey = hotkey
         self.registryURL = registryURL
+        self.hiddenShellCommands = hiddenShellCommands
     }
 
     enum CodingKeys: String, CodingKey {
         case hotkey
         case registryURL = "registry_url"
+        case hiddenShellCommands = "hidden_shell_commands"
     }
 
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         hotkey = try c.decodeIfPresent(String.self, forKey: .hotkey) ?? "option+space"
         registryURL = try c.decodeIfPresent(String.self, forKey: .registryURL) ?? Self.defaultRegistryURL
+        hiddenShellCommands = try c.decodeIfPresent(Set<String>.self, forKey: .hiddenShellCommands) ?? []
     }
 }
 

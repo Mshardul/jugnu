@@ -31,6 +31,20 @@ cleanup:
 - `entrypoint.path`: relative path to the entrypoint; absolute paths and parent traversal are forbidden.
 - `cleanup`: declared addon-owned paths and launchd labels to remove on disable or uninstall.
 
+## View types (accepted; not validated in code yet)
+
+Shell-owned viewport ids. Do **not** add `width`, `height`, or `percent` fields.
+
+```yaml
+view_types: [rows, fields, ask]   # allow-list from the catalog
+commands:
+  - id: pick
+    title: Pick an item
+    view: rows                    # must be in view_types
+```
+
+Catalog, defaults, click-outside, and multi-display rules: [view types spec](architecture/2026-08-24-view-types.md). `scripts/validate-addon.sh` should reject unknown ids when ticket 0045 is implemented.
+
 ## Validation
 
 Run the dependency-free validator before packaging:

@@ -16,7 +16,7 @@ The project has not published a release yet. Entries currently describe unreleas
 
 ### Documentation
 
-- 2026-08-23 — Added a reviewer watchlist (exhaustive switches, UserFacingError mapping, tokens/screens, unit-test isolation).
+- 2026-08-24 — Locked view types (ten viewport ids, multi-display clamps, click-outside split) and `window-layouts` (zones max 6, no undo, AX-first). Specs + tickets 0045/0046; not implemented.
 - 2026-08-23 — Added reuse-before-invent / reach-for-this-type rules; SwiftLint errors on force unwrap/cast/try and runs via `make lint-swift` and pre-commit.
 - 2026-08-23 — Folded agent-ops copies into `AGENTS.md`; coding standards stay in `docs/conventions.md`.
 - 2026-08-23 — Added standing coding conventions (`docs/conventions.md`) and pointed CONTRIBUTING / agent instructions at them.

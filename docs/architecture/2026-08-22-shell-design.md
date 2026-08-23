@@ -186,7 +186,7 @@ Fuzzy over title, subtitle, keywords, and `addonId.commandId` for **enabled** in
 |---|---|
 | Input Monitoring (or hotkey API equivalent) | Global hotkey |
 | Network | Registry + zip download |
-| Accessibility | Not required for shell-only; individual addons may need it later (window mgmt) — request at addon use time when possible |
+| Accessibility | Not required for shell-only; `window-layouts` and similar request it **on first use of that addon** — [window-layouts spec](./2026-08-24-window-layouts.md) |
 
 ### Dev override
 

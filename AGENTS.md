@@ -29,6 +29,8 @@ When proposing or accepting addons:
   - **User would want it alone** → make it **its own addon**.
   - **User would not** → **shared file(s)** included in each consuming zip at package time (not a registry product).
 - Treat **popup UI + speed** as part of every job — not CLI-only scripts. Context-aware “right UI for what’s on screen” is a later platform capability; still design addons as UI-ready.
+- **View types:** the shell owns the viewport catalog ([view types](docs/architecture/2026-08-24-view-types.md)). Addons allow-list ids; they do not ship pixels or percents.
+- **Window family:** one zip `window-layouts` ([spec](docs/architecture/2026-08-24-window-layouts.md)). Zones only (max 6), no undo, no scenes. AX-first; SIP stays on.
 - Backlog packaging map: [docs/backlog.md](docs/backlog.md) (must stay consistent with vision).
 
 Shell = light Swift host only; addons never bundled in the `.app`. No user Python for published addons.

@@ -11,9 +11,10 @@ Copy the **current** pattern in the type table, not leftover names or comments. 
 | Do not copy | Copy instead | Cleanup |
 |---|---|---|
 | `handleEsc` / `handleClickOutside` | Outcome names (`popOrDismiss`, `dismiss`) | [0013](tickets.md) |
-| `///` that restates the method or cites “Task N” | No comment, or a short **why** | [0013](tickets.md) |
+| `///` / `/* */` / “Task N” notes | No comment, or one `//` **why** | [0013](tickets.md) |
 | `PrefsView` in `App/` | Views in `JugnuUI` | [0013](tickets.md) |
 | Addon `Process` that outlives hide/Esc | Cancel + `cleanup` on leave | [0014](tickets.md) |
+| `hide()` setting `panel = nil` | Keep the `KeyablePanel`; `orderOut` only | [0016](tickets.md) |
 | `AddonInstaller.unzip()` as-is | Path-safe extract | [0003](tickets.md) |
 
 ## Vocabulary
@@ -26,6 +27,8 @@ Use product terms only:
 | **Addon** | One installable zip and one enable key. Commands and/or popup UI for one job. |
 | **Commands** | Palette / menu actions inside that addon (`addon.yaml` `commands`). |
 | **UI** | Panels, pickers, forms, previews for that addon (same zip). |
+| **View type** | Shell-owned viewport id (`seek`, `palette`, `ask`, `fields`, `rows`, `grid`, `board`, `spread`, `canvas`, `rail`). Size band + panel aspect + dismiss rules. Not pixels. Catalog: [view types](architecture/2026-08-24-view-types.md). |
+| **Zone** | Named saved **geometry** on `window-layouts` (max 6). Not occupancy. Not undo. |
 
 Name addons and commands for the user's job (`mute-all`, not `call-mute-all`). Related commands share an addon; unrelated jobs do not. Popup UI and speed are part of every job.
 
@@ -62,6 +65,27 @@ Dependencies only flow **App → JugnuUI → JugnuCore**. Core must stay UI-free
 | Invoke UI | `CommandInvoke` (skeleton, then run) | Blocking the palette until `Process` exits |
 
 A new type is allowed when none of these can express the job. Put that argument in the PR, not in a comment.
+
+## Config, state, and data flow
+
+A new fact belongs in **one** home. Do not add `UserDefaults`, a `static var`, or an untyped config map because it was convenient.
+
+| Home | Holds | Does not hold |
+|---|---|---|
+| **Product law** | Budgets, tokens, protocol shape, timeouts, taxonomy, user-facing error copy | Anything a user would toggle |
+| **Config** | User intent that survives relaunch and belongs in Preferences or a documented yaml field | Logs, recents, flags the user would not look for |
+| **State** | Machine-local memory; loss is acceptable | Prefs, budgets, protocol keys |
+| **Call / environment** | This invocation, this screen, this clock, this home directory, OS appearance / Reduce Motion | Process-wide app memory |
+
+New prefs get a **typed** config field. Do not grow a stringly-typed dump. Addons do not read host config; stdin is the contract (`api`, `op`, command, args, empty `context` in v1).
+
+**Process-wide objects we own** are almost never allowed. Apple’s process objects (`NSApplication`, `NSWorkspace`) are not ours. One paint bus for live chrome (theme / sound) is allowed so views can redraw without the composition root leaking into JugnuUI — put nothing else on it. Writes to that bus come from App when config is saved, not from leaf views.
+
+**Composition root is App.** It owns paths, stores, runner, and published config/state. Core types that touch disk take paths in; tests pass a temp home. Do not read the real home inside a function that already has paths.
+
+**Pass by value** across Core and the JSON boundary (snapshots, descriptors, stack entries). **Pass closures** at AppKit / SwiftUI seams (motion, clock, confirm/cancel). **Pass the panel’s screen**, not the main display, when morphing from an already-visible panel. JugnuUI takes descriptors and callbacks — not the composition root, not `@EnvironmentObject` of App types. Do not add a DI container; paths / clock / Reduce Motion injection is the seam. Protocols stay at FS / process / clock / network / clipboard (and view-model protocols the UI already uses).
+
+In-flight work lives on the host that dismisses, not on a static “current run.” A singleton that outlives hide is a leak.
 
 ## Hot path
 
@@ -119,9 +143,9 @@ If a comment would say **what** the code does, the name is wrong. Rename; do not
 
 ## Comments
 
-Comments exist only to explain **why** this code is this way when the why is surprising (0.8 s timeout, `try?` on cache, click-outside is not pop). Default is **no comment**.
+Default is **no comment**. A comment is allowed only when the **why** is surprising and the names cannot carry it (0.8 s timeout, `try?` on a cache write, click-outside is dismiss not pop).
 
-Do not comment what, who, how, or the plan (“Pops the stack”, “called by AppDelegate”, “Task 9”, “temporary”). Do not comment out code. Do not add `TODO`/`FIXME` — use `docs/tickets.md`. Do not require `///` on public API. If the why is an architecture rule, it belongs in this file or `docs/architecture/`, not above a method.
+If you need one, it is a **single** `//` line on the surprising line. No `/* */`, no `/** */`, no `///`, no stacked `//` paragraphs, no file banners, no `// MARK:` as a table of contents. Do not comment what, who, how, or the plan. Do not comment out code. Do not add `TODO`/`FIXME` — use `docs/tickets.md`. Architecture belongs in this file or `docs/architecture/`, not above a method. Tests and names carry the **what**.
 
 ## Unnecessary and smelly code
 
@@ -146,16 +170,25 @@ Do not add SwiftLint rules that try to judge algorithms. Wrong structure on the 
 
 ## UI ownership
 
-One `KeyablePanel`. Destinations are named presets (`launcher`, `catalog`, `settings`, `detail`, `confirm`, `list`, `form`). Toast is a HUD, not a stack node. `note` is the only detached window class in v1. Details: [shell surface presets](architecture/2026-08-23-shell-surface-presets.md).
+One `KeyablePanel`. Destinations are named presets (`launcher`, `catalog`, `settings`, `detail`, `confirm`, `list`, `form`). Frame size is a **view type** from the [viewport catalog](architecture/2026-08-24-view-types.md), not addon yaml. Toast is a HUD, not a stack node. `note` is the only detached window class in v1. Details: [shell surface presets](architecture/2026-08-23-shell-surface-presets.md).
 
 | Shell owns | Addon owns |
 |---|---|
 | Windows, focus, Esc / pop / home / click-out | Job logic and system calls |
 | Pattern layouts, `JugnuTokens`, theme | Which pattern + JSON fields |
+| View-type size/aspect (current screen `visibleFrame` + clamps) | Which view-type **ids** are allowed; which id this command uses |
 | Motion (~200 ms morph; Reduce Motion snaps) | `cleanup.paths` / `cleanup.launchd` |
 | Latency measurement | Tiny entrypoint that returns JSON |
 
-Addons never create `NSWindow` and never declare pixel sizes. Use the smallest pattern that finishes the job. Nested navigation stays inside the stack (push child, replace sibling, pop restores view state). Leaving a long job cancels the process and runs cleanup.
+Addons never create `NSWindow` and never declare pixel sizes or percents. They declare `view_types: [id, …]` from the catalog. Use the smallest type that finishes the job. Nested navigation stays inside the stack (push child, replace sibling, pop restores view state). Leaving a long job cancels the process and runs cleanup.
+
+Click-outside **dismisses** `seek` / `palette` / `ask` / `fields` / `rows` / `grid` / `rail`. It does **not** dismiss `board` / `spread` / `canvas` (Esc / Cmd+W).
+
+Window geometry addons (`window-layouts`) request Accessibility **on first use**, keep tiling on AX, and isolate private CGS. Do not disable SIP. Do not add `layout-undo`. Spec: [window-layouts](architecture/2026-08-24-window-layouts.md).
+
+Do not use SwiftUI `.sheet`, `.alert`, `.confirmationDialog`, or `NavigationStack` in the shell panel. Those are extra windows and a second navigation model. Confirm/list/form are stack presets; toast is the HUD.
+
+**Focus:** first arrival at a preset focuses that preset’s default (search on `launcher`/`catalog`/`list`, Confirm on `confirm`, first field on `form`). Pop restores the previous first responder. Toast must not steal search focus. Invoke must key the panel on the first press.
 
 ## Addon contract
 
@@ -172,7 +205,7 @@ Canonical: [ADR 0001](architecture/decisions/0001-json-addon-boundary.md), [addo
 
 ## Testing
 
-Tests carry the **what** that comments must not. `test_pop_atRoot_isNoOp` is the spec; a `/// No-op at root` is noise.
+Tests carry the **what** that comments must not. `test_pop_atRoot_isNoOp` is the spec; a comment on the test is noise.
 
 - TDD for `JugnuCore` at boundaries: YAML/JSON, paths, index, fuzzy, runner fixtures, checksum, cleanup. Use temp `JugnuPaths(home:)`.
 - Assert the outcome (`stack.top.preset == .catalog`, timeout error, toast ceiling), not the implementation (mock call counts, private state).
@@ -218,7 +251,7 @@ What a junior PR still gets wrong after the rules above. Reject these:
 - **New `*Error` case not in `UserFacingError`.** The toast becomes “Something went wrong.”
 - **Empty `catch` / ignored `Task` failure.** Allowed `try?` is only config/state/cache writes.
 - **`public` so a test can see it.** App stays internal; tests use `@testable import`.
-- **Magic size or `Color.accentColor`.** `ShellPreset.size` and `JugnuTokens` / theme only.
+- **Magic size or `Color.accentColor`.** View-type size table / `ShellPreset.size` and `JugnuTokens` / theme only. No per-addon width/height.
 - **`NSScreen.main` for a morph** when the panel already has `currentScreen` (multi-display).
 - **`DispatchQueue.main.async` from `@MainActor`** on the invoke path — extra frame, blows the 50 ms budget. HotKey’s callback is the exception (it is not MainActor).
 - **`List`/`ForEach` without a stable id** (`qualifiedId`, addon id). No `id: \.offset`, no `.id(UUID())` on the palette.
@@ -226,6 +259,10 @@ What a junior PR still gets wrong after the rules above. Reject these:
 - **Tests that use the real home, `Date()`, or the network** in `JugnuCoreTests`. `JugnuPaths(home: temp)`, inject `now`, live calls only in `TestsExtended`.
 - **`refreshIndex()` / YAML / directory walk inside invoke.** Already forbidden on the hot path; it still shows up in `AppDelegate` “just to be safe.”
 - **A view that must update but does not observe the model** (enable/disable/install). Mutating `AppModel` is not enough if the catalog VM never reads it.
+- **`.sheet` / `.alert` / `NavigationStack` in the panel.** Stack presets and the toast HUD only.
+- **Focus left on the wrong control** after push/pop, or toast becoming key.
+- **`///`, `/* */`, or a comment block** on a type or method. One `//` why, or nothing.
+- **New fact in the wrong home.** `UserDefaults`, `static var`, untyped yaml, or extra fields on the theme paint bus.
 
 ## Review checklist
 
@@ -235,6 +272,7 @@ Use on every Swift or addon change. If any row is no, the change is not done.
 |---|---|
 | Reuse | Named the existing type, or the PR says why it is wrong |
 | Layer | New type sits in Core, UI, or App for the right reason |
+| Data | Law / config / state / call — not a new singleton or `UserDefaults` |
 | Hot path | No FS / network / Process / index rebuild before first paint |
 | Chrome | Known panel jobs skeleton within 100 ms; toast stays HUD |
 | MainActor | UI mutations only; runner work is detached |
@@ -246,6 +284,6 @@ Use on every Swift or addon change. If any row is no, the change is not done.
 | Privacy | No secrets in logs; `context` still empty unless designed |
 | Hygiene | SwiftLint clean; no new `!` / `as!` / `try!` in product code |
 | Names | A reader does not need a what-comment |
-| Comments | Absent, or a short why |
+| Comments | Absent, or one `//` why |
 | Tests | Named behavior; would fail if the outcome changed |
 | Watchlist | No `default: break` on presets; no magic colors/sizes; no real `$HOME` in unit tests |

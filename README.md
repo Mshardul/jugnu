@@ -9,6 +9,7 @@ Jugnu (Hindi: *firefly*) is a Mac command platform — meant to replace Spotligh
 | **App** | Jugnu |
 | **Repo / CLI** | `jugnu` |
 | **Status** | Shell MVP + addon UI host — Core + `Jugnu` app (SPM), 11 native addons shipped via GitHub Release registry |
+| **Requires** | macOS 14 (Sonoma) or later |
 | **License** | [MIT](LICENSE) |
 
 ## Shell (Swift)

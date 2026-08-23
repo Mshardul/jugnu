@@ -1,9 +1,8 @@
 # Layout save
 
-**Backlog:** T-106 · `layout-save`
+**Backlog:** `layout-save` — **folded into `window-layouts` zones**  
+**Spec:** [docs/architecture/2026-08-24-window-layouts.md](../../docs/architecture/2026-08-24-window-layouts.md)
 
-Save/restore current window arrangement only (lite vs T-020)
+Not a separate zip. Named geometry snapshots (max 6) live on `window-layouts`. This does **not** feed undo (undo is out of product).
 
-Status: planned (`idea`). Implementation not started.
-
-Not for: unrelated jobs — keep this leaf single-purpose (conversions use source/target or mode options inside this tool).
+Status: stub only. Do not scaffold.

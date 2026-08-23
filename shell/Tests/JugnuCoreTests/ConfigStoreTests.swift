@@ -13,7 +13,21 @@ final class ConfigStoreTests: XCTestCase {
         XCTAssertEqual(config.shell.registryURL, ShellConfig.defaultRegistryURL)
         XCTAssertEqual(config.theme.dark.accent, "#F5A623")
         XCTAssertEqual(config.sound, true)
+        XCTAssertEqual(config.shell.hiddenShellCommands, [])
         XCTAssertTrue(FileManager.default.fileExists(atPath: store.paths.configFile.path))
+    }
+
+    func testRoundTripHiddenShellCommands() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+
+        let store = ConfigStore(paths: JugnuPaths(home: dir))
+        var config = try store.loadOrCreateDefaults()
+        config.shell.hiddenShellCommands = ["browse-addons"]
+        try store.save(config)
+        let loaded = try store.load()
+        XCTAssertEqual(loaded.shell.hiddenShellCommands, ["browse-addons"])
     }
 
     func testRoundTripRegistryURL() throws {

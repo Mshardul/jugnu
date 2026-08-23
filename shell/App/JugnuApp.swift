@@ -163,7 +163,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 model: model,
                 onRun: { [weak self] cmd in self?.runCommand(cmd) },
                 onClose: { [weak shellHost] in shellHost?.hide() },
-                onOpenBrowseCatalog: { [weak self] in self?.pushCatalog() }
+                onOpenBrowseCatalog: { [weak self] in self?.pushCatalog() },
+                onOpenPreferences: { [weak self] in self?.pushSettings() }
             ),
             size: ShellPreset.launcher.size(compactLauncher: false)
         )
@@ -183,6 +184,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 onRun: { [weak self] cmd in self?.runCommand(cmd) },
                 onClose: { [weak shellHost] in shellHost?.hide() },
                 onOpenBrowseCatalog: { [weak self] in self?.pushCatalog() },
+                onOpenPreferences: { [weak self] in self?.pushSettings() },
                 onStateChange: { [weak shellHost] state in shellHost?.updateTopState(state) }
             ))
         case .settings:

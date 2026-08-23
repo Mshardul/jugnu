@@ -54,22 +54,29 @@ public struct BrowseCatalogView<VM: BrowseCatalogViewModelProtocol>: View {
                     PanelErrorBanner(message: errorMessage).padding(.horizontal)
                 }
 
-                ScrollView {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 240), spacing: 12)], spacing: 12) {
-                        ForEach(viewModel.filtered, id: \.id) { entry in
-                            AddonCardView(
-                                entry: entry,
-                                isInstalled: viewModel.isInstalled(entry.id),
-                                isEnabled: viewModel.isEnabled(entry.id),
-                                isInstalling: viewModel.installingIDs.contains(entry.id),
-                                onInstall: { Task { await viewModel.install(entry) } },
-                                onEnabledChange: { viewModel.setEnabled(entry.id, enabled: $0) },
-                                onUninstall: { viewModel.uninstall(id: entry.id, name: entry.name) },
-                                onTap: { onSelectCard(entry.id) }
-                            )
+                if viewModel.filtered.isEmpty && !viewModel.entries.isEmpty {
+                    Text("No addons match these filters.")
+                        .font(JugnuTokens.font(presetId: store.presetId, role: .body))
+                        .foregroundStyle(theme.textSecondary)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                } else {
+                    ScrollView {
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 240), spacing: 12)], spacing: 12) {
+                            ForEach(viewModel.filtered, id: \.id) { entry in
+                                AddonCardView(
+                                    entry: entry,
+                                    isInstalled: viewModel.isInstalled(entry.id),
+                                    isEnabled: viewModel.isEnabled(entry.id),
+                                    isInstalling: viewModel.installingIDs.contains(entry.id),
+                                    onInstall: { Task { await viewModel.install(entry) } },
+                                    onEnabledChange: { viewModel.setEnabled(entry.id, enabled: $0) },
+                                    onUninstall: { viewModel.uninstall(id: entry.id, name: entry.name) },
+                                    onTap: { onSelectCard(entry.id) }
+                                )
+                            }
                         }
+                        .padding()
                     }
-                    .padding()
                 }
             }
         }
@@ -101,8 +108,15 @@ public struct BrowseCatalogView<VM: BrowseCatalogViewModelProtocol>: View {
 
     @ViewBuilder
     private func tagChips(theme: JugnuThemeColors) -> some View {
+        let available = availableTags(
+            entries: viewModel.entries,
+            category: viewModel.selection.category,
+            subcategory: viewModel.selection.subcategory,
+            search: viewModel.searchText
+        )
+        let visibleTags = CatalogTaxonomy.tags.filter { available.contains($0) }
         HStack {
-            ForEach(CatalogTaxonomy.tags, id: \.self) { tag in
+            ForEach(visibleTags, id: \.self) { tag in
                 let selected = viewModel.selectedTags.contains(tag)
                 Text(tag)
                     .font(.caption)

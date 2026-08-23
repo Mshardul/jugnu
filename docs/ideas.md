@@ -27,3 +27,11 @@ Apple’s current glass (`glassEffect` / `NSGlassEffectView`, macOS 26) for the 
 **Origin:** raised while locking [shell surface presets](architecture/2026-08-23-shell-surface-presets.md) (ticket 0008). Explicitly deferred — deployment is still macOS 14; real Liquid Glass is 26; identity risk if glass replaces Firefly instead of sitting under it. Revisit after 0008’s one-panel + preset model is real, not before.
 
 **Depends on:** 0008 landing (one morphing panel exists to put glass on).
+
+## Runtime addon-to-addon calls (MCP-style or similar)
+
+A mechanism for one running addon to call into another at runtime (e.g. a converter addon reading clipboard-history's stored clips directly, rather than through the clipboard). MCP (each addon exposes tools, another addon's process calls them over JSON-RPC) is one possible shape, but heavyweight — a persistent server per addon — for what's mostly small `exec`-and-exit binaries today.
+
+**Origin:** raised while discussing [ticket 0025](tickets.md)'s addon dependency declaration. Explicitly not pursued yet — vision rule 4's "shared capability" case is already resolved at package time (shared source copied into each consuming addon's zip), and no real addon proposal currently needs a *runtime* cross-addon call. Revisit only if a concrete addon design actually needs it; a simpler on-disk shared-state contract (declared paths, like `cleanup.paths` today) is the more likely shape if/when that happens.
+
+**Depends on:** a real addon proposal that needs this, not speculative build-ahead.

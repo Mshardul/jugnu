@@ -39,26 +39,32 @@ public struct AddonCardView: View {
     public var body: some View {
         let theme = JugnuThemeColors(theme: resolvedTheme(from: store.config, colorScheme: colorScheme))
         VStack(alignment: .leading, spacing: JugnuTokens.Spacing.row) {
-            Text(entry.name)
-                .font(JugnuTokens.font(presetId: store.presetId, role: .headline))
-                .foregroundStyle(theme.textPrimary)
-            Text(entry.summary)
-                .font(JugnuTokens.font(presetId: store.presetId, role: .caption))
-                .foregroundStyle(theme.textSecondary)
-            Text(entry.category)
-                .font(JugnuTokens.font(presetId: store.presetId, role: .caption2))
-                .foregroundStyle(theme.textSecondary)
+            Button(action: { onTap?() }) {
+                VStack(alignment: .leading, spacing: JugnuTokens.Spacing.row) {
+                    Text(entry.name)
+                        .font(JugnuTokens.font(presetId: store.presetId, role: .headline))
+                        .foregroundStyle(theme.textPrimary)
+                    Text(entry.summary)
+                        .font(JugnuTokens.font(presetId: store.presetId, role: .caption))
+                        .foregroundStyle(theme.textSecondary)
+                    Text(entry.category)
+                        .font(JugnuTokens.font(presetId: store.presetId, role: .caption2))
+                        .foregroundStyle(theme.textSecondary)
 
-            HStack(spacing: 4) {
-                ForEach(displayTags, id: \.self) { tag in
-                    Text(tag)
-                        .font(.caption2)
-                        .padding(.horizontal, 6).padding(.vertical, 2)
-                        .background(theme.surface)
-                        .clipShape(Capsule())
-                        .overlay(Capsule().strokeBorder(theme.textSecondary.opacity(0.3)))
+                    HStack(spacing: 4) {
+                        ForEach(displayTags, id: \.self) { tag in
+                            Text(tag)
+                                .font(.caption2)
+                                .padding(.horizontal, 6).padding(.vertical, 2)
+                                .background(theme.surface)
+                                .clipShape(Capsule())
+                                .overlay(Capsule().strokeBorder(theme.textSecondary.opacity(0.3)))
+                        }
+                    }
                 }
+                .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
 
             AddonActionRow(
                 isInstalled: isInstalled, isEnabled: isEnabled, isInstalling: isInstalling, theme: theme,
@@ -72,7 +78,5 @@ public struct AddonCardView: View {
         .padding(JugnuTokens.Spacing.panelPadding)
         .background(theme.surface)
         .clipShape(RoundedRectangle(cornerRadius: JugnuTokens.Radius.panel, style: .continuous))
-        .contentShape(Rectangle())
-        .onTapGesture { onTap?() }
     }
 }

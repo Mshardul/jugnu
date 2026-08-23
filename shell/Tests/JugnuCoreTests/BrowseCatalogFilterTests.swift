@@ -67,6 +67,24 @@ final class BrowseCatalogFilterTests: XCTestCase {
         XCTAssertEqual(Set(result.map(\.id)), ["ports", "battery"])
     }
 
+    func testAvailableTagsScopedToCategoryIgnoresOtherCategoryTags() {
+        let entries = [
+            entry("a", category: "System", tags: ["dev-tool"]),
+            entry("b", category: "Focus", tags: ["toggle"]),
+        ]
+        let result = availableTags(entries: entries, category: "System", search: "")
+        XCTAssertEqual(result, ["dev-tool"])
+    }
+
+    func testAvailableTagsIgnoresTagFilterItself() {
+        let entries = [
+            entry("a", category: "System", tags: ["dev-tool", "popup-ui"]),
+            entry("b", category: "System", tags: ["dev-tool"]),
+        ]
+        let result = availableTags(entries: entries, category: "System", search: "")
+        XCTAssertEqual(result, ["dev-tool", "popup-ui"])
+    }
+
     func testSidebarSelectionExposesCategoryAndSubcategory() {
         XCTAssertNil(CatalogSidebarSelection.all.category)
         XCTAssertNil(CatalogSidebarSelection.all.subcategory)

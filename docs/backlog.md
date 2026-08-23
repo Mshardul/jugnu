@@ -8,7 +8,7 @@ Status legend for staged leaves: **active** = runnable code; **stub** = README o
 |---|---|---|
 | 1 | Shell + YAML addon enablement | Design before scaffold — see `docs/architecture/` |
 | 2 | Dual clipboard modes | Ephemeral vs history; privacy-aware; build on `apps/clipboard-history` |
-| 3 | Robust window management | Absorb `window-layouts` / `layout-save` stubs into a real first-party addon |
+| 3 | Robust window management | Absorb `window-layouts` / `layout-save` stubs into a real first-party addon — [spec](architecture/2026-08-24-window-layouts.md) · [ticket 0046](tickets.md) |
 | 4 | Addon **popup UI** host | [UI + speed design](architecture/2026-08-22-addon-ui-speed-design.md) (Approved) · [P1 plan](superpowers/plans/2026-08-22-addon-ui-host-p1.md) **done** |
 | 5 | **Speed** budget | Invoke → visible result; budgets in that design §6 |
 | 6 | Context-aware UI (later) | Reserved in UI + speed §7 — after UI host exists |
@@ -83,7 +83,7 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | Files | **media-convert** | **afconvert** (+ other built-in audio convert presets) | Audio via macOS `afconvert` |
 | Files | **favorite-folders** | jump curated folder list | Own; curated ≠ Alfred disk search |
 | Files | **recent-files** | recently modified files / filter by folder or extension / reveal or open / copy path | Focused recent-file utility; not full-disk search |
-| Window | **window-layouts** | center, fill-desktop, maximize, hide-others, pin-top, space-jump, stage-toggle, left/right-half, quarters, gather-windows, move-display, app-windows, desktop-name, fullscreen-toggle, minimize-all, show-desktop, **layout-undo**, **tile-two** (+ swap / other layout ops; fold **layout-save**) | One window family |
+| Window | **window-layouts** | center, fill-desktop, maximize, hide-others, pin-top, space-jump, stage-toggle, left/right-half, quarters, gather-windows, move-display, app-windows, desktop-name (Jugnu-local label), fullscreen-toggle, minimize-all, show-desktop, **tile-two** (+ swap / other layout ops); **zones** (save/apply, max 6, replace picker). Fold **layout-save**. **No layout-undo.** Snap board + palette commands. Spec: [2026-08-24 window-layouts](architecture/2026-08-24-window-layouts.md) | One window family |
 | Meeting | **screenshare-prep** | hide icons + pause banners; **screenshare-restore** | Orchestrator + one-shot undo |
 | Meeting | **mute-all** | mute mic+speakers / restore; **mute-status** (menu glyph; shared w/ mic-mute) | Mute everything + visible state |
 | Meeting | **display-mirror** | mirror vs extend | Own display job |
@@ -255,11 +255,11 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | gather-windows | Gather front app’s windows to current Space/display | **window-layouts** |
 | move-display | Move front window to next/previous display | **window-layouts** |
 | app-windows | List front app’s windows → focus one | **window-layouts** |
-| desktop-name | Rename current Space | **window-layouts**; fragile / may drop if unscriptable |
+| desktop-name | Jugnu-local label for the current Space (our lists only) | **window-layouts** |
 | fullscreen-toggle | Toggle native fullscreen on front window | **window-layouts** |
 | minimize-all | Minimize all windows (optional: except front) | **window-layouts** |
 | show-desktop | Show Desktop (hide all) / restore | **window-layouts** |
-| layout-undo | Restore previous window arrangement | **window-layouts** (w/ **layout-save**) |
+| zone-save / zone-apply | Snapshot / apply named geometry (max 6; seventh save is a replace picker) | **window-layouts** — not occupancy; **no undo** |
 | tile-two | Side-by-side front + next app (+ swap / other layout ops) | **window-layouts** |
 
 ### System QoL / appearance
@@ -355,8 +355,8 @@ versions here stay as reference implementations, not shipped.
 | weather-bar | graduated → `addons/weather-bar` | `curl` + Open-Meteo; toast |
 | world-clock | graduated → `addons/world-clock` | Fixed zone list in script; list UI |
 | tools-palette | stub | Nursery CLI runner — evolves into shell search surface or thin addon |
-| window-layouts | stub | Window family; layout-undo, tile-two, and other layout ops |
-| layout-save | stub | Fold into window-layouts (feeds layout-undo) |
+| window-layouts | stub | Window family; zones (max 6), tile-two, snap board; **no** layout-undo. Spec [2026-08-24](architecture/2026-08-24-window-layouts.md) |
+| layout-save | stub | Fold into window-layouts **zones** (not undo) |
 | meeting-bar | stub | Meeting/device QoL |
 | paste-transform | stub | Paste plain / transforms; clip-tools host for converters |
 | port-picker | superseded | Folded into `addons/ports` (list + kill; no longer wraps Tools `port-tool`) |

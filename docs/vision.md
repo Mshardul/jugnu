@@ -15,7 +15,8 @@ A Mac **command platform** that can replace Spotlight + Alfred + Raycast for dai
 1. **Commands** — searchable palette / menu-bar actions
 2. **Popup UI** — focused panels, pickers, forms, previews, and status chrome that feel native and intentional
 3. **Speed** — first-class; invoke → visible result must feel instant (no sluggish “script runner” feel)
-4. **Context later** — intelligent surfacing: the right popup/command offered from what’s on screen / selection / clipboard (design after v0 primitives exist)
+4. **View types** — the shell owns a fixed viewport catalog (search strip through ~70% canvas); addons pick ids, never pixels. [Spec](architecture/2026-08-24-view-types.md)
+5. **Context later** — intelligent surfacing: the right popup/command offered from what’s on screen / selection / clipboard (design after v0 primitives exist)
 
 Backlog ids name **jobs**; shipping a job implies designing its **UI + latency**, not only a CLI-shaped action.
 
@@ -33,7 +34,7 @@ Do not invent a second product name or collapse the Tools nursery into Jugnu wit
 
 1. **Shell** — hotkey palette, search, addon loader, install/uninstall addons, enable/disable via YAML
 2. **Clipboard** — two modes: use-and-throw vs full history; skip concealed pasteboard / password-manager markers
-3. **Window management** — deep feature set and strong UX (not only a minimal layout saver)
+3. **Window management** — deep feature set and strong UX (not only a minimal layout saver). Product lock: [window-layouts](architecture/2026-08-24-window-layouts.md)
 4. **First-party addons** — meeting/device QoL, file triage, and similar focused jobs
 5. **Dev ops in the menu bar** — yes (ports, brew, agents, disk, etc.)
 

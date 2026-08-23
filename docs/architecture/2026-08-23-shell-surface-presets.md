@@ -4,7 +4,7 @@
 **Status:** Approved  
 **Ticket:** [0008](../tickets.md)  
 **Depends on:** [Addon UI host + speed](./2026-08-22-addon-ui-speed-design.md) (patterns, shell-owned chrome), [Palette + addon UI product pass](./2026-08-23-palette-ui-product-pass.md) (tokens, theming), [Addon catalog browse](./2026-08-23-addon-catalog-browse-design.md) (taxonomy, registry, install — **not** the titled `BrowseCatalogWindow`)  
-**Out of scope here:** Liquid Glass / Tahoe material chrome (parked in [ideas.md](../ideas.md)); first-run rewrite ([ticket 0004](../tickets.md) — this spec only leaves a door); per-addon pixel sizes; addons creating their own `NSWindow`; background `progress` queue (later); Quick note **command** (backlog on `floating-note`; this spec only adds the host `persist` flag)
+**Out of scope here:** Liquid Glass / Tahoe material chrome (parked in [ideas.md](../ideas.md)); first-run rewrite ([ticket 0004](../tickets.md) — this spec only leaves a door); per-addon pixel sizes (superseded by [view types](./2026-08-24-view-types.md)); addons creating their own `NSWindow`; background `progress` queue (later); Quick note **command** (backlog on `floating-note`; this spec only adds the host `persist` flag)
 
 ## 1. Why now
 
@@ -21,12 +21,12 @@ This **supersedes** ticket 0002’s locked “own resizable `BrowseCatalogWindow
 | Surface | **One** `KeyablePanel`. The configured invoke hotkey (`shell.hotkey`) and menu **Open Palette** drive that same object. It **resizes and swaps its view** (views transform into each other). No second launcher. No titled catalog or prefs windows. |
 | Owner | **One** host owns the panel, the stack, mapping, hotkey home/close, toast HUD, and opening detached `note`. Do not keep today’s split (`PalettePanelController` destroys itself on run; `UIHostController` opens another panel). |
 | Mechanism | Named **presets** (size + layout + chrome). History is a **stack** of `(preset, view state)`. Frame morphs to the top preset; Reduce Motion **snaps**. |
-| Preset key | **Pattern / shell destination**, not addon id, not raw width/height. `mic-mute` and `paste-plain` share toast; `clipboard-history` and `brew-outdated` share `list`. A job that doesn’t fit gets a **new pattern**, not a one-off size. Addons do not declare pixel sizes. |
+| Preset key | **Pattern / shell destination**, not addon id, not raw width/height. Geometry is a [view type](./2026-08-24-view-types.md) id. Addons allow-list those ids; they do not declare pixel sizes. A job that doesn’t fit gets a **new pattern** (and a catalog view type), not a one-off size. |
 | Tree | Push / replace / pop follow the **tree from `launcher`**, not whether the frame size changes. Same-preset follow-up **pushes** when it is a child (e.g. list drill-down). Siblings **replace**. See §4. |
 | History — pop | Leave a **child** step: **Esc**, **Cmd+W**, **Cancel**, and natural finish of **that step** (Confirm on a confirm, Close on detail). Restore previous preset + size + **view state** (query, selection, scroll, catalog filters, first responder). Esc is pop, not home. No extra Back control (Esc is enough). |
 | History — home | Invoke hotkey / Open Palette while **not** on `launcher`: stack becomes `[launcher]` — **fresh** initial view (configured `first_view`, empty query, search focused). Does **not** restore the previous launcher query. |
 | History — close | Invoke hotkey / Open Palette while **on** `launcher`: hide, stack empty. Next invoke is a fresh `launcher`. |
-| History — dismiss | **Click outside** the panel (desktop / other apps — not empty space *inside* the panel): hide, stack empty. Click-outside is **not** pop and **not** home. **Cmd+Tab** / resign-key is **not** click-outside; the panel may resign key but the stack stays until click-out, home, close, or pop-to-dismiss. |
+| History — dismiss | **Click outside** the panel (desktop / other apps — not empty space *inside* the panel): hide, stack empty — **except** when the top view type is `board`, `spread`, or `canvas` ([view types](./2026-08-24-view-types.md)); those ignore click-outside (Esc / Cmd+W still pop or dismiss). Click-outside is **not** pop and **not** home. **Cmd+Tab** / resign-key is **not** click-outside. |
 | Esc at root | On `launcher`, Esc and Cmd+W **dismiss** (nothing to pop). |
 | Already there | Opening a destination you are already on (menu Preferences while on `settings`; Browse Addons while on `catalog`) is a **no-op** except focus that view. |
 | Hidden vs visible | Menu / `openCatalog` / `openSettings` build the same stack whether the panel was hidden. Shell destinations are always `[launcher, destination]`. |
@@ -46,7 +46,7 @@ This **supersedes** ticket 0002’s locked “own resizable `BrowseCatalogWindow
 
 - Always-on catalog-sized frame with the launcher as a small view inside it — empty search still looks like a blank page in a large panel.
 - A second window that “grows out of” the palette — still two windows and two focus targets.
-- Per-addon width/height in yaml.
+- Per-addon width/height in yaml (use [view types](./2026-08-24-view-types.md) instead).
 - Click-outside as pop.
 - Invoke hotkey as dismiss-from-any-depth (home-or-close instead).
 - Folding Floating Note into the panel (it stays detached).
