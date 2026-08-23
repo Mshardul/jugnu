@@ -1,32 +1,16 @@
-import AppKit
 import JugnuCore
 import JugnuUI
 
 @MainActor
 enum AddonUninstallPresenter {
-    private static var activePanel: ConfirmPanel?
-
     static func present(id: String, name: String, model: AppModel, onDone: @escaping () -> Void) {
-        let ui = confirmUninstallUI(name: name)
-        let panel = ConfirmPanel(
-            ui: ui,
+        model.uiHost.presentConfirm(
+            ui: confirmUninstallUI(name: name),
+            commandId: "shell.uninstall.\(id)",
             onConfirm: {
-                do {
-                    try model.uninstall(id: id)
-                } catch {
-                    model.statusMessage = UserFacingError.message(for: error)
-                }
-                activePanel?.orderOut(nil)
-                activePanel = nil
+                try model.uninstall(id: id)
                 onDone()
-            },
-            onCancel: {
-                activePanel?.orderOut(nil)
-                activePanel = nil
             }
         )
-        activePanel = panel
-        panel.center()
-        panel.makeKeyAndOrderFront(nil)
     }
 }

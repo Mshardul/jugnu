@@ -60,7 +60,10 @@ public struct AddonCardView: View {
                 }
             }
 
-            actionRow(theme: theme)
+            AddonActionRow(
+                isInstalled: isInstalled, isEnabled: isEnabled, isInstalling: isInstalling, theme: theme,
+                onInstall: onInstall, onEnabledChange: onEnabledChange, onUninstall: onUninstall
+            )
 
             if let errorMessage {
                 PanelErrorBanner(message: errorMessage)
@@ -71,28 +74,5 @@ public struct AddonCardView: View {
         .clipShape(RoundedRectangle(cornerRadius: JugnuTokens.Radius.panel, style: .continuous))
         .contentShape(Rectangle())
         .onTapGesture { onTap?() }
-    }
-
-    @ViewBuilder
-    private func actionRow(theme: JugnuThemeColors) -> some View {
-        HStack {
-            if isInstalled {
-                Button(isEnabled ? "Disable" : "Enable") {
-                    onEnabledChange(!isEnabled)
-                }
-                .tint(isEnabled ? theme.error : theme.accent)
-                Button("Uninstall", action: onUninstall)
-                    .tint(theme.error)
-            } else if isInstalling {
-                HStack(spacing: 4) {
-                    ProgressView().controlSize(.small)
-                    Text("Installing…")
-                }
-                .foregroundStyle(theme.textSecondary)
-            } else {
-                Button("Install", action: onInstall)
-                    .tint(theme.accent)
-            }
-        }
     }
 }

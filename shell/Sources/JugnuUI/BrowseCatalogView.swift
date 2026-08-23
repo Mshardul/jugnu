@@ -5,10 +5,10 @@ import JugnuCore
 public protocol BrowseCatalogViewModelProtocol: ObservableObject {
     var entries: [RegistryEntry] { get }
     var filtered: [RegistryEntry] { get }
-    var selectedCategory: String? { get set }
+    var selection: CatalogSidebarSelection { get set }
     var selectedTags: Set<String> { get set }
     var searchText: String { get set }
-    var staleBanner: Bool { get }
+    var staleMessage: String? { get }
     var errorMessage: String? { get }
     var installingIDs: Set<String> { get }
     var categories: [String] { get }
@@ -34,7 +34,7 @@ public struct BrowseCatalogView<VM: BrowseCatalogViewModelProtocol>: View {
     public var body: some View {
         let theme = JugnuThemeColors(theme: resolvedTheme(from: store.config, colorScheme: colorScheme))
         HStack(spacing: 0) {
-            sidebar(theme: theme)
+            sidebar()
                 .frame(width: 160)
             Divider()
             VStack(alignment: .leading, spacing: JugnuTokens.Spacing.row) {
@@ -45,8 +45,8 @@ public struct BrowseCatalogView<VM: BrowseCatalogViewModelProtocol>: View {
                 tagChips(theme: theme)
                     .padding(.horizontal)
 
-                if viewModel.staleBanner {
-                    PanelErrorBanner(message: "Showing cached results — offline or registry unreachable")
+                if let staleMessage = viewModel.staleMessage {
+                    PanelErrorBanner(message: staleMessage)
                         .padding(.horizontal)
                 }
                 if let errorMessage = viewModel.errorMessage {
@@ -90,19 +90,20 @@ public struct BrowseCatalogView<VM: BrowseCatalogViewModelProtocol>: View {
     }
 
     @ViewBuilder
-    private func sidebar(theme: JugnuThemeColors) -> some View {
-        List(selection: $viewModel.selectedCategory) {
-            Text("All").tag(String?.none)
+    private func sidebar() -> some View {
+        List(selection: $viewModel.selection) {
+            Text("All").tag(CatalogSidebarSelection.all)
             ForEach(viewModel.categories, id: \.self) { category in
                 let subcats = Set(viewModel.entries.filter { $0.category == category }.compactMap { $0.subcategory })
                 if subcats.count >= 2 {
                     DisclosureGroup(category) {
                         ForEach(Array(subcats).sorted(), id: \.self) { sub in
-                            Text(sub).tag(String?.some(category))
+                            Text(sub).tag(CatalogSidebarSelection.subcategory(category: category, name: sub))
                         }
                     }
+                    .tag(CatalogSidebarSelection.category(category))
                 } else {
-                    Text(category).tag(String?.some(category))
+                    Text(category).tag(CatalogSidebarSelection.category(category))
                 }
             }
         }
@@ -111,9 +112,8 @@ public struct BrowseCatalogView<VM: BrowseCatalogViewModelProtocol>: View {
 
     @ViewBuilder
     private func tagChips(theme: JugnuThemeColors) -> some View {
-        let allTags = ["quick-glance", "toggle", "background", "popup-ui", "dev-tool", "recommended"]
         HStack {
-            ForEach(allTags, id: \.self) { tag in
+            ForEach(CatalogTaxonomy.tags, id: \.self) { tag in
                 let selected = viewModel.selectedTags.contains(tag)
                 Text(tag)
                     .font(.caption)

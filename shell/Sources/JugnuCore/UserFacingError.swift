@@ -1,6 +1,18 @@
 import Foundation
 
 public enum UserFacingError {
+    public static let catalogUnreachable = "Couldn’t reach the catalog. Check your connection and try again."
+    public static let catalogInvalid = "The catalog couldn’t be read. Try again later."
+    public static let catalogCachedUnreachable = "Showing cached results — offline or registry unreachable"
+    public static let catalogCachedInvalid = "Showing cached results — the catalog update couldn’t be read."
+
+    public static func cachedCatalogMessage(for failure: RegistryFetchFailure) -> String {
+        switch failure {
+        case .unreachable: return catalogCachedUnreachable
+        case .invalid: return catalogCachedInvalid
+        }
+    }
+
     public static func message(for error: Error) -> String {
         if let loader = error as? ManifestLoaderError {
             switch loader {
@@ -32,10 +44,18 @@ public enum UserFacingError {
                 return "Something went wrong. Try again."
             }
         }
+        if let failure = error as? RegistryFetchFailure {
+            switch failure {
+            case .unreachable: return catalogUnreachable
+            case .invalid: return catalogInvalid
+            }
+        }
         if let registry = error as? RegistryClientError {
             switch registry {
             case .httpStatus:
-                return "Couldn’t reach the catalog. Check your connection and try again."
+                return catalogUnreachable
+            case .invalidCatalog:
+                return catalogInvalid
             }
         }
         return "Something went wrong. Try again."

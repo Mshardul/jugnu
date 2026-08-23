@@ -149,6 +149,11 @@ final class AppModel: ObservableObject {
         return kids.map(\.lastPathComponent).sorted()
     }
 
+    func addonDisplayName(id: String) -> String {
+        let root = paths.addonsDir.appendingPathComponent(id)
+        return (try? ManifestLoader.load(from: root))?.name ?? id
+    }
+
     func saveConfig(_ newConfig: JugnuConfig) throws {
         try store.save(newConfig)
         config = newConfig

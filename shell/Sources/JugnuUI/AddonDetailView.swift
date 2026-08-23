@@ -59,7 +59,10 @@ public struct AddonDetailView: View {
                 }
 
                 Divider()
-                actionRow(theme: theme)
+                AddonActionRow(
+                    isInstalled: isInstalled, isEnabled: isEnabled, isInstalling: isInstalling, theme: theme,
+                    onInstall: onInstall, onEnabledChange: onEnabledChange, onUninstall: onUninstall
+                )
 
                 if let errorMessage {
                     PanelErrorBanner(message: errorMessage)
@@ -68,24 +71,5 @@ public struct AddonDetailView: View {
             .padding(JugnuTokens.Spacing.panelPadding)
         }
         .background(theme.background)
-    }
-
-    @ViewBuilder
-    private func actionRow(theme: JugnuThemeColors) -> some View {
-        HStack {
-            if isInstalled {
-                Button(isEnabled ? "Disable" : "Enable") { onEnabledChange(!isEnabled) }
-                    .tint(isEnabled ? theme.error : theme.accent)
-                Button("Uninstall", action: onUninstall).tint(theme.error)
-            } else if isInstalling {
-                HStack(spacing: 4) {
-                    ProgressView().controlSize(.small)
-                    Text("Installing…")
-                }
-                .foregroundStyle(theme.textSecondary)
-            } else {
-                Button("Install", action: onInstall).tint(theme.accent)
-            }
-        }
     }
 }

@@ -29,8 +29,8 @@ jobs:
       - name: Package addons and build registry
         run: |
           scripts/build-registry.sh dist \
-            "https://github.com/${{ github.repository }}/releases/download/${{ steps.tag.outputs.name }}" \
-            > registry/addons.json
+            "https://github.com/${{ github.repository }}/releases/download/${{ steps.tag.outputs.name }}"
+          scripts/sync-registry-commands.sh
 
       - name: Upload zips to release
         uses: softprops/action-gh-release@v2

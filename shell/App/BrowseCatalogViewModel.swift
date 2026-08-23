@@ -6,14 +6,14 @@ import Combine
 @MainActor
 final class BrowseCatalogViewModel: ObservableObject, BrowseCatalogViewModelProtocol {
     @Published var entries: [RegistryEntry] = []
-    @Published var selectedCategory: String?
+    @Published var selection: CatalogSidebarSelection = .all
     @Published var selectedTags: Set<String> = []
     @Published var searchText: String = ""
-    @Published var staleBanner: Bool = false
+    @Published var staleMessage: String?
     @Published var errorMessage: String?
     @Published var installingIDs: Set<String> = []
 
-    let categories = ["Clipboard", "Focus", "System", "Info", "Notes"]
+    let categories = CatalogTaxonomy.categories
     private let model: AppModel
 
     init(model: AppModel) {
@@ -21,7 +21,13 @@ final class BrowseCatalogViewModel: ObservableObject, BrowseCatalogViewModelProt
     }
 
     var filtered: [RegistryEntry] {
-        filterCatalog(entries: entries, category: selectedCategory, tags: selectedTags, search: searchText)
+        filterCatalog(
+            entries: entries,
+            category: selection.category,
+            subcategory: selection.subcategory,
+            tags: selectedTags,
+            search: searchText
+        )
     }
 
     func isInstalled(_ id: String) -> Bool {
@@ -41,14 +47,14 @@ final class BrowseCatalogViewModel: ObservableObject, BrowseCatalogViewModelProt
         switch result {
         case .fresh(let fetched):
             entries = fetched
-            staleBanner = false
+            staleMessage = nil
             errorMessage = nil
-        case .cached(let cached):
+        case .cached(let cached, let failure):
             entries = cached
-            staleBanner = true
+            staleMessage = UserFacingError.cachedCatalogMessage(for: failure)
             errorMessage = nil
-        case .unavailable:
-            errorMessage = "Couldn’t reach the catalog. Check your connection and try again."
+        case .unavailable(let failure):
+            errorMessage = UserFacingError.message(for: failure)
         }
     }
 

@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
-# usage: scripts/build-registry.sh <dist-dir> <release-base-url> > registry/addons.json
+# usage: scripts/build-registry.sh <dist-dir> <release-base-url>
 #
-# Packages every addons/<id> leaf, then emits registry/addons.json built from
-# the actual zips (real sha256, real version) instead of hand-maintained
-# entries. release-base-url is the GitHub Release download prefix, e.g.
+# Packages every addons/<id> leaf, then writes registry/addons.json from the
+# actual zips (real sha256, real version). Hand-authored catalog fields
+# (category, subcategory, tags, description, commands) are preserved from the
+# existing registry file. Do not redirect stdout onto registry/addons.json —
+# the shell would truncate it before this script can read those fields.
+#
+# release-base-url is the GitHub Release download prefix, e.g.
 # https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0
 
 if [[ $# -ne 2 ]]; then
@@ -16,6 +20,13 @@ dist_dir=$1
 release_base_url=$2
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 repo_root="$(cd "$script_dir/.." && pwd)"
+registry_file="$repo_root/registry/addons.json"
+
+if [[ ! -s "$registry_file" ]]; then
+  echo "$0: $registry_file is missing or empty; cannot preserve category/tags/description/commands" >&2
+  echo "Do not redirect stdout onto registry/addons.json." >&2
+  exit 1
+fi
 
 mkdir -p "$dist_dir"
 dist_dir=$(cd "$dist_dir" && pwd)
@@ -72,6 +83,8 @@ JSON
   entries+=("$entry")
 done
 
+new_json=$(mktemp)
+trap 'rm -f "$new_json"' EXIT
 {
   echo "["
   for i in "${!entries[@]}"; do
@@ -82,4 +95,33 @@ done
     fi
   done
   echo "]"
-}
+} > "$new_json"
+
+python3 - "$registry_file" "$new_json" <<'PYEOF'
+import json, sys
+
+registry_file, new_file = sys.argv[1], sys.argv[2]
+new_entries = json.loads(open(new_file).read())
+existing = json.loads(open(registry_file).read())
+by_id = {entry["id"]: entry for entry in existing}
+preserve = ("category", "subcategory", "tags", "description", "commands")
+missing = []
+for entry in new_entries:
+    old = by_id.get(entry["id"], {})
+    for key in preserve:
+        if key in old:
+            entry[key] = old[key]
+    if not entry.get("category"):
+        missing.append(entry["id"])
+if missing:
+    sys.stderr.write(
+        "build-registry: missing category for: " + ", ".join(missing) + "\n"
+        "Add category (and optional subcategory/tags/description) in "
+        "registry/addons.json before rebuilding.\n"
+    )
+    sys.exit(1)
+with open(registry_file, "w") as handle:
+    json.dump(new_entries, handle, indent=2)
+    handle.write("\n")
+PYEOF
+

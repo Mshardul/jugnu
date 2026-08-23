@@ -45,7 +45,9 @@ struct PrefsView: View {
                         )
                         .labelsHidden()
                         Button("Uninstall") {
-                            AddonUninstallPresenter.present(id: id, name: id, model: model) {
+                            AddonUninstallPresenter.present(
+                                id: id, name: model.addonDisplayName(id: id), model: model
+                            ) {
                                 reload()
                             }
                         }
@@ -111,6 +113,9 @@ struct PrefsView: View {
         .frame(minWidth: 480, minHeight: 520)
         .background(theme.background)
         .onAppear(perform: reload)
+        .onChange(of: model.statusMessage) { _, value in
+            if let value { errorText = value }
+        }
     }
 
     private var soundBinding: Binding<Bool> {

@@ -75,6 +75,37 @@ public final class UIHostController {
         }
     }
 
+    /// Host a confirm panel that is not an addon follow-up (e.g. uninstall).
+    /// Uses the same active panel + trace hooks as addon-driven confirms.
+    public func presentConfirm(
+        ui: UIDescriptor,
+        commandId: String,
+        onConfirm: @escaping () throws -> Void
+    ) {
+        dismissActive(markDismiss: false)
+        activeTrace = InvokeTrace(commandId: commandId)
+        let panel = ConfirmPanel(
+            ui: ui,
+            onConfirm: { [weak self] in
+                do {
+                    try onConfirm()
+                    self?.dismissActive()
+                } catch {
+                    self?.presentError?(UserFacingError.message(for: error))
+                    playCommandSound(success: false)
+                }
+            },
+            onCancel: { [weak self] in
+                self?.dismissActive()
+            }
+        )
+        activePanel = panel
+        presentError = { [weak panel] message in panel?.presentError(message) }
+        panel.orderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+        markPaintAndContent()
+    }
+
     private func markFirstPaint() {
         activeTrace?.markFirstPaint()
     }

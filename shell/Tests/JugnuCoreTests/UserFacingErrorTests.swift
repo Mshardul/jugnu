@@ -25,6 +25,22 @@ final class UserFacingErrorTests: XCTestCase {
 
     func testRegistryClientHTTPStatusMapsToFriendlyMessage() {
         let message = UserFacingError.message(for: RegistryClientError.httpStatus(500))
-        XCTAssertEqual(message, "Couldn’t reach the catalog. Check your connection and try again.")
+        XCTAssertEqual(message, UserFacingError.catalogUnreachable)
+    }
+
+    func testRegistryInvalidCatalogDoesNotLookLikeNetworkFailure() {
+        XCTAssertEqual(
+            UserFacingError.message(for: RegistryClientError.invalidCatalog),
+            UserFacingError.catalogInvalid
+        )
+        XCTAssertEqual(
+            UserFacingError.message(for: RegistryFetchFailure.invalid),
+            UserFacingError.catalogInvalid
+        )
+        XCTAssertEqual(
+            UserFacingError.message(for: RegistryFetchFailure.unreachable),
+            UserFacingError.catalogUnreachable
+        )
+        XCTAssertNotEqual(UserFacingError.catalogInvalid, UserFacingError.catalogUnreachable)
     }
 }

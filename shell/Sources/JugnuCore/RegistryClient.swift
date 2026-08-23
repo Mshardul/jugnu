@@ -68,10 +68,15 @@ public struct RegistryClient: Sendable {
         if let http = response as? HTTPURLResponse, !(200...299).contains(http.statusCode) {
             throw RegistryClientError.httpStatus(http.statusCode)
         }
-        return try JSONDecoder().decode([RegistryEntry].self, from: data)
+        do {
+            return try JSONDecoder().decode([RegistryEntry].self, from: data)
+        } catch {
+            throw RegistryClientError.invalidCatalog
+        }
     }
 }
 
 public enum RegistryClientError: Error, Equatable {
     case httpStatus(Int)
+    case invalidCatalog
 }
