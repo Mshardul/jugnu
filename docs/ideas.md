@@ -19,3 +19,11 @@ Replace the current text-only skeleton (`Loading {pattern}…`) with layout-shap
 **Origin:** raised during the 2026-08-23 palette + addon UI product pass. Explicitly deferred — the epic locked a SwiftUI rewrite of those panels and a shared token set; shaping the skeleton against the *final* layouts is cheaper as a fast-follow than guessing shapes while the panels were still moving.
 
 **Depends on:** that epic’s List / Form / Confirm layouts staying put (tokens, borderless chrome, in-content titles).
+
+## Liquid Glass / Tahoe material chrome on the launcher
+
+Apple’s current glass (`glassEffect` / `NSGlassEffectView`, macOS 26) for the Option+Space panel: glass as **shell chrome**, Firefly / Phosphor / Rose Quartz as the **tint inside**, Reduce Transparency falling back to today’s opaque tokens. Not full-glass cards/sidebar.
+
+**Origin:** raised while locking [shell surface presets](architecture/2026-08-23-shell-surface-presets.md) (ticket 0008). Explicitly deferred — deployment is still macOS 14; real Liquid Glass is 26; identity risk if glass replaces Firefly instead of sitting under it. Revisit after 0008’s one-panel + preset model is real, not before.
+
+**Depends on:** 0008 landing (one morphing panel exists to put glass on).

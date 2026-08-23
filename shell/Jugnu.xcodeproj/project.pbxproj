@@ -10,11 +10,13 @@
 		0C269B59DB0AD928393F514F /* JugnuApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFC6769799C763B68AB9458E /* JugnuApp.swift */; };
 		2EF413B28BA833B1BA5D290B /* PrefsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F65D4A1078835B0D1646C28 /* PrefsView.swift */; };
 		31B5452F7928667E746030F0 /* PalettePanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72943E054458D32AFC64B830 /* PalettePanelController.swift */; };
+		548EE8613579A3EE86FFEA1F /* BrowseCatalogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E828A6B867A511A83ECEBC3 /* BrowseCatalogViewModel.swift */; };
 		A1EBD9F94A85D7D3946C0860 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EF23787A5713452BFF2A17F8 /* Assets.xcassets */; };
 		AC65EF4AD2F34CBB13F2E6F9 /* HotKey in Frameworks */ = {isa = PBXBuildFile; productRef = 7EEF6C210640E38020837ACD /* HotKey */; };
 		AD78C530AE4729B3D27FE654 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D00E1FEF0969F288E08FF6 /* AppModel.swift */; };
 		CF46D9EC5366F66E608B763D /* MenuBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE92CF58DD3BE972D2AEC8CB /* MenuBarController.swift */; };
 		CFFE550ED2B1ABABCBF8B52D /* HotkeyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 278F0380D93A6EEE31AD2C2F /* HotkeyController.swift */; };
+		D075254A62556C0A795B0DAB /* AddonUninstallPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7827A8A356F9392C623B554 /* AddonUninstallPresenter.swift */; };
 		D3584E6337F9B4D089C8193E /* JugnuCore in Frameworks */ = {isa = PBXBuildFile; productRef = 24FB2BFFCBA284CE5BC001B6 /* JugnuCore */; };
 		D46018A13E56874B0C944D88 /* JugnuUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5EA3A420B1701DCC99B5E95F /* JugnuUI */; };
 		F8BD7FCD72AE22D31DA008F7 /* FirstRunWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E983F2778775352830C719C /* FirstRunWindow.swift */; };
@@ -22,9 +24,11 @@
 
 /* Begin PBXFileReference section */
 		278F0380D93A6EEE31AD2C2F /* HotkeyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyController.swift; sourceTree = "<group>"; };
+		4E828A6B867A511A83ECEBC3 /* BrowseCatalogViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowseCatalogViewModel.swift; sourceTree = "<group>"; };
 		5E983F2778775352830C719C /* FirstRunWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstRunWindow.swift; sourceTree = "<group>"; };
 		72943E054458D32AFC64B830 /* PalettePanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PalettePanelController.swift; sourceTree = "<group>"; };
 		8F65D4A1078835B0D1646C28 /* PrefsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefsView.swift; sourceTree = "<group>"; };
+		A7827A8A356F9392C623B554 /* AddonUninstallPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddonUninstallPresenter.swift; sourceTree = "<group>"; };
 		BE92CF58DD3BE972D2AEC8CB /* MenuBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarController.swift; sourceTree = "<group>"; };
 		C5935023FD7BC462A1C14B9A /* shell */ = {isa = PBXFileReference; lastKnownFileType = folder; name = shell; path = .; sourceTree = SOURCE_ROOT; };
 		C92B9A72BEBE9AA2C83556D4 /* Jugnu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Jugnu.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -66,8 +70,10 @@
 		F57367362B9A9A9EFD13E750 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				A7827A8A356F9392C623B554 /* AddonUninstallPresenter.swift */,
 				D3D00E1FEF0969F288E08FF6 /* AppModel.swift */,
 				EF23787A5713452BFF2A17F8 /* Assets.xcassets */,
+				4E828A6B867A511A83ECEBC3 /* BrowseCatalogViewModel.swift */,
 				5E983F2778775352830C719C /* FirstRunWindow.swift */,
 				278F0380D93A6EEE31AD2C2F /* HotkeyController.swift */,
 				EFC6769799C763B68AB9458E /* JugnuApp.swift */,
@@ -162,7 +168,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D075254A62556C0A795B0DAB /* AddonUninstallPresenter.swift in Sources */,
 				AD78C530AE4729B3D27FE654 /* AppModel.swift in Sources */,
+				548EE8613579A3EE86FFEA1F /* BrowseCatalogViewModel.swift in Sources */,
 				F8BD7FCD72AE22D31DA008F7 /* FirstRunWindow.swift in Sources */,
 				CFFE550ED2B1ABABCBF8B52D /* HotkeyController.swift in Sources */,
 				0C269B59DB0AD928393F514F /* JugnuApp.swift in Sources */,

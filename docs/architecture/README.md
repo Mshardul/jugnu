@@ -16,7 +16,8 @@ Architecture decisions are recorded in [decisions/](decisions/). Future-work tic
 | Addons packaging (detail) | Follow-on if needed beyond shell spec §2 |
 | Catalog taxonomy (categories ↔ addons / commands) | Product intent in [vision — Catalog hierarchy](../vision.md); registry `category` field TBD |
 | Persistent latency logging | Future epic — [ticket 0001](../tickets.md); JSON-lines, capped retention, timing/ids only, no payload |
-| Addon management / settings (browse, catalog, Preferences redesign) | Future epic — [ticket 0002](../tickets.md) |
+| Addon management / settings (browse, catalog, Preferences redesign) | Taxonomy/install: [ticket 0002](../tickets.md). Chrome: [ticket 0008](../tickets.md) — [one panel, presets, stack](./2026-08-23-shell-surface-presets.md). Slices: [0005](../tickets.md)–[0007](../tickets.md), [0009](../tickets.md)–[0012](../tickets.md) |
+| Shell surface (one panel, presets, stack) | Draft — [2026-08-23 spec](./2026-08-23-shell-surface-presets.md) · [ticket 0008](../tickets.md) |
 | Security audit (installer/runner/registry-trust hardening) | Future epic — [ticket 0003](../tickets.md); seeded with a real zip-slip finding in `AddonInstaller.unzip()` |
 | Clipboard | Later |
 | Window management | Later |

@@ -14,7 +14,7 @@ Status legend for staged leaves: **active** = runnable code; **stub** = README o
 | 6 | Context-aware UI (later) | Reserved in UI + speed §7 — after UI host exists |
 | 7 | Palette + addon UI **product pass** | [2026-08-23 spec](architecture/2026-08-23-palette-ui-product-pass.md) · [plan](superpowers/plans/2026-08-23-palette-ui-product-pass.md) — search quality, AppKit→SwiftUI panel rewrite onto shared design tokens, user-editable light/dark theming, keyboard/motion accessibility, first-run recommended-set refresh, live-verification suite. **Implemented; walk [shell-smoke.md](architecture/shell-smoke.md)** |
 | 8 | Persistent latency logging (future epic) | [Ticket 0001](tickets.md) — JSON-lines, capped retention, timing/ids only, never payload |
-| 9 | Addon management / settings (future epic) | [Ticket 0002](tickets.md) — Preferences redesign, catalog browse, category taxonomy surfaced in-app |
+| 9 | Addon management / settings (future epic) | [Ticket 0002](tickets.md) taxonomy/install. Chrome: [0008](tickets.md) ([one panel, presets, stack](architecture/2026-08-23-shell-surface-presets.md)). Slices [0005](tickets.md)–[0007](tickets.md), [0009](tickets.md)–[0012](tickets.md) |
 | 10 | Security audit (future epic) | [Ticket 0003](tickets.md) — seeded with a real zip-slip finding in `AddonInstaller.unzip()`; expect more findings from a full pass on installer/runner/registry-trust |
 
 **Canonical product surfaces:** [`docs/vision.md`](vision.md) — commands + popup UI + speed; context-aware surfacing later.
@@ -112,7 +112,7 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | System | **speak-clip** | speak clipboard / stop | Own a11y job |
 | System | **nudges** | **eye-rest**, **water-nudge**, **stretch-nudge** (same timer shell; different copy/art/GIF per kind) | One wellness nudge addon |
 | System | **time-machine** | status / start backup / open Time Machine | Own |
-| System | **floating-note** (staged) | + **note-pin** | First-party note QoL |
+| System | **floating-note** (staged) | `open` (scratchpad, persist on close/quit), **quick-note** (throwaway; close discards), **note-pin** | One note addon: persistent scratchpad vs session scrap; pin is chrome QoL |
 | System | **world-clock** (staged) | + **world-overlap** | Clocks + meeting overlap |
 | System | **pomodoro** (staged) | **pomodoro-skip**, extend, log interruption (+ other session controls) | Focus timer forms |
 | Security | **password-gen** | random password; **password-options** (passphrase / PIN / exclude-ambiguous / copy-once / …) | Own — not under play |
@@ -304,6 +304,7 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | stretch-nudge | Stand/stretch reminder | **nudges** |
 | time-machine | Status / start backup / open Time Machine | Own addon |
 | note-pin | Pin floating note above other windows | **floating-note** |
+| quick-note | Throwaway floating note: close / Cmd+W discards; nothing survives quit or reopen | **floating-note** — not its own zip; shell `note` pattern `persist: false`. Scratchpad stays `open` (`persist: true`) |
 | world-overlap | Overlap helper for “when is 9–10 across cities?” | **world-clock** |
 | pomodoro-skip | Skip / extend / log interruption (+ other session controls) | **pomodoro** |
 
@@ -349,7 +350,7 @@ versions here stay as reference implementations, not shipped.
 | clipboard-history | graduated → `addons/clipboard-history` | Background launchd watcher + sqlite3 CLI store; list UI, copy-back |
 | battery-eta | graduated → `addons/battery-eta` | `pmset` parse; toast |
 | brew-outdated | graduated → `addons/brew-outdated` | JXA (`osascript -l JavaScript`) for real JSON parsing; list UI |
-| floating-note | graduated → `addons/floating-note` | New `note` UI pattern (always-on-top editable panel) added to `JugnuCore`/`JugnuUI` for this |
+| floating-note | graduated → `addons/floating-note` | `note` UI pattern (always-on-top editable panel). Shipped command is persist-on-close scratchpad (`open`). Backlog: **quick-note** (ephemeral) + **note-pin** |
 | pomodoro | graduated → `addons/pomodoro` | Fire-and-forget background timer + notification; state file |
 | weather-bar | graduated → `addons/weather-bar` | `curl` + Open-Meteo; toast |
 | world-clock | graduated → `addons/world-clock` | Fixed zone list in script; list UI |

@@ -16,6 +16,8 @@ The project has not published a release yet. Entries currently describe unreleas
 
 ### Documentation
 
+- 2026-08-23 — Drafted the one-panel / preset / stack shell-surface epic (ticket 0008) and filed 0009–0012 from Browse Addons smoke; parked Liquid Glass in ideas.
+- 2026-08-23 — Filed tickets 0005–0007 for Browse Addons palette empty/keyboard, catalog state/errors, and catalog visual follow-up.
 - 2026-08-22 — Documented latency as a product requirement with budgets, non-blocking work, instrumentation, and responsiveness testing.
 - 2026-08-22 — Added contributor, addon release, changelog, SwiftFormat, and SwiftLint conventions.
 - 2026-08-22 — Added addon manifest validation, architecture decisions, contribution templates, security guidance, and a data privacy policy.
