@@ -42,6 +42,8 @@ public enum UserFacingError {
                 return "The addon didn’t return a result we could use."
             case .unsupportedEntrypointKind:
                 return "This addon can’t run on this Mac."
+            case .helperMissing:
+                return "This addon is missing a helper. Try reinstalling it."
             }
         }
         if let installer = error as? AddonInstallerError {
@@ -50,7 +52,11 @@ public enum UserFacingError {
                 return "The download didn’t match what we expected. Nothing was installed."
             case .missingURL:
                 return "No download location is listed for this addon."
-            case .idMismatch, .addonYAMLMissing, .unzipFailed:
+            case .helperUnreachable:
+                return "Couldn’t download the helper. Check your connection and try again."
+            case .helperNotInCatalog:
+                return "This addon needs a helper that isn’t in the catalog."
+            case .idMismatch, .addonYAMLMissing, .unzipFailed, .helperYAMLMissing, .helperManifestMismatch:
                 return "Something went wrong. Try again."
             }
         }

@@ -31,6 +31,33 @@ cleanup:
 - `entrypoint.path`: relative path to the entrypoint; absolute paths and parent traversal are forbidden.
 - `cleanup`: declared addon-owned paths and launchd labels to remove on disable or uninstall.
 
+## Helpers
+
+Optional. A **helper** is shared runtime the user would not install alone (vision rule 4). It is **not** a catalog addon and **not** an enable key. Do not copy helper code into each addon zip. An in-zip binary (e.g. window-layouts AX exec) is not a Helper.
+
+```yaml
+helpers:
+  - id: play-runtime
+    version: 1.0.0
+```
+
+Omit `helpers` when the addon needs none. Distinct from catalog-addon `dependencies` ([ticket 0025](tickets.md)).
+
+| Rule | Lock |
+|---|---|
+| **Declare** | Exact `id` + three-part `version`. No ranges in v0. |
+| **On disk** | `~/.local/share/jugnu/helpers/<id>/<version>/` (addons stay under `addons/<id>/`). |
+| **When** | Installing an addon: download any listed helper version that is not already on disk. A later addon that lists the same `id`+`version` reuses it. |
+| **Trust** | Same as addons: registry URL + sha256, then unpack. Addons never fetch helper URLs. Signing follows [0003](tickets.md). |
+| **Catalog** | Helpers live in `registry/helpers.json`, **not** `addons.json`. Browse Catalog does not list them. No enable key in `jugnu.yaml`. |
+| **Run** | For each declared helper, the runner sets `JUGNU_HELPER_<ID>` to that version’s directory (`id` hyphens → underscores, then uppercase: `play-runtime` → `JUGNU_HELPER_PLAY_RUNTIME`). |
+| **Offline** | Missing helper and download fails → install or invoke fails with a plain connection error and Retry. Do not hang. |
+| **Uninstall** | Removing an addon deletes a helper version only if **no remaining installed addon** lists that `id`+`version`. Other versions stay. |
+
+Helper zip: `helper.yaml` at the root (`id`, `version` — no `commands`, no enable). Unpack into the version directory above.
+
+Play addons wait on this plumbing ([ticket 0047](tickets.md)). Bundles are [0048](tickets.md).
+
 ## View types
 
 Shell-owned viewport ids. Do **not** add `width`, `height`, or `percent` fields.

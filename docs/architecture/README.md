@@ -15,6 +15,8 @@ Architecture decisions are recorded in [decisions/](decisions/). Future-work tic
 | Context-aware UI (screen/selection) | Later — reserved in UI+speed §7 |
 | Addons packaging (detail) | Follow-on if needed beyond shell spec §2 |
 | Catalog taxonomy (categories ↔ addons / commands) | Product intent in [vision — Catalog hierarchy](../vision.md); registry `category` field TBD |
+| Shared helpers | Implemented in Core — [addon manifest — Helpers](../addon-manifest.md#helpers) · [ticket 0047](../tickets.md). Empty `registry/helpers.json` until a real helper ships. Catalog-addon deps stay [0025](../tickets.md). |
+| Catalog bundles | Deferred separate epic — [ticket 0048](../tickets.md). Vision rule 5 user model only; more product discussion required. |
 | Persistent latency logging | Future epic — [ticket 0001](../tickets.md); JSON-lines, capped retention, timing/ids only, no payload |
 | Addon management / settings (browse, catalog, Preferences redesign) | Taxonomy/install: [ticket 0002](../tickets.md). Chrome: [ticket 0008](../tickets.md) — [one panel, presets, stack](./2026-08-23-shell-surface-presets.md). Slices: [0005](../tickets.md)–[0007](../tickets.md), [0009](../tickets.md)–[0012](../tickets.md) |
 | Shell surface (one panel, presets, stack) | Done — [2026-08-23 spec](./2026-08-23-shell-surface-presets.md) · [ticket 0008](../tickets.md) |

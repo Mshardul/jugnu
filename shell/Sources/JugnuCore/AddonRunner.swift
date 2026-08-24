@@ -13,7 +13,8 @@ public struct AddonRunner: Sendable {
         commandId: String,
         args: [String: JSONValue] = [:],
         context: [String: JSONValue]? = [:],
-        timeout: TimeInterval? = nil
+        timeout: TimeInterval? = nil,
+        paths: JugnuPaths? = nil
     ) throws -> RunResponse {
         let request = RunRequest(
             api: 1,
@@ -22,19 +23,39 @@ public struct AddonRunner: Sendable {
             args: args,
             context: context
         )
+        let extra = try Self.helperEnvironment(manifest: manifest, paths: paths)
         return try run(
             addonRoot: addonRoot,
             entrypoint: manifest.entrypoint,
             request: request,
-            timeout: timeout ?? timeoutSeconds
+            timeout: timeout ?? timeoutSeconds,
+            extraEnvironment: extra
         )
+    }
+
+    public static func helperEnvironment(manifest: AddonManifest, paths: JugnuPaths?) throws -> [String: String] {
+        guard !manifest.helpers.isEmpty else { return [:] }
+        guard let paths else {
+            throw AddonRunnerError.helperMissing("paths")
+        }
+        var env: [String: String] = [:]
+        for ref in manifest.helpers {
+            let root = paths.helperRoot(id: ref.id, version: ref.version)
+            let yaml = root.appendingPathComponent("helper.yaml")
+            guard FileManager.default.fileExists(atPath: yaml.path) else {
+                throw AddonRunnerError.helperMissing(ref.id)
+            }
+            env[ref.environmentVariable] = root.path
+        }
+        return env
     }
 
     public func run(
         addonRoot: URL,
         entrypoint: Entrypoint,
         request: RunRequest,
-        timeout: TimeInterval
+        timeout: TimeInterval,
+        extraEnvironment: [String: String] = [:]
     ) throws -> RunResponse {
         let entry = addonRoot.appendingPathComponent(entrypoint.path)
         let process = Process()
@@ -60,6 +81,13 @@ public struct AddonRunner: Sendable {
         process.standardInput = stdin
         process.standardOutput = stdout
         process.standardError = stderr
+        if !extraEnvironment.isEmpty {
+            var env = ProcessInfo.processInfo.environment
+            for (key, value) in extraEnvironment {
+                env[key] = value
+            }
+            process.environment = env
+        }
 
         let requestData = try RunJSON.encodeRequest(request)
 
@@ -95,4 +123,5 @@ public enum AddonRunnerError: Error, Equatable {
     case unsupportedEntrypointKind(String)
     case timeout
     case invalidResponse
+    case helperMissing(String)
 }

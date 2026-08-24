@@ -98,12 +98,14 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
         state.recordRecent(qualifiedId: command.qualifiedId)
         try? stateStore.save(state)
         let manifest = try ManifestLoader.load(from: command.addonRoot)
-        let execute: () async throws -> RunResponse = { [runner] in
+        let execute: () async throws -> RunResponse = { [runner, installer, paths] in
             try await Task.detached {
+                try await installer.ensureHelpers(for: manifest)
                 let response = try runner.run(
                     manifest: manifest,
                     addonRoot: command.addonRoot,
-                    commandId: command.commandId
+                    commandId: command.commandId,
+                    paths: paths
                 )
                 return try response.resolvingView(
                     commandView: command.defaultViewType,
@@ -111,13 +113,16 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
                 )
             }.value
         }
-        let followUp: (RunRequest) async throws -> RunResponse = { [runner] request in
+        let followUp: (RunRequest) async throws -> RunResponse = { [runner, installer, paths] request in
             try await Task.detached {
+                try await installer.ensureHelpers(for: manifest)
+                let env = try AddonRunner.helperEnvironment(manifest: manifest, paths: paths)
                 let response = try runner.run(
                     addonRoot: command.addonRoot,
                     entrypoint: manifest.entrypoint,
                     request: request,
-                    timeout: runner.timeoutSeconds
+                    timeout: runner.timeoutSeconds,
+                    extraEnvironment: env
                 )
                 return try response.resolvingView(
                     commandView: command.defaultViewType,
@@ -169,6 +174,8 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
                 if localAddonRoots.isEmpty { throw error }
                 for root in localAddonRoots {
                     try installer.installFromDirectory(url: root, enable: true)
+                    let manifest = try ManifestLoader.load(from: root)
+                    try await installer.ensureHelpers(for: manifest)
                 }
                 statusMessage = "Couldn’t reach the catalog, so the starter addons were copied from this Mac."
             }

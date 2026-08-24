@@ -17,7 +17,7 @@ Coding standards: [docs/conventions.md](docs/conventions.md). Product intent: [d
 
 ## Addon packaging (user POV)
 
-Canonical product intent: [docs/vision.md](docs/vision.md) → **Catalog hierarchy**. Use product terms only: **Addon**, **Commands**, **UI**, **Category** (definitions in [docs/conventions.md](docs/conventions.md#vocabulary)).
+Canonical product intent: [docs/vision.md](docs/vision.md) → **Catalog hierarchy**. Use product terms only: **Addon**, **Commands**, **UI**, **Category**, **Helper**, **Bundle** (definitions in [docs/conventions.md](docs/conventions.md#vocabulary)).
 
 When proposing or accepting addons:
 
@@ -26,8 +26,10 @@ When proposing or accepting addons:
 - Club similar converters/formatters as **commands** (and shared UI) on one addon — never one zip per “JSON→CSV”, “CSV→Excel”, etc.
 - Don’t merge unrelated settings into one zip just because they are toggles; split by user mental model.
 - If two addons share something significant enough in common:
-  - **User would want it alone** → make it **its own addon**.
-  - **User would not** → **shared file(s)** included in each consuming zip at package time (not a registry product).
+  - **User would want it alone** → make it **its own addon** (consumer declares a dependency).
+  - **User would not** → a **helper**: shell downloads it the first time an addon needs it; later addons reuse the cache. Not copied into each zip. Not a catalog product.
+- **Bundle** = optional multi-addon download, not a fourth catalog level. Enable/uninstall stay per addon.
+- **Play** is a **category** of individual addons (dice-roll, hangman, …), not one shelf zip.
 - Treat **popup UI + speed** as part of every job — not CLI-only scripts. Context-aware “right UI for what’s on screen” is a later platform capability; still design addons as UI-ready.
 - **View types:** the shell owns the viewport catalog ([view types](docs/architecture/2026-08-24-view-types.md)). Addons allow-list ids; they do not ship pixels or percents.
 - **Window family:** one zip `window-layouts` ([spec](docs/architecture/2026-08-24-window-layouts.md)). Zones only (max 6), no undo, no scenes. AX-first; SIP stays on.

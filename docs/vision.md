@@ -52,7 +52,7 @@ Think like a user browsing Jugnu, not like a repo of one-line scripts.
 | Level | What the user sees | Ship / install unit | Example |
 |---|---|---|---|
 | **Category** | Browse/group in the app (and registry) | Taxonomy only — not a zip | Clipboard, Meeting, Appearance, Converters, Play |
-| **Addon** | An installable tool with a clear job (commands **and/or** popup UI) | **One zip** / one YAML enable key | Dark Mode, Clip Tools, Unit Convert, Play Shelf |
+| **Addon** | An installable tool with a clear job (commands **and/or** popup UI) | **One zip** / one YAML enable key | Dark Mode, Clip Tools, Unit Convert, Dice Roll |
 | **Commands** | Actions inside that addon (palette / menu entries) | `commands` in `addon.yaml` — not their own zip | Toggle appearance; Format JSON; JSON → CSV; Roll 2d6 |
 | **UI** | Panels, pickers, forms, previews for that addon | Part of the same zip — not a separate product | Process list sorter; emoji search; layout picker; nudge card |
 
@@ -62,13 +62,13 @@ Think like a user browsing Jugnu, not like a repo of one-line scripts.
 2. **Same shape of work → multiple commands on one addon.** Converters/formatters belong together (JSON pretty/minify, JSON ↔ CSV, Base64, slugify, timestamps, …) — not a separate zip per transformation. Same for sibling **UI** flows on that job.
 3. **Do not club unrelated jobs** just because they are all “toggles” or all “small.” Dock autohide and mic mute are different user jobs; split or group only when a user would expect one tool.
 4. **Shared capability between addons — pick one:**
-   - If the user would want that capability **on its own** → it is (or becomes) **its own addon**; other addons depend on / invoke it, or the user installs both.
-   - If the user would **not** need it as a separate installable → keep it as **shared source** that is **copied/included into each consuming addon’s zip** at package time (not a hidden second product in the registry).
-5. Shell **search** lists commands; **install / enable** is per addon; **browse** can use categories; addon **UI** opens from command, hotkey, menu bar, or (later) context.
+   - If the user would want that capability **on its own** → it is (or becomes) **its own addon**; other addons declare it as a dependency. Missing addons install with the consumer; **enable stays manual** per addon.
+   - If the user would **not** need it as a separate installable → it is a **helper**: first-party, versioned, signed like addons; **not** a catalog product and **not** an enable key. Addons declare the helper. The **shell/installer** downloads it the first time an addon needs it and **reuses** the cached copy for later addons. Addons never fetch helper URLs themselves. Do **not** copy helper code into each zip. Version ranges, last-consumer cleanup, and offline failure are installer plumbing ([ticket 0047](tickets.md)).
+5. Shell **search** lists commands; **install / enable** is per addon; **browse** can use categories; addon **UI** opens from command, hotkey, menu bar, or (later) context. An optional **bundle** is a download grouping only — one click may install several addons; it is not a zip, not an enable key, and not a fourth catalog level. Uninstall/disable stay per addon.
 6. **Name the job** in ids/titles — what the user searches for — not the scenario you pictured while inventing it (`mute-all`, not `call-mute-all`).
 7. **UI + speed are part of the job.** A backlog accept is not “ship a silent script”; plan the popup/panel and keep interaction snappy. Context-aware popups come after the shell can host addon UI reliably.
 
-Category names and exact addon boundaries can evolve; Category → Addon → Commands/UI should not. Shared-code packaging (rule 4) is locked intent; exact build plumbing can follow later.
+Category names and exact addon boundaries can evolve; Category → Addon → Commands/UI should not. Helpers (rule 4) and bundles (rule 5) are install plumbing, not extra catalog levels. Exact helper/bundle mechanics follow in tickets; the user model above is locked.
 
 ## Relationship to Tools
 

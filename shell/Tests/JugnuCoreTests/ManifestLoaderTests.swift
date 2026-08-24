@@ -135,4 +135,39 @@ final class ManifestLoaderTests: XCTestCase {
             XCTAssertEqual(error as? ManifestLoaderError, .commandViewNotAllowed(command: "x", view: "board"))
         }
     }
+
+    func testLoadsDeclaredHelpers() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+
+        let yaml = """
+        id: dice-roll
+        name: Dice Roll
+        version: 1.0.0
+        api: 1
+        helpers:
+          - id: play-runtime
+            version: 1.0.0
+        commands:
+          - id: roll
+            title: Roll
+        entrypoint:
+          kind: exec
+          path: bin/run
+        """
+        try yaml.write(to: dir.appendingPathComponent("addon.yaml"), atomically: true, encoding: .utf8)
+        let m = try ManifestLoader.load(from: dir)
+        XCTAssertEqual(m.helpers, [HelperRef(id: "play-runtime", version: "1.0.0")])
+        XCTAssertEqual(m.helpers[0].environmentVariable, "JUGNU_HELPER_PLAY_RUNTIME")
+    }
+
+    func testOmitsHelpersWhenAbsent() throws {
+        let root = try XCTUnwrap(
+            Bundle.module.url(forResource: "addon", withExtension: "yaml", subdirectory: "Fixtures/mic-mute")?
+                .deletingLastPathComponent()
+        )
+        let m = try ManifestLoader.load(from: root)
+        XCTAssertEqual(m.helpers, [])
+    }
 }

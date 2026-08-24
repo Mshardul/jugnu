@@ -27,6 +27,8 @@ Use product terms only:
 | **Addon** | One installable zip and one enable key. Commands and/or popup UI for one job. |
 | **Commands** | Palette / menu actions inside that addon (`addon.yaml` `commands`). |
 | **UI** | Panels, pickers, forms, previews for that addon (same zip). |
+| **Helper** | Shared runtime a user would not install alone. Not a catalog product, not an enable key. Shell downloads once, later addons reuse. See [vision](vision.md) packaging rule 4. |
+| **Bundle** | Optional one-click download of several addons. Not a zip, not an enable key, not a catalog level. |
 | **View type** | Shell-owned viewport id (`seek`, `palette`, `ask`, `fields`, `rows`, `grid`, `board`, `spread`, `canvas`, `rail`). Size band + panel aspect + dismiss rules. Not pixels. Catalog: [view types](architecture/2026-08-24-view-types.md). |
 | **Zone** | Named saved **geometry** on `window-layouts` (max 6). Not occupancy. Not undo. |
 

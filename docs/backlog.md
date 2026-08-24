@@ -38,8 +38,8 @@ Not yet staged as leaves. Candidates after shell MVP:
 
 Accepted for backlog — still **not** scaffolded. Build later.
 
-**Canonical rules:** [`docs/vision.md`](vision.md) — *Catalog hierarchy* (Category → Addon → Commands/UI), **shared-capability rule**, and **Surfaces** (popup UI + speed; context later).
-Ids below are **capability / job ids**; several become **commands and UI** on one **addon** zip. Do not treat every row as its own zip — and do not treat rows as CLI-only.
+**Canonical rules:** [`docs/vision.md`](vision.md) — *Catalog hierarchy* (Category → Addon → Commands/UI; **Helper** / **Bundle** are install plumbing), **shared-capability rule**, and **Surfaces** (popup UI + speed; context later).
+Ids below are **capability / job ids**; several become **commands and UI** on one **addon** zip. Do not treat every row as its own zip — and do not treat rows as CLI-only. Play ids are the exception: each is its own addon under the Play category.
 
 ### Packaging map (preferred addon → commands)
 
@@ -116,7 +116,7 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | System | **world-clock** (staged) | + **world-overlap** | Clocks + meeting overlap |
 | System | **pomodoro** (staged) | **pomodoro-skip**, extend, log interruption (+ other session controls) | Focus timer forms |
 | Security | **password-gen** | random password; **password-options** (passphrase / PIN / exclude-ambiguous / copy-once / …) | Own — not under play |
-| Play | **play** | dice-roll, coin-flip, pick-one, number-guess, hangman, eight-ball, chess-clock, rps, stopwatch, memory, breathing, reaction-time, tic-tac-toe, fortune | Fun shelf |
+| Play | *(each id its own zip)* | dice-roll, coin-flip, pick-one, number-guess, hangman, eight-ball, chess-clock, rps, stopwatch, memory, breathing, reaction-time, tic-tac-toe, fortune | Play is a **category**, not one shelf. Shared RNG/timer code is a **helper** ([0047](tickets.md)) — ship that before any Play zip. **Bundles** later ([0048](tickets.md)); 14 separate catalog rows is fine until then. |
 | Design | **sf-symbols** | pick/copy | Solo for now |
 | Design | **design-calc** | type-scale, rem-px, **aspect-ratio** (+ spacing-scale and other design math) | Design math shelf |
 | Design | **color-eyedropper** (staged) | + color-format | Eyedropper + hex/SwiftUI format commands |
@@ -285,7 +285,7 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | kitchen-timer | One-shot countdown + chime | Standalone; ≠ pomodoro; ≠ focus-until; ≠ stopwatch |
 | notify-clear | Clear Notification Center | Own; private API risk |
 | login-items | List / open Login Items | Own or Settings deep-link |
-| password-gen | Generate password → clipboard | Own security addon — not **play** |
+| password-gen | Generate password → clipboard | Own security addon — not a Play-category toy |
 | password-options | Passphrase / PIN / exclude-ambiguous / copy-once / strength variants | **password-gen** |
 | hidden-files | Toggle Finder show-hidden files | **finder-toggles** |
 | path-bar | Toggle Finder path bar | **finder-toggles** |
@@ -308,24 +308,24 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | world-overlap | Overlap helper for “when is 9–10 across cities?” | **world-clock** |
 | pomodoro-skip | Skip / extend / log interruption (+ other session controls) | **pomodoro** |
 
-### Fun — **play** (one addon, many commands)
+### Fun — Play category (one addon per id)
 
 | Id | One-liner | Packaging |
 |---|---|---|
-| dice-roll | `2d6+1` → toast + clipboard | **play** |
-| coin-flip | Heads/tails (± best-of-N) | **play** |
-| pick-one | Random pick from options/lines | **play** |
-| number-guess | 1–100 guess loop | **play** |
-| hangman | Offline hangman in palette | **play** |
-| eight-ball | Magic 8-Ball answer | **play** |
-| chess-clock | Simple dual chess clock | **play** |
-| rps | Rock–paper–scissors | **play** |
-| stopwatch | Start / lap / stop | **play**; ≠ kitchen-timer |
-| memory | Tiny card-match in palette | **play**; ambitious UX |
-| breathing | Box / 4-7-8 breathing guide | **play** |
-| reaction-time | Click-when-green mini test | **play** |
-| tic-tac-toe | Quick local tic-tac-toe | **play** |
-| fortune | Random short fortune/epigram → notification or clipboard | **play**; bundled quotes |
+| dice-roll | `2d6+1` → toast + clipboard | Own addon; Play category |
+| coin-flip | Heads/tails (± best-of-N) | Own addon; Play category |
+| pick-one | Random pick from options/lines | Own addon; Play category |
+| number-guess | 1–100 guess loop | Own addon; Play category |
+| hangman | Offline hangman in palette | Own addon; Play category |
+| eight-ball | Magic 8-Ball answer | Own addon; Play category |
+| chess-clock | Simple dual chess clock | Own addon; Play category |
+| rps | Rock–paper–scissors | Own addon; Play category |
+| stopwatch | Start / lap / stop | Own addon; Play category; ≠ kitchen-timer |
+| memory | Tiny card-match in palette | Own addon; Play category; ambitious UX |
+| breathing | Box / 4-7-8 breathing guide | Own addon; Play category |
+| reaction-time | Click-when-green mini test | Own addon; Play category |
+| tic-tac-toe | Quick local tic-tac-toe | Own addon; Play category |
+| fortune | Random short fortune/epigram → notification or clipboard | Own addon; Play category; quotes ship in this zip |
 
 ### Design
 

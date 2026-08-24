@@ -216,6 +216,14 @@ public struct ShellConfig: Codable, Equatable, Sendable {
     public static let defaultRegistryURL =
         "https://raw.githubusercontent.com/Mshardul/jugnu/main/registry/addons.json"
 
+    public static func helpersCatalogURL(from registryURL: String) -> String {
+        if let range = registryURL.range(of: "addons.json", options: [.backwards]),
+           range.upperBound == registryURL.endIndex {
+            return registryURL.replacingCharacters(in: range, with: "helpers.json")
+        }
+        return registryURL
+    }
+
     public static let recommendedAddonIDs = [
         "mic-mute", "focus-toggle", "paste-plain", "floating-note", "ports",
     ]
@@ -328,6 +336,30 @@ public struct CleanupSpec: Codable, Equatable, Sendable {
     }
 }
 
+public struct HelperRef: Codable, Equatable, Sendable {
+    public var id: String
+    public var version: String
+
+    public init(id: String, version: String) {
+        self.id = id
+        self.version = version
+    }
+
+    public var environmentVariable: String {
+        "JUGNU_HELPER_" + id.replacingOccurrences(of: "-", with: "_").uppercased()
+    }
+}
+
+public struct HelperManifest: Codable, Equatable, Sendable {
+    public var id: String
+    public var version: String
+
+    public init(id: String, version: String) {
+        self.id = id
+        self.version = version
+    }
+}
+
 public struct AddonManifest: Codable, Equatable, Sendable {
     public var id: String
     public var name: String
@@ -337,6 +369,7 @@ public struct AddonManifest: Codable, Equatable, Sendable {
     public var entrypoint: Entrypoint
     public var cleanup: CleanupSpec
     public var viewTypes: [ViewType]
+    public var helpers: [HelperRef]
 
     public var allowedViewTypes: [ViewType] {
         viewTypes.isEmpty ? ViewType.shellDefaults : viewTypes
@@ -350,7 +383,8 @@ public struct AddonManifest: Codable, Equatable, Sendable {
         commands: [CommandDescriptor],
         entrypoint: Entrypoint,
         cleanup: CleanupSpec = CleanupSpec(),
-        viewTypes: [ViewType] = []
+        viewTypes: [ViewType] = [],
+        helpers: [HelperRef] = []
     ) {
         self.id = id
         self.name = name
@@ -360,10 +394,11 @@ public struct AddonManifest: Codable, Equatable, Sendable {
         self.entrypoint = entrypoint
         self.cleanup = cleanup
         self.viewTypes = viewTypes
+        self.helpers = helpers
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, name, version, api, commands, entrypoint, cleanup
+        case id, name, version, api, commands, entrypoint, cleanup, helpers
         case viewTypes = "view_types"
     }
 
@@ -376,6 +411,7 @@ public struct AddonManifest: Codable, Equatable, Sendable {
         commands = try c.decode([CommandDescriptor].self, forKey: .commands)
         entrypoint = try c.decode(Entrypoint.self, forKey: .entrypoint)
         cleanup = try c.decodeIfPresent(CleanupSpec.self, forKey: .cleanup) ?? CleanupSpec()
+        helpers = try c.decodeIfPresent([HelperRef].self, forKey: .helpers) ?? []
         let raw = try c.decodeIfPresent([String].self, forKey: .viewTypes) ?? []
         viewTypes = try raw.map { token in
             guard let parsed = ViewType(rawValue: token) else {

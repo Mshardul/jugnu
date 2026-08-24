@@ -21,6 +21,9 @@ public struct AddonInstaller: Sendable {
         try FileManager.default.moveItem(at: tempURL, to: zipURL)
         defer { try? FileManager.default.removeItem(at: zipURL) }
         try installFromLocalZip(url: zipURL, expectedSHA256: entry.sha256, enable: enable, addonId: entry.id)
+        let dest = paths.addonsDir.appendingPathComponent(entry.id)
+        let manifest = try ManifestLoader.load(from: dest)
+        try await ensureHelpers(for: manifest)
     }
 
     public func installFromLocalZip(
@@ -77,6 +80,107 @@ public struct AddonInstaller: Sendable {
         try store.save(config)
     }
 
+    public func installHelperFromLocalZip(
+        url: URL,
+        expectedSHA256: String?,
+        id: String,
+        version: String
+    ) throws {
+        let data = try Data(contentsOf: url)
+        if let expected = expectedSHA256?.lowercased(), !expected.isEmpty {
+            let actual = SHA256.hash(data: data).compactMap { String(format: "%02x", $0) }.joined()
+            guard actual == expected else {
+                throw AddonInstallerError.sha256Mismatch(expected: expected, actual: actual)
+            }
+        }
+
+        let extractRoot = FileManager.default.temporaryDirectory
+            .appendingPathComponent("jugnu-helper-extract-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: extractRoot, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: extractRoot) }
+
+        try unzip(zipURL: url, to: extractRoot)
+        let packageRoot = try findHelperRoot(in: extractRoot)
+        let manifest = try ManifestLoader.loadHelper(from: packageRoot)
+        guard manifest.id == id, manifest.version == version else {
+            throw AddonInstallerError.helperManifestMismatch(
+                expectedId: id,
+                expectedVersion: version,
+                actualId: manifest.id,
+                actualVersion: manifest.version
+            )
+        }
+
+        let dest = paths.helperRoot(id: id, version: version)
+        try FileManager.default.createDirectory(at: dest.deletingLastPathComponent(), withIntermediateDirectories: true)
+        if FileManager.default.fileExists(atPath: dest.path) {
+            try FileManager.default.removeItem(at: dest)
+        }
+        try FileManager.default.copyItem(at: packageRoot, to: dest)
+    }
+
+    public func ensureHelpers(for manifest: AddonManifest) async throws {
+        for ref in manifest.helpers {
+            let yaml = paths.helperRoot(id: ref.id, version: ref.version).appendingPathComponent("helper.yaml")
+            if FileManager.default.fileExists(atPath: yaml.path) { continue }
+
+            let config = try store.loadOrCreateDefaults()
+            let catalog = ShellConfig.helpersCatalogURL(from: config.shell.registryURL)
+            guard let catalogURL = URL(string: catalog) else {
+                throw AddonInstallerError.helperUnreachable
+            }
+            let entries: [HelperRegistryEntry]
+            do {
+                entries = try await RegistryClient().fetchHelpers(from: catalogURL)
+            } catch {
+                throw AddonInstallerError.helperUnreachable
+            }
+            guard let entry = entries.first(where: { $0.id == ref.id && $0.version == ref.version }) else {
+                throw AddonInstallerError.helperNotInCatalog(id: ref.id, version: ref.version)
+            }
+            guard let remote = URL(string: entry.url), !entry.url.isEmpty else {
+                throw AddonInstallerError.missingURL
+            }
+            let zipURL: URL
+            do {
+                let (tempURL, _) = try await URLSession.shared.download(from: remote)
+                zipURL = FileManager.default.temporaryDirectory
+                    .appendingPathComponent("\(entry.id)-\(entry.version)-\(UUID().uuidString).zip")
+                try? FileManager.default.removeItem(at: zipURL)
+                try FileManager.default.moveItem(at: tempURL, to: zipURL)
+            } catch {
+                throw AddonInstallerError.helperUnreachable
+            }
+            defer { try? FileManager.default.removeItem(at: zipURL) }
+            try installHelperFromLocalZip(
+                url: zipURL,
+                expectedSHA256: entry.sha256,
+                id: ref.id,
+                version: ref.version
+            )
+        }
+    }
+
+    private func findHelperRoot(in extractRoot: URL) throws -> URL {
+        let fm = FileManager.default
+        let direct = extractRoot.appendingPathComponent("helper.yaml")
+        if fm.fileExists(atPath: direct.path) { return extractRoot }
+
+        let children = try fm.contentsOfDirectory(
+            at: extractRoot,
+            includingPropertiesForKeys: [.isDirectoryKey],
+            options: [.skipsHiddenFiles]
+        )
+        for child in children {
+            var isDir: ObjCBool = false
+            guard fm.fileExists(atPath: child.path, isDirectory: &isDir), isDir.boolValue else { continue }
+            if fm.fileExists(atPath: child.appendingPathComponent("helper.yaml").path) {
+                return child
+            }
+        }
+        throw AddonInstallerError.helperYAMLMissing
+    }
+
     private func findAddonRoot(in extractRoot: URL) throws -> URL {
         let fm = FileManager.default
         let direct = extractRoot.appendingPathComponent("addon.yaml")
@@ -117,4 +221,10 @@ public enum AddonInstallerError: Error, Equatable {
     case idMismatch(expected: String, actual: String)
     case addonYAMLMissing
     case unzipFailed
+    case helperYAMLMissing
+    case helperManifestMismatch(
+        expectedId: String, expectedVersion: String, actualId: String, actualVersion: String
+    )
+    case helperUnreachable
+    case helperNotInCatalog(id: String, version: String)
 }

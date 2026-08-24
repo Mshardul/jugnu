@@ -38,6 +38,23 @@ entrypoint_path=$(sed -n 's/^  path:[[:space:]]*//p' "$manifest" | head -1 | tr 
 grep -q '^commands:' "$manifest" || { echo "missing commands in addon.yaml" >&2; exit 1; }
 grep -q '^cleanup:' "$manifest" || { echo "missing cleanup in addon.yaml" >&2; exit 1; }
 
+if grep -q '^helpers:' "$manifest"; then
+  awk '
+    /^helpers:/ { in_h = 1; next }
+    in_h && /^[^[:space:]-]/ { in_h = 0 }
+    in_h && $1 == "id:" {
+      id = $2
+      gsub(/["'\'']/, "", id)
+      if (id !~ /^[a-z0-9][a-z0-9-]*$/) { print "invalid helper id: " id > "/dev/stderr"; exit 1 }
+    }
+    in_h && $1 == "version:" {
+      ver = $2
+      gsub(/["'\'']/, "", ver)
+      if (ver !~ /^[0-9]+\.[0-9]+\.[0-9]+$/) { print "invalid helper version: " ver > "/dev/stderr"; exit 1 }
+    }
+  ' "$manifest"
+fi
+
 if grep -E '^[[:space:]]*(width|height|percent)[[:space:]]*:' "$manifest" >/dev/null; then
   echo "addon.yaml must not declare width, height, or percent; use view_types" >&2
   exit 1

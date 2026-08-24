@@ -55,6 +55,57 @@ final class AddonRunnerTests: XCTestCase {
         XCTAssertEqual(res.ui?.items?.first?.id, "a")
     }
 
+    func testSetsHelperEnvironmentVariable() throws {
+        let home = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: home, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: home) }
+        let paths = JugnuPaths(home: home)
+
+        let helperRoot = paths.helperRoot(id: "play-runtime", version: "1.0.0")
+        try FileManager.default.createDirectory(at: helperRoot, withIntermediateDirectories: true)
+        try "id: play-runtime\nversion: 1.0.0\n".write(
+            to: helperRoot.appendingPathComponent("helper.yaml"),
+            atomically: true,
+            encoding: .utf8
+        )
+
+        let work = home.appendingPathComponent("addon")
+        try FileManager.default.createDirectory(at: work.appendingPathComponent("bin"), withIntermediateDirectories: true)
+        let yaml = """
+        id: dice-roll
+        name: Dice
+        version: 1.0.0
+        api: 1
+        helpers:
+          - id: play-runtime
+            version: 1.0.0
+        commands:
+          - id: ping
+            title: Ping
+        entrypoint:
+          kind: exec
+          path: bin/run
+        """
+        try yaml.write(to: work.appendingPathComponent("addon.yaml"), atomically: true, encoding: .utf8)
+        let script = """
+        #!/bin/sh
+        printf '{"ok":true,"message":"%s"}\\n' "$JUGNU_HELPER_PLAY_RUNTIME"
+        """
+        let runURL = work.appendingPathComponent("bin/run")
+        try script.write(to: runURL, atomically: true, encoding: .utf8)
+        try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: runURL.path)
+
+        let manifest = try ManifestLoader.load(from: work)
+        let response = try AddonRunner(timeoutSeconds: 2).run(
+            manifest: manifest,
+            addonRoot: work,
+            commandId: "ping",
+            paths: paths
+        )
+        XCTAssertTrue(response.ok)
+        XCTAssertEqual(response.message, helperRoot.path)
+    }
+
     private func copyUIHostFixtures() throws -> URL {
         let bundleRoot = try XCTUnwrap(
             Bundle.module.url(forResource: "echo-list", withExtension: "sh", subdirectory: "Fixtures/ui-host")?

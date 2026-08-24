@@ -25,6 +25,46 @@ public enum Cleanup {
         }
     }
 
+    public static func removeOrphanedHelpers(
+        declared: [HelperRef],
+        excludingAddon: String,
+        paths: JugnuPaths
+    ) throws {
+        let fm = FileManager.default
+        for ref in declared {
+            if anotherAddonLists(ref, excludingAddon: excludingAddon, paths: paths) { continue }
+            let root = paths.helperRoot(id: ref.id, version: ref.version)
+            if fm.fileExists(atPath: root.path) {
+                try fm.removeItem(at: root)
+            }
+            let idDir = paths.helpersDir.appendingPathComponent(ref.id)
+            if fm.fileExists(atPath: idDir.path),
+               (try? fm.contentsOfDirectory(atPath: idDir.path))?.isEmpty == true {
+                try fm.removeItem(at: idDir)
+            }
+        }
+    }
+
+    private static func anotherAddonLists(
+        _ ref: HelperRef,
+        excludingAddon: String,
+        paths: JugnuPaths
+    ) -> Bool {
+        let fm = FileManager.default
+        guard fm.fileExists(atPath: paths.addonsDir.path),
+              let children = try? fm.contentsOfDirectory(
+                  at: paths.addonsDir,
+                  includingPropertiesForKeys: [.isDirectoryKey],
+                  options: [.skipsHiddenFiles]
+              )
+        else { return false }
+        for child in children where child.lastPathComponent != excludingAddon {
+            guard let manifest = try? ManifestLoader.load(from: child) else { continue }
+            if manifest.helpers.contains(ref) { return true }
+        }
+        return false
+    }
+
     private static func expandHome(_ path: String) -> URL {
         if path.hasPrefix("~/") {
             let home = FileManager.default.homeDirectoryForCurrentUser
@@ -81,6 +121,11 @@ public struct AddonLifecycle: Sendable {
         if FileManager.default.fileExists(atPath: addonRoot.appendingPathComponent("addon.yaml").path) {
             let manifest = try ManifestLoader.load(from: addonRoot)
             try Cleanup.performUninstall(manifest: manifest, addonRoot: addonRoot, paths: paths)
+            try Cleanup.removeOrphanedHelpers(
+                declared: manifest.helpers,
+                excludingAddon: id,
+                paths: paths
+            )
         } else if FileManager.default.fileExists(atPath: addonRoot.path) {
             try FileManager.default.removeItem(at: addonRoot)
         }

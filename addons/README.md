@@ -32,10 +32,12 @@ See [`docs/vision.md`](../docs/vision.md) — **Catalog hierarchy**:
 - **Category** — browse/group in the app (not a zip)
 - **Addon** — this directory leaf → one zip / one enable key
 - **Commands** — palette actions inside the addon (`addon.yaml`)
+- **Helper** — shared runtime, not a catalog product (vision rule 4)
+- **Bundle** — optional multi-addon download, not a catalog level
 
 Club paired toggles and similar converters as commands under one addon. Don’t ship one zip per toggle or per conversion.
 
-**Shared logic:** if two addons need the same capability, either ship that capability as its **own addon** (when users would install it alone) or **include shared files in each zip** (when they would not). See vision packaging rule 4.
+**Shared logic:** if two addons need the same capability, either ship that capability as its **own addon** (when users would install it alone) or as a **helper** the shell downloads once and later addons reuse (when they would not). Do not copy helper code into each zip. See vision packaging rule 4.
 
 Design: [`docs/architecture/2026-08-22-shell-design.md`](../docs/architecture/2026-08-22-shell-design.md)
 Backlog / packaging map: [`docs/backlog.md`](../docs/backlog.md)

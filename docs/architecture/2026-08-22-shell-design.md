@@ -56,6 +56,7 @@ extensions/macos/           # staging nursery
 | `Jugnu.app` | Shell only |
 | `~/.config/jugnu/jugnu.yaml` | Hotkey, enable/disable, future UI prefs |
 | `~/.local/share/jugnu/addons/<id>/` | Unpacked installed addons |
+| `~/.local/share/jugnu/helpers/<id>/<version>/` | Shared **helpers** (not catalog addons). Rules: [addon manifest — Helpers](../addon-manifest.md#helpers) |
 | GitHub Releases | Zip download source |
 
 ## 2. Addon package + JSON protocol

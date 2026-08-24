@@ -74,6 +74,32 @@ public struct RegistryClient: Sendable {
             throw RegistryClientError.invalidCatalog
         }
     }
+
+    public func fetchHelpers(from url: URL) async throws -> [HelperRegistryEntry] {
+        let (data, response) = try await URLSession.shared.data(from: url)
+        if let http = response as? HTTPURLResponse, !(200...299).contains(http.statusCode) {
+            throw RegistryClientError.httpStatus(http.statusCode)
+        }
+        do {
+            return try JSONDecoder().decode([HelperRegistryEntry].self, from: data)
+        } catch {
+            throw RegistryClientError.invalidCatalog
+        }
+    }
+}
+
+public struct HelperRegistryEntry: Codable, Equatable, Sendable {
+    public var id: String
+    public var version: String
+    public var url: String
+    public var sha256: String
+
+    public init(id: String, version: String, url: String, sha256: String) {
+        self.id = id
+        self.version = version
+        self.url = url
+        self.sha256 = sha256
+    }
 }
 
 public enum RegistryClientError: Error, Equatable {
