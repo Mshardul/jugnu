@@ -112,6 +112,38 @@
     ]
   },
   {
+    "id": "keep-awake",
+    "name": "Keep Awake",
+    "version": "1.0.0",
+    "api": 1,
+    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/keep-awake-1.0.0.zip",
+    "sha256": "c1d08353692911c0acf0df99ee69d3e7186c93d75d52bf3edd529032d01e90da",
+    "summary": "Keep the Mac from idle-sleeping",
+    "category": "System",
+    "tags": [
+      "background",
+      "popup-ui"
+    ],
+    "description": "Keeps the Mac from idle-sleeping and leaves the display on for 15 minutes, an hour, two hours, or until you turn it off. Closing the lid can still sleep. Uses the macOS caffeinate tool already on the machine; no extra download.",
+    "commands": [
+      {
+        "id": "pick",
+        "title": "Keep awake",
+        "subtitle": "Stop the Mac from idle-sleeping for a while"
+      },
+      {
+        "id": "stop",
+        "title": "Stop keep-awake",
+        "subtitle": "Allow idle sleep again"
+      },
+      {
+        "id": "status",
+        "title": "Keep-awake status",
+        "subtitle": "Whether a keep-awake session is running"
+      }
+    ]
+  },
+  {
     "id": "mic-mute",
     "name": "Mic Mute",
     "version": "1.0.0",

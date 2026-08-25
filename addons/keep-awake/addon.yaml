@@ -1,0 +1,28 @@
+id: keep-awake
+name: Keep Awake
+version: 1.0.0
+api: 1
+commands:
+  - id: pick
+    title: Keep awake
+    subtitle: Stop the Mac from idle-sleeping for a while
+    keywords: [awake, caffeine, sleep, display, caffeinate, stay awake]
+    ui:
+      pattern: list
+  - id: stop
+    title: Stop keep-awake
+    subtitle: Allow idle sleep again
+    keywords: [awake, sleep, stop, off]
+  - id: status
+    title: Keep-awake status
+    subtitle: Whether a keep-awake session is running
+    keywords: [awake, status, sleep]
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths:
+    - "~/.local/share/jugnu/state/keep-awake"
+    - "~/Library/LaunchAgents/com.jugnu.keep-awake.plist"
+  launchd:
+    - com.jugnu.keep-awake

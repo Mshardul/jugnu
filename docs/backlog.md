@@ -24,7 +24,7 @@ Status legend for staged leaves: **active** = runnable code; **stub** = README o
 Not yet staged as leaves. Candidates after shell MVP:
 
 1. Audio output switcher
-2. Caffeine / keep-awake
+2. ~~Caffeine / keep-awake~~ done → `addons/keep-awake`
 3. Webcam mute
 4. AirPods / BT battery bar
 5. Claude/agent mission control (lite)
@@ -106,6 +106,7 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | System | **notify-clear** | clear Notification Center | Own; private API risk |
 | System | **login-items** | list / open Login Items | Own or Settings deep-link |
 | System | **sleep** | sleep-now, display-sleep | Power sleep family |
+| System | **keep-awake** (`addons/keep-awake`) | 15m / 1h / 2h / until-off; stop; status | Idle sleep + display; lid can still sleep |
 | System | **settings-jump** | palette → System Settings pane | Own |
 | System | **default-browser** | pick default browser | Own; pairs with open-url |
 | System | **memory-pressure** | pressure + top memory apps | Own; pair conceptually w/ disk-pressure gap |

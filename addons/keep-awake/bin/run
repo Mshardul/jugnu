@@ -1,0 +1,165 @@
+#!/bin/bash
+set -euo pipefail
+
+STATE_DIR="${JUGNU_STATE_DIR:-$HOME/.local/share/jugnu/state/keep-awake}"
+SESSION="$STATE_DIR/session"
+LABEL="com.jugnu.keep-awake"
+PLIST="$HOME/Library/LaunchAgents/${LABEL}.plist"
+UID_NUM="$(id -u)"
+DOMAIN="gui/${UID_NUM}"
+
+mkdir -p "$STATE_DIR"
+
+req=$(cat)
+
+json_get_str() {
+  printf '%s' "$1" | sed -n -E "s/.*\"$2\"[[:space:]]*:[[:space:]]*\"((\\\\.|[^\"\\\\])*)\".*/\1/p" | head -n1
+}
+
+command=$(json_get_str "$req" "command")
+item_id=$(json_get_str "$req" "itemId")
+
+now_ts() { date +%s; }
+
+bootout() {
+  launchctl bootout "${DOMAIN}/${LABEL}" >/dev/null 2>&1 || true
+}
+
+write_plist() {
+  local timeout="${1:-}"
+  local extra=""
+  if [[ -n "$timeout" ]]; then
+    extra="    <string>-t</string>
+    <string>${timeout}</string>
+"
+  fi
+  mkdir -p "$(dirname "$PLIST")"
+  cat >"$PLIST" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>${LABEL}</string>
+  <key>RunAtLoad</key>
+  <false/>
+  <key>KeepAlive</key>
+  <false/>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/caffeinate</string>
+    <string>-di</string>
+${extra}  </array>
+</dict>
+</plist>
+EOF
+}
+
+load_agent() {
+  launchctl bootstrap "$DOMAIN" "$PLIST" >/dev/null 2>&1 || true
+  launchctl kickstart -k "${DOMAIN}/${LABEL}" >/dev/null 2>&1 || true
+}
+
+clear_session() {
+  bootout
+  rm -f "$SESSION"
+}
+
+session_active() {
+  [[ -f "$SESSION" ]] || return 1
+  local mode end
+  mode=$(awk '{print $1}' "$SESSION")
+  if [[ "$mode" == "until" ]]; then
+    return 0
+  fi
+  end=$(awk '{print $3}' "$SESSION")
+  if [[ -z "$end" ]] || (( 10#$(now_ts) >= 10#$end )); then
+    clear_session
+    return 1
+  fi
+  return 0
+}
+
+start_timed() {
+  local seconds="$1"
+  local label="$2"
+  local end=$(( $(now_ts) + seconds ))
+  bootout
+  write_plist "$seconds"
+  load_agent
+  printf 'timed %s %s\n' "$seconds" "$end" >"$SESSION"
+  echo "{\"ok\":true,\"message\":\"Keeping Mac awake for ${label}\"}"
+}
+
+start_until() {
+  bootout
+  write_plist
+  load_agent
+  printf 'until\n' >"$SESSION"
+  echo '{"ok":true,"message":"Keeping Mac awake until you stop it"}'
+}
+
+emit_list() {
+  local items=""
+  if session_active; then
+    items+='{"id":"stop","title":"Stop keep-awake","subtitle":"Allow idle sleep again"},'
+  fi
+  items+='{"id":"15m","title":"15 minutes","subtitle":"Idle sleep and display stay on"},'
+  items+='{"id":"1h","title":"1 hour","subtitle":"Idle sleep and display stay on"},'
+  items+='{"id":"2h","title":"2 hours","subtitle":"Idle sleep and display stay on"},'
+  items+='{"id":"until","title":"Until I stop it","subtitle":"Idle sleep and display stay on"}'
+  echo "{\"ok\":true,\"ui\":{\"pattern\":\"list\",\"title\":\"Keep awake\",\"items\":[${items}]}}"
+}
+
+handle_pick_item() {
+  case "$item_id" in
+    15m) start_timed 900 "15 minutes" ;;
+    1h) start_timed 3600 "1 hour" ;;
+    2h) start_timed 7200 "2 hours" ;;
+    until) start_until ;;
+    stop)
+      clear_session
+      echo '{"ok":true,"message":"Keep-awake is off"}'
+      ;;
+    *)
+      echo '{"ok":false,"error":"unknown keep-awake duration"}'
+      ;;
+  esac
+}
+
+status_message() {
+  if ! session_active; then
+    echo '{"ok":true,"message":"Keep-awake is off"}'
+    return
+  fi
+  local mode end rem mins
+  mode=$(awk '{print $1}' "$SESSION")
+  if [[ "$mode" == "until" ]]; then
+    echo '{"ok":true,"message":"Keeping Mac awake until you stop it"}'
+    return
+  fi
+  end=$(awk '{print $3}' "$SESSION")
+  rem=$(( end - $(now_ts) ))
+  mins=$(( (rem + 59) / 60 ))
+  echo "{\"ok\":true,\"message\":\"Keeping Mac awake for about ${mins} more minutes\"}"
+}
+
+case "$command" in
+  pick)
+    if [[ -n "$item_id" ]]; then
+      handle_pick_item
+    else
+      emit_list
+    fi
+    ;;
+  stop)
+    clear_session
+    echo '{"ok":true,"message":"Keep-awake is off"}'
+    ;;
+  status)
+    status_message
+    ;;
+  *)
+    echo '{"ok":false,"error":"keep-awake: unknown command"}'
+    ;;
+esac

@@ -22,6 +22,7 @@ Nothing here is bundled inside `Jugnu.app`. Users install zips into `~/.local/sh
 | `window-layouts` | snaps, snap board, zones (max 6), Space jump; AX helper |
 | `open-terminal-here` | open last-picked terminal at the front Finder folder |
 | `mute-all` | mute mic + speakers and restore previous volumes |
+| `keep-awake` | keep Mac awake (15m / 1h / 2h / until-off) via `caffeinate` |
 
 Package: `scripts/package-addon.sh addons/<id> dist/`
 
