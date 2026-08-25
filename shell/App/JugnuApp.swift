@@ -19,6 +19,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var menuBar: MenuBarController?
     private var model: AppModel?
     private var shellHost: ShellHost?
+    private var clockHost: ClockHost?
     private var hotkey: HotkeyController?
     private var firstRun: FirstRunWindowController?
     /// Reused across catalog/detail renders so entries/filters/scroll survive a push/pop instead of
@@ -32,6 +33,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         let shellHost = ShellHost()
         self.shellHost = shellHost
+
+        let clockHost = ClockHost(paths: model.paths) { [weak model] message in
+            model?.statusMessage = message
+        }
+        self.clockHost = clockHost
+        clockHost.start { [weak self] addon, command, timerID in
+            guard let self else { throw ClockInvocationError.unavailable }
+            try await self.runClockCommand(
+                addon: addon,
+                command: command,
+                timerID: timerID
+            )
+        }
 
         let menuBar = MenuBarController(
             onOpenPalette: { [weak self] in self?.invokeShell() },
@@ -54,6 +68,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self.firstRun = first
             first.show()
         }
+    }
+
+    func applicationWillTerminate(_ notification: Notification) {
+        clockHost?.stop()
     }
 
     /// Invoke hotkey / Open Palette: not on launcher (or not visible) -> home; on launcher -> close.
@@ -271,4 +289,39 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             playCommandSound(success: false)
         }
     }
+
+    private func runClockCommand(
+        addon: String,
+        command: String,
+        timerID: String
+    ) async throws {
+        guard let model, let shellHost else { throw ClockInvocationError.unavailable }
+        model.refreshIndex()
+        guard let indexed = model.allCommands.first(where: {
+            $0.addonId == addon && $0.commandId == command
+        }) else {
+            throw ClockInvocationError.commandNotFound
+        }
+        guard let screen = NSScreen.main ?? NSScreen.screens.first else {
+            throw ClockInvocationError.unavailable
+        }
+        let invocation = try model.runInvocation(
+            for: indexed,
+            args: ["timerId": .string(timerID)]
+        )
+        let succeeded = await CommandInvoke.run(
+            host: shellHost,
+            commandId: indexed.qualifiedId,
+            onScreen: screen,
+            execute: invocation.execute,
+            followUp: invocation.followUp
+        )
+        guard succeeded else { throw ClockInvocationError.commandFailed }
+    }
+}
+
+private enum ClockInvocationError: Error {
+    case unavailable
+    case commandNotFound
+    case commandFailed
 }

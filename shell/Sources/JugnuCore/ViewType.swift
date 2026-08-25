@@ -72,7 +72,7 @@ public enum ViewType: String, Codable, CaseIterable, Sendable, Equatable {
     }
 
     public static func resolve(pattern: UIPattern, requested: ViewType?, allowed: [ViewType]) throws -> ViewType? {
-        if pattern == .note { return nil }
+        if pattern == .note || pattern == .card { return nil }
         let chosen = requested ?? pattern.defaultViewType
         guard let chosen else { return nil }
         guard allowed.contains(chosen) else {
@@ -107,7 +107,7 @@ public extension UIPattern {
         case .list: return .rows
         case .form: return .fields
         case .confirm: return .ask
-        case .note: return nil
+        case .note, .card: return nil
         }
     }
 }

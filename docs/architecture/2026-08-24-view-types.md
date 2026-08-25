@@ -76,7 +76,11 @@ A response may set `"view": "board"` only if the addon allow-list includes `boar
 
 ## 4. Click-outside
 
-| Types | Click outside the panel |
+**Amended 2026-08-25** (see [launcher + catalog design §3](./2026-08-25-launcher-catalog-design.md)): click-outside is **not** a property of view type. A type is geometry only (size band + aspect + chrome) — behavior on click-outside is a separate, per-command/per-response config, because the same type (`canvas`) hosts both a launcher-adjacent catalog browse (wants dismiss) and a sit-in content viewer like Play/PDF (wants ignore). Baking behavior into type would force a type split for what is really an unrelated axis.
+
+Each command (or run response) sets its own click-outside behavior: **dismiss** (hide, empty stack) or **ignore** (panel stays; Esc / Cmd+W pop or dismiss per stack rules). Default per type, overridable per command:
+
+| Types | Default click outside |
 |---|---|
 | `seek`, `palette`, `ask`, `fields`, `rows`, `grid`, `rail` | **Dismiss** (hide, empty stack) — same as 0008 |
 | `board`, `spread`, `canvas` | **Ignore** (panel stays). Esc / Cmd+W pop or dismiss per stack rules |

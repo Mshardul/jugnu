@@ -1,14 +1,14 @@
 # Jugnu backlog
 
-Status legend for staged leaves: **active** = runnable code; **stub** = README only; **icebox** / **later** = defer.
+Unbuilt jobs live in the packaging map and gap list below. Shipped first-party sources live under `addons/`.
 
 ## Platform (build order)
 
 | Priority | Item | Notes |
 |---|---|---|
 | 1 | Shell + YAML addon enablement | Design before scaffold — see `docs/architecture/` |
-| 2 | Dual clipboard modes | Ephemeral vs history; privacy-aware; build on `apps/clipboard-history` |
-| 3 | Robust window management | Absorb `window-layouts` / `layout-save` stubs into a real first-party addon — [spec](architecture/2026-08-24-window-layouts.md) · [ticket 0046](tickets.md) |
+| 2 | Dual clipboard modes | Ephemeral vs history; privacy-aware; build on `addons/clipboard-history` |
+| 3 | Robust window management | First-party `window-layouts` — [spec](architecture/2026-08-24-window-layouts.md) · [ticket 0046](tickets.md) **done** |
 | 4 | Addon **popup UI** host | [UI + speed design](architecture/2026-08-22-addon-ui-speed-design.md) (Approved) · [P1 plan](superpowers/plans/2026-08-22-addon-ui-host-p1.md) **done** |
 | 5 | **Speed** budget | Invoke → visible result; budgets in that design §6 |
 | 6 | Context-aware UI (later) | Reserved in UI + speed §7 — after UI host exists |
@@ -65,7 +65,9 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | Clipboard | **diff** | diff-clip | Heavier than one-shot transforms — own addon unless kept tiny on clip-tools |
 | Files | **paths** | path-copy, reveal-path, **count-files**, **folder-size** | Path/Finder folder jobs |
 | Files | **images** | heic-jpeg, resize-image, **image-rotate**, flip, format convert, compress (+ other `sips`/Image I/O ops) | Image transforms family |
-| Files | **downloads-triage** (staged) | reveal-downloads, **downloads-age** (+ type/age triage variants) | Downloads job |
+| Files | **downloads-triage** | reveal-downloads, **downloads-age** (+ type/age triage variants) | Downloads job |
+| Files | **airdrop-folder** | share Finder selection via AirDrop UI | Finder / share QoL |
+| Files | **quarantine-clear** | clear Gatekeeper quarantine xattr (± check) | File / Gatekeeper QoL |
 | Files | **new-file** | create in front Finder folder | Own file job |
 | Files | **zip-selection** | zip Finder selection | Pair with unarchive; shared archive helpers in zips |
 | Files | **unarchive** | unzip archive beside it | Pair with zip-selection |
@@ -73,7 +75,7 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | Files | **save-clipboard** | clipboard → Scratch/Downloads | May share path helpers w/ scratch-folder |
 | Files | **quick-capture** | capture clipboard / append to today / open latest / reveal captures | Intentional clipboard-to-file capture; text first, images later |
 | Files | **ocr** | image → text (Vision) | Own; permission-heavy |
-| Files | **trash-ui** (staged) | trash-selection, empty-trash, **trash-put-back** | Trash jobs on trash-ui |
+| Files | **trash-ui** | trash-selection, empty-trash, **trash-put-back** | Trash jobs on trash-ui |
 | Files | **screenshot-folder** | open screenshots location | Own until screenshot-inbox (gap) absorbs it |
 | Files | **screenshot-inbox** | open inbox / reveal latest / archive latest / archive older | Screenshot organization job; palette commands first, no background watcher in v0 |
 | Files | **pdf-tools** | merge / split / page-count PDFs (+ compress and same-shape PDF ops) | Same-shape PDF jobs — not on images |
@@ -98,7 +100,9 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | Network | **http-status** | HEAD/GET status + timing; **http-headers** (+ copy as markdown / other probe views) | Own; may later share **net-probe** w/ ping |
 | Dev | **git-root** | reveal git root of front path | Own or near repo-jumper |
 | Dev | **open-url** | open clipboard URL in chosen browser; **open-url-profile** | Browser + profile chooser |
-| Dev | **brew-outdated** (staged) | brew-services, **brew-cleanup**, doctor/update and other brew ops | One Homebrew job shelf |
+| Dev | **brew-outdated** (`addons/brew-outdated`) | brew-services, **brew-cleanup**, doctor/update and other brew ops | One Homebrew job shelf |
+| Dev | **repo-jumper** | jump known git repos | Own; pairs with **git-root** |
+| Dev | **ssh-host-picker** | pick SSH host → connect | Own |
 | Dev | **process-find** | process-list, find-by-name, **process-sort** (CPU/mem) (+ force-quit / copy PID variants) | ≠ quit-heavy, ≠ kill-hung |
 | Dev | **open-terminal-here** (`addons/open-terminal-here`) | last-picked terminal at Finder folder; **term-app-pick** later | Dev QoL |
 | Dev | **app-info** | front app name / bundle id / version / path | Own support blurb |
@@ -111,21 +115,22 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | System | **default-browser** | pick default browser | Own; pairs with open-url |
 | System | **memory-pressure** | pressure + top memory apps | Own; pair conceptually w/ disk-pressure gap |
 | System | **speak-clip** | speak clipboard / stop | Own a11y job |
-| System | **nudges** | **eye-rest**, **water-nudge**, **stretch-nudge** (same timer shell; different copy/art/GIF per kind) | One wellness nudge addon |
+| System | **nudges** | **eye-rest**, **water-nudge**, **stretch-nudge** (same timer shell; different copy/art/GIF per kind) | One wellness nudge addon. Implementing — [0049](tickets.md) / [spec 2026-08-25](architecture/2026-08-25-nudges-clock-helper-design.md) |
 | System | **time-machine** | status / start backup / open Time Machine | Own |
-| System | **floating-note** (staged) | `open` (scratchpad, persist on close/quit), **quick-note** (throwaway; close discards), **note-pin** | One note addon: persistent scratchpad vs session scrap; pin is chrome QoL |
-| System | **world-clock** (staged) | + **world-overlap** | Clocks + meeting overlap |
-| System | **pomodoro** (staged) | **pomodoro-skip**, extend, log interruption (+ other session controls) | Focus timer forms |
+| System | **floating-note** (`addons/floating-note`) | `open` (scratchpad, persist on close/quit), **quick-note** (throwaway; close discards), **note-pin** | One note addon: persistent scratchpad vs session scrap; pin is chrome QoL |
+| System | **world-clock** (`addons/world-clock`) | + **world-overlap** | Clocks + meeting overlap |
+| System | **pomodoro** (`addons/pomodoro`) | **pomodoro-skip**, extend, log interruption (+ other session controls) | Focus timer forms |
 | Security | **password-gen** | random password; **password-options** (passphrase / PIN / exclude-ambiguous / copy-once / …) | Own — not under play |
 | Play | *(each id its own zip)* | dice-roll, coin-flip, pick-one, number-guess, hangman, eight-ball, chess-clock, rps, stopwatch, memory, breathing, reaction-time, tic-tac-toe, fortune | Play is a **category**, not one shelf. Shared RNG/timer code is a **helper** ([0047](tickets.md)) — ship that before any Play zip. **Bundles** later ([0048](tickets.md)); 14 separate catalog rows is fine until then. |
 | Design | **sf-symbols** | pick/copy | Solo for now |
 | Design | **design-calc** | type-scale, rem-px, **aspect-ratio** (+ spacing-scale and other design math) | Design math shelf |
-| Design | **color-eyedropper** (staged) | + color-format | Eyedropper + hex/SwiftUI format commands |
+| Design | **color-eyedropper** | + color-format | Eyedropper + hex/SwiftUI format commands |
 | Design | **grid-overlay** | column/baseline overlay | Own design-QA overlay |
 | Design | **emoji-picker** | search emoji → copy | Own; keep tiny |
-| Design | **qr-clip** (staged) | encode + **qr-decode** | QR both directions |
+| Design | **qr-clip** | encode + **qr-decode** | QR both directions |
 | Tools | **unit-convert** | all units | One converter addon |
-| *(own addons)* | — | mic-picker, camera-check, speaker-mute, copy-ip, dns-flush, proxy-toggle, quit-heavy, vpn-connect, scratch-folder, wifi-toggle, lock-screen, low-power, reminder-add, next-event, kitchen-timer, flash-attention, http-status, process-find, large-files, pdf-tools, desktop-sweep, speak-clip, resolution-preset, finder-toggles, default-browser, settings-jump, sleep, memory-pressure, nudges, grid-overlay, design-calc, app-info, relaunch-app, favorite-folders, time-machine, emoji-picker, media-convert, mount-dmg | Distinct jobs |
+| Meeting | **meeting-bar** | next meeting / join lite | Own; or fold into **next-event** |
+| *(own addons)* | — | mic-picker, camera-check, speaker-mute, copy-ip, dns-flush, proxy-toggle, quit-heavy, vpn-connect, scratch-folder, wifi-toggle, lock-screen, low-power, reminder-add, next-event, kitchen-timer, flash-attention, http-status, process-find, large-files, pdf-tools, desktop-sweep, speak-clip, resolution-preset, finder-toggles, default-browser, settings-jump, sleep, memory-pressure, nudges, grid-overlay, design-calc, app-info, relaunch-app, favorite-folders, time-machine, emoji-picker, media-convert, mount-dmg, airdrop-folder, quarantine-clear, repo-jumper, ssh-host-picker | Distinct jobs |
 
 ### Meeting / device
 
@@ -299,8 +304,8 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | settings-jump | Palette → jump to a System Settings pane | Own addon |
 | memory-pressure | Memory pressure + top memory apps | Own addon; pair conceptually w/ disk-pressure gap |
 | speak-clip | Speak clipboard text (or stop speaking) | Own addon |
-| nudges | Wellness nudge shell: eye-rest / water / stretch (same timer; different copy/GIF) | Own **nudges** addon |
-| eye-rest | 20-20-20 look-away nudge | **nudges**; ≠ pomodoro / kitchen-timer |
+| nudges | Wellness nudge shell: eye-rest / water / stretch (same timer; different copy/GIF) | Own **nudges** addon. Implementing — [0049](tickets.md) / [spec 2026-08-25](architecture/2026-08-25-nudges-clock-helper-design.md) |
+| eye-rest | 20-20-20 look-away nudge | **nudges**; ≠ pomodoro / kitchen-timer. Implementing — [0049](tickets.md) / [spec 2026-08-25](architecture/2026-08-25-nudges-clock-helper-design.md) |
 | water-nudge | Hydrate reminder | **nudges** |
 | stretch-nudge | Stand/stretch reminder | **nudges** |
 | time-machine | Status / start backup / open Time Machine | Own addon |
@@ -339,46 +344,6 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | color-format | Hex ↔ rgb/hsl ↔ SwiftUI `Color` / UIColor snippets | **color-eyedropper** |
 | grid-overlay | Toggle simple column/baseline overlay on screen | Own addon |
 | emoji-picker | Search emoji → copy (Character Viewer lite) | Own addon; keep tiny |
-
-## Staged leaves — `apps/`
-
-7 of these leaves have graduated to native addons under `addons/` (rewritten as
-`exec`/JXA entrypoints — no user Python; see `addons/README.md`). The Python
-versions here stay as reference implementations, not shipped.
-
-| Leaf | Status | Role for Jugnu |
-|---|---|---|
-| clipboard-history | graduated → `addons/clipboard-history` | Background launchd watcher + sqlite3 CLI store; list UI, copy-back |
-| battery-eta | graduated → `addons/battery-eta` | `pmset` parse; toast |
-| brew-outdated | graduated → `addons/brew-outdated` | JXA (`osascript -l JavaScript`) for real JSON parsing; list UI |
-| floating-note | graduated → `addons/floating-note` | `note` UI pattern (always-on-top editable panel). Shipped command is persist-on-close scratchpad (`open`). Backlog: **quick-note** (ephemeral) + **note-pin** |
-| pomodoro | graduated → `addons/pomodoro` | Fire-and-forget background timer + notification; state file |
-| weather-bar | graduated → `addons/weather-bar` | `curl` + Open-Meteo; toast |
-| world-clock | graduated → `addons/world-clock` | Fixed zone list in script; list UI |
-| tools-palette | stub | Nursery CLI runner — evolves into shell search surface or thin addon |
-| window-layouts | graduated → `addons/window-layouts` | Window family; zones (max 6), tile-two, snap board; **no** layout-undo. Spec [2026-08-24](architecture/2026-08-24-window-layouts.md) |
-| layout-save | folded | Folded into window-layouts **zones** (not undo) |
-| meeting-bar | stub | Meeting/device QoL |
-| paste-transform | stub | Paste plain / transforms; clip-tools host for converters |
-| port-picker | superseded | Folded into `addons/ports` (list + kill; no longer wraps Tools `port-tool`) |
-| trash-ui | stub | May wrap Tools `trash`; + trash-put-back |
-| color-eyedropper | stub | Utility addon; absorb color-format commands |
-| qr-clip | stub | May wrap Tools `qr-encode`; + qr-decode |
-| downloads-triage | stub | File triage; + downloads-age |
-| repo-jumper | stub | Dev QoL |
-| ssh-host-picker | stub | Dev QoL |
-| app-launcher | stub / icebox | Ecosystem war; Jugnu *is* the launcher |
-
-## Staged leaves — `extensions/macos/`
-
-| Leaf | Status | Role for Jugnu |
-|---|---|---|
-| airdrop-folder | active | Finder / share QoL |
-| focus-toggle | active | Meeting/device QoL |
-| mic-mute | active | Meeting/device QoL; shares mute-status indicator w/ mute-all |
-| open-terminal-here | graduated → `addons/open-terminal-here` | Dev QoL; last-picked app; **term-app-pick** later |
-| quarantine-clear | active | File / Gatekeeper QoL |
-| snippet-expand | stub / later | Prefer clipboard/hotkey paste first |
 
 ## Related Tools CLIs (stay in Tools)
 

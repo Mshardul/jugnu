@@ -203,7 +203,7 @@ Canonical: [ADR 0001](architecture/decisions/0001-json-addon-boundary.md), [addo
 - Declare `cleanup` for every side effect. Disable/uninstall must be deterministic.
 - Entrypoint path is relative, no `..`.
 - Follow-ups: same entrypoint, richer `args` — not a second IPC model.
-- `apps/` and `extensions/macos/` are staging only. Do not scaffold an addon until its packaging boundary is explicit.
+- Do not scaffold an addon until its packaging boundary is explicit.
 
 ## Testing
 

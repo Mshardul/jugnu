@@ -4,7 +4,7 @@
 **Status:** Approved — implemented (`addons/window-layouts`; ticket 0046)  
 **Ticket:** [0046](../tickets.md)  
 **Depends on:** [View types](./2026-08-24-view-types.md), [Shell design](./2026-08-22-shell-design.md) (Accessibility at addon use), [UI host + speed](./2026-08-22-addon-ui-speed-design.md)  
-**Packaging:** one zip, id `window-layouts`. Absorbs staged `apps/window-layouts` and `apps/layout-save`. **No** `layout-undo`.
+**Packaging:** one zip, id `window-layouts`. Folded prior layout-save ideas into **zones**. **No** `layout-undo`.
 
 ## 1. Job
 

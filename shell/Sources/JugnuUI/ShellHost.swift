@@ -21,6 +21,7 @@ public final class ShellHost: ObservableObject {
     private let followUpError = PanelErrorState()
     private var activeFollowUp: (commandId: String, followUp: (RunRequest) async throws -> RunResponse, trace: InvokeTrace)?
     private let toast = ToastPresenter()
+    private var cards: [String: WeakCardPanel] = [:]
     /// Set by the caller (AppDelegate) right after `pushFollowUp`/`renderFollowUpContent` so Cancel
     /// routes through the same Esc/pop path as every other preset (`handleEsc`), instead of duplicating
     /// pop-and-morph logic inside `ShellHost`. AppModel-free: this only signals "user cancelled",
@@ -174,12 +175,18 @@ extension ShellHost {
         onScreen screen: NSScreen,
         followUp: @escaping (RunRequest) async throws -> RunResponse
     ) {
-        if let ui = response.ui, ui.pattern != .note {
+        if let ui = response.ui, ui.pattern != .note, ui.pattern != .card {
             pushFollowUp(ui: ui, commandId: commandId, trace: trace, onScreen: screen, followUp: followUp)
             return
         }
         if let ui = response.ui, ui.pattern == .note {
             openNote(ui: ui, followUp: followUp)
+            trace.markFirstPaint()
+            trace.markContent()
+            return
+        }
+        if let ui = response.ui, ui.pattern == .card {
+            openCard(ui: ui)
             trace.markFirstPaint()
             trace.markContent()
             return
@@ -209,6 +216,7 @@ extension ShellHost {
         case .list: state = .list(query: "", highlightedID: nil, scroll: 0)
         case .form: state = .form(values: [:], focusedFieldID: nil)
         case .note: return // note is detached, not a stack push — handled separately (Task 12)
+        case .card: return
         }
         let resolvedTrace = trace ?? InvokeTrace(commandId: commandId)
         followUpDescriptor = ui
@@ -303,6 +311,34 @@ extension ShellHost {
         NSApp.activate(ignoringOtherApps: true)
     }
 
+    private func openCard(ui: UIDescriptor) {
+        hide()
+        let key = ui.title ?? "card"
+        let shouldReduceMotion = reduceMotion()
+
+        if let card = cards[key]?.value {
+            card.replace(ui: ui, reduceMotion: shouldReduceMotion)
+            card.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+            return
+        }
+
+        let reference = WeakCardPanel()
+        let card = CardPanel(
+            ui: ui,
+            reduceMotion: shouldReduceMotion,
+            onClose: { [weak self, weak reference] in
+                guard self?.cards[key]?.value === reference?.value else { return }
+                self?.cards[key] = nil
+            }
+        )
+        reference.value = card
+        cards[key] = reference
+        card.makeKeyAndOrderFront(nil)
+        card.dismissOnOutsideClick()
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
     private func submitFollowUp(args: [String: JSONValue]) {
         guard let active = activeFollowUp else { return }
         let request = RunJSON.followUpRequest(command: active.commandId, args: args)
@@ -325,4 +361,8 @@ extension ShellHost {
             }
         }
     }
+}
+
+private final class WeakCardPanel {
+    weak var value: CardPanel?
 }

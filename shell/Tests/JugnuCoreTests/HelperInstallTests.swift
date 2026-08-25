@@ -55,16 +55,16 @@ final class HelperInstallTests: XCTestCase {
         )
     }
 
-    func testEnsureHelpersDownloadsMissingHelperFromFileCatalog() async throws {
+    func testEnsureHelpersForNudgesInstallsClockBinaryFromFileCatalog() async throws {
         let ctx = try makeHome()
         defer { ctx.tearDown() }
 
-        let helperZip = try makeHelperZip(in: ctx.home, id: "play-runtime", version: "1.0.0")
+        let helperZip = try makeHelperZip(in: ctx.home, id: "clock", version: "1.0.0")
         let digest = try sha256(of: helperZip)
         let catalogDir = ctx.home.appendingPathComponent("catalog")
         try FileManager.default.createDirectory(at: catalogDir, withIntermediateDirectories: true)
         let helpersJSON = """
-        [{"id":"play-runtime","version":"1.0.0","url":"\(helperZip.absoluteString)","sha256":"\(digest)"}]
+        [{"id":"clock","version":"1.0.0","url":"\(helperZip.absoluteString)","sha256":"\(digest)"}]
         """
         try helpersJSON.write(
             to: catalogDir.appendingPathComponent("helpers.json"),
@@ -76,19 +76,19 @@ final class HelperInstallTests: XCTestCase {
 
         let installer = AddonInstaller(paths: ctx.paths)
         let manifest = AddonManifest(
-            id: "dice-roll",
-            name: "Dice",
+            id: "nudges",
+            name: "Nudges",
             version: "1.0.0",
             api: 1,
             commands: [],
             entrypoint: Entrypoint(kind: "exec", path: "bin/run"),
-            helpers: [HelperRef(id: "play-runtime", version: "1.0.0")]
+            helpers: [HelperRef(id: "clock", version: "1.0.0")]
         )
         try await installer.ensureHelpers(for: manifest)
         XCTAssertTrue(
             FileManager.default.fileExists(
-                atPath: ctx.paths.helperRoot(id: "play-runtime", version: "1.0.0")
-                    .appendingPathComponent("helper.yaml").path
+                atPath: ctx.paths.helperRoot(id: "clock", version: "1.0.0")
+                    .appendingPathComponent("bin/clock").path
             )
         )
     }
@@ -205,6 +205,13 @@ final class HelperInstallTests: XCTestCase {
         version: \(version)
         """
         try yaml.write(to: staging.appendingPathComponent("helper.yaml"), atomically: true, encoding: .utf8)
+        let bin = staging.appendingPathComponent("bin")
+        try FileManager.default.createDirectory(at: bin, withIntermediateDirectories: true)
+        try "#!/bin/sh\n".write(
+            to: bin.appendingPathComponent(id),
+            atomically: true,
+            encoding: .utf8
+        )
         let zipURL = home.appendingPathComponent("\(id)-\(version).zip")
         try zipDirectory(staging, to: zipURL)
         return zipURL

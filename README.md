@@ -8,7 +8,7 @@ Jugnu (Hindi: *firefly*) is a Mac command platform — meant to replace Spotligh
 |---|---|
 | **App** | Jugnu |
 | **Repo / CLI** | `jugnu` |
-| **Status** | Shell MVP + addon UI host — Core + `Jugnu` app (SPM), 14 native addons in tree (GitHub Release registry still lists the published set) |
+| **Status** | Shell MVP + addon UI host — Core + `Jugnu` app (SPM), 15 native addons in tree (GitHub Release registry still lists the published set) |
 | **Requires** | macOS 14 (Sonoma) or later |
 | **License** | [MIT](LICENSE) |
 
@@ -76,16 +76,15 @@ Focused **addons** (one zip each) over one mega-binary; related actions are **co
 ## Repo layout
 
 ```
-apps/                 # staged Mac leaves (implemented + stub) — inventory until addon contract
-extensions/macos/     # staged Finder / Shortcuts-style helpers
 config/               # example Jugnu YAML (enable/disable sketch)
 docs/
   vision.md           # product + brand
   conventions.md      # standing coding standards
-  backlog.md          # platform, gap list, staged leaves
+  backlog.md          # platform, gap list, packaging map
   architecture/       # design specs (shell first)
 shell/                # JugnuCore + JugnuUI + Jugnu menu bar app (SPM)
 addons/               # first-party addon sources (one zip each)
+registry/             # catalog + checksummed download URLs
 ```
 
 ## Docs
@@ -99,16 +98,11 @@ addons/               # first-party addon sources (one zip each)
 - [Addon manifest](docs/addon-manifest.md)
 - [Vision](docs/vision.md)
 - [Backlog](docs/backlog.md)
-- [Staging inventory](docs/staging.md) — how `apps/` / `extensions/` relate to addons
 - [Architecture](docs/architecture/) — specs land here after design
 
 ## What’s here today
 
-**Graduated to native addons** (`addons/`): clipboard-history, battery-eta, brew-outdated, floating-note, pomodoro, weather-bar, world-clock, ports, window-layouts, open-terminal-here, mute-all — rewritten as shell/JXA `exec` entrypoints (no user Python) alongside mic-mute, focus-toggle, paste-plain. The `apps/` Python versions remain as reference implementations, not shipped.
-
-**macOS helpers (`extensions/macos/`, active, not yet addon-wrapped):** airdrop-folder, focus-toggle, mic-mute, quarantine-clear.
-
-**Stubs (README only):** tools-palette, meeting-bar, paste-transform, port-picker, and other planned leaves — see [backlog](docs/backlog.md).
+**First-party addons** (`addons/`): clipboard-history, battery-eta, brew-outdated, floating-note, pomodoro, weather-bar, world-clock, ports, window-layouts, open-terminal-here, mute-all, keep-awake, mic-mute, focus-toggle, paste-plain — shell/JXA/`exec` entrypoints (no user Python). Unbuilt jobs live in [backlog](docs/backlog.md).
 
 Hotkey shell, YAML addon runtime, and the addon UI host (toast/confirm/list/form/note) are built and tested (`shell/`). Published addons are GitHub Release assets under `addons-v1.0.0`, with `registry/addons.json` pointing at sha256-verified zips — install via the registry, or the dev `JUGNU_ADDON_PATH` override for local addon work. `open-terminal-here` and `mute-all` are in-tree and catalogued; their release zips ship with the next addons release.
 

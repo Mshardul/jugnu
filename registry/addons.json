@@ -187,6 +187,58 @@
     ]
   },
   {
+    "id": "nudges",
+    "name": "Nudges",
+    "version": "1.0.0",
+    "api": 1,
+    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/nudges-1.0.0.zip",
+    "sha256": "d9d9626d9d2118a58a933a6d4440d6a01435d759a37ed7f3322a9e2339adfd12",
+    "summary": "Schedule recurring wellness reminders",
+    "category": "System",
+    "tags": [
+      "background",
+      "popup-ui"
+    ],
+    "description": "Schedules recurring local reminders for water, eye breaks, stretching, and custom nudges, then shows each one as a lightweight card.",
+    "commands": [
+      {
+        "id": "manage",
+        "title": "Nudges",
+        "subtitle": "Add, edit, and enable nudge timers"
+      },
+      {
+        "id": "nudge-now",
+        "title": "Nudge now",
+        "subtitle": "Show a nudge card immediately"
+      },
+      {
+        "id": "pause",
+        "title": "Pause nudges",
+        "subtitle": ""
+      },
+      {
+        "id": "resume",
+        "title": "Resume nudges",
+        "subtitle": ""
+      },
+      {
+        "id": "restore-presets",
+        "title": "Restore nudge presets",
+        "subtitle": ""
+      },
+      {
+        "id": "advanced",
+        "title": "Nudge advanced",
+        "subtitle": "Edit new-nudge template"
+      },
+      {
+        "id": "show-card",
+        "title": "Show nudge card",
+        "subtitle": "Internal — fired by clock"
+      }
+    ]
+  },
+  {
     "id": "open-terminal-here",
     "name": "Open Terminal Here",
     "version": "1.0.0",

@@ -72,7 +72,7 @@ Category names and exact addon boundaries can evolve; Category → Addon → Com
 
 ## Relationship to Tools
 
-Jugnu lives in its **own** repo. Staging leaves under `apps/` and `extensions/macos/` were moved or copied from Tools planning. Small independent CLIs remain in Tools unless graduated; Jugnu integrates them as dependencies/wrappers when needed.
+Jugnu lives in its **own** repo. Small independent CLIs remain in Tools unless graduated; Jugnu integrates them as dependencies/wrappers when needed.
 
 ## Explicit non-goals (early)
 

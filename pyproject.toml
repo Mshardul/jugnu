@@ -25,10 +25,10 @@ default-groups = ["dev"]
 [tool.ruff]
 target-version = "py311"
 line-length = 100
-src = ["apps", "extensions", "addons"]
+src = ["addons"]
 
 [tool.ruff.lint]
-# Keep nursery leaves readable; skip opinionated SIM rewrites for now.
+# Keep leaf packages readable; skip opinionated SIM rewrites for now.
 select = ["E", "F", "I", "UP", "B"]
 
 [tool.ruff.lint.per-file-ignores]
@@ -40,7 +40,7 @@ warn_return_any = true
 warn_unused_configs = true
 ignore_missing_imports = true
 check_untyped_defs = true
-files = ["apps", "extensions"]
+files = ["addons"]
 # Match other repos: type-check product code, not tests.
 exclude = ["(?x)(/tests/|/__pycache__/|/\\.venv/)"]
 
@@ -50,6 +50,6 @@ skip = ".git,.venv,uv.lock,.mypy_cache,.ruff_cache,.pytest_cache,__pycache__"
 ignore-words-list = "jugnu,crate,rime,iterm,assertin"
 
 [tool.pytest.ini_options]
-testpaths = ["apps", "extensions", "addons"]
+testpaths = ["addons"]
 python_files = ["test_*.py"]
 addopts = "-q"

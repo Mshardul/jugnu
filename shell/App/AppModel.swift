@@ -94,17 +94,24 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
     /// Presentation-free: records "recent" and runs the addon's binary, returning the raw response
     /// (or throwing). The caller (`AppDelegate.runCommand`) owns presenting the result via
     /// `CommandInvoke.run`/`ShellHost`.
-    func runInvocation(for command: IndexedCommand) throws -> (execute: () async throws -> RunResponse, followUp: (RunRequest) async throws -> RunResponse) {
+    func runInvocation(
+        for command: IndexedCommand,
+        args: [String: JSONValue] = [:]
+    ) throws -> (
+        execute: () async throws -> RunResponse,
+        followUp: (RunRequest) async throws -> RunResponse
+    ) {
         state.recordRecent(qualifiedId: command.qualifiedId)
         try? stateStore.save(state)
         let manifest = try ManifestLoader.load(from: command.addonRoot)
-        let execute: () async throws -> RunResponse = { [runner, installer, paths] in
+        let execute: () async throws -> RunResponse = { [runner, installer, paths, args] in
             try await Task.detached {
                 try await installer.ensureHelpers(for: manifest)
                 let response = try runner.run(
                     manifest: manifest,
                     addonRoot: command.addonRoot,
                     commandId: command.commandId,
+                    args: args,
                     paths: paths
                 )
                 return try response.resolvingView(

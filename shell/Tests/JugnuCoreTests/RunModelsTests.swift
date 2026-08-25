@@ -35,6 +35,16 @@ final class RunModelsTests: XCTestCase {
         XCTAssertEqual(decoded.ui?.view, .board)
     }
 
+    func testDecodesCardUI() throws {
+        let json = """
+        {"ok":true,"ui":{"pattern":"card","emoji":"👀","message":"Glow farther.","accent":"#4A90D9","title":"Eyes"}}
+        """.data(using: .utf8)!
+        let decoded = try JSONDecoder().decode(RunResponse.self, from: json)
+        XCTAssertEqual(decoded.ui?.pattern, .card)
+        XCTAssertEqual(decoded.ui?.emoji, "👀")
+        XCTAssertEqual(decoded.ui?.accent, "#4A90D9")
+    }
+
     func testRequestEncodesEmptyContext() throws {
         let req = RunRequest(api: 1, op: "run", command: "toggle", args: [:], context: [:])
         let data = try JSONEncoder().encode(req)

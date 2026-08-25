@@ -5,6 +5,7 @@ public enum UIPattern: String, Codable, Sendable, Equatable {
     case form
     case confirm
     case note
+    case card
 }
 
 /// Minimal JSON value for `args` / `context` / form fields.
@@ -89,6 +90,10 @@ public struct UIDescriptor: Codable, Sendable, Equatable {
     public var cancelLabel: String?
     /// `.note` pattern: initial editable text content.
     public var content: String?
+    /// `.card` pattern: optional emoji shown above the message.
+    public var emoji: String?
+    /// `.card` pattern: CSS-like accent color (`#RRGGBB` or `#RRGGBBAA`).
+    public var accent: String?
     public var view: ViewType?
 
     public init(
@@ -101,6 +106,8 @@ public struct UIDescriptor: Codable, Sendable, Equatable {
         confirmLabel: String? = nil,
         cancelLabel: String? = nil,
         content: String? = nil,
+        emoji: String? = nil,
+        accent: String? = nil,
         view: ViewType? = nil
     ) {
         self.pattern = pattern
@@ -112,6 +119,8 @@ public struct UIDescriptor: Codable, Sendable, Equatable {
         self.confirmLabel = confirmLabel
         self.cancelLabel = cancelLabel
         self.content = content
+        self.emoji = emoji
+        self.accent = accent
         self.view = view
     }
 }

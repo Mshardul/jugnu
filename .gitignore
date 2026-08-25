@@ -27,6 +27,7 @@ dist/
 # Agent / plan scratch (local)
 .superpowers/
 .prompts/
+.playwright-mcp/
 
 # Git worktrees (local isolation)
 .worktrees/

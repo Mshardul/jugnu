@@ -23,6 +23,7 @@ Nothing here is bundled inside `Jugnu.app`. Users install zips into `~/.local/sh
 | `open-terminal-here` | open last-picked terminal at the front Finder folder |
 | `mute-all` | mute mic + speakers and restore previous volumes |
 | `keep-awake` | keep Mac awake (15m / 1h / 2h / until-off) via `caffeinate` |
+| `nudges` | recurring wellness reminders with detached card UI |
 
 Package: `scripts/package-addon.sh addons/<id> dist/`
 
@@ -42,5 +43,3 @@ Club paired toggles and similar converters as commands under one addon. Don’t 
 
 Design: [`docs/architecture/2026-08-22-shell-design.md`](../docs/architecture/2026-08-22-shell-design.md)
 Backlog / packaging map: [`docs/backlog.md`](../docs/backlog.md)
-
-Staging nursery (pre-graduation): `../apps/`, `../extensions/macos/`.

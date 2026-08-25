@@ -15,6 +15,14 @@ public struct JugnuPaths: Sendable {
         home.appendingPathComponent(".local/share/jugnu/helpers")
     }
 
+    public var stateDir: URL {
+        home.appendingPathComponent(".local/share/jugnu/state")
+    }
+
+    public var clockTimersFile: URL {
+        stateDir.appendingPathComponent("clock/timers.json")
+    }
+
     public func helperRoot(id: String, version: String) -> URL {
         helpersDir.appendingPathComponent(id).appendingPathComponent(version)
     }

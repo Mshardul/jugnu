@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Jugnu — launcher + catalog mockup (living reference)</title>
+<style>
+  :root{
+    --accent:#F5A623; --accent-deep:#C97A12; --background:#16130E; --surface:#1F1B13; --surface2:#241f16;
+    --textPrimary:#EDE6D9; --textSecondary:#8C8577; --subText:#B8AF9E; --border:#332C1E; --error:#E5484D;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#0b0b0b;color:#ddd;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:32px;}
+  h1{font-size:20px;margin:0 0 4px;}
+  .meta{color:#888;font-size:12px;margin-bottom:28px;}
+  .meta a{color:#8ab4f8;}
+  section{margin-bottom:48px;}
+  h2{font-size:14px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;margin:0 0 14px;font-weight:700;}
+  .note{font-size:12px;color:#777;max-width:640px;margin:10px 0 0;line-height:1.5;}
+  .not-decided{display:inline-block;background:#3a2a12;color:#e0a94b;font-size:10.5px;padding:2px 8px;border-radius:6px;margin-left:8px;font-weight:600;vertical-align:middle;}
+
+  .theme-controls{position:fixed;top:20px;right:20px;display:flex;gap:8px;z-index:50;}
+  .theme-controls select{background:#1a1a1a;color:#ddd;border:1px solid #3a3a3a;border-radius:8px;padding:7px 10px;font-size:12px;font-family:inherit;}
+
+  .stage{background:#000;border-radius:12px;padding:28px;display:inline-block;}
+
+  /* ---- shared jg panel chrome ---- */
+  .jg{background:var(--background);color:var(--textPrimary);border:1px solid var(--border);border-radius:14px;
+      box-shadow:0 24px 60px rgba(0,0,0,.55); overflow:hidden; position:relative;}
+  .row1{display:flex;align-items:center;padding:0 16px;height:52px;border-bottom:1px solid var(--border);flex-shrink:0;}
+  .logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:var(--textPrimary);}
+  .logo .dot{width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff2d9,var(--accent) 55%,transparent 80%);box-shadow:0 0 10px 2px rgba(245,166,35,.55);}
+  .favs{display:flex;gap:6px;flex:1;justify-content:center;align-items:center;}
+  .fav{width:28px;height:28px;border-radius:8px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;position:relative;}
+  .fav.lit{background:color-mix(in srgb, var(--accent) 16%, var(--surface));box-shadow:0 0 8px 1px color-mix(in srgb, var(--accent) 45%, transparent);}
+  .fav.dim{opacity:.45;}
+  .fav.more{color:var(--textSecondary);font-weight:700;font-size:15px;}
+  .prefs-btn{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--textSecondary);background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 10px;white-space:nowrap;}
+  .row2{padding:10px 16px;border-bottom:1px solid var(--border);flex-shrink:0;}
+  .search{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:9px 12px;font-size:12.5px;color:var(--textSecondary);display:flex;align-items:center;gap:8px;box-sizing:border-box;}
+
+  /* ---- viewA ---- */
+  .viewA{width:640px;}
+
+  /* ---- viewB ---- */
+  .viewB{width:864px;height:585px;display:flex;flex-direction:column;}
+  .body-c{display:grid;grid-template-columns:170px 1fr;flex:1;min-height:0;}
+  .rail{background:rgba(255,255,255,.02);padding:10px;border-right:1px solid var(--border);overflow:auto;}
+  .rail-group-label{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--textSecondary);margin:4px 6px 6px;font-weight:700;display:flex;align-items:center;gap:6px;}
+  .rail-group-label:first-child{margin-top:2px;}
+  .rail-group-label::after{content:"";flex:1;border-bottom:1px dotted var(--border);}
+  .r1-cat{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:7px;font-size:12.5px;color:var(--textPrimary);margin-bottom:1px;position:relative;}
+  .r1-cat .ic{width:20px;height:20px;border-radius:5px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:10.5px;flex-shrink:0;}
+  .r1-cat.on{background:color-mix(in srgb, var(--accent) 12%, transparent);color:var(--accent);font-weight:600;}
+  .r1-cat.on .ic{background:color-mix(in srgb, var(--accent) 22%, transparent);}
+  .r1-cat.on::before{content:"";position:absolute;left:-10px;top:4px;bottom:4px;width:3px;border-radius:2px;background:var(--accent);}
+  .r1-subwrap{margin:2px 0 4px 28px;border-left:1px solid var(--border);padding-left:10px;display:flex;flex-direction:column;gap:1px;}
+  .r1-sub{padding:5px 8px;border-radius:6px;font-size:11.5px;color:var(--subText);}
+  .r1-sub.on{background:color-mix(in srgb, var(--accent) 13%, transparent);color:var(--accent);font-weight:600;}
+
+  .list{padding:14px 16px;overflow:auto;}
+  .jg-tags{font-size:10px;color:var(--textSecondary);margin-bottom:10px;display:flex;gap:8px;align-items:center;}
+  .jg-tags b{color:var(--textPrimary);text-transform:uppercase;letter-spacing:.05em;font-weight:700;font-size:9px;}
+  .tagchip{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:3px 10px;color:var(--textSecondary);}
+  .tagchip.on{background:color-mix(in srgb, var(--accent) 16%, var(--surface));color:var(--accent);border-color:transparent;box-shadow:0 0 8px 1px color-mix(in srgb, var(--accent) 40%, transparent);font-weight:700;}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+
+  /* ---- card (no-flip, everything on one face) ---- */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:13px;display:flex;flex-direction:column;transition:all .15s ease;}
+  .card:hover{transform:scale(1.05);box-shadow:0 14px 28px rgba(0,0,0,.5);border-color:var(--accent);z-index:5;position:relative;}
+  .card.inactive{opacity:.55;}
+  @keyframes btnGlowPulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent);}50%{box-shadow:0 0 0 6px transparent;}}
+  .card.inactive:hover .pill-install,
+  .card.inactive:hover .toggle-mini{animation:btnGlowPulse .6s ease-in-out;border-radius:9px;}
+  .icrow{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px;}
+  .ic-card{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--accent),var(--accent-deep));flex-shrink:0;position:relative;}
+  .status-dot{position:absolute;bottom:-2px;right:-2px;width:9px;height:9px;border-radius:50%;border:2px solid var(--surface);}
+  .status-dot.on{background:#4ADE80;}
+  .status-dot.off{background:var(--textSecondary);}
+  .badge{width:16px;height:16px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--accent);}
+  .star{width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--accent);}
+  .star.off{color:var(--textSecondary);}
+  .topright{display:flex;gap:5px;align-items:center;}
+  .nm{font-size:13.5px;font-weight:700;color:var(--textPrimary);margin-bottom:3px;}
+  .desc{font-size:10.5px;color:var(--subText);line-height:1.4;margin-bottom:10px;}
+  .pill-install{background:color-mix(in srgb, var(--accent) 15%, transparent);color:var(--accent);font-size:10.5px;font-weight:700;padding:6px 10px;border-radius:9px;text-align:center;margin-bottom:10px;}
+  .state-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .state-label{font-size:10.5px;color:var(--textPrimary);}
+  .toggle-mini{width:28px;height:16px;border-radius:9px;background:var(--border);position:relative;flex-shrink:0;}
+  .toggle-mini.on{background:color-mix(in srgb, var(--accent) 55%, var(--border));}
+  .toggle-mini .knob{width:12px;height:12px;border-radius:50%;background:var(--textPrimary);position:absolute;top:2px;left:2px;}
+  .toggle-mini.on .knob{left:14px;background:var(--background);}
+  .card-footer{display:flex;justify-content:space-between;align-items:center;padding-top:9px;border-top:1px solid var(--border);}
+  .card-link{font-size:10.5px;color:var(--textSecondary);}
+  .card-link.danger{color:var(--error);}
+
+  body.mono .jg{font-family:"SF Mono",Menlo,Consolas,monospace;}
+
+  /* ---- search results: breadcrumb style, fixed 5-row-slot window ---- */
+  .results{padding:6px 10px 12px;}
+  .result-row{display:flex;align-items:center;gap:10px;height:46px;padding:0 12px;border-radius:8px;box-sizing:border-box;}
+  .result-row.hi{background:color-mix(in srgb, var(--accent) 10%, transparent);}
+  .result-row.empty-slot{height:46px;}
+  .result-ic{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--accent),var(--accent-deep));flex-shrink:0;}
+  .result-txt{font-size:12.5px;}
+  .result-addon{color:var(--textSecondary);}
+  .result-sep{color:var(--textSecondary);margin:0 3px;}
+  .result-cmd{font-weight:700;color:var(--textPrimary);}
+  .result-trailing{height:46px;display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:12px;font-weight:700;border-top:1px dashed var(--border);margin-top:2px;}
+  .results.scrolling{max-height:230px;overflow-y:auto;}
+
+  /* ---- detail view: gallery + tabs, stacked over a dimmed viewB ---- */
+  .stack-wrap{position:relative;width:864px;height:585px;}
+  .stack-behind{position:absolute;inset:0;filter:brightness(.45) saturate(.7);pointer-events:none;}
+  .stack-front{position:absolute;}
+  .detailView{width:760px;height:500px;display:flex;flex-direction:column;}
+  .dv-close{cursor:pointer;}
+
+  /* genie open/close transition — shape (clip-path) and position/size (transform) animate on one
+     unified timeline so they can't desync; clip-path stays a real non-degenerate polygon throughout
+     (a taper toward one edge, never a near-zero point) so the browser always has a real shape to tween. */
+  @keyframes genieOpen{
+    0%{ transform: translate(var(--from-x), var(--from-y)) scale(var(--from-sx), var(--from-sy)); clip-path: polygon(50% 0%, 50% 0%, 100% 100%, 0% 100%); }
+    100%{ transform: translate(0,0) scale(1,1); clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); }
+  }
+  @keyframes genieClose{
+    0%{ transform: translate(0,0) scale(1,1); clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); }
+    100%{ transform: translate(var(--from-x), var(--from-y)) scale(var(--from-sx), var(--from-sy)); clip-path: polygon(50% 0%, 50% 0%, 100% 100%, 0% 100%); }
+  }
+  .detailView.genie-open{animation:genieOpen .5s cubic-bezier(.25,.75,.35,1) forwards;}
+  .detailView.genie-close{animation:genieClose .45s cubic-bezier(.6,0,.85,.3) forwards;}
+  .stack-behind{transition:filter .3s ease;}
+  .dv-hd{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--border);flex-shrink:0;}
+  .dv-ic{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-deep));flex-shrink:0;}
+  .dv-name{font-size:15px;font-weight:700;}
+  .dv-cat{font-size:10.5px;color:var(--subText);}
+  .dv-close{margin-left:auto;color:var(--textSecondary);font-size:13px;}
+  .dv-gallery{display:flex;gap:8px;padding:14px 18px 0;flex-shrink:0;overflow-x:auto;}
+  .dv-shot{background:var(--surface);border:1px solid var(--border);border-radius:9px;height:110px;width:180px;flex:none;display:flex;align-items:center;justify-content:center;color:var(--textSecondary);font-size:10.5px;}
+  .dv-tabs{display:flex;gap:2px;padding:12px 18px 0;border-bottom:1px solid var(--border);flex-shrink:0;}
+  .dv-tab{padding:8px 14px;font-size:11.5px;color:var(--textSecondary);border-bottom:2px solid transparent;}
+  .dv-tab.on{color:var(--accent);border-bottom-color:var(--accent);font-weight:700;}
+  .dv-body{flex:1;overflow:auto;padding:16px 18px;}
+  .dv-sec-label{font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--textSecondary);font-weight:700;margin-bottom:7px;}
+  .dv-sec-body{font-size:11.5px;color:var(--subText);line-height:1.55;}
+  .dv-meta-row{display:flex;justify-content:space-between;padding:3px 0;font-size:11px;color:var(--textSecondary);max-width:220px;}
+</style>
+</head>
+<body>
+
+<div class="theme-controls">
+  <select id="modeSelect">
+    <option value="dark">Dark</option>
+    <option value="light">Light</option>
+  </select>
+  <select id="presetSelect">
+    <option value="firefly">Firefly</option>
+    <option value="terminal">Terminal Phosphor</option>
+    <option value="rose">Rose Quartz</option>
+  </select>
+</div>
+
+<h1>Jugnu — launcher + catalog mockup</h1>
+<p class="meta">Living reference for <a href="./2026-08-25-launcher-catalog-design.md">2026-08-25-launcher-catalog-design.md</a> — updated as sections lock. Preset/light-dark values match the locked tokens in <a href="./2026-08-23-palette-ui-product-pass.md">2026-08-23 product pass §3</a>; <code>subText</code> is a new real <code>JugnuTheme</code> field, <code>border</code>/<code>surface2</code>/<code>accentDeep</code> stay derived from existing tokens rather than becoming new fields (see design doc §4). Sections not yet decided are omitted or marked.</p>
+
+<section>
+  <h2>viewA — launcher (Opt+Space)</h2>
+  <div class="stage">
+    <div class="jg viewA">
+      <div class="row1">
+        <div class="logo"><span class="dot"></span>Jugnu</div>
+        <div class="favs">
+          <div class="fav lit">🎤</div>
+          <div class="fav dim">🔇</div>
+          <div class="fav lit">🌙</div>
+          <div class="fav dim">📶</div>
+          <div class="fav">🧮</div>
+          <div class="fav more">···</div>
+        </div>
+        <div class="prefs-btn">⚙︎ All addons</div>
+      </div>
+      <div class="row2"><div class="search">🔍 Try &ldquo;mute mic&rdquo;…</div></div>
+    </div>
+  </div>
+  <p class="note">Row1: logo (left) · top-5 favorites by user order, lit/dim reflecting live state for stateful commands, plain for non-stateful (calculator) · 6th &ldquo;…&rdquo; opens viewB with Favorites pre-selected · prefs button (right). Row2: search, placeholder rotates through real commands. <strong>Row1 editing</strong> (not visually depicted, both interactions apply directly to these icons): drag-and-drop to reorder within the 5 visible slots; right-click an icon → &ldquo;Remove from Favorites&rdquo; context menu. Adding a new favorite is card-star-only (viewB), not available from row1.</p>
+</section>
+
+<section>
+  <h2>viewA — row1, empty favorites state</h2>
+  <div class="stage">
+    <div class="jg viewA">
+      <div class="row1">
+        <div class="logo"><span class="dot"></span>Jugnu</div>
+        <div class="favs"></div>
+        <div class="prefs-btn">⚙︎ All addons</div>
+      </div>
+      <div class="row2"><div class="search">🔍 Try &ldquo;mute mic&rdquo;…</div></div>
+    </div>
+  </div>
+  <p class="note">Zero favorites configured — row1's center stays blank, no substitute content. Layout geometry (logo left, prefs right) never shifts regardless of favorite count.</p>
+</section>
+
+<section>
+  <h2>viewA — grown in place, showing search results</h2>
+  <div class="stage">
+    <div class="jg viewA">
+      <div class="row1">
+        <div class="logo"><span class="dot"></span>Jugnu</div>
+        <div class="favs">
+          <div class="fav lit">🎤</div>
+          <div class="fav dim">🔇</div>
+          <div class="fav lit">🌙</div>
+          <div class="fav dim">📶</div>
+          <div class="fav">🧮</div>
+          <div class="fav more">···</div>
+        </div>
+        <div class="prefs-btn">⚙︎ All addons</div>
+      </div>
+      <div class="row2"><div class="search">🔍 mute</div></div>
+      <div class="results">
+        <div class="result-row hi">
+          <div class="result-ic"></div>
+          <div class="result-txt"><span class="result-addon">Mic Mute</span><span class="result-sep">›</span><span class="result-cmd">Mute Mic</span></div>
+        </div>
+        <div class="result-row">
+          <div class="result-ic"></div>
+          <div class="result-txt"><span class="result-addon">Mute All</span><span class="result-sep">›</span><span class="result-cmd">Mute All</span></div>
+        </div>
+        <div class="result-row">
+          <div class="result-ic"></div>
+          <div class="result-txt"><span class="result-addon">Auto Mute</span><span class="result-sep">›</span><span class="result-cmd">On Join</span></div>
+        </div>
+        <div class="result-row empty-slot"></div>
+        <div class="result-trailing">Show all addons →</div>
+      </div>
+    </div>
+  </div>
+  <p class="note">Row1/Row2 stay fixed, never hidden — the panel morphs once to a <strong>fixed 5-row-slot height</strong> (same <code>KeyablePanel</code>, per <a href="./2026-08-24-view-types.md">view types §2</a>), not resizing per keystroke. Each result row: icon (same chip language as favorites/cards) + breadcrumb text &ldquo;Addon › Command&rdquo; (addon muted, command bold) on one line. Top result highlighted via full-row tint (keyboard-selected by default). <strong>Slot 5 is always &ldquo;Show all addons&rdquo;</strong> (opens viewB) — with 3 real results here, slot 4 stays reserved/blank rather than letting slot 5 slide up.</p>
+</section>
+
+<section>
+  <h2>viewA — search results, 8 matches (scrolls within the same fixed height)</h2>
+  <div class="stage">
+    <div class="jg viewA">
+      <div class="row1">
+        <div class="logo"><span class="dot"></span>Jugnu</div>
+        <div class="favs">
+          <div class="fav lit">🎤</div>
+          <div class="fav dim">🔇</div>
+          <div class="fav lit">🌙</div>
+          <div class="fav dim">📶</div>
+          <div class="fav">🧮</div>
+          <div class="fav more">···</div>
+        </div>
+        <div class="prefs-btn">⚙︎ All addons</div>
+      </div>
+      <div class="row2"><div class="search">🔍 e</div></div>
+      <div class="results scrolling">
+        <div class="result-row hi"><div class="result-ic"></div><div class="result-txt"><span class="result-addon">Mic Mute</span><span class="result-sep">›</span><span class="result-cmd">Mute Mic</span></div></div>
+        <div class="result-row"><div class="result-ic"></div><div class="result-txt"><span class="result-addon">Mute All</span><span class="result-sep">›</span><span class="result-cmd">Mute All</span></div></div>
+        <div class="result-row"><div class="result-ic"></div><div class="result-txt"><span class="result-addon">Meeting Tools</span><span class="result-sep">›</span><span class="result-cmd">Mic Check</span></div></div>
+        <div class="result-row"><div class="result-ic"></div><div class="result-txt"><span class="result-addon">Calendar</span><span class="result-sep">›</span><span class="result-cmd">My Events</span></div></div>
+        <div class="result-row"><div class="result-ic"></div><div class="result-txt"><span class="result-addon">Converters</span><span class="result-sep">›</span><span class="result-cmd">Metric</span></div></div>
+        <div class="result-row"><div class="result-ic"></div><div class="result-txt"><span class="result-addon">Reminders</span><span class="result-sep">›</span><span class="result-cmd">Set Timer</span></div></div>
+        <div class="result-row"><div class="result-ic"></div><div class="result-txt"><span class="result-addon">Play</span><span class="result-sep">›</span><span class="result-cmd">Emoji Picker</span></div></div>
+        <div class="result-row"><div class="result-ic"></div><div class="result-txt"><span class="result-addon">Focus</span><span class="result-sep">›</span><span class="result-cmd">Enable DND</span></div></div>
+      </div>
+    </div>
+  </div>
+  <p class="note">More than 4 real results: slots scroll internally instead of showing &ldquo;Show all addons&rdquo; — no room for it, and it would compete with actually scrolling to see more matches. Outer panel height is identical to the 3-result case above.</p>
+</section>
+
+<section>
+  <h2>viewA — search results, zero matches (&ldquo;did you mean&rdquo; fallback)</h2>
+  <div class="stage">
+    <div class="jg viewA">
+      <div class="row1">
+        <div class="logo"><span class="dot"></span>Jugnu</div>
+        <div class="favs">
+          <div class="fav lit">🎤</div>
+          <div class="fav dim">🔇</div>
+          <div class="fav lit">🌙</div>
+          <div class="fav dim">📶</div>
+          <div class="fav">🧮</div>
+          <div class="fav more">···</div>
+        </div>
+        <div class="prefs-btn">⚙︎ All addons</div>
+      </div>
+      <div class="row2"><div class="search">🔍 mutee</div></div>
+      <div class="results">
+        <div class="result-row hi"><div class="result-ic"></div><div class="result-txt" style="color:var(--textSecondary);">Did you mean <span class="result-cmd" style="margin-left:3px;">Mute Mic</span></div></div>
+        <div class="result-row empty-slot"></div>
+        <div class="result-row empty-slot"></div>
+        <div class="result-row empty-slot"></div>
+        <div class="result-trailing">Show all addons →</div>
+      </div>
+    </div>
+  </div>
+  <p class="note">Zero real matches: falls back to the already-shipped &ldquo;did you mean&rdquo; behavior (<a href="./2026-08-23-palette-ui-product-pass.md">product pass §4.A</a>) — single closest command by fuzzy score, <strong>scoped to installed addons only</strong> (an uninstalled suggestion wouldn't be immediately actionable). &ldquo;Show all addons&rdquo; still shows at slot 5 as the fallback's fallback.</p>
+</section>
+
+<section>
+  <h2>viewB — catalog browse (&ldquo;see all addons&rdquo;)</h2>
+  <div class="stage">
+    <div class="jg viewB">
+      <div class="row1">
+        <div class="logo"><span class="dot"></span>Jugnu</div>
+        <div class="favs">
+          <div class="fav lit">🎤</div>
+          <div class="fav dim">🔇</div>
+          <div class="fav lit">🌙</div>
+          <div class="fav dim">📶</div>
+          <div class="fav">🧮</div>
+          <div class="fav more">···</div>
+        </div>
+        <div class="prefs-btn">⚙︎ All addons</div>
+      </div>
+      <div class="row2"><div class="search">🔍 Search commands…</div></div>
+      <div class="body-c">
+        <div class="rail">
+          <div class="rail-group-label">Browse</div>
+          <div class="r1-cat on"><span class="ic">◆</span>All</div>
+          <div class="r1-cat"><span class="ic">▣</span>Installed</div>
+          <div class="r1-cat"><span class="ic">◷</span>Recent</div>
+          <div class="r1-cat"><span class="ic">★</span>Favorites</div>
+          <div class="rail-group-label">Categories</div>
+          <div class="r1-cat"><span class="ic">📋</span>Clipboard</div>
+          <div class="r1-cat on"><span class="ic">🎥</span>Meeting</div>
+          <div class="r1-subwrap">
+            <div class="r1-sub on">Mic</div>
+            <div class="r1-sub">Camera</div>
+            <div class="r1-sub">Calendar</div>
+          </div>
+          <div class="r1-cat"><span class="ic">🎨</span>Appearance</div>
+          <div class="r1-cat"><span class="ic">🔄</span>Converters</div>
+          <div class="r1-cat"><span class="ic">🎲</span>Play</div>
+        </div>
+        <div class="list">
+          <div class="jg-tags"><b>Tags</b><span class="tagchip on">popular</span><span class="tagchip">new</span><span class="tagchip on">free</span></div>
+          <div class="grid3" id="cardGrid">
+            <!-- cards injected identical markup to the single-card demo below, repeated -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="note">Row1/Row2 identical to viewA. Rail = one flat list, two groups each with a dot-leader label (uppercase group name + trailing dotted line): <strong>Browse</strong> (All/Installed/Recent/Favorites — All pre-selected by default, mutually exclusive with category selection by construction) and <strong>Categories</strong> (accordion — clicking a category expands its subcategories nested beneath it, shown here with &ldquo;Meeting&rdquo; expanded to Mic/Camera/Calendar). Panel sized via the <code>canvas</code> view type's own band (~864×585pt working reference, ~70% capped).</p>
+</section>
+
+<section>
+  <h2>Detail view — smaller than viewB, stacked on top of a dimmed/faded viewB behind it</h2>
+  <div class="stage">
+    <div class="stack-wrap">
+      <div class="jg viewB stack-behind">
+        <div class="row1">
+          <div class="logo"><span class="dot"></span>Jugnu</div>
+          <div class="favs"><div class="fav lit">🎤</div><div class="fav dim">🔇</div><div class="fav lit">🌙</div><div class="fav dim">📶</div><div class="fav">🧮</div><div class="fav more">···</div></div>
+          <div class="prefs-btn">⚙︎ All addons</div>
+        </div>
+        <div class="row2"><div class="search">🔍 Search commands…</div></div>
+        <div class="body-c">
+          <div class="rail">
+            <div class="rail-group-label">Browse</div>
+            <div class="r1-cat on"><span class="ic">◆</span>All</div>
+            <div class="r1-cat"><span class="ic">▣</span>Installed</div>
+            <div class="r1-cat"><span class="ic">◷</span>Recent</div>
+            <div class="r1-cat"><span class="ic">★</span>Favorites</div>
+            <div class="rail-group-label">Categories</div>
+            <div class="r1-cat"><span class="ic">📋</span>Clipboard</div>
+            <div class="r1-cat"><span class="ic">🎥</span>Meeting</div>
+            <div class="r1-cat"><span class="ic">🎨</span>Appearance</div>
+          </div>
+          <div class="list"><div class="grid3" id="cardGridBehind"></div></div>
+        </div>
+      </div>
+      <div class="jg detailView stack-front" id="genieDetail" style="top:42px;left:52px;">
+        <div class="dv-hd">
+          <div class="dv-ic"></div>
+          <div><div class="dv-name">Mic Mute</div><div class="dv-cat">Meeting › Mic</div></div>
+          <div class="dv-close" id="genieClose" onclick="closeGenie()">✕</div>
+        </div>
+        <div class="dv-gallery">
+          <div class="dv-shot">screenshot 1</div>
+          <div class="dv-shot">screenshot 2</div>
+          <div class="dv-shot">screenshot 3</div>
+        </div>
+        <div class="dv-tabs">
+          <div class="dv-tab on">Overview</div>
+          <div class="dv-tab">Commands</div>
+          <div class="dv-tab">Permissions</div>
+        </div>
+        <div class="dv-body">
+          <div class="dv-sec-label">Description</div>
+          <div class="dv-sec-body">Toggle your microphone instantly from anywhere, with visual state feedback in the menu bar and favorites row.</div>
+          <div class="dv-sec-label" style="margin-top:16px">Details</div>
+          <div class="dv-meta-row"><span>Version</span><span>1.2.0</span></div>
+          <div class="dv-meta-row"><span>Size</span><span>340 KB</span></div>
+          <div class="dv-meta-row"><span>Commands</span><span>3</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="note">Opened via the card's &ldquo;Details&rdquo; footer link. <strong>Smaller than viewB on both axes</strong> (~760×500pt vs. viewB's ~864×585pt) — not the same footprint — layered on top with viewB's card grid/rail visibly dimmed/faded behind it (not just logically inactive). Header (icon/name/category breadcrumb) fixed, then a horizontally-scrollable screenshot gallery, then a full-width tab strip (Overview / Commands / Permissions), tab body scrolls independently. Explored and rejected: two-column fixed-sidebar layout, 3-column no-scroll dashboard.</p>
+</section>
+
+<section>
+  <h2>Addon card — everything on one face, no flip</h2>
+  <div class="stage" style="display:flex;gap:24px;align-items:flex-start;">
+    <div style="width:210px;">
+      <div class="card">
+        <div class="icrow"><div class="ic-card"><div class="status-dot on"></div></div><div class="topright"><div class="star">★</div><div class="badge">✓</div></div></div>
+        <div class="nm">Mic Mute</div>
+        <div class="desc">Toggle your mic on or off with one shortcut.</div>
+        <div class="state-row"><div class="state-label">Enabled</div><div class="toggle-mini on"><div class="knob"></div></div></div>
+        <div class="card-footer"><span class="card-link">Details</span><span class="card-link danger">Uninstall</span></div>
+      </div>
+      <p class="flip-hint">Active — installed + favorited + enabled</p>
+    </div>
+
+    <div style="width:210px;">
+      <div class="card inactive">
+        <div class="icrow"><div class="ic-card"><div class="status-dot off"></div></div><div class="topright"><div class="star off">★</div><div class="badge">✓</div></div></div>
+        <div class="nm">Mute All</div>
+        <div class="desc">Mic and camera off together, one click.</div>
+        <div class="state-row"><div class="state-label" style="color:var(--textSecondary)">Disabled</div><div class="toggle-mini"><div class="knob"></div></div></div>
+        <div class="card-footer"><span class="card-link">Details</span><span class="card-link danger">Uninstall</span></div>
+      </div>
+      <p class="flip-hint">Inactive — installed, not favorited, disabled</p>
+    </div>
+
+    <div style="width:210px;">
+      <div class="card inactive">
+        <div class="icrow"><div class="ic-card"><div class="status-dot off"></div></div><div class="topright"><div class="badge">✓</div></div></div>
+        <div class="nm">Focus Toggle</div>
+        <div class="desc">Flip Do Not Disturb instantly from anywhere.</div>
+        <div class="pill-install" style="text-align:center">Install</div>
+        <div class="card-footer"><span class="card-link">Details</span></div>
+      </div>
+      <p class="flip-hint">Inactive — not installed, no star, no Uninstall link, single Install action</p>
+    </div>
+  </div>
+  <p class="note">Content locked: icon, name, description, favorite star (installed-only), official badge, 3-state install area (Install / Enabled+toggle / Disabled+toggle), plus a footer row (Details left, Uninstall right in <code>error</code> color) below a thin top border. No flip — clicking Details opens the detail view directly; clicking Uninstall still opens the existing confirm (<code>ask</code>) dialog. <strong>Card state groups by Active vs. Inactive</strong> (disabled and not-installed share one treatment: dim + a status dot on the icon corner) rather than by installed/not-installed — see design doc §3.2 for the full reasoning and other options explored. Icon art shown here is a placeholder gradient block — real per-addon icon system is <a href="../tickets.md">ticket 0051</a>, parked.</p>
+</section>
+
+<script>
+  // Locked preset values — 2026-08-23-palette-ui-product-pass.md §3. subText/border are new (design doc §4), not yet in JugnuTheme.
+  const THEMES = {
+    firefly: {
+      dark:  {accent:"#F5A623", accentDeep:"#C97A12", background:"#16130E", surface:"#1F1B13", surface2:"#241f16", textPrimary:"#EDE6D9", textSecondary:"#8C8577", subText:"#B8AF9E", border:"#332C1E", error:"#E5484D"},
+      light: {accent:"#C97A12", accentDeep:"#A8620D", background:"#F7F3EA", surface:"#FFFDF8", surface2:"#F1EADA", textPrimary:"#2A2417", textSecondary:"#756E5C", subText:"#5B5647", border:"#E4DCC8", error:"#E5484D"},
+    },
+    terminal: {
+      dark:  {accent:"#39FF6A", accentDeep:"#22C24E", background:"#020402", surface:"#0A120A", surface2:"#0F1B10", textPrimary:"#C9FFD4", textSecondary:"#3A8A4A", subText:"#6FAF7C", border:"#123018", error:"#E5484D"},
+      light: {accent:"#1C8A3F", accentDeep:"#146B30", background:"#EEF3EC", surface:"#F7FAF6", surface2:"#E7EFE6", textPrimary:"#12291A", textSecondary:"#4F6D57", subText:"#385E43", border:"#D3E0D6", error:"#E5484D"},
+    },
+    rose: {
+      dark:  {accent:"#F0559B", accentDeep:"#C43D7D", background:"#210F1A", surface:"#2E1524", surface2:"#3A1B2E", textPrimary:"#FBE6F1", textSecondary:"#B98AA7", subText:"#D2A9BF", border:"#402032", error:"#E5484D"},
+      light: {accent:"#D13D82", accentDeep:"#A82F67", background:"#FDF0F6", surface:"#FFFAFD", surface2:"#F8E4EE", textPrimary:"#4A1936", textSecondary:"#93677F", subText:"#6F4A5E", border:"#F0DCE7", error:"#E5484D"},
+    },
+  };
+
+  function applyTheme(preset, mode) {
+    const t = THEMES[preset][mode];
+    const root = document.documentElement.style;
+    root.setProperty('--accent', t.accent);
+    root.setProperty('--accent-deep', t.accentDeep);
+    root.setProperty('--background', t.background);
+    root.setProperty('--surface', t.surface);
+    root.setProperty('--surface2', t.surface2);
+    root.setProperty('--textPrimary', t.textPrimary);
+    root.setProperty('--textSecondary', t.textSecondary);
+    root.setProperty('--subText', t.subText);
+    root.setProperty('--border', t.border);
+    root.setProperty('--error', t.error);
+    document.body.classList.toggle('mono', preset === 'terminal');
+  }
+
+  const modeSelect = document.getElementById('modeSelect');
+  const presetSelect = document.getElementById('presetSelect');
+  function syncTheme() { applyTheme(presetSelect.value, modeSelect.value); }
+  modeSelect.addEventListener('change', syncTheme);
+  presetSelect.addEventListener('change', syncTheme);
+  syncTheme();
+
+  // populate the viewB grid with 6 card instances (front-only, static) using the same markup as the demo card fronts
+  const cardData = [
+    {name:"Mic Mute", desc:"Toggle your mic on or off with one shortcut.", state:"enabled", star:true},
+    {name:"Push to Talk", desc:"Hold a key to unmute while you speak.", state:"install"},
+    {name:"Auto Mute", desc:"Mutes automatically when you join a call.", state:"disabled", star:false},
+    {name:"Focus Toggle", desc:"Flip Do Not Disturb instantly from anywhere.", state:"enabled", star:false},
+    {name:"Camera Off", desc:"Disable your webcam with one shortcut.", state:"install"},
+    {name:"Mute All", desc:"Mic and camera off together, one click.", state:"disabled", star:false},
+  ];
+  function renderCards(gridEl) {
+    if (!gridEl) return;
+    cardData.forEach(c => {
+      const isInactive = c.state !== "enabled";
+      const dotClass = c.state === "enabled" ? "on" : "off";
+      const topright = c.state === "install"
+        ? `<div class="badge">✓</div>`
+        : `<div class="star ${c.star ? '' : 'off'}">★</div><div class="badge">✓</div>`;
+      const bottom = c.state === "install"
+        ? `<div class="pill-install" style="text-align:center">Install</div>`
+        : `<div class="state-row"><div class="state-label" ${c.state==='disabled'?'style="color:var(--textSecondary)"':''}>${c.state==='enabled'?'Enabled':'Disabled'}</div><div class="toggle-mini ${c.state==='enabled'?'on':''}"><div class="knob"></div></div></div>`;
+      const footer = c.state === "install"
+        ? `<div class="card-footer"><span class="card-link">Details</span></div>`
+        : `<div class="card-footer"><span class="card-link">Details</span><span class="card-link danger">Uninstall</span></div>`;
+      gridEl.insertAdjacentHTML('beforeend', `
+        <div class="card ${isInactive ? 'inactive' : ''}">
+          <div class="icrow"><div class="ic-card"><div class="status-dot ${dotClass}"></div></div><div class="topright">${topright}</div></div>
+          <div class="nm">${c.name}</div>
+          <div class="desc">${c.desc}</div>
+          ${bottom}
+          ${footer}
+        </div>`);
+    });
+  }
+  renderCards(document.getElementById('cardGrid'));
+  renderCards(document.getElementById('cardGridBehind'));
+
+  // Genie open/close demo — click a card in the "behind" grid to open the detail view from that
+  // card's exact position/size; click ✕ to close it back into the same spot.
+  (function () {
+    const behindGrid = document.getElementById('cardGridBehind');
+    const detail = document.getElementById('genieDetail');
+    const stackBehind = document.querySelector('.stack-behind');
+    if (!behindGrid || !detail) return;
+
+    behindGrid.querySelectorAll('.flip-wrap, .card').forEach(cardEl => {
+      cardEl.style.cursor = 'pointer';
+      cardEl.addEventListener('click', () => openGenie(cardEl));
+    });
+
+    function openGenie(cardEl) {
+      const cardRect = cardEl.getBoundingClientRect();
+      const detailRect = detail.getBoundingClientRect();
+
+      const fx = cardRect.left - detailRect.left;
+      const fy = cardRect.top - detailRect.top;
+
+      detail.style.setProperty('--from-x', fx + 'px');
+      detail.style.setProperty('--from-y', fy + 'px');
+      detail.style.setProperty('--from-sx', (cardRect.width / detailRect.width).toFixed(3));
+      detail.style.setProperty('--from-sy', (cardRect.height / detailRect.height).toFixed(3));
+
+      detail.classList.remove('genie-close');
+      void detail.offsetWidth;
+      detail.classList.add('genie-open');
+      if (stackBehind) stackBehind.style.filter = 'brightness(.45) saturate(.7)';
+    }
+
+    window.closeGenie = function () {
+      detail.classList.remove('genie-open');
+      void detail.offsetWidth;
+      detail.classList.add('genie-close');
+    };
+  })();
+</script>
+
+</body>
+</html>

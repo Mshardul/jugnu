@@ -21,7 +21,6 @@
 | Recommended v0 addons | mic-mute, focus-toggle, paste-plain (installed as separate zips, skippable) |
 | Config | YAML; enable/disable; everything configurable later including first screen |
 | Disable / uninstall | **Proper cleanup** (see lifecycle) |
-| Staging | `apps/` + `extensions/macos/` remain nursery; graduate into `addons/` when packaging |
 
 ## 1. Big picture
 
@@ -45,8 +44,6 @@ registry/
   addons.json               # catalog (id, version, url, sha256, api, summary)
 docs/architecture/          # this spec and follow-ons
 config/jugnu.example.yaml
-apps/                       # staging nursery (not the runtime layout)
-extensions/macos/           # staging nursery
 ```
 
 ### User machine
@@ -240,5 +237,4 @@ Config/env may point at a **local** addon directory (repo `addons/<id>`) so deve
 
 - [Vision](../vision.md)
 - [Backlog](../backlog.md)
-- [Staging](../staging.md)
 - [Addon UI host + speed](./2026-08-22-addon-ui-speed-design.md)

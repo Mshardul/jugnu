@@ -27,6 +27,7 @@ Architecture decisions are recorded in [decisions/](decisions/). Future-work tic
 | Security audit (installer/runner/registry-trust hardening) | Future epic — [ticket 0003](../tickets.md); seeded with a real zip-slip finding in `AddonInstaller.unzip()` |
 | View types (viewport catalog) | Approved, implemented — [2026-08-24 spec](./2026-08-24-view-types.md) · [ticket 0045](../tickets.md) · [ADR 0002](decisions/0002-view-types.md) · [plan](../superpowers/plans/2026-08-24-view-types.md) |
 | Window management | Approved, implemented — [2026-08-24 `window-layouts`](./2026-08-24-window-layouts.md) · [ticket 0046](../tickets.md) · [plan](../superpowers/plans/2026-08-24-window-layouts.md) |
+| Clock helper + nudges | Approved — [2026-08-25](./2026-08-25-nudges-clock-helper-design.md) · [plan](../superpowers/plans/2026-08-25-nudges-clock-helper.md) · [0049](../tickets.md). First real `registry/helpers.json` consumer after [0047](../tickets.md). PNG icons: [0050](../tickets.md). |
 | Clipboard | Later |
 
 Process: brainstorm → section approval → write spec here → human review → implementation plan → code.

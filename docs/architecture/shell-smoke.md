@@ -56,6 +56,16 @@ Walk this after the 2026-08-23 palette + addon UI product pass. Leave items unch
 - [ ] **Floating Note**: type, Cmd+S, close, reopen — text persisted by the addon
 - [ ] Menu bar uses the template firefly icon (tints with the menu bar); click opens the menu
 
+### Nudges and clock helper
+
+- [ ] Enable **Nudges** → three presets visible
+- [ ] Set one interval to 30s (test) → card appears with huge emoji
+- [ ] Dismiss card → no duplicate stack
+- [ ] Pause nudges → no fire; Resume → fires again
+- [ ] Delete a preset → Restore presets brings it back
+- [ ] Add custom nudge from template → appears and schedules
+- [ ] Quit Jugnu → no fire; relaunch → schedules resume without burst of missed cards
+
 ### Permissions / hotkey (manual only — do not automate against TCC)
 
 - [ ] Deny a permission an addon needs: the shell shows a human sentence, not `ManifestLoaderError…`

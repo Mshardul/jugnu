@@ -8,6 +8,9 @@ The project has not published a release yet. Entries currently describe unreleas
 
 ### Added
 
+- 2026-08-26 — Shared `clock` helper: versioned timer scheduling installed once and reused by addons.
+- 2026-08-26 — First-party `nudges` addon: recurring wellness reminders, three presets, custom nudges, pause/resume, and restore.
+- 2026-08-26 — Shell `card` UI pattern for detached, dismissible reminder surfaces with prominent emoji.
 - 2026-08-24 — First-party `open-terminal-here` addon: open the last-picked terminal at the front Finder folder (default Terminal; no picker yet).
 - 2026-08-24 — First-party `mute-all` addon: mute mic and speakers together, restore saved volumes on the next run.
 - 2026-08-24 — Shell view types: ten viewport ids, screen `visibleFrame` clamps, click-outside ignored for `board`/`spread`/`canvas`, manifest `view_types` / command `view` / `ui.view`.
@@ -20,6 +23,8 @@ The project has not published a release yet. Entries currently describe unreleas
 
 ### Documentation
 
+- 2026-08-25 — Approved clock helper + nudges design; plan under docs/superpowers/plans/.
+- 2026-08-25 — Removed `apps/` and `extensions/` staging nurseries; unbuilt jobs live only in `docs/backlog.md`. Dropped `docs/staging.md`.
 - 2026-08-24 — Locked view types and `window-layouts` product (zones max 6, no undo, AX-first). View types implemented in the shell; `window-layouts` addon follows.
 - 2026-08-23 — Added reuse-before-invent / reach-for-this-type rules; SwiftLint errors on force unwrap/cast/try and runs via `make lint-swift` and pre-commit.
 - 2026-08-23 — Folded agent-ops copies into `AGENTS.md`; coding standards stay in `docs/conventions.md`.

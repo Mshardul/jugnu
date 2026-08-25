@@ -1,4 +1,4 @@
-"""Pytest path setup for leaf packages (module next to tests/)."""
+"""Pytest path setup for addon leaf packages (module next to tests/)."""
 
 from __future__ import annotations
 
@@ -10,12 +10,12 @@ _ROOT = Path(__file__).resolve().parent
 
 def _leaf_roots() -> list[Path]:
     roots: list[Path] = []
-    for base in (_ROOT / "apps", _ROOT / "extensions" / "macos"):
-        if not base.is_dir():
-            continue
-        for leaf in sorted(base.iterdir()):
-            if leaf.is_dir() and (leaf / "tests").is_dir():
-                roots.append(leaf)
+    base = _ROOT / "addons"
+    if not base.is_dir():
+        return roots
+    for leaf in sorted(base.iterdir()):
+        if leaf.is_dir() and (leaf / "tests").is_dir():
+            roots.append(leaf)
     return roots
 
 

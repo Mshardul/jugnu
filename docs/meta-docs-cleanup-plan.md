@@ -8,12 +8,13 @@ Decisions from the meta-file review pass (2026-08-24). Each bullet is one action
 
 ## README.md
 
-- §2 status table — keep the "14 native addons in tree" count, but flag for a currency check now (verify it's accurate).
+- §2 status table — **updated 2026-08-25:** count is 15 native addons in tree (currency check done).
 - §6 Dev tooling — trim to one-time setup only (uv sync, pre-commit install, tools-swift); link to CONTRIBUTING.md's Local Checks for the rest.
 - §7 Architecture (target) — trim to a pointer at vision.md's Decomposition list.
-- §10 What's here today — trim to a pointer at docs/backlog.md's staged-leaves tables.
+- §10 What's here today — trim to a pointer at docs/backlog.md + addons/README.md (staging tables gone 2026-08-25).
 - §11 Out of scope (for now) — delete entirely; vision.md's Explicit non-goals is canonical.
 - §12 Next — delete entirely; docs/backlog.md's Platform build-order table is canonical.
+- Repo layout — **updated 2026-08-25:** dropped `apps/` / `extensions/` lines.
 
 ## CHANGELOG.md
 
@@ -49,7 +50,7 @@ Decisions from the meta-file review pass (2026-08-24). Each bullet is one action
 - §4 Packaging-map preamble — trim to a pointer at vision.md §6; keep only backlog-specific framing (e.g. "ids below are capability/job ids...").
 - §5 Packaging map table — keep as-is, canonical, no merge.
 - §6 (7 detail sub-tables: Meeting/device, Devops/network/dev, Files/clipboard, Window/focus, System QoL, Play, Design) — delete entirely. No merge into §5.
-- §7/§8 (Staged leaves apps/ and extensions/macos/ tables) — keep; add a cross-link to docs/staging.md (staging.md explains the process, backlog.md holds the data).
+- ~~§7/§8 (Staged leaves apps/ and extensions/macos/ tables)~~ — **done (2026-08-25):** staging tables removed with `apps/` + `extensions/`; unbuilt jobs folded into packaging map / gap list. No `docs/staging.md` cross-link.
 - §10 Out of scope rabbit holes — delete entirely; vision.md's Explicit non-goals is canonical.
 
 ## docs/tickets.md
@@ -63,7 +64,7 @@ Decisions from the meta-file review pass (2026-08-24). Each bullet is one action
 
 ## docs/staging.md
 
-- Add one cross-link line pointing to docs/backlog.md's §7/§8 staged-leaves tables ("Current inventory: see docs/backlog.md § Staged leaves").
+- **Done (2026-08-25):** deleted with `apps/` + `extensions/`. Do not recreate. Inventory lives in `docs/backlog.md` + `addons/`.
 
 ## docs/release-process.md
 
@@ -128,16 +129,74 @@ Decisions from the meta-file review pass (2026-08-24). Each bullet is one action
 
 - No changes. Clean. Confirmed as correct canonical target.
 
-## addons/*/README.md (11 files)
+## shell/README.md
+
+- Intro — keep as-is.
+- §JugnuCore (SPM) — trim to a pointer at CONTRIBUTING.md's Local Checks; stop restating `swift test` / `make test-extended`.
+- §Run locally — trim to a pointer at root README.md's Run locally; keep only shell-specific bits not stated there (XcodeGen/project.yml regen note).
+- §Dev addons without install (`JUGNU_ADDON_PATH` example) — keep, shell-specific, not duplicated.
+- §Point xcode-select at Xcode — keep, shell-specific one-time setup.
+- Smoke link — keep.
+
+## registry/README.md
+
+- No changes. Clean.
+
+## addons/README.md
+
+- §v0 packages table (addon → commands) — keep as canonical inventory (closest to source, right next to the addon directories). No change to backlog.md's packaging map — different job (boundaries/rationale, not a duplicate inventory).
+- §Hierarchy (user POV) — trim to a pointer at vision.md §6 + conventions.md#vocabulary; delete restated terms/packaging rule 4.
+- Package command, design/backlog links — keep. Staging nursery pointer — **removed (2026-08-25)** with `apps/` / `extensions/`.
+
+## addons/*/README.md
 
 - Keep, one per addon, no change to the pattern. Different job from registry/addons.json (which is the centralized catalog/browse data source — summary/description for the app's Browse UI). Per-addon README.md is packaging content that ships inside the zip; release-process.md's packaging spec requires it there. Not duplicative — different consumers (browsing the catalog vs. inspecting a downloaded zip).
 
-## apps/*/README.md (19 files, staging/reference-only leaves)
+## apps/ + extensions/ (staging nursery)
 
-- Keep individual READMEs, one per leaf, same heading/subheading template across all of them.
-- apps/README.md becomes an index: lists every leaf (current/planned) with proper status, links to each leaf's own README.
-- Not yet defined: the shared template shape itself, and which existing leaf (if any) is closest to the target shape — revisit when we get to this group.
+- **Done (2026-08-25):** both trees deleted. Product installables are `addons/` only. Unbuilt jobs (`airdrop-folder`, `quarantine-clear`, stub ideas, etc.) live in `docs/backlog.md` packaging map / gap list — not as parallel folders.
+- ~~apps/*/README.md index + keep leaves~~ — cancelled; folders gone.
+- ~~extensions/macos/*/README.md index + keep leaves~~ — cancelled; folders gone.
+- ~~apps/*/ticket-backlog.md (8) + extensions ticket-backlogs (6)~~ — gone with the trees (were T-0xx fossils anyway).
 
-## Not yet reviewed
+## .prompts/backlog-prioritizer-and-implementer.prompt.md
 
-shell/README.md, registry/README.md, extensions/macos/*/README.md, each app's ticket-backlog.md, .prompts/*.md, .github/ISSUE_TEMPLATE/*.md, .github/pull_request_template.md, .github/instructions/jugnu.instructions.md (already skimmed once, appears clean as a thin redirect stub — not formally closed out).
+- Phase 1 step 3 — trim to just "inspect directory structure and files involved in each candidate"; delete the restated AGENTS.md Change-discipline language (step 1 already commits to following AGENTS.md).
+- Phase 2 step 4 — delete the restated "don't scaffold until packaging boundary explicit" clause (already in AGENTS.md, already referenced via step 1); keep "follow existing conventions."
+- Phase 2 step 5 — trim to a pointer ("follow Jugnu's addon packaging rules — vision.md, addon-manifest.md") instead of restating one-zip/shell-only-host/no-Python-Homebrew.
+- Phase 2 step 6 — delete entirely; the restated Git hard rule is redundant with step 1's AGENTS.md pointer.
+- Everything else — keep. Task-specific workflow/scoring/reporting instructions not stated elsewhere.
+
+## .github/ISSUE_TEMPLATE/bug_report.md, feature_request.md
+
+- No changes. Re-verified line by line (twice) — both are pure fill-in-the-blank templates, nothing to duplicate.
+
+## .github/pull_request_template.md
+
+- No changes. Re-verified line by line. Line 31 correctly links to conventions.md; line 32's inline restatement of the no-bundled-payload rule is appropriate for a checklist item (needs to be checkable at a glance, unlike design-doc prose) — not a miss.
+
+## .github/instructions/jugnu.instructions.md
+
+- No changes. Clean thin-redirect stub, confirmed earlier in the review (points to AGENTS.md / conventions.md / CONTRIBUTING.md, doesn't restate).
+
+## docs/assets/jugnu-icon-size-ladder.md
+
+- Line 15 — delete the dead "artifact link preserved in conversation history" clause (unusable outside the original session); keep the interpolation fallback instruction. Rest of the file is clean, unique, load-bearing reference data — no other changes.
+
+## docs/superpowers/plans/*.md (7 files) + .superpowers/sdd/*/*.md (4 files)
+
+Verified against actual code (spot-checked files/tests/commits, not just each plan's own closing notes) before deciding — all 7 confirmed COMPLETE:
+
+- 2026-08-22-shell-mvp.md — complete; the "no such module XCTest" failure in its .superpowers/sdd progress.md was an environment issue (xcode-select misconfigured), resolved per shell-smoke.md's documented 82-test green run and CI running `swift test` on every push.
+- 2026-08-22-addon-ui-host-p1.md — complete; AddonRunner/Protocol files + their tests exist.
+- 2026-08-23-addon-catalog-browse.md — complete; its final-review-report.md's C1 (critical) + I2-I4 (important) findings all confirmed fixed in current code (named files/lines checked), fix-prompt.md's asks were carried out.
+- 2026-08-23-palette-ui-product-pass.md — complete; Theme/DesignTokens/AppModel + matching tests exist.
+- 2026-08-23-shell-surface-presets.md — complete; ShellHost/KeyablePanel/ShellStack exist; confirmed zero references anywhere to the old PalettePanelController/UIHostController/BrowseCatalogWindowController (actually deleted, not left dangling).
+- 2026-08-24-view-types.md — complete; ViewType.swift + ListPanel/ConfirmPanel/FormPanel + tests exist.
+- 2026-08-24-window-layouts.md — complete; full addon package exists at addons/window-layouts/ matching the plan's scope.
+
+Action: move all 7 plan files + all 4 .superpowers/sdd files to a new archive location (e.g. docs/architecture/archive/) — implementation is done, these are disposable working documents now, not standing reference docs. Exact target folder name/structure not yet decided.
+
+## Review complete
+
+All meta files across the repo have been reviewed section-by-section. Staging nursery (`apps/`, `extensions/`, `docs/staging.md`) removed 2026-08-25 — related plan bullets marked done/cancelled above. Next step: apply the remaining queued edits.
