@@ -143,6 +143,23 @@
   .dv-sec-label{font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--textSecondary);font-weight:700;margin-bottom:7px;}
   .dv-sec-body{font-size:11.5px;color:var(--subText);line-height:1.55;}
   .dv-meta-row{display:flex;justify-content:space-between;padding:3px 0;font-size:11px;color:var(--textSecondary);max-width:220px;}
+
+  /* ---- preferences: same rail+canvas shell as viewB, pure categories, no scope group ---- */
+  .prefsView{width:864px;height:585px;display:flex;flex-direction:column;}
+  .row1-title{flex:1;text-align:center;font-size:13px;font-weight:700;color:var(--textPrimary);}
+  .pref-list{padding:18px 22px;overflow:auto;}
+  .pref-sec-h{font-size:15px;font-weight:700;margin:0 0 4px;}
+  .pref-sec-sub{font-size:11px;color:var(--textSecondary);margin:0 0 18px;}
+  .pref-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);}
+  .pref-row:last-child{border-bottom:none;}
+  .pref-label{font-size:12.5px;color:var(--textPrimary);}
+  .pref-desc{font-size:10.5px;color:var(--subText);margin-top:2px;}
+  .pref-label-group{display:flex;flex-direction:column;}
+  .pref-swatchrow{display:flex;gap:8px;}
+  .pref-swatch{width:38px;height:38px;border-radius:9px;border:2px solid transparent;}
+  .pref-swatch.on{border-color:var(--accent);box-shadow:0 0 8px 1px color-mix(in srgb, var(--accent) 45%, transparent);}
+  .pref-group-label{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--textSecondary);margin:22px 0 8px;font-weight:700;}
+  .pref-group-label:first-child{margin-top:0;}
 </style>
 </head>
 <body>
@@ -181,7 +198,7 @@
       <div class="row2"><div class="search">🔍 Try &ldquo;mute mic&rdquo;…</div></div>
     </div>
   </div>
-  <p class="note">Row1: logo (left) · top-5 favorites by user order, lit/dim reflecting live state for stateful commands, plain for non-stateful (calculator) · 6th &ldquo;…&rdquo; opens viewB with Favorites pre-selected · prefs button (right). Row2: search, placeholder rotates through real commands. <strong>Row1 editing</strong> (not visually depicted, both interactions apply directly to these icons): drag-and-drop to reorder within the 5 visible slots; right-click an icon → &ldquo;Remove from Favorites&rdquo; context menu. Adding a new favorite is card-star-only (viewB), not available from row1.</p>
+  <p class="note">Row1: logo · top-5 favorites (lit/dim = state) · &ldquo;…&rdquo; → viewB Favorites · prefs button. Row2: search. Row1 editing (not shown): drag to reorder, right-click to remove; adding is card-star-only.</p>
 </section>
 
 <section>
@@ -234,7 +251,7 @@
       </div>
     </div>
   </div>
-  <p class="note">Row1/Row2 stay fixed, never hidden — the panel morphs once to a <strong>fixed 5-row-slot height</strong> (same <code>KeyablePanel</code>, per <a href="./2026-08-24-view-types.md">view types §2</a>), not resizing per keystroke. Each result row: icon (same chip language as favorites/cards) + breadcrumb text &ldquo;Addon › Command&rdquo; (addon muted, command bold) on one line. Top result highlighted via full-row tint (keyboard-selected by default). <strong>Slot 5 is always &ldquo;Show all addons&rdquo;</strong> (opens viewB) — with 3 real results here, slot 4 stays reserved/blank rather than letting slot 5 slide up.</p>
+  <p class="note">Fixed 5-row-slot height, Row1/Row2 unchanged. 3 real results shown — slot 4 stays reserved/blank, slot 5 is always &ldquo;Show all addons.&rdquo;</p>
 </section>
 
 <section>
@@ -266,7 +283,7 @@
       </div>
     </div>
   </div>
-  <p class="note">More than 4 real results: slots scroll internally instead of showing &ldquo;Show all addons&rdquo; — no room for it, and it would compete with actually scrolling to see more matches. Outer panel height is identical to the 3-result case above.</p>
+  <p class="note">8 real results: slots scroll internally instead of showing &ldquo;Show all addons.&rdquo; Outer panel height unchanged from the 3-result case above.</p>
 </section>
 
 <section>
@@ -295,7 +312,7 @@
       </div>
     </div>
   </div>
-  <p class="note">Zero real matches: falls back to the already-shipped &ldquo;did you mean&rdquo; behavior (<a href="./2026-08-23-palette-ui-product-pass.md">product pass §4.A</a>) — single closest command by fuzzy score, <strong>scoped to installed addons only</strong> (an uninstalled suggestion wouldn't be immediately actionable). &ldquo;Show all addons&rdquo; still shows at slot 5 as the fallback's fallback.</p>
+  <p class="note">Zero matches: &ldquo;did you mean&rdquo; fallback, installed addons only. Slot 5 still shows &ldquo;Show all addons.&rdquo;</p>
 </section>
 
 <section>
@@ -343,7 +360,55 @@
       </div>
     </div>
   </div>
-  <p class="note">Row1/Row2 identical to viewA. Rail = one flat list, two groups each with a dot-leader label (uppercase group name + trailing dotted line): <strong>Browse</strong> (All/Installed/Recent/Favorites — All pre-selected by default, mutually exclusive with category selection by construction) and <strong>Categories</strong> (accordion — clicking a category expands its subcategories nested beneath it, shown here with &ldquo;Meeting&rdquo; expanded to Mic/Camera/Calendar). Panel sized via the <code>canvas</code> view type's own band (~864×585pt working reference, ~70% capped).</p>
+  <p class="note">Rail: Browse group (All/Installed/Recent/Favorites) + Categories group, dot-leader labels. &ldquo;Meeting&rdquo; shown expanded. ~864×585pt.</p>
+</section>
+
+<section>
+  <h2>viewB — a subcategory selected (&ldquo;Meeting › Mic&rdquo;)</h2>
+  <div class="stage">
+    <div class="jg viewB">
+      <div class="row1">
+        <div class="logo"><span class="dot"></span>Jugnu</div>
+        <div class="favs">
+          <div class="fav lit">🎤</div>
+          <div class="fav dim">🔇</div>
+          <div class="fav lit">🌙</div>
+          <div class="fav dim">📶</div>
+          <div class="fav">🧮</div>
+          <div class="fav more">···</div>
+        </div>
+        <div class="prefs-btn">⚙︎ All addons</div>
+      </div>
+      <div class="row2"><div class="search">🔍 Search commands…</div></div>
+      <div class="body-c">
+        <div class="rail">
+          <div class="rail-group-label">Browse</div>
+          <div class="r1-cat"><span class="ic">◆</span>All</div>
+          <div class="r1-cat"><span class="ic">▣</span>Installed</div>
+          <div class="r1-cat"><span class="ic">◷</span>Recent</div>
+          <div class="r1-cat"><span class="ic">★</span>Favorites</div>
+          <div class="rail-group-label">Categories</div>
+          <div class="r1-cat"><span class="ic">📋</span>Clipboard</div>
+          <div class="r1-cat on"><span class="ic">🎥</span>Meeting</div>
+          <div class="r1-subwrap">
+            <div class="r1-sub on">Mic</div>
+            <div class="r1-sub">Camera</div>
+            <div class="r1-sub">Calendar</div>
+          </div>
+          <div class="r1-cat"><span class="ic">🎨</span>Appearance</div>
+          <div class="r1-cat"><span class="ic">🔄</span>Converters</div>
+          <div class="r1-cat"><span class="ic">🎲</span>Play</div>
+        </div>
+        <div class="list">
+          <div class="jg-tags"><b>Tags</b><span class="tagchip">popular</span><span class="tagchip">new</span><span class="tagchip">free</span></div>
+          <div class="grid3" id="cardGridMicSub">
+            <!-- narrowed set: only Mic-subcategory addons -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="note">&ldquo;Mic&rdquo; is the active subcategory row. List narrows to Mic-only addons; tags stay unselected.</p>
 </section>
 
 <section>
@@ -399,7 +464,7 @@
       </div>
     </div>
   </div>
-  <p class="note">Opened via the card's &ldquo;Details&rdquo; footer link. <strong>Smaller than viewB on both axes</strong> (~760×500pt vs. viewB's ~864×585pt) — not the same footprint — layered on top with viewB's card grid/rail visibly dimmed/faded behind it (not just logically inactive). Header (icon/name/category breadcrumb) fixed, then a horizontally-scrollable screenshot gallery, then a full-width tab strip (Overview / Commands / Permissions), tab body scrolls independently. Explored and rejected: two-column fixed-sidebar layout, 3-column no-scroll dashboard.</p>
+  <p class="note">~760×500pt, smaller than viewB on both axes. Header → scrollable screenshot gallery → tab strip (Overview/Commands/Permissions) → independently-scrolling tab body.</p>
 </section>
 
 <section>
@@ -438,7 +503,46 @@
       <p class="flip-hint">Inactive — not installed, no star, no Uninstall link, single Install action</p>
     </div>
   </div>
-  <p class="note">Content locked: icon, name, description, favorite star (installed-only), official badge, 3-state install area (Install / Enabled+toggle / Disabled+toggle), plus a footer row (Details left, Uninstall right in <code>error</code> color) below a thin top border. No flip — clicking Details opens the detail view directly; clicking Uninstall still opens the existing confirm (<code>ask</code>) dialog. <strong>Card state groups by Active vs. Inactive</strong> (disabled and not-installed share one treatment: dim + a status dot on the icon corner) rather than by installed/not-installed — see design doc §3.2 for the full reasoning and other options explored. Icon art shown here is a placeholder gradient block — real per-addon icon system is <a href="../tickets.md">ticket 0051</a>, parked.</p>
+  <p class="note">No flip. Footer: Details (left) / Uninstall (right, omitted if not installed). Active vs. Inactive grouping (see §3.2). Icon art is placeholder — real system: <a href="../tickets.md">ticket 0051</a>.</p>
+</section>
+
+<section>
+  <h2>Preferences (from viewA's prefs button) — reuses viewB's rail + canvas shell</h2>
+  <div class="stage">
+    <div class="jg prefsView">
+      <div class="row1">
+        <div class="logo"><span class="dot"></span>Jugnu</div>
+        <div class="row1-title">Preferences</div>
+        <div class="dv-close">✕</div>
+      </div>
+      <div class="body-c">
+        <div class="rail">
+          <div class="r1-cat"><span class="ic">🎨</span>Theme</div>
+          <div class="r1-cat on"><span class="ic">🧩</span>Addons</div>
+          <div class="r1-subwrap">
+            <div class="r1-sub on">General</div>
+            <div class="r1-sub">Permissions</div>
+            <div class="r1-sub">Updates</div>
+          </div>
+          <div class="r1-cat"><span class="ic">⌨︎</span>Hotkeys</div>
+          <div class="r1-cat"><span class="ic">⚙︎</span>General</div>
+        </div>
+        <div class="pref-list">
+          <div class="pref-sec-h">Addons → General</div>
+          <div class="pref-sec-sub">Default behavior for installed addons</div>
+          <div class="pref-row">
+            <div class="pref-label-group"><div class="pref-label">Auto-update addons</div><div class="pref-desc">Install new versions automatically</div></div>
+            <div class="toggle-mini on"><div class="knob"></div></div>
+          </div>
+          <div class="pref-row">
+            <div class="pref-label-group"><div class="pref-label">Show in menu bar</div><div class="pref-desc">Quick toggle from the system menu bar</div></div>
+            <div class="toggle-mini"><div class="knob"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="note">Same shell as viewB (864×585pt). Rail: flat, no scope rows — Theme / Addons / Hotkeys / General. &ldquo;Addons&rdquo; here = settings, not the catalog. See design doc §3.4.</p>
 </section>
 
 <script>
@@ -516,6 +620,37 @@
   }
   renderCards(document.getElementById('cardGrid'));
   renderCards(document.getElementById('cardGridBehind'));
+
+  const micSubData = [
+    {name:"Mic Mute", desc:"Toggle your mic on or off with one shortcut.", state:"enabled", star:true},
+    {name:"Push to Talk", desc:"Hold a key to unmute while you speak.", state:"install"},
+    {name:"Auto Mute", desc:"Mutes automatically when you join a call.", state:"disabled", star:false},
+  ];
+  (function renderMicSub() {
+    const gridEl = document.getElementById('cardGridMicSub');
+    if (!gridEl) return;
+    micSubData.forEach(c => {
+      const isInactive = c.state !== "enabled";
+      const dotClass = c.state === "enabled" ? "on" : "off";
+      const topright = c.state === "install"
+        ? `<div class="badge">✓</div>`
+        : `<div class="star ${c.star ? '' : 'off'}">★</div><div class="badge">✓</div>`;
+      const bottom = c.state === "install"
+        ? `<div class="pill-install" style="text-align:center">Install</div>`
+        : `<div class="state-row"><div class="state-label" ${c.state==='disabled'?'style="color:var(--textSecondary)"':''}>${c.state==='enabled'?'Enabled':'Disabled'}</div><div class="toggle-mini ${c.state==='enabled'?'on':''}"><div class="knob"></div></div></div>`;
+      const footer = c.state === "install"
+        ? `<div class="card-footer"><span class="card-link">Details</span></div>`
+        : `<div class="card-footer"><span class="card-link">Details</span><span class="card-link danger">Uninstall</span></div>`;
+      gridEl.insertAdjacentHTML('beforeend', `
+        <div class="card ${isInactive ? 'inactive' : ''}">
+          <div class="icrow"><div class="ic-card"><div class="status-dot ${dotClass}"></div></div><div class="topright">${topright}</div></div>
+          <div class="nm">${c.name}</div>
+          <div class="desc">${c.desc}</div>
+          ${bottom}
+          ${footer}
+        </div>`);
+    });
+  })();
 
   // Genie open/close demo — click a card in the "behind" grid to open the detail view from that
   // card's exact position/size; click ✕ to close it back into the same spot.

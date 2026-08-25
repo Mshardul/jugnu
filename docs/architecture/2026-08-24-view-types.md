@@ -111,6 +111,40 @@ Unknown ids fail validation (`scripts/validate-addon.sh`) once 0045 implements i
 - A `board` on a portrait *monitor* is still a **wide-and-short panel** on that `visibleFrame`.
 - A `rail` on an ultrawide stays **narrow**; it does not take 40% of 5120 px.
 
-## 7. Mapping to 0008 presets
+## 7. Per-addon view type assignment — LOCKED (2026-08-26)
+
+Every real addon's `view_types` assignment, decided while auditing the whole app's surfaces (not per-addon guesswork — each mapped against the addon's actual command shape: read-only glance, filterable list, form-style setup, spatial layout, or detached scratchpad).
+
+| Addon | View type | Notes |
+|---|---|---|
+| `battery-eta` | `rows` | Read-only status; kept as a panel rather than folded into toast-only, since a single value still reads fine as a one-row `rows` panel |
+| `weather-bar` | `rows` | Same reasoning as `battery-eta` |
+| `world-clock` | `rows` | Multiple zones = genuinely multi-row content, clearest `rows` case of the three |
+| `brew-outdated` | `rows` | Filterable package list |
+| `ports` | `rows` | Filterable list + kill action — the spec's own `rows` example |
+| `clipboard-history` | `rows` | Filterable list — the spec's own `rows` example |
+| `pomodoro` | `fields` | Duration/session setup before the timer runs |
+| `keep-awake` | `fields` | Duration picker |
+| `floating-note` | `note` | Detached, persistent scratchpad — not one of the ten in-panel types (§2) |
+| `window-layouts` | `board` | 2D spatial snap layout — already declared in yaml |
+| `nudges` | `rows`, `fields`, `ask` | List + setup + confirm — already declared in yaml |
+| `ui-demo-confirm` | `ask` | Reference confirm pattern |
+| `ui-demo-form` | `fields` | Reference form pattern |
+| `ui-demo-list` | `rows` | Reference list pattern |
+| `mic-mute` | **TBD** | Instant toggle, no content to browse — likely toast-only (no panel), pending a real toast redesign (toast currently has no visual design, only an old AppKit implementation) |
+| `mute-all` | **TBD** | Same as `mic-mute` |
+| `focus-toggle` | **TBD** | Same as `mic-mute` |
+| `open-terminal-here` | **TBD** | Instant action, no content — same toast-only question |
+| `paste-plain` | **TBD** | Instant action, no content — same toast-only question |
+
+**Types with no current real-addon example:** `seek` / `palette` (occupied by the launcher itself, not an addon), `grid` and `spread` (no addon currently needs a gallery or two-pane compare view — left unoccupied, not a gap to fix).
+
+## 7.1 Visual design status — most types undesigned, own epic
+
+This section (and §3's ten types) locks **geometry only**. Beyond `seek`/`palette` (viewA) and `canvas` (viewB/detail view/Preferences) — all designed as part of the [launcher + catalog design](./2026-08-25-launcher-catalog-design.md) — no type in this catalog has a real visual mockup. That includes `toast`, whose current AppKit implementation was flagged as visually poor when raised during this audit; five addons (`mic-mute`, `mute-all`, `focus-toggle`, `open-terminal-here`, `paste-plain`) are instant actions with no content to browse and are strong toast-only candidates, but their view-type assignment in §7's table stays **TBD** until toast — and the rest of the undesigned catalog — gets a real design pass.
+
+Tracked as its own epic, not scattered across individual addon/surface docs: [2026-08-26 view types visual design](./2026-08-26-view-types-visual-design.md) (ticket 0052).
+
+## 8. Mapping to 0008 presets
 
 0008 destinations stay (`launcher`, `catalog`, `settings`, …). View types are the **size/aspect function** those destinations (and addon UIs) call. Do not add a parallel `NSWindow`. New spatial jobs (`board`, `canvas`) are new destinations that reuse this catalog — they are not one-off frames.

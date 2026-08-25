@@ -1,7 +1,7 @@
 # Jugnu — launcher + catalog browse design
 
 **Date:** 2026-08-25
-**Status:** In progress — living doc, decisions appended as brainstorming continues
+**Status:** Planning complete — §0–§5 locked, no open blocking items. Remaining icon-related items parked to [ticket 0051](../tickets.md)'s epic; not blockers here.
 **Depends on:** [Shell design](./2026-08-22-shell-design.md), [Palette + addon UI product pass](./2026-08-23-palette-ui-product-pass.md), [View types](./2026-08-24-view-types.md), [Shell surface presets](./2026-08-23-shell-surface-presets.md)
 **Living mockup:** [2026-08-25-launcher-catalog-mockup.html](./2026-08-25-launcher-catalog-mockup.html) — visual reference kept in sync with each locked section, Firefly dark theme only
 **Related open ticket:** [0002](../tickets.md) — addon management / Preferences redesign + catalog browse (this doc is that design)
@@ -17,7 +17,7 @@ Design for the Opt+Space launcher surface (**viewA**) and the "see all addons" c
 | **viewA** | Opt+Space | Very-small-height, medium-width. Row1 + Row2 only. | Locked (§2) |
 | **viewB** | "See all addons" button in viewA | ~60% screen width × ~60–70% screen height on a 13–16" MacBook (exact fraction/clamp TBD — see open questions). Row1 + Row2 (same as viewA) + category/subcategory/list region below. | Locked (§3) |
 | Search results (typing in viewA's row2) | User types in viewA | viewA grows downward in place (same panel, morphs — see §2.1) | Locked (§2.1) |
-| Preferences (from viewA's prefs button) | Click "all addons + prefs" | Not yet designed — likely `rail` per existing view-type catalog | **Open** |
+| Preferences (from viewA's prefs button) | Click "all addons + prefs" | Same `canvas` shell as viewB (864×585pt, left rail + content pane) | Locked (§3.4) |
 
 **Mapping to the existing [view types](./2026-08-24-view-types.md) catalog — LOCKED:**
 
@@ -182,6 +182,18 @@ Reopened from an earlier open item ("addon card states beyond install/uninstall/
 - **Tag chip visual style — LOCKED: glow/lit.** Selected tags get a tinted ember background + soft ember glow (same "lit" visual language already locked for favorites-icon state, §2 — a deliberate reuse, not a coincidence). Unselected tags stay a plain outline chip. Explored and rejected: filled pill (flat ember fill, no glow), checkbox-style (small check icon inside the chip), underline-only (no background change at all, too minimal against the rest of the theme's visual weight), ring+dot (thin border ring + small leading dot).
 - Grid of addon cards below, 3 per row at the locked panel width — each card: icon, name, one-line description, install/uninstall button. Card visual spec (corner radius, border, hover state) reuses the same `JugnuTokens`/`JugnuTheme` system as the rest of the shell — no new token category introduced for cards themselves.
 
+### 3.4 Preferences surface (from viewA's prefs button) — LOCKED
+
+**Not a new view shape — reuses viewB's exact shell.** Same `canvas` band, same 864×585pt working reference, same left rail + content-pane layout, same rail row treatment (icon chip, accordion expand, left accent bar on the active row) already locked in §3. Resolves the earlier open question (flat scrolling page vs. sectioned-with-nav) by sidestepping it: sectioned nav was the right call, and the nav to use already exists — no new component to design.
+
+**Rail content differs from viewB's, structurally simpler:** pure categories, no scope group. viewB's rail has two groups (Browse: All/Installed/Recent/Favorites, and Categories) separated by the dot-leader label; Preferences has **one group, no dot-leader label needed** — just the four top-level entries **Theme / Addons / Hotkeys / General**, flat vertical list, same accordion behavior for any that have subcategories (mocked: Addons expands to General / Permissions / Updates, matching the Meeting→Mic/Camera/Calendar pattern from viewB).
+
+**"Addons" here is prefs, not the catalog.** Distinct from viewB — this section holds addon-level *settings* (auto-update, menu-bar visibility, per-addon granted permissions, update channel), not browse/install/uninstall. viewB stays the only place to discover, install, or uninstall addons; this is where already-installed addons' behavior gets configured.
+
+**Content pane — LOCKED: standard preference-row pattern.** Each row: label (+ optional one-line description below it) on the left, control (toggle, or a preset swatch row for Theme) on the right, thin `--border` divider between rows — same visual language as the addon card's toggle, no new control style introduced. Header keeps a lightweight `Preferences` title + ✕ close (no favorites row, no search bar — Row2 isn't reused here since prefs isn't a search surface).
+
+**Close behavior — matches viewB's own convention (§1):** click-outside dismisses, Esc dismisses, explicit ✕ in the header (viewB has no ✕ since it has no stacked-detail relationship to pop out of, but Preferences — like the detail view — is a step reachable from viewA/viewB, so an explicit ✕ stays consistent with "anything not the root launcher gets an explicit close").
+
 ## 4. Theming — new tokens surfaced by this design
 
 The [product pass spec](./2026-08-23-palette-ui-product-pass.md#3-shared-design-tokens--swiftui-migration-for-appkit-panels) locks 6 core `JugnuTheme` fields: `accent`, `background`, `surface`, `textPrimary`, `textSecondary`, `error`. Building viewB's rail surfaced a real gap: `textSecondary` alone doesn't give enough contrast steps for a nav region with an inactive/active state plus a "readable but secondary" label tier.
@@ -205,8 +217,8 @@ Also surfaced: a `border` value distinct from `surface`, and a `surface2` (used 
 
 ## 5. Open questions (not yet decided)
 
-- **Unified icon system (addon icons + UI chrome) — parked as [ticket 0051](../tickets.md), scope expanded 2026-08-26.** Every icon in the app — per-addon icons **and** UI chrome icons (close, search, star, badges, and other small functional glyphs, currently emoji/text placeholders like ✕ and 🔍 throughout viewA/viewB/detail view) — should be hand-drawn, share the app icon's glow-motif visual language, and re-tint (primary/secondary) per active theme, not be arbitrary/mixed-source art (emoji, system symbols, fixed per-addon art). Real design work (construction rules, template format, full glyph inventory, per-icon supply mechanism) deferred to when that ticket is picked up — a single unified decision, not two separate icon efforts. **Until then, use placeholders everywhere an icon appears**: default app icon for addon icons (favorites row, catalog cards), plain emoji/text glyphs for UI chrome (✕, 🔍, ★, etc.) — this doc's mockups use both kinds of stand-ins, not final art.
-- Preferences surface (from viewA's prefs button): confirmed likely `rail` per existing pattern-default mapping, not yet designed in depth
+- **Unified icon system (addon icons + UI chrome) — promoted to its own epic, [2026-08-26 icon system design](./2026-08-26-icon-system-design.md) (tracked via [ticket 0051](../tickets.md)), scope expanded 2026-08-26.** Every icon in the app — per-addon icons **and** UI chrome icons (close, search, star, badges, and other small functional glyphs, currently emoji/text placeholders like ✕ and 🔍 throughout viewA/viewB/detail view) — should be hand-drawn, share the app icon's glow-motif visual language, and re-tint (primary/secondary) per active theme, not be arbitrary/mixed-source art (emoji, system symbols, fixed per-addon art). Real design work (construction rules, template format, full glyph inventory, per-icon supply mechanism) deferred to when that ticket is picked up — a single unified decision, not two separate icon efforts. **Until then, use placeholders everywhere an icon appears**: default app icon for addon icons (favorites row, catalog cards), plain emoji/text glyphs for UI chrome (✕, 🔍, ★, etc.) — this doc's mockups use both kinds of stand-ins, not final art.
+  - **Stateful favorite icon on/off representation — direction LOCKED, execution deferred to 0051.** Glow/dim on one shared icon (this doc's current placeholder, firefly motif lit vs. dark) doesn't hold up from a UX standpoint — a subtle brightness/glow diff is too easy to misread as "off" even for icons that were never meant to carry state (see the plain-icon-reads-as-dim problem raised for non-stateful commands like the calculator). **Two visually distinct icon assets per on/off state** (e.g. separate mic-on / mic-muted glyphs) is the settled direction — unambiguous at a glance, no reliance on a hard-to-perceive treatment. Accepted tradeoff: doubles per-command icon-authoring for stateful commands only (non-stateful commands stay single-icon), which 0051 owns designing around (construction rules, template format, glyph inventory) since it already owns the full hand-drawn icon system. This doc's mockups keep glow/dim as placeholder art only because 0051 hasn't shipped real icons yet — not because glow is still under consideration.
 - Possible future icon-only "minimize" affordance for the categories rail (raised when rejecting option F as the *only* mode) — not designed, just flagged as worth keeping in mind
 
 ## Related
