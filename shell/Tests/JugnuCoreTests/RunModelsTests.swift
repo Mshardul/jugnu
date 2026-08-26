@@ -1,5 +1,5 @@
-import XCTest
 @testable import JugnuCore
+import XCTest
 
 final class RunModelsTests: XCTestCase {
     func testToastResponseRoundTrip() throws {
@@ -36,9 +36,9 @@ final class RunModelsTests: XCTestCase {
     }
 
     func testDecodesCardUI() throws {
-        let json = """
+        let json = Data("""
         {"ok":true,"ui":{"pattern":"card","emoji":"👀","message":"Glow farther.","accent":"#4A90D9","title":"Eyes"}}
-        """.data(using: .utf8)!
+        """.utf8)
         let decoded = try JSONDecoder().decode(RunResponse.self, from: json)
         XCTAssertEqual(decoded.ui?.pattern, .card)
         XCTAssertEqual(decoded.ui?.emoji, "👀")

@@ -1,5 +1,5 @@
-import XCTest
 @testable import JugnuUI
+import XCTest
 
 final class ShellStackEntryTests: XCTestCase {
     func test_launcherState_mapsToLauncherPreset() {
@@ -8,7 +8,14 @@ final class ShellStackEntryTests: XCTestCase {
     }
 
     func test_catalogState_mapsToCatalogPreset() {
-        let entry = ShellStackEntry(.catalog(category: nil, subcategory: nil, tags: [], query: "", scroll: 0, selectedCardID: nil))
+        let entry = ShellStackEntry(.catalog(
+            category: nil,
+            subcategory: nil,
+            tags: [],
+            query: "",
+            scroll: 0,
+            selectedCardID: nil
+        ))
         XCTAssertEqual(entry.preset, .catalog)
     }
 

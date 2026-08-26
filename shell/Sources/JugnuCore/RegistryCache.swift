@@ -11,8 +11,8 @@ public enum RegistryFetchResult: Equatable {
     case unavailable(RegistryFetchFailure)
 }
 
-extension RegistryClient {
-    public func fetchWithCache(from url: URL, cacheFile: URL) async -> RegistryFetchResult {
+public extension RegistryClient {
+    func fetchWithCache(from url: URL, cacheFile: URL) async -> RegistryFetchResult {
         do {
             let entries = try await fetch(from: url)
             if let data = try? JSONEncoder().encode(entries) {
@@ -26,7 +26,8 @@ extension RegistryClient {
             let failure: RegistryFetchFailure =
                 (error as? RegistryClientError) == .invalidCatalog ? .invalid : .unreachable
             if let cachedData = try? Data(contentsOf: cacheFile),
-               let cachedEntries = try? JSONDecoder().decode([RegistryEntry].self, from: cachedData) {
+               let cachedEntries = try? JSONDecoder().decode([RegistryEntry].self, from: cachedData)
+            {
                 return .cached(cachedEntries, failure: failure)
             }
             return .unavailable(failure)

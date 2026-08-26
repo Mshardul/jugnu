@@ -1,5 +1,5 @@
-import XCTest
 @testable import JugnuCore
+import XCTest
 
 final class UserFacingErrorTests: XCTestCase {
     func testEmptyIdNeverLeaksEnumName() {

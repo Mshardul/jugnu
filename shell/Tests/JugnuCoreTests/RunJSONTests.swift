@@ -1,5 +1,5 @@
-import XCTest
 @testable import JugnuCore
+import XCTest
 
 final class RunJSONTests: XCTestCase {
     func testDecodeIgnoresTrailingWhitespace() throws {
@@ -8,7 +8,7 @@ final class RunJSONTests: XCTestCase {
         XCTAssertEqual(r.message, "ok")
     }
 
-    func testFollowUpIncludesItemId() throws {
+    func testFollowUpIncludesItemId() {
         let req = RunJSON.followUpRequest(
             command: "list",
             args: ["itemId": .string("1234"), "action": .string("quit")]

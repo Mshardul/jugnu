@@ -218,14 +218,15 @@ public struct ShellConfig: Codable, Equatable, Sendable {
 
     public static func helpersCatalogURL(from registryURL: String) -> String {
         if let range = registryURL.range(of: "addons.json", options: [.backwards]),
-           range.upperBound == registryURL.endIndex {
+           range.upperBound == registryURL.endIndex
+        {
             return registryURL.replacingCharacters(in: range, with: "helpers.json")
         }
         return registryURL
     }
 
     public static let recommendedAddonIDs = [
-        "mic-mute", "focus-toggle", "paste-plain", "floating-note", "ports",
+        "mic-mute", "focus-toggle", "paste-plain", "floating-note", "ports"
     ]
 
     public init(
@@ -292,7 +293,9 @@ public struct CommandDescriptor: Codable, Equatable, Sendable {
         self.view = view
     }
 
-    public var defaultUIPattern: UIPattern? { ui?.pattern }
+    public var defaultUIPattern: UIPattern? {
+        ui?.pattern
+    }
 
     enum CodingKeys: String, CodingKey {
         case id, title, subtitle, keywords, ui, view

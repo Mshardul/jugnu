@@ -52,8 +52,12 @@ public enum Fuzzy {
     public static func editDistance(_ a: String, _ b: String) -> Int {
         let left = Array(fold(a))
         let right = Array(fold(b))
-        if left.isEmpty { return right.count }
-        if right.isEmpty { return left.count }
+        if left.isEmpty {
+            return right.count
+        }
+        if right.isEmpty {
+            return left.count
+        }
         var prev = Array(0 ... right.count)
         var current = Array(repeating: 0, count: right.count + 1)
         for i in 1 ... left.count {

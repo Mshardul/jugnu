@@ -25,11 +25,15 @@ public struct ListPanelView: View {
         self.onCancel = onCancel
     }
 
-    private var items: [UIListItem] { ui.items ?? [] }
+    private var items: [UIListItem] {
+        ui.items ?? []
+    }
 
     private var filtered: [UIListItem] {
         let q = query.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        if q.isEmpty { return items }
+        if q.isEmpty {
+            return items
+        }
         return items.filter {
             $0.title.lowercased().contains(q) || ($0.subtitle?.lowercased().contains(q) ?? false)
         }

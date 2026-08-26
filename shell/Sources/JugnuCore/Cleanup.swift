@@ -32,14 +32,17 @@ public enum Cleanup {
     ) throws {
         let fm = FileManager.default
         for ref in declared {
-            if anotherAddonLists(ref, excludingAddon: excludingAddon, paths: paths) { continue }
+            if anotherAddonLists(ref, excludingAddon: excludingAddon, paths: paths) {
+                continue
+            }
             let root = paths.helperRoot(id: ref.id, version: ref.version)
             if fm.fileExists(atPath: root.path) {
                 try fm.removeItem(at: root)
             }
             let idDir = paths.helpersDir.appendingPathComponent(ref.id)
             if fm.fileExists(atPath: idDir.path),
-               (try? fm.contentsOfDirectory(atPath: idDir.path))?.isEmpty == true {
+               (try? fm.contentsOfDirectory(atPath: idDir.path))?.isEmpty == true
+            {
                 try fm.removeItem(at: idDir)
             }
         }
@@ -60,7 +63,9 @@ public enum Cleanup {
         else { return false }
         for child in children where child.lastPathComponent != excludingAddon {
             guard let manifest = try? ManifestLoader.load(from: child) else { continue }
-            if manifest.helpers.contains(ref) { return true }
+            if manifest.helpers.contains(ref) {
+                return true
+            }
         }
         return false
     }
@@ -84,7 +89,9 @@ public enum Cleanup {
         process.standardError = Pipe()
         try? process.run()
         process.waitUntilExit()
-        if process.terminationStatus == 0 { return }
+        if process.terminationStatus == 0 {
+            return
+        }
 
         let fallback = Process()
         fallback.executableURL = URL(fileURLWithPath: "/bin/launchctl")

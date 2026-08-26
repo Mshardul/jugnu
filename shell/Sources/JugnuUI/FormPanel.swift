@@ -25,7 +25,9 @@ public struct FormPanelView: View {
         self.onCancel = onCancel
     }
 
-    private var fields: [UIFormField] { ui.fields ?? [] }
+    private var fields: [UIFormField] {
+        ui.fields ?? []
+    }
 
     public var body: some View {
         VStack(alignment: .leading, spacing: JugnuTokens.Spacing.row) {
@@ -63,11 +65,11 @@ public struct FormPanelView: View {
     private func seed() {
         for field in fields {
             switch field.value {
-            case .bool(let value):
+            case let .bool(value):
                 boolValues[field.id] = value
-            case .string(let value):
+            case let .string(value):
                 textValues[field.id] = value
-            case .number(let value):
+            case let .number(value):
                 textValues[field.id] = String(value)
             default:
                 textValues[field.id] = textValues[field.id] ?? ""

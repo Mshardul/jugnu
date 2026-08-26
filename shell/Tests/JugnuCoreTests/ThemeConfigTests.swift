@@ -1,6 +1,6 @@
+@testable import JugnuCore
 import XCTest
 import Yams
-@testable import JugnuCore
 
 final class ThemeConfigTests: XCTestCase {
     func testDefaultThemeIsFireflyDarkAccent() {

@@ -10,7 +10,12 @@ public struct ConfirmView: View {
     @Environment(\.jugnuTheme) private var theme
     @ObservedObject private var store = ThemeStore.shared
 
-    public init(ui: UIDescriptor, errorState: PanelErrorState, onConfirm: @escaping () -> Void, onCancel: @escaping () -> Void) {
+    public init(
+        ui: UIDescriptor,
+        errorState: PanelErrorState,
+        onConfirm: @escaping () -> Void,
+        onCancel: @escaping () -> Void
+    ) {
         self.ui = ui
         self.errorState = errorState
         self.onConfirm = onConfirm

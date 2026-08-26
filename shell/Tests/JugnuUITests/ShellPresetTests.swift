@@ -1,5 +1,5 @@
-import XCTest
 @testable import JugnuUI
+import XCTest
 
 final class ShellPresetTests: XCTestCase {
     func test_launcherSize_compactWhenEmpty() {

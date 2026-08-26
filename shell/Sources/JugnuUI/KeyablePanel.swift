@@ -5,6 +5,11 @@ public class KeyablePanel: NSPanel {
     /// don't need each hosted content view to implement its own Esc handler.
     public var escHandler: (() -> Void)?
 
-    override public var canBecomeKey: Bool { true }
-    override public func cancelOperation(_ sender: Any?) { escHandler?() }
+    override public var canBecomeKey: Bool {
+        true
+    }
+
+    override public func cancelOperation(_: Any?) {
+        escHandler?()
+    }
 }

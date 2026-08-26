@@ -1,5 +1,5 @@
-import XCTest
 @testable import JugnuCore
+import XCTest
 
 final class RegistryClientTests: XCTestCase {
     private let baseJSON = """
@@ -45,6 +45,9 @@ final class RegistryClientTests: XCTestCase {
         XCTAssertEqual(entries[0].subcategory, "Dev Tools")
         XCTAssertEqual(entries[0].tags, ["popup-ui", "dev-tool", "recommended"])
         XCTAssertEqual(entries[0].description, "Lists listening ports and lets you kill by pid.")
-        XCTAssertEqual(entries[0].commands, [RegistryCommand(id: "list", title: "List ports", subtitle: "Show listening ports")])
+        XCTAssertEqual(
+            entries[0].commands,
+            [RegistryCommand(id: "list", title: "List ports", subtitle: "Show listening ports")]
+        )
     }
 }

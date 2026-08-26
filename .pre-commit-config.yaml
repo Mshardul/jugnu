@@ -20,16 +20,6 @@ repos:
       - id: ruff-format
         types_or: [python, pyi]
 
-  # ── Static type checking (uv-managed mypy — same as CI) ─────────────────────
-  - repo: local
-    hooks:
-      - id: mypy
-        name: mypy
-        entry: uv run mypy
-        language: system
-        pass_filenames: false
-        files: ^(apps|extensions)/
-
   # ── Registry commands sync (regenerates on stale, does not re-stage) ───────
   - repo: local
     hooks:

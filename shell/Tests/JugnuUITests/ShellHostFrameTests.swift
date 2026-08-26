@@ -1,6 +1,6 @@
-import XCTest
 import AppKit
 @testable import JugnuUI
+import XCTest
 
 final class ShellHostFrameTests: XCTestCase {
     func test_clampedFrame_centersWithinScreen() {

@@ -65,7 +65,7 @@ public struct RegistryClient: Sendable {
 
     public func fetch(from url: URL) async throws -> [RegistryEntry] {
         let (data, response) = try await URLSession.shared.data(from: url)
-        if let http = response as? HTTPURLResponse, !(200...299).contains(http.statusCode) {
+        if let http = response as? HTTPURLResponse, !(200 ... 299).contains(http.statusCode) {
             throw RegistryClientError.httpStatus(http.statusCode)
         }
         do {
@@ -77,7 +77,7 @@ public struct RegistryClient: Sendable {
 
     public func fetchHelpers(from url: URL) async throws -> [HelperRegistryEntry] {
         let (data, response) = try await URLSession.shared.data(from: url)
-        if let http = response as? HTTPURLResponse, !(200...299).contains(http.statusCode) {
+        if let http = response as? HTTPURLResponse, !(200 ... 299).contains(http.statusCode) {
             throw RegistryClientError.httpStatus(http.statusCode)
         }
         do {

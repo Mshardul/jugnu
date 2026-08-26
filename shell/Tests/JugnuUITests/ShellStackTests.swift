@@ -1,5 +1,5 @@
-import XCTest
 @testable import JugnuUI
+import XCTest
 
 final class ShellStackTests: XCTestCase {
     func test_initialStack_isLauncherOnly() {
@@ -11,7 +11,14 @@ final class ShellStackTests: XCTestCase {
 
     func test_push_addsChild() {
         var stack = ShellStack()
-        stack.push(ShellStackEntry(.catalog(category: nil, subcategory: nil, tags: [], query: "", scroll: 0, selectedCardID: nil)))
+        stack.push(ShellStackEntry(.catalog(
+            category: nil,
+            subcategory: nil,
+            tags: [],
+            query: "",
+            scroll: 0,
+            selectedCardID: nil
+        )))
         XCTAssertEqual(stack.entries.count, 2)
         XCTAssertEqual(stack.top.preset, .catalog)
         XCTAssertFalse(stack.isAtRoot)
@@ -19,10 +26,24 @@ final class ShellStackTests: XCTestCase {
 
     func test_pushSamePreset_isIdempotent_updatesTopInPlace() {
         var stack = ShellStack()
-        stack.push(ShellStackEntry(.catalog(category: nil, subcategory: nil, tags: [], query: "", scroll: 0, selectedCardID: nil)))
-        stack.push(ShellStackEntry(.catalog(category: "Clipboard", subcategory: nil, tags: [], query: "", scroll: 0, selectedCardID: nil)))
+        stack.push(ShellStackEntry(.catalog(
+            category: nil,
+            subcategory: nil,
+            tags: [],
+            query: "",
+            scroll: 0,
+            selectedCardID: nil
+        )))
+        stack.push(ShellStackEntry(.catalog(
+            category: "Clipboard",
+            subcategory: nil,
+            tags: [],
+            query: "",
+            scroll: 0,
+            selectedCardID: nil
+        )))
         XCTAssertEqual(stack.entries.count, 2, "must not push a second catalog entry")
-        if case .catalog(let category, _, _, _, _, _) = stack.top.state {
+        if case let .catalog(category, _, _, _, _, _) = stack.top.state {
             XCTAssertEqual(category, "Clipboard", "idempotent push still refocuses/updates state in place")
         } else {
             XCTFail("expected catalog state")
@@ -31,7 +52,14 @@ final class ShellStackTests: XCTestCase {
 
     func test_replace_swapsSibling_keepsParent() {
         var stack = ShellStack()
-        stack.push(ShellStackEntry(.catalog(category: nil, subcategory: nil, tags: [], query: "", scroll: 0, selectedCardID: nil)))
+        stack.push(ShellStackEntry(.catalog(
+            category: nil,
+            subcategory: nil,
+            tags: [],
+            query: "",
+            scroll: 0,
+            selectedCardID: nil
+        )))
         stack.replace(ShellStackEntry(.settings(scroll: 0, focusedControlID: nil)))
         XCTAssertEqual(stack.entries.count, 2, "replace does not grow the stack")
         XCTAssertEqual(stack.top.preset, .settings)
@@ -40,7 +68,14 @@ final class ShellStackTests: XCTestCase {
 
     func test_pop_restoresParent() {
         var stack = ShellStack()
-        stack.push(ShellStackEntry(.catalog(category: nil, subcategory: nil, tags: [], query: "", scroll: 0, selectedCardID: nil)))
+        stack.push(ShellStackEntry(.catalog(
+            category: nil,
+            subcategory: nil,
+            tags: [],
+            query: "",
+            scroll: 0,
+            selectedCardID: nil
+        )))
         stack.push(ShellStackEntry(.detail(addonID: "mic-mute")))
         stack.pop()
         XCTAssertEqual(stack.top.preset, .catalog)
@@ -56,11 +91,18 @@ final class ShellStackTests: XCTestCase {
 
     func test_home_resetsToFreshLauncherOnly() {
         var stack = ShellStack()
-        stack.push(ShellStackEntry(.catalog(category: "X", subcategory: nil, tags: [], query: "abc", scroll: 5, selectedCardID: "id")))
+        stack.push(ShellStackEntry(.catalog(
+            category: "X",
+            subcategory: nil,
+            tags: [],
+            query: "abc",
+            scroll: 5,
+            selectedCardID: "id"
+        )))
         stack.home(initial: .launcher(query: "", selection: nil, scroll: 0))
         XCTAssertEqual(stack.entries.count, 1)
         XCTAssertEqual(stack.top.preset, .launcher)
-        if case .launcher(let query, _, _) = stack.top.state {
+        if case let .launcher(query, _, _) = stack.top.state {
             XCTAssertEqual(query, "", "home must not restore the previous launcher query")
         } else {
             XCTFail("expected launcher state")
@@ -69,7 +111,14 @@ final class ShellStackTests: XCTestCase {
 
     func test_clear_emptiesStack() {
         var stack = ShellStack()
-        stack.push(ShellStackEntry(.catalog(category: nil, subcategory: nil, tags: [], query: "", scroll: 0, selectedCardID: nil)))
+        stack.push(ShellStackEntry(.catalog(
+            category: nil,
+            subcategory: nil,
+            tags: [],
+            query: "",
+            scroll: 0,
+            selectedCardID: nil
+        )))
         stack.clear()
         XCTAssertEqual(stack.entries.count, 0)
     }
@@ -95,7 +144,14 @@ final class ShellStackTests: XCTestCase {
 
     func test_invokeOutcome_visibleOnCatalog_showsHome() {
         var stack = ShellStack()
-        stack.push(ShellStackEntry(.catalog(category: nil, subcategory: nil, tags: [], query: "", scroll: 0, selectedCardID: nil)))
+        stack.push(ShellStackEntry(.catalog(
+            category: nil,
+            subcategory: nil,
+            tags: [],
+            query: "",
+            scroll: 0,
+            selectedCardID: nil
+        )))
         XCTAssertEqual(decideInvokeOutcome(stack: stack, isVisible: true), .showHome)
     }
 }

@@ -8,8 +8,8 @@ public enum UserFacingError {
 
     public static func cachedCatalogMessage(for failure: RegistryFetchFailure) -> String {
         switch failure {
-        case .unreachable: return catalogCachedUnreachable
-        case .invalid: return catalogCachedInvalid
+        case .unreachable: catalogCachedUnreachable
+        case .invalid: catalogCachedInvalid
         }
     }
 

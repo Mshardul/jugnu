@@ -15,7 +15,9 @@ public final class InvokeTrace: @unchecked Sendable {
     }
 
     public func markFirstPaint() {
-        if firstPaintAt == nil { firstPaintAt = now() }
+        if firstPaintAt == nil {
+            firstPaintAt = now()
+        }
     }
 
     public func markContent() {
@@ -26,9 +28,17 @@ public final class InvokeTrace: @unchecked Sendable {
         dismissAt = now()
     }
 
-    public var firstPaintMs: Int? { ms(since: invokeAt, to: firstPaintAt) }
-    public var contentMs: Int? { ms(since: invokeAt, to: contentAt) }
-    public var totalMs: Int? { ms(since: invokeAt, to: dismissAt) }
+    public var firstPaintMs: Int? {
+        ms(since: invokeAt, to: firstPaintAt)
+    }
+
+    public var contentMs: Int? {
+        ms(since: invokeAt, to: contentAt)
+    }
+
+    public var totalMs: Int? {
+        ms(since: invokeAt, to: dismissAt)
+    }
 
     public var debugDescription: String {
         let paint = firstPaintMs.map(String.init) ?? "-"

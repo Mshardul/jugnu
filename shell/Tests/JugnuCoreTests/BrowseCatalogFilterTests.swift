@@ -1,5 +1,5 @@
-import XCTest
 @testable import JugnuCore
+import XCTest
 
 final class BrowseCatalogFilterTests: XCTestCase {
     private func entry(
@@ -26,7 +26,7 @@ final class BrowseCatalogFilterTests: XCTestCase {
     func testTagsRequireAllSelectedTagsPresent() {
         let entries = [
             entry("a", category: "System", tags: ["popup-ui", "dev-tool"]),
-            entry("b", category: "System", tags: ["popup-ui"]),
+            entry("b", category: "System", tags: ["popup-ui"])
         ]
         let result = filterCatalog(entries: entries, category: nil, tags: ["popup-ui", "dev-tool"], search: "")
         XCTAssertEqual(result.map(\.id), ["a"])
@@ -35,7 +35,13 @@ final class BrowseCatalogFilterTests: XCTestCase {
     func testSearchComposesWithCategoryAndTags() {
         let entries = [
             entry("ports", category: "System", tags: ["dev-tool"], name: "Ports", summary: "kill by pid"),
-            entry("brew-outdated", category: "System", tags: ["dev-tool"], name: "Brew Outdated", summary: "outdated packages"),
+            entry(
+                "brew-outdated",
+                category: "System",
+                tags: ["dev-tool"],
+                name: "Brew Outdated",
+                summary: "outdated packages"
+            )
         ]
         let result = filterCatalog(entries: entries, category: "System", tags: ["dev-tool"], search: "port")
         XCTAssertEqual(result.map(\.id), ["ports"])
@@ -50,7 +56,7 @@ final class BrowseCatalogFilterTests: XCTestCase {
         let entries = [
             entry("ports", category: "System", tags: [], subcategory: "Dev Tools"),
             entry("battery", category: "System", tags: [], subcategory: "Monitoring"),
-            entry("paste", category: "Clipboard", tags: []),
+            entry("paste", category: "Clipboard", tags: [])
         ]
         let result = filterCatalog(
             entries: entries, category: "System", subcategory: "Dev Tools", tags: [], search: ""
@@ -61,7 +67,7 @@ final class BrowseCatalogFilterTests: XCTestCase {
     func testCategoryWithoutSubcategoryReturnsAllMembers() {
         let entries = [
             entry("ports", category: "System", tags: [], subcategory: "Dev Tools"),
-            entry("battery", category: "System", tags: [], subcategory: "Monitoring"),
+            entry("battery", category: "System", tags: [], subcategory: "Monitoring")
         ]
         let result = filterCatalog(entries: entries, category: "System", subcategory: nil, tags: [], search: "")
         XCTAssertEqual(Set(result.map(\.id)), ["ports", "battery"])
@@ -70,7 +76,7 @@ final class BrowseCatalogFilterTests: XCTestCase {
     func testAvailableTagsScopedToCategoryIgnoresOtherCategoryTags() {
         let entries = [
             entry("a", category: "System", tags: ["dev-tool"]),
-            entry("b", category: "Focus", tags: ["toggle"]),
+            entry("b", category: "Focus", tags: ["toggle"])
         ]
         let result = availableTags(entries: entries, category: "System", search: "")
         XCTAssertEqual(result, ["dev-tool"])
@@ -79,7 +85,7 @@ final class BrowseCatalogFilterTests: XCTestCase {
     func testAvailableTagsIgnoresTagFilterItself() {
         let entries = [
             entry("a", category: "System", tags: ["dev-tool", "popup-ui"]),
-            entry("b", category: "System", tags: ["dev-tool"]),
+            entry("b", category: "System", tags: ["dev-tool"])
         ]
         let result = availableTags(entries: entries, category: "System", search: "")
         XCTAssertEqual(result, ["dev-tool", "popup-ui"])

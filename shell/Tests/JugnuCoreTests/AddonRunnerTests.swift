@@ -1,5 +1,5 @@
-import XCTest
 @testable import JugnuCore
+import XCTest
 
 final class AddonRunnerTests: XCTestCase {
     func testRunsEchoFixture() throws {
@@ -70,7 +70,10 @@ final class AddonRunnerTests: XCTestCase {
         )
 
         let work = home.appendingPathComponent("addon")
-        try FileManager.default.createDirectory(at: work.appendingPathComponent("bin"), withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(
+            at: work.appendingPathComponent("bin"),
+            withIntermediateDirectories: true
+        )
         let yaml = """
         id: dice-roll
         name: Dice

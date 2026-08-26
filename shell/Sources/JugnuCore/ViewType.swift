@@ -17,8 +17,8 @@ public enum ViewType: String, Codable, CaseIterable, Sendable, Equatable {
 
     public var dismissesOnOutsideClick: Bool {
         switch self {
-        case .board, .spread, .canvas: return false
-        case .seek, .palette, .ask, .fields, .rows, .grid, .rail: return true
+        case .board, .spread, .canvas: false
+        case .seek, .palette, .ask, .fields, .rows, .grid, .rail: true
         }
     }
 
@@ -72,7 +72,9 @@ public enum ViewType: String, Codable, CaseIterable, Sendable, Equatable {
     }
 
     public static func resolve(pattern: UIPattern, requested: ViewType?, allowed: [ViewType]) throws -> ViewType? {
-        if pattern == .note || pattern == .card { return nil }
+        if pattern == .note || pattern == .card {
+            return nil
+        }
         let chosen = requested ?? pattern.defaultViewType
         guard let chosen else { return nil }
         guard allowed.contains(chosen) else {
@@ -84,9 +86,9 @@ public enum ViewType: String, Codable, CaseIterable, Sendable, Equatable {
     private var aspect: ViewAspect {
         switch self {
         case .seek, .palette, .ask, .grid, .board, .spread, .canvas:
-            return .landscape
+            .landscape
         case .fields, .rows, .rail:
-            return .portrait
+            .portrait
         }
     }
 }
@@ -104,10 +106,10 @@ public enum ViewTypeError: Error, Equatable {
 public extension UIPattern {
     var defaultViewType: ViewType? {
         switch self {
-        case .list: return .rows
-        case .form: return .fields
-        case .confirm: return .ask
-        case .note, .card: return nil
+        case .list: .rows
+        case .form: .fields
+        case .confirm: .ask
+        case .note, .card: nil
         }
     }
 }

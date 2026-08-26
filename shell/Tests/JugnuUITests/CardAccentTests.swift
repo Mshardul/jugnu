@@ -1,5 +1,5 @@
-import XCTest
 @testable import JugnuUI
+import XCTest
 
 final class CardAccentTests: XCTestCase {
     func test_init_sixDigitHex_parsesOpaqueColor() throws {

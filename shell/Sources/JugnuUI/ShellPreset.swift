@@ -13,12 +13,12 @@ public enum ShellPreset: String, Equatable, Sendable {
     /// `compactLauncher` only affects `.launcher`; ignored for other cases.
     public func defaultViewType(compactLauncher: Bool) -> ViewType {
         switch self {
-        case .launcher: return compactLauncher ? .seek : .palette
-        case .catalog: return .grid
-        case .settings, .detail: return .rail
-        case .confirm: return .ask
-        case .list: return .rows
-        case .form: return .fields
+        case .launcher: compactLauncher ? .seek : .palette
+        case .catalog: .grid
+        case .settings, .detail: .rail
+        case .confirm: .ask
+        case .list: .rows
+        case .form: .fields
         }
     }
 
@@ -30,5 +30,7 @@ public enum ShellPreset: String, Equatable, Sendable {
         return NSSize(width: box.width, height: box.height)
     }
 
-    public var hasSidebar: Bool { self == .catalog }
+    public var hasSidebar: Bool {
+        self == .catalog
+    }
 }

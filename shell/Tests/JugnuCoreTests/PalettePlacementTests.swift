@@ -1,11 +1,11 @@
-import XCTest
 @testable import JugnuCore
+import XCTest
 
 final class PalettePlacementTests: XCTestCase {
     func testMouseOnSecondScreen() {
         let frames = [
             CGRect(x: 0, y: 0, width: 1440, height: 900),
-            CGRect(x: 1440, y: 0, width: 1920, height: 1080),
+            CGRect(x: 1440, y: 0, width: 1920, height: 1080)
         ]
         XCTAssertEqual(
             PalettePlacement.screenIndex(frames: frames, mouse: CGPoint(x: 2000, y: 100)),

@@ -55,7 +55,7 @@ private final class NoteModel: NSObject, ObservableObject, NSWindowDelegate {
         self.persist = persist
     }
 
-    func windowWillClose(_ notification: Notification) {
+    func windowWillClose(_: Notification) {
         if persist {
             onSave?(text)
         }

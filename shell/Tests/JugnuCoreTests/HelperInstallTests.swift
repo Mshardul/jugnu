@@ -1,6 +1,6 @@
 import CryptoKit
-import XCTest
 @testable import JugnuCore
+import XCTest
 
 final class HelperInstallTests: XCTestCase {
     func testHelpersCatalogURLReplacesAddonsJson() {
@@ -72,7 +72,10 @@ final class HelperInstallTests: XCTestCase {
             encoding: .utf8
         )
         try "[]".write(to: catalogDir.appendingPathComponent("addons.json"), atomically: true, encoding: .utf8)
-        try writeRegistryURL(home: ctx.home, addonsJSON: catalogDir.appendingPathComponent("addons.json").absoluteString)
+        try writeRegistryURL(
+            home: ctx.home,
+            addonsJSON: catalogDir.appendingPathComponent("addons.json").absoluteString
+        )
 
         let installer = AddonInstaller(paths: ctx.paths)
         let manifest = AddonManifest(

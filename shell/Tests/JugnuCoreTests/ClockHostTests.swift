@@ -10,7 +10,7 @@ final class ClockHostTests: XCTestCase {
         let host = ClockHost(service: service)
         var invocations: [(target: ClockTarget, timerID: String)] = []
 
-        await host.tick(now: Date(timeIntervalSince1970: 1_000)) { addon, command, timerID in
+        await host.tick(now: Date(timeIntervalSince1970: 1000)) { addon, command, timerID in
             invocations.append((ClockTarget(addon: addon, command: command), timerID))
         }
 
@@ -80,10 +80,10 @@ final class ClockHostTests: XCTestCase {
             id: id,
             kind: .oneShot,
             intervalSeconds: nil,
-            fireAt: Date(timeIntervalSince1970: 1_000),
+            fireAt: Date(timeIntervalSince1970: 1000),
             enabled: true,
             paused: paused,
-            nextFire: Date(timeIntervalSince1970: 1_000),
+            nextFire: Date(timeIntervalSince1970: 1000),
             group: nil,
             target: ClockTarget(addon: "nudges", command: "show")
         )
@@ -105,11 +105,11 @@ private final class FakeClockService: ClockServicing, @unchecked Sendable {
         self.markFailuresRemaining = markFailuresRemaining
     }
 
-    func due(now: Date) throws -> [ClockTimer] {
+    func due(now _: Date) throws -> [ClockTimer] {
         dueTimers
     }
 
-    func markFired(id: String, now: Date) throws {
+    func markFired(id: String, now _: Date) throws {
         try lock.withLock {
             if markFailuresRemaining > 0 {
                 markFailuresRemaining -= 1

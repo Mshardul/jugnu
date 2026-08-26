@@ -1,5 +1,5 @@
-import SwiftUI
 import JugnuCore
+import SwiftUI
 
 public struct AddonDetailView: View {
     let entry: RegistryEntry

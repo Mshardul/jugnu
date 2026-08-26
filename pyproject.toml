@@ -13,7 +13,6 @@ dependencies = []
 [dependency-groups]
 dev = [
     "codespell>=2.3",
-    "mypy>=1.13",
     "pre-commit>=4.0",
     "pytest>=8.0",
     "ruff>=0.16.4",
@@ -34,20 +33,11 @@ select = ["E", "F", "I", "UP", "B"]
 [tool.ruff.lint.per-file-ignores]
 "**/tests/**" = ["B011", "B904"]
 
-[tool.mypy]
-python_version = "3.11"
-warn_return_any = true
-warn_unused_configs = true
-ignore_missing_imports = true
-check_untyped_defs = true
-files = ["addons"]
-# Match other repos: type-check product code, not tests.
-exclude = ["(?x)(/tests/|/__pycache__/|/\\.venv/)"]
-
 [tool.codespell]
 skip = ".git,.venv,uv.lock,.mypy_cache,.ruff_cache,.pytest_cache,__pycache__"
-# jugnu = brand; rime = WMO weather label; iterm = iTerm app name
-ignore-words-list = "jugnu,crate,rime,iterm,assertin"
+# jugnu = brand; rime = WMO weather label; iterm = iTerm app name;
+# inout = Swift keyword; wit/statics/pre-selected = correct words; assertin = test helper name
+ignore-words-list = "jugnu,crate,rime,iterm,assertin,inout,wit,statics,pre-selected"
 
 [tool.pytest.ini_options]
 testpaths = ["addons"]

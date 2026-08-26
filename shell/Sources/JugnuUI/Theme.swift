@@ -11,8 +11,12 @@ public final class ThemeStore: ObservableObject {
     @Published public var soundEnabled: Bool = true
 
     public var presetId: String {
-        if config == .terminalPhosphor { return "terminalPhosphor" }
-        if config == .roseQuartz { return "roseQuartz" }
+        if config == .terminalPhosphor {
+            return "terminalPhosphor"
+        }
+        if config == .roseQuartz {
+            return "roseQuartz"
+        }
         return "firefly"
     }
 }
@@ -21,7 +25,7 @@ public enum JugnuPresets {
     public static let all: [(id: String, name: String, config: ThemeConfig)] = [
         ("firefly", "Firefly", .firefly),
         ("terminalPhosphor", "Terminal Phosphor", .terminalPhosphor),
-        ("roseQuartz", "Rose Quartz", .roseQuartz),
+        ("roseQuartz", "Rose Quartz", .roseQuartz)
     ]
 }
 
@@ -47,15 +51,15 @@ private struct ThemeEnvKey: EnvironmentKey {
     static let defaultValue = JugnuThemeColors(theme: ThemeConfig.firefly.dark)
 }
 
-extension EnvironmentValues {
-    public var jugnuTheme: JugnuThemeColors {
+public extension EnvironmentValues {
+    var jugnuTheme: JugnuThemeColors {
         get { self[ThemeEnvKey.self] }
         set { self[ThemeEnvKey.self] = newValue }
     }
 }
 
-extension Color {
-    public init(jugnuHex: String, fallback: Color) {
+public extension Color {
+    init(jugnuHex: String, fallback: Color) {
         let trimmed = jugnuHex.trimmingCharacters(in: .whitespacesAndNewlines)
         guard trimmed.count == 7, trimmed.hasPrefix("#") else {
             self = fallback

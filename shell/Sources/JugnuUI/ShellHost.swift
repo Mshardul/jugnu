@@ -1,7 +1,7 @@
 import AppKit
+import Combine
 import JugnuCore
 import SwiftUI
-import Combine
 
 public func clampedFrame(size requested: NSSize, centeredOn screenFrame: NSRect) -> NSRect {
     let width = min(requested.width, screenFrame.width)
@@ -19,7 +19,11 @@ public final class ShellHost: ObservableObject {
     private var outsideClickMonitor: Any?
     private var followUpDescriptor: UIDescriptor?
     private let followUpError = PanelErrorState()
-    private var activeFollowUp: (commandId: String, followUp: (RunRequest) async throws -> RunResponse, trace: InvokeTrace)?
+    private var activeFollowUp: (
+        commandId: String,
+        followUp: (RunRequest) async throws -> RunResponse,
+        trace: InvokeTrace
+    )?
     private let toast = ToastPresenter()
     private var cards: [String: WeakCardPanel] = [:]
     /// Set by the caller (AppDelegate) right after `pushFollowUp`/`renderFollowUpContent` so Cancel
@@ -33,16 +37,22 @@ public final class ShellHost: ObservableObject {
         self.reduceMotion = reduceMotion
     }
 
-    public var isVisible: Bool { panel?.isVisible ?? false }
+    public var isVisible: Bool {
+        panel?.isVisible ?? false
+    }
 
     /// The screen the panel is currently on, if it's up. Callers that push a follow-up in response to
     /// user interaction with the panel's own content (e.g. an uninstall button in `detail`) should
     /// morph on this screen rather than `NSScreen.main`, matching wherever the panel already is.
-    public var currentScreen: NSScreen? { panel?.screen }
+    public var currentScreen: NSScreen? {
+        panel?.screen
+    }
 
     public private(set) var currentViewType: ViewType = .seek
 
-    public var dismissesOnOutsideClick: Bool { currentViewType.dismissesOnOutsideClick }
+    public var dismissesOnOutsideClick: Bool {
+        currentViewType.dismissesOnOutsideClick
+    }
 
     /// Sets the panel's Esc/Cmd+. handler. Callers should rebind this whenever the hosted content changes.
     public func setOnCancel(_ handler: (() -> Void)?) {
@@ -124,12 +134,12 @@ public final class ShellHost: ObservableObject {
     }
 
     /// Swaps the panel's hosted content to `view`. Callers own the mapping from `stack.top.preset` to a concrete view.
-    public func setContent<V: View>(_ view: V) {
+    public func setContent(_ view: some View) {
         panel?.contentView = NSHostingView(rootView: view)
     }
 
     /// Builds the single `KeyablePanel` with `content` if it doesn't exist yet; no-op otherwise.
-    public func ensurePanel<V: View>(initialContent content: V, size: NSSize) {
+    public func ensurePanel(initialContent content: some View, size: NSSize) {
         guard panel == nil else { return }
         attach(panel: PanelChrome.borderless(size: size, content: content))
     }
@@ -142,10 +152,10 @@ public final class ShellHost: ObservableObject {
     }
 }
 
-extension ShellHost {
+public extension ShellHost {
     /// Dismiss: hides the panel and empties the stack entirely (never pops). Used for click-outside,
     /// Esc/Cmd+W at root, and hotkey-close-on-launcher.
-    public func hide() {
+    func hide() {
         stopOutsideClickMonitor()
         panel?.orderOut(nil)
         panel = nil
@@ -158,7 +168,7 @@ extension ShellHost {
     /// Starts (or restarts) the global click-outside monitor. Call once the panel is visible;
     /// `hide()` stops it. Fires only for genuine mouse-down outside the app's own windows —
     /// resign-key / Cmd+Tab never trigger this.
-    public func armClickOutsideDismiss(onOutside: @escaping () -> Void) {
+    func armClickOutsideDismiss(onOutside: @escaping () -> Void) {
         startOutsideClickMonitor(onOutside: onOutside)
     }
 }
@@ -252,7 +262,9 @@ extension ShellHost {
                 errorState: followUpError,
                 onSelect: { [weak self] item, action in
                     var args: [String: JSONValue] = ["itemId": .string(item.id)]
-                    if let action { args["action"] = .string(action) }
+                    if let action {
+                        args["action"] = .string(action)
+                    }
                     self?.submitFollowUp(args: args)
                 },
                 onCancel: { [weak self] in self?.cancelFollowUp() }
@@ -275,7 +287,7 @@ extension ShellHost {
         if let trace = activeFollowUp?.trace {
             trace.markDismiss()
             #if DEBUG
-            NSLog("%@", trace.debugDescription)
+                NSLog("%@", trace.debugDescription)
             #endif
         }
         onCancelFollowUp?()
@@ -291,7 +303,8 @@ extension ShellHost {
         let commandId = ui.title ?? "note"
         let note = NotePanel(
             ui: ui,
-            persist: true, // today's shipped command is a persist:true scratchpad; persist:false Quick Note is backlog (spec §2)
+            persist: true, // today's shipped command is a persist:true scratchpad; persist:false Quick Note is backlog
+            // (spec §2)
             onSave: { [weak self] text in
                 Task { @MainActor in
                     do {
@@ -347,14 +360,21 @@ extension ShellHost {
                 let response = try await active.followUp(request)
                 guard self.activeFollowUp?.commandId == active.commandId else { return }
                 if response.ok == false, response.ui == nil {
-                    self.followUpError.message = response.error ?? UserFacingError.message(for: AddonRunnerError.invalidResponse)
+                    self.followUpError.message = response.error ?? UserFacingError
+                        .message(for: AddonRunnerError.invalidResponse)
                     playCommandSound(success: false)
                     return
                 }
                 guard let screen = self.panel?.screen ?? NSScreen.main else { return }
                 self.stack.pop() // drop the finished follow-up before presenting its result
                 self.followUpDescriptor = nil
-                self.present(response: response, commandId: active.commandId, trace: active.trace, onScreen: screen, followUp: active.followUp)
+                self.present(
+                    response: response,
+                    commandId: active.commandId,
+                    trace: active.trace,
+                    onScreen: screen,
+                    followUp: active.followUp
+                )
             } catch {
                 self.followUpError.message = UserFacingError.message(for: error)
                 playCommandSound(success: false)

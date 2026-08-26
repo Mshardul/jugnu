@@ -1,5 +1,5 @@
-import SwiftUI
 import JugnuCore
+import SwiftUI
 
 @MainActor
 public protocol BrowseCatalogViewModelProtocol: ObservableObject {
@@ -54,7 +54,7 @@ public struct BrowseCatalogView<VM: BrowseCatalogViewModelProtocol>: View {
                     PanelErrorBanner(message: errorMessage).padding(.horizontal)
                 }
 
-                if viewModel.filtered.isEmpty && !viewModel.entries.isEmpty {
+                if viewModel.filtered.isEmpty, !viewModel.entries.isEmpty {
                     Text("No addons match these filters.")
                         .font(JugnuTokens.font(presetId: store.presetId, role: .body))
                         .foregroundStyle(theme.textSecondary)
@@ -85,12 +85,11 @@ public struct BrowseCatalogView<VM: BrowseCatalogViewModelProtocol>: View {
         .task { await viewModel.load() }
     }
 
-    @ViewBuilder
     private func sidebar() -> some View {
         List(selection: $viewModel.selection) {
             Text("All").tag(CatalogSidebarSelection.all)
             ForEach(viewModel.categories, id: \.self) { category in
-                let subcats = Set(viewModel.entries.filter { $0.category == category }.compactMap { $0.subcategory })
+                let subcats = Set(viewModel.entries.filter { $0.category == category }.compactMap(\.subcategory))
                 if subcats.count >= 2 {
                     DisclosureGroup(category) {
                         ForEach(Array(subcats).sorted(), id: \.self) { sub in
@@ -125,7 +124,11 @@ public struct BrowseCatalogView<VM: BrowseCatalogViewModelProtocol>: View {
                     .clipShape(Capsule())
                     .overlay(Capsule().strokeBorder(selected ? theme.accent : theme.textSecondary.opacity(0.3)))
                     .onTapGesture {
-                        if selected { viewModel.selectedTags.remove(tag) } else { viewModel.selectedTags.insert(tag) }
+                        if selected {
+                            viewModel.selectedTags.remove(tag)
+                        } else {
+                            viewModel.selectedTags.insert(tag)
+                        }
                     }
             }
         }

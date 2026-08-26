@@ -29,16 +29,13 @@ jobs:
 
       # Lint — check only, never autofix in CI (just report).
       - name: Ruff lint
-        run: uv run ruff check apps extensions conftest.py
+        run: uv run ruff check addons conftest.py
 
       - name: Ruff format check
-        run: uv run ruff format --check apps extensions conftest.py
-
-      - name: Type check (mypy)
-        run: uv run mypy
+        run: uv run ruff format --check addons conftest.py
 
       - name: Spell check (codespell)
-        run: uv run codespell apps extensions docs config README.md LICENSE Makefile
+        run: uv run codespell addons docs config README.md LICENSE Makefile
 
       - name: Tests
         run: uv run pytest
@@ -54,7 +51,7 @@ jobs:
         run: |
           semgrep scan --error --config=p/security-audit --config=p/python \
             --exclude-rule python.lang.security.audit.logging.logger-credential-leak.python-logger-credential-disclosure \
-            apps extensions
+            addons
 
   swift:
     runs-on: macos-latest

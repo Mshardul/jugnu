@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 
 enum PanelChrome {
-    static func borderless<V: View>(size: NSSize, content: V) -> KeyablePanel {
+    static func borderless(size: NSSize, content: some View) -> KeyablePanel {
         let hosting = NSHostingView(rootView: content)
         let panel = KeyablePanel(
             contentRect: NSRect(origin: .zero, size: size),

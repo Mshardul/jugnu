@@ -63,7 +63,7 @@ public final class CardPanel: NSPanel {
         }
     }
 
-    override public func cancelOperation(_ sender: Any?) {
+    override public func cancelOperation(_: Any?) {
         close()
     }
 }
@@ -88,7 +88,7 @@ private final class CardPanelLifecycle: NSObject, NSWindowDelegate {
         }
     }
 
-    func windowWillClose(_ notification: Notification) {
+    func windowWillClose(_: Notification) {
         stopOutsideClickMonitor()
         onClose?()
     }

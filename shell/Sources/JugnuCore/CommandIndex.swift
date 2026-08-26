@@ -33,7 +33,9 @@ public struct IndexedCommand: Equatable, Sendable {
         self.allowedViewTypes = allowedViewTypes
     }
 
-    public var qualifiedId: String { "\(addonId).\(commandId)" }
+    public var qualifiedId: String {
+        "\(addonId).\(commandId)"
+    }
 }
 
 public struct CommandIndex: Sendable {
@@ -42,7 +44,9 @@ public struct CommandIndex: Sendable {
     public var extraAddonRoots: [URL]
     private var commands: [IndexedCommand] = []
 
-    public var all: [IndexedCommand] { commands }
+    public var all: [IndexedCommand] {
+        commands
+    }
 
     public init(paths: JugnuPaths, config: JugnuConfig, extraAddonRoots: [URL] = []) {
         self.paths = paths
@@ -60,7 +64,8 @@ public struct CommandIndex: Sendable {
                at: paths.addonsDir,
                includingPropertiesForKeys: [.isDirectoryKey],
                options: [.skipsHiddenFiles]
-           ) {
+           )
+        {
             for child in children {
                 var isDir: ObjCBool = false
                 guard fm.fileExists(atPath: child.path, isDirectory: &isDir), isDir.boolValue else { continue }
@@ -122,8 +127,12 @@ public struct CommandIndex: Sendable {
             }
         }
         hits.sort { lhs, rhs in
-            if lhs.tier != rhs.tier { return lhs.tier < rhs.tier }
-            if lhs.score != rhs.score { return lhs.score > rhs.score }
+            if lhs.tier != rhs.tier {
+                return lhs.tier < rhs.tier
+            }
+            if lhs.score != rhs.score {
+                return lhs.score > rhs.score
+            }
             return lhs.command.title.localizedCaseInsensitiveCompare(rhs.command.title) == .orderedAscending
         }
         if hits.isEmpty, let suggestion = closest(query: trimmed) {

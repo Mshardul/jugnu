@@ -41,12 +41,12 @@ public enum JSONValue: Codable, Sendable, Equatable {
     public func encode(to encoder: Encoder) throws {
         var c = encoder.singleValueContainer()
         switch self {
-        case .string(let s): try c.encode(s)
-        case .number(let n): try c.encode(n)
-        case .bool(let b): try c.encode(b)
+        case let .string(s): try c.encode(s)
+        case let .number(n): try c.encode(n)
+        case let .bool(b): try c.encode(b)
         case .null: try c.encodeNil()
-        case .object(let o): try c.encode(o)
-        case .array(let a): try c.encode(a)
+        case let .object(o): try c.encode(o)
+        case let .array(a): try c.encode(a)
         }
     }
 }

@@ -2,7 +2,7 @@
 -include .env
 export DEVELOPER_DIR ?= /Applications/Xcode.app/Contents/Developer
 
-.PHONY: sync hooks precommit lint lint-swift format format-swift typecheck spell test test-extended tools-swift stop run ci window-layouts helper-clock
+.PHONY: sync hooks precommit lint lint-swift format format-swift spell test test-extended tools-swift stop run ci window-layouts helper-clock
 
 sync:
 	uv sync
@@ -23,16 +23,13 @@ precommit:
 	uv run pre-commit run --all-files
 
 lint:
-	uv run ruff check apps extensions addons conftest.py
+	uv run ruff check addons conftest.py
 
 format:
-	uv run ruff format apps extensions addons conftest.py
-
-typecheck:
-	uv run mypy
+	uv run ruff format addons conftest.py
 
 spell:
-	uv run codespell apps extensions addons docs config README.md LICENSE Makefile
+	uv run codespell addons docs config README.md LICENSE Makefile
 
 test:
 	uv run pytest
@@ -75,7 +72,6 @@ run: stop
 
 # Match CI check job (no semgrep locally).
 ci: lint
-	uv run ruff format --check apps extensions conftest.py
-	$(MAKE) typecheck
+	uv run ruff format --check addons conftest.py
 	$(MAKE) spell
 	$(MAKE) test

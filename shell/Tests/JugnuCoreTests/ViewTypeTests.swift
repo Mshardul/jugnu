@@ -1,5 +1,5 @@
-import XCTest
 @testable import JugnuCore
+import XCTest
 
 final class ViewTypeTests: XCTestCase {
     private let laptop = CGRect(x: 0, y: 0, width: 1440, height: 900)
@@ -96,7 +96,7 @@ final class ViewTypeTests: XCTestCase {
 
     func testCatalogHasTenIds() {
         XCTAssertEqual(ViewType.allCases.map(\.rawValue).sorted(), [
-            "ask", "board", "canvas", "fields", "grid", "palette", "rail", "rows", "seek", "spread",
+            "ask", "board", "canvas", "fields", "grid", "palette", "rail", "rows", "seek", "spread"
         ])
     }
 }

@@ -35,11 +35,15 @@ public enum ManifestLoader {
 }
 
 private func unwrapManifestError(_ error: Error) -> Error {
-    if let loader = error as? ManifestLoaderError { return loader }
+    if let loader = error as? ManifestLoaderError {
+        return loader
+    }
     guard let decoding = error as? DecodingError else { return error }
     switch decoding {
-    case .dataCorrupted(let ctx), .keyNotFound(_, let ctx), .typeMismatch(_, let ctx), .valueNotFound(_, let ctx):
-        if let loader = ctx.underlyingError as? ManifestLoaderError { return loader }
+    case let .dataCorrupted(ctx), let .keyNotFound(_, ctx), let .typeMismatch(_, ctx), let .valueNotFound(_, ctx):
+        if let loader = ctx.underlyingError as? ManifestLoaderError {
+            return loader
+        }
     @unknown default:
         break
     }

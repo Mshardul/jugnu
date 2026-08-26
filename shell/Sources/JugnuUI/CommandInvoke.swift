@@ -30,7 +30,7 @@ public enum CommandInvoke {
             succeeded = false
         }
         #if DEBUG
-        print(trace.debugDescription)
+            print(trace.debugDescription)
         #endif
         return succeeded
     }

@@ -2,7 +2,14 @@ import Foundation
 
 public enum ShellViewState: Equatable, Sendable {
     case launcher(query: String, selection: String?, scroll: CGFloat)
-    case catalog(category: String?, subcategory: String?, tags: Set<String>, query: String, scroll: CGFloat, selectedCardID: String?)
+    case catalog(
+        category: String?,
+        subcategory: String?,
+        tags: Set<String>,
+        query: String,
+        scroll: CGFloat,
+        selectedCardID: String?
+    )
     case settings(scroll: CGFloat, focusedControlID: String?)
     case detail(addonID: String)
     case confirm
@@ -11,13 +18,13 @@ public enum ShellViewState: Equatable, Sendable {
 
     public var preset: ShellPreset {
         switch self {
-        case .launcher: return .launcher
-        case .catalog: return .catalog
-        case .settings: return .settings
-        case .detail: return .detail
-        case .confirm: return .confirm
-        case .list: return .list
-        case .form: return .form
+        case .launcher: .launcher
+        case .catalog: .catalog
+        case .settings: .settings
+        case .detail: .detail
+        case .confirm: .confirm
+        case .list: .list
+        case .form: .form
         }
     }
 }
@@ -29,7 +36,9 @@ public struct ShellStackEntry: Equatable, Sendable {
         self.state = state
     }
 
-    public var preset: ShellPreset { state.preset }
+    public var preset: ShellPreset {
+        state.preset
+    }
 }
 
 public struct ShellStack: Equatable, Sendable {
@@ -46,7 +55,9 @@ public struct ShellStack: Equatable, Sendable {
         return last
     }
 
-    public var isAtRoot: Bool { entries.count == 1 }
+    public var isAtRoot: Bool {
+        entries.count == 1
+    }
 
     /// Push a child. No-op (updates the top entry's state in place) if `entry.preset == top.preset` (idempotent rule).
     public mutating func push(_ entry: ShellStackEntry) {

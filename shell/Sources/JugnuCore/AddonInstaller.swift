@@ -122,7 +122,9 @@ public struct AddonInstaller: Sendable {
     public func ensureHelpers(for manifest: AddonManifest) async throws {
         for ref in manifest.helpers {
             let yaml = paths.helperRoot(id: ref.id, version: ref.version).appendingPathComponent("helper.yaml")
-            if FileManager.default.fileExists(atPath: yaml.path) { continue }
+            if FileManager.default.fileExists(atPath: yaml.path) {
+                continue
+            }
 
             let config = try store.loadOrCreateDefaults()
             let catalog = ShellConfig.helpersCatalogURL(from: config.shell.registryURL)
@@ -164,7 +166,9 @@ public struct AddonInstaller: Sendable {
     private func findHelperRoot(in extractRoot: URL) throws -> URL {
         let fm = FileManager.default
         let direct = extractRoot.appendingPathComponent("helper.yaml")
-        if fm.fileExists(atPath: direct.path) { return extractRoot }
+        if fm.fileExists(atPath: direct.path) {
+            return extractRoot
+        }
 
         let children = try fm.contentsOfDirectory(
             at: extractRoot,
@@ -184,7 +188,9 @@ public struct AddonInstaller: Sendable {
     private func findAddonRoot(in extractRoot: URL) throws -> URL {
         let fm = FileManager.default
         let direct = extractRoot.appendingPathComponent("addon.yaml")
-        if fm.fileExists(atPath: direct.path) { return extractRoot }
+        if fm.fileExists(atPath: direct.path) {
+            return extractRoot
+        }
 
         let children = try fm.contentsOfDirectory(
             at: extractRoot,

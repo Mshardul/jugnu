@@ -234,7 +234,7 @@
       {
         "id": "show-card",
         "title": "Show nudge card",
-        "subtitle": "Internal — fired by clock"
+        "subtitle": "Internal \u2014 fired by clock"
       }
     ]
   },

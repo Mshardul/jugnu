@@ -7,16 +7,16 @@ public enum CatalogSidebarSelection: Hashable, Sendable {
 
     public var category: String? {
         switch self {
-        case .all: return nil
-        case .category(let category): return category
-        case .subcategory(let category, _): return category
+        case .all: nil
+        case let .category(category): category
+        case let .subcategory(category, _): category
         }
     }
 
     public var subcategory: String? {
         switch self {
-        case .all, .category: return nil
-        case .subcategory(_, let name): return name
+        case .all, .category: nil
+        case let .subcategory(_, name): name
         }
     }
 }

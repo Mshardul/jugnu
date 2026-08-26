@@ -1,6 +1,6 @@
 import CryptoKit
-import XCTest
 @testable import JugnuCore
+import XCTest
 
 final class AddonInstallerTests: XCTestCase {
     func testInstallFromLocalZipAndRejectBadHash() throws {

@@ -1,5 +1,5 @@
-import XCTest
 @testable import JugnuCore
+import XCTest
 
 final class RegistryCacheTests: XCTestCase {
     private func makeHome() -> URL {
@@ -21,7 +21,7 @@ final class RegistryCacheTests: XCTestCase {
         try sourceJSON.write(to: sourceFile, atomically: true, encoding: .utf8)
 
         let result = await RegistryClient().fetchWithCache(from: sourceFile, cacheFile: paths.registryCacheFile)
-        guard case .fresh(let entries) = result else { return XCTFail("expected .fresh, got \(result)") }
+        guard case let .fresh(entries) = result else { return XCTFail("expected .fresh, got \(result)") }
         XCTAssertEqual(entries.count, 1)
         XCTAssertTrue(FileManager.default.fileExists(atPath: paths.registryCacheFile.path))
     }
@@ -46,7 +46,7 @@ final class RegistryCacheTests: XCTestCase {
         XCTAssertEqual(entries.first?.id, "b")
     }
 
-    func testFetchWithCacheUnavailableWhenNoCacheAndFetchFails() async throws {
+    func testFetchWithCacheUnavailableWhenNoCacheAndFetchFails() async {
         let home = makeHome()
         defer { try? FileManager.default.removeItem(at: home) }
         let paths = JugnuPaths(home: home)
