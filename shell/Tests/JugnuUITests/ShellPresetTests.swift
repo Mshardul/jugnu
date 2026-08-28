@@ -8,15 +8,23 @@ final class ShellPresetTests: XCTestCase {
 
     func test_launcherSize_fullWhenRows() {
         let size = ShellPreset.launcher.size(compactLauncher: false)
-        XCTAssertEqual(size.width, 560, accuracy: 0.5)
+        XCTAssertEqual(size.width, 640, accuracy: 0.5)
         XCTAssertEqual(size.height, 360, accuracy: 0.5)
     }
 
-    func test_catalogSize() {
+    func test_catalogSize_usesCanvasBand() {
         let size = ShellPreset.catalog.size(compactLauncher: false)
-        XCTAssertEqual(size.width, 640, accuracy: 0.5)
-        XCTAssertEqual(size.height, 400, accuracy: 0.5)
-        XCTAssertEqual(ShellPreset.catalog.defaultViewType(compactLauncher: false), .grid)
+        XCTAssertEqual(size.width, 1008, accuracy: 0.5)
+        XCTAssertEqual(size.height, 630, accuracy: 0.5)
+        XCTAssertEqual(ShellPreset.catalog.defaultViewType(compactLauncher: false), .canvas)
+    }
+
+    func test_detailUsesCanvasBand() {
+        XCTAssertEqual(ShellPreset.detail.defaultViewType(compactLauncher: false), .canvas)
+    }
+
+    func test_settingsUsesCanvasBand() {
+        XCTAssertEqual(ShellPreset.settings.defaultViewType(compactLauncher: false), .canvas)
     }
 
     func test_detailHasNoSidebar() {

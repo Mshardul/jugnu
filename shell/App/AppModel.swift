@@ -91,6 +91,24 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
         state.favoriteCommandIDs.contains(qualifiedId)
     }
 
+    func moveFavorite(from source: Int, to destination: Int) {
+        state.moveFavorite(from: source, to: destination)
+        try? stateStore.save(state)
+        objectWillChange.send()
+    }
+
+    func removeFavorite(qualifiedId: String) {
+        state.removeFavorite(qualifiedId: qualifiedId)
+        try? stateStore.save(state)
+        objectWillChange.send()
+    }
+
+    func topFavorites(limit: Int) -> [IndexedCommand] {
+        Array(state.favoriteCommandIDs.compactMap { id in
+            allCommands.first { $0.qualifiedId == id }
+        }.prefix(limit))
+    }
+
     /// Presentation-free: records "recent" and runs the addon's binary, returning the raw response
     /// (or throwing). The caller (`AppDelegate.runCommand`) owns presenting the result via
     /// `CommandInvoke.run`/`ShellHost`.

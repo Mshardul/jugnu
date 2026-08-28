@@ -6,6 +6,7 @@ public struct JugnuTheme: Codable, Equatable, Sendable {
     public var surface: String
     public var textPrimary: String
     public var textSecondary: String
+    public var subText: String
     public var error: String
 
     public init(
@@ -14,6 +15,7 @@ public struct JugnuTheme: Codable, Equatable, Sendable {
         surface: String,
         textPrimary: String,
         textSecondary: String,
+        subText: String,
         error: String
     ) {
         self.accent = accent
@@ -21,6 +23,7 @@ public struct JugnuTheme: Codable, Equatable, Sendable {
         self.surface = surface
         self.textPrimary = textPrimary
         self.textSecondary = textSecondary
+        self.subText = subText
         self.error = error
     }
 
@@ -30,6 +33,7 @@ public struct JugnuTheme: Codable, Equatable, Sendable {
         case surface
         case textPrimary = "text_primary"
         case textSecondary = "text_secondary"
+        case subText = "sub_text"
         case error
     }
 
@@ -45,6 +49,7 @@ public struct JugnuTheme: Codable, Equatable, Sendable {
             surface: hex(surface, defaults.surface),
             textPrimary: hex(textPrimary, defaults.textPrimary),
             textSecondary: hex(textSecondary, defaults.textSecondary),
+            subText: hex(subText, defaults.subText),
             error: hex(error, defaults.error)
         )
     }
@@ -66,6 +71,7 @@ public struct ThemeConfig: Codable, Equatable, Sendable {
             surface: "#FFFDF8",
             textPrimary: "#2A2417",
             textSecondary: "#756E5C",
+            subText: "#5B5647",
             error: "#E5484D"
         ),
         dark: JugnuTheme(
@@ -74,6 +80,7 @@ public struct ThemeConfig: Codable, Equatable, Sendable {
             surface: "#1F1B13",
             textPrimary: "#EDE6D9",
             textSecondary: "#8C8577",
+            subText: "#B8AF9E",
             error: "#E5484D"
         )
     )
@@ -85,6 +92,7 @@ public struct ThemeConfig: Codable, Equatable, Sendable {
             surface: "#F7FAF6",
             textPrimary: "#12291A",
             textSecondary: "#4F6D57",
+            subText: "#385E43",
             error: "#E5484D"
         ),
         dark: JugnuTheme(
@@ -93,6 +101,7 @@ public struct ThemeConfig: Codable, Equatable, Sendable {
             surface: "#020402",
             textPrimary: "#C9FFD4",
             textSecondary: "#3A8A4A",
+            subText: "#6FAF7C",
             error: "#E5484D"
         )
     )
@@ -104,6 +113,7 @@ public struct ThemeConfig: Codable, Equatable, Sendable {
             surface: "#FFFAFD",
             textPrimary: "#4A1936",
             textSecondary: "#93677F",
+            subText: "#6F4A5E",
             error: "#E5484D"
         ),
         dark: JugnuTheme(
@@ -112,6 +122,7 @@ public struct ThemeConfig: Codable, Equatable, Sendable {
             surface: "#2E1524",
             textPrimary: "#FBE6F1",
             textSecondary: "#B98AA7",
+            subText: "#D2A9BF",
             error: "#E5484D"
         )
     )

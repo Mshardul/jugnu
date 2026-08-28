@@ -53,8 +53,10 @@ Walk this after the 2026-08-23 palette + addon UI product pass. Leave items unch
 - [ ] First-run installs the starter set from registry (falls back to local `addons/` if offline): `mic-mute`, `focus-toggle`, `paste-plain`, `floating-note`, `ports`
 - [ ] Preferences → **Install starter addons** downloads zips + verifies sha256
 - [ ] Preferences: disable removes from palette; uninstall removes files + declared cleanup
+- [ ] **clipboard-history disable stops the watcher for good** (ticket 0023): enable it, invoke `Clipboard history` once, confirm `launchctl print gui/$(id -u)/com.jugnu.clipboard-history.watch` succeeds and `~/Library/LaunchAgents/com.jugnu.clipboard-history.watch.plist` exists → disable in Preferences → both are gone → log out and back in → watcher does **not** return, no new pasteboard entries recorded
 - [ ] **Floating Note**: type, Cmd+S, close, reopen — text persisted by the addon
 - [ ] Menu bar uses the template firefly icon (tints with the menu bar); click opens the menu
+- [ ] **Single-instance guard** (ticket 0020): with Jugnu already running, launch `Jugnu.app` again → the second copy exits immediately, the running copy opens the palette, and Activity Monitor shows exactly one `Jugnu` process. The hotkey still works afterward.
 
 ### Nudges and clock helper
 
@@ -86,3 +88,33 @@ Budgets from [addon-ui-speed-design.md §6](./2026-08-22-addon-ui-speed-design.m
 - [ ] DEBUG console `InvokeTrace` lines stay inside those budgets on toast addons (mic-mute) and a list panel (clipboard-history)
 
 Default catalog URL: `https://raw.githubusercontent.com/Mshardul/jugnu/main/registry/addons.json` (`shell.registry_url` in config).
+
+## Manual — launcher + catalog foundation (Phase 1)
+
+Walk this after the 2026-08-27 launcher-catalog-foundation plan (viewA row1 favorites bar, fixed 5-slot search-results region, `canvas` remap for catalog/detail/settings). Leave items unchecked until you actually do them.
+
+### Row1 — favorites bar
+
+- [ ] 0 favorites: row1 center is blank, no placeholder text, logo (left) / prefs (right) stay in place
+- [ ] Favoriting a command via the search-results star updates row1 within the same session
+- [ ] Row1 shows the top 5 favorites in the stored order; a 6th favorited command shows the "…" (`ellipsis.circle`) icon
+- [ ] Drag-reorder two favorites in row1; the new order persists after closing/reopening the palette (Opt+Space twice)
+- [ ] Right-click a row1 favorite → **Remove from Favorites** removes it without confirmation
+- [ ] Click a row1 favorite runs the command exactly as running it from search
+
+### Row2 + search-results region
+
+- [ ] Query with 0 results: did-you-mean suggestion (if any installed command matches) shows in slot 1 with `(did you mean this?)`; "Show all addons →" link still shows
+- [ ] Query with exactly 4 results: 4 rows + "Show all addons →" link, no scrollbar
+- [ ] Query with >4 results: scrollable region, no "Show all addons →" link
+- [ ] Panel height stays visually stable while typing (no per-keystroke resize — confirms the fixed-5-slot rule)
+- [ ] Breadcrumb row reads `addon-id › Command Title` (addon id muted, title bold)
+- [ ] Search-results star still pins/unpins without running the command
+
+### Canvas remap
+
+- [ ] Catalog / Detail / Preferences panels open at the new (larger, `canvas`-sized) dimensions without visual clipping — full redesign is a later phase, just confirm nothing is broken/cut-off by the `.canvas` remap alone
+
+### Theme token
+
+- [ ] `subText` token resolves per preset×mode (no crash, no black text) — spot-check by eye in each of Firefly / Terminal Phosphor / Rose Quartz

@@ -19,6 +19,10 @@ public struct JugnuPaths: Sendable {
         home.appendingPathComponent(".local/share/jugnu/state")
     }
 
+    public var launchAgentsDir: URL {
+        home.appendingPathComponent("Library/LaunchAgents")
+    }
+
     public var clockTimersFile: URL {
         stateDir.appendingPathComponent("clock/timers.json")
     }

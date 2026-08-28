@@ -43,6 +43,16 @@ targets:
         product: JugnuUI
       - package: HotKey
         product: HotKey
+  ScreenshotTests:
+    type: bundle.ui-testing
+    platform: macOS
+    sources:
+      - path: ScreenshotTests
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: app.jugnu.screenshot-tests
+      GENERATE_INFOPLIST_FILE: YES
+    dependencies:
+      - target: Jugnu
 schemes:
   Jugnu:
     build:
@@ -55,3 +65,12 @@ schemes:
       targets:
         - package: JugnuLocal/JugnuCoreTests
         - package: JugnuLocal/JugnuUITests
+  Screenshots:
+    build:
+      targets:
+        Jugnu: all
+        ScreenshotTests: [test]
+    test:
+      config: Debug
+      targets:
+        - ScreenshotTests

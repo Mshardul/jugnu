@@ -22,12 +22,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var clockHost: ClockHost?
     private var hotkey: HotkeyController?
     private var firstRun: FirstRunWindowController?
-    /// Reused across catalog/detail renders so entries/filters/scroll survive a push/pop instead of
-    /// being lost each time renderCurrentTop rebuilds the hosted content (see Task 9 notes).
     private var catalogViewModel: BrowseCatalogViewModel?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        let model = AppModel()
+        if !ScreenshotMode.isActive, yieldToRunningInstance() { return }
+
+        let model: AppModel
+        if ScreenshotMode.isActive, let paths = ScreenshotMode.makePaths() {
+            model = AppModel(paths: paths)
+        } else {
+            model = AppModel()
+        }
         self.model = model
         model.bootstrap()
 
@@ -60,7 +65,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         self.hotkey = hotkey
         hotkey.registerFromConfig()
 
-        if !model.state.firstRunCompleted {
+        DistributedNotificationCenter.default().addObserver(
+            forName: SingleInstance.openPaletteNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.invokeShell() }
+        }
+
+        if !model.state.firstRunCompleted, !ScreenshotMode.isActive {
             let first = FirstRunWindowController(model: model) { [weak self, weak hotkey] in
                 hotkey?.registerFromConfig()
                 self?.firstRun = nil
@@ -72,6 +85,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         clockHost?.stop()
+    }
+
+    // Another Jugnu is already up: ask it to open the palette, then quit before touching the hotkey or menu bar.
+    private func yieldToRunningInstance() -> Bool {
+        guard let bundleID = Bundle.main.bundleIdentifier else { return false }
+        let selfPID = Int(ProcessInfo.processInfo.processIdentifier)
+        let running = NSRunningApplication.runningApplications(withBundleIdentifier: bundleID).map {
+            RunningInstance(pid: Int($0.processIdentifier), launchDate: $0.launchDate)
+        }
+        guard SingleInstance.shouldYield(running: running, selfPID: selfPID) else { return false }
+        DistributedNotificationCenter.default().postNotificationName(
+            SingleInstance.openPaletteNotification,
+            object: nil,
+            userInfo: nil,
+            deliverImmediately: true
+        )
+        NSApp.terminate(nil)
+        return true
     }
 
     /// Invoke hotkey / Open Palette: not on launcher (or not visible) -> home; on launcher -> close.
@@ -180,10 +211,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         shellHost.ensurePanel(
             initialContent: PaletteView(
                 model: model,
+                favorites: model.topFavorites(limit: 5),
                 onRun: { [weak self] cmd in self?.runCommand(cmd) },
                 onClose: { [weak shellHost] in shellHost?.hide() },
                 onOpenBrowseCatalog: { [weak self] in self?.pushCatalog() },
-                onOpenPreferences: { [weak self] in self?.pushSettings() }
+                onOpenPreferences: { [weak self] in self?.pushSettings() },
+                onReorderFavorite: { [weak self] from, to in self?.model?.moveFavorite(from: from, to: to) },
+                onRemoveFavorite: { [weak self] cmd in self?.model?.removeFavorite(qualifiedId: cmd.qualifiedId) }
             ),
             size: ShellPreset.launcher.size(compactLauncher: false)
         )
@@ -199,12 +233,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             guard case .launcher(let query, _, _) = shellHost.stack.top.state else { return }
             shellHost.setContent(PaletteView(
                 model: model,
+                favorites: model.topFavorites(limit: 5),
                 initialQuery: query,
                 onRun: { [weak self] cmd in self?.runCommand(cmd) },
                 onClose: { [weak shellHost] in shellHost?.hide() },
                 onOpenBrowseCatalog: { [weak self] in self?.pushCatalog() },
                 onOpenPreferences: { [weak self] in self?.pushSettings() },
-                onStateChange: { [weak shellHost] state in shellHost?.updateTopState(state) }
+                onStateChange: { [weak shellHost] state in shellHost?.updateTopState(state) },
+                onReorderFavorite: { [weak self] from, to in self?.model?.moveFavorite(from: from, to: to) },
+                onRemoveFavorite: { [weak self] cmd in self?.model?.removeFavorite(qualifiedId: cmd.qualifiedId) }
             ))
         case .settings:
             shellHost.setContent(PrefsView(model: model, shellHost: shellHost, onOpenCatalog: { [weak self] in self?.pushCatalog() }))

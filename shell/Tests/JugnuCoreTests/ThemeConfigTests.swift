@@ -25,6 +25,22 @@ final class ThemeConfigTests: XCTestCase {
         XCTAssertEqual(ThemeConfig.roseQuartz.light.error, "#E5484D")
     }
 
+    func testSubTextValuesPerPresetAndMode() {
+        XCTAssertEqual(ThemeConfig.firefly.dark.subText, "#B8AF9E")
+        XCTAssertEqual(ThemeConfig.firefly.light.subText, "#5B5647")
+        XCTAssertEqual(ThemeConfig.terminalPhosphor.dark.subText, "#6FAF7C")
+        XCTAssertEqual(ThemeConfig.terminalPhosphor.light.subText, "#385E43")
+        XCTAssertEqual(ThemeConfig.roseQuartz.dark.subText, "#D2A9BF")
+        XCTAssertEqual(ThemeConfig.roseQuartz.light.subText, "#6F4A5E")
+    }
+
+    func testSubTextSanitizesLikeOtherFields() {
+        var dirty = ThemeConfig.firefly.dark
+        dirty.subText = "nope"
+        let clean = dirty.sanitized(against: ThemeConfig.firefly.dark)
+        XCTAssertEqual(clean.subText, "#B8AF9E")
+    }
+
     func testJugnuConfigDecodesMissingThemeAsFirefly() throws {
         let yaml = "version: 1\nshell:\n  hotkey: option+space\naddons: {}\n"
         let config = try YAMLDecoder().decode(JugnuConfig.self, from: yaml)

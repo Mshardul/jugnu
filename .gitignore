@@ -24,6 +24,9 @@ DerivedData/
 # Addon packaging output (scripts/package-addon.sh)
 dist/
 
+# Screenshot gallery (make screenshots)
+screenshots/
+
 # Agent / plan scratch (local)
 .superpowers/
 .prompts/

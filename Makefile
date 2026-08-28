@@ -2,7 +2,7 @@
 -include .env
 export DEVELOPER_DIR ?= /Applications/Xcode.app/Contents/Developer
 
-.PHONY: sync hooks precommit lint lint-swift format format-swift spell test test-extended tools-swift stop run ci window-layouts helper-clock
+.PHONY: sync hooks precommit lint lint-swift format format-swift spell test test-extended tools-swift stop run ci window-layouts helper-clock screenshots
 
 sync:
 	uv sync
@@ -59,6 +59,10 @@ stop:
 		fi; \
 		sleep 0.15; \
 	done
+
+# Drive the real app through every page (XCUITest) and dump PNGs to screenshots/.
+screenshots:
+	./scripts/screenshots.sh
 
 run: stop
 	cd shell && \

@@ -17,11 +17,14 @@ public protocol PaletteModelProtocol: ObservableObject {
 
 public struct PaletteView<Model: PaletteModelProtocol>: View {
     @ObservedObject var model: Model
+    var favorites: [IndexedCommand]
     var onRun: (IndexedCommand) -> Void
     var onClose: () -> Void
     var onOpenBrowseCatalog: () -> Void
     var onOpenPreferences: () -> Void
     var onStateChange: (ShellViewState) -> Void
+    var onReorderFavorite: (Int, Int) -> Void
+    var onRemoveFavorite: (IndexedCommand) -> Void
 
     @State private var query: String
     @State private var selection = 0
@@ -33,24 +36,39 @@ public struct PaletteView<Model: PaletteModelProtocol>: View {
 
     public init(
         model: Model,
+        favorites: [IndexedCommand] = [],
         initialQuery: String = "",
         onRun: @escaping (IndexedCommand) -> Void,
         onClose: @escaping () -> Void,
         onOpenBrowseCatalog: @escaping () -> Void,
         onOpenPreferences: @escaping () -> Void,
-        onStateChange: @escaping (ShellViewState) -> Void = { _ in }
+        onStateChange: @escaping (ShellViewState) -> Void = { _ in },
+        onReorderFavorite: @escaping (Int, Int) -> Void = { _, _ in },
+        onRemoveFavorite: @escaping (IndexedCommand) -> Void = { _ in }
     ) {
         self.model = model
+        self.favorites = favorites
         self.onRun = onRun
         self.onClose = onClose
         self.onOpenBrowseCatalog = onOpenBrowseCatalog
         self.onOpenPreferences = onOpenPreferences
         self.onStateChange = onStateChange
+        self.onReorderFavorite = onReorderFavorite
+        self.onRemoveFavorite = onRemoveFavorite
         _query = State(initialValue: initialQuery)
     }
 
     private var theme: JugnuThemeColors {
         JugnuThemeColors(theme: resolvedTheme(from: themeStore.config, colorScheme: colorScheme))
+    }
+
+    private func pillBackground(radius: CGFloat) -> some View {
+        RoundedRectangle(cornerRadius: radius, style: .continuous)
+            .fill(theme.surface)
+            .overlay(
+                RoundedRectangle(cornerRadius: radius, style: .continuous)
+                    .strokeBorder(theme.border, lineWidth: JugnuTokens.Launcher.hairline)
+            )
     }
 
     private var displayed: [SearchHit] {
@@ -61,18 +79,6 @@ public struct PaletteView<Model: PaletteModelProtocol>: View {
             }
         }
         return model.lastHits
-    }
-
-    private var isFirstView: Bool {
-        query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-    }
-
-    private var showBrowseCatalogRow: Bool {
-        isFirstView && !model.hiddenShellCommands.contains("browse-addons")
-    }
-
-    private var showPreferencesRow: Bool {
-        isFirstView && !model.hiddenShellCommands.contains("preferences")
     }
 
     private var placeholder: String {
@@ -87,104 +93,75 @@ public struct PaletteView<Model: PaletteModelProtocol>: View {
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: JugnuTokens.Spacing.row) {
-            TextField(placeholder, text: $query)
-                .textFieldStyle(.plain)
-                .font(JugnuTokens.font(presetId: themeStore.presetId, role: .title3))
-                .padding(8)
-                .background(theme.background)
-                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                .onChange(of: query) { _, newValue in
-                    onStateChange(.launcher(query: newValue, selection: nil, scroll: 0))
-                    searchTask?.cancel()
-                    searchTask = Task {
-                        try? await Task.sleep(nanoseconds: 100_000_000)
-                        guard !Task.isCancelled else { return }
-                        _ = model.search(newValue)
-                        selection = 0
-                    }
-                }
-
-            if showBrowseCatalogRow {
-                Button {
-                    onOpenBrowseCatalog()
-                    onClose()
-                } label: {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Browse Addons")
-                                .font(JugnuTokens.font(presetId: themeStore.presetId, role: .headline))
-                            Text("Discover, install, and manage addons")
-                                .font(JugnuTokens.font(presetId: themeStore.presetId, role: .caption))
-                                .foregroundStyle(theme.textSecondary)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                    .padding(.vertical, 2)
+        let L = JugnuTokens.Launcher.self
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 12) {
+                JugnuWordmark()
+                FavoritesRow(
+                    favorites: favorites,
+                    onRun: onRun,
+                    onReorder: onReorderFavorite,
+                    onRemove: onRemoveFavorite,
+                    onOpenAllFavorites: { onOpenBrowseCatalog() }
+                )
+                Button(action: { onOpenPreferences() }) {
+                    Text("⚙︎ All addons")
+                        .font(.system(size: 11.5))
+                        .foregroundStyle(theme.textSecondary)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(pillBackground(radius: L.favTileRadius))
+                        .fixedSize()
                 }
                 .buttonStyle(.plain)
-                Divider()
+                .help("All addons + preferences")
             }
+            .padding(.horizontal, L.edgeInset)
+            .frame(height: L.row1Height)
+            .overlay(alignment: .bottom) { theme.border.frame(height: L.hairline) }
 
-            if showPreferencesRow {
-                Button {
-                    onOpenPreferences()
-                    onClose()
-                } label: {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Preferences")
-                                .font(JugnuTokens.font(presetId: themeStore.presetId, role: .headline))
-                            Text("Theme, hotkey, and shell settings")
-                                .font(JugnuTokens.font(presetId: themeStore.presetId, role: .caption))
-                                .foregroundStyle(theme.textSecondary)
+            HStack(spacing: 8) {
+                Image(systemName: "magnifyingglass")
+                    .foregroundStyle(theme.textSecondary)
+                TextField(placeholder, text: $query)
+                    .textFieldStyle(.plain)
+                    .font(JugnuTokens.font(presetId: themeStore.presetId, role: .callout))
+                    .onChange(of: query) { _, newValue in
+                        onStateChange(.launcher(query: newValue, selection: nil, scroll: 0))
+                        searchTask?.cancel()
+                        searchTask = Task {
+                            try? await Task.sleep(nanoseconds: 100_000_000)
+                            guard !Task.isCancelled else { return }
+                            _ = model.search(newValue)
+                            selection = 0
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
-                    .padding(.vertical, 2)
-                }
-                .buttonStyle(.plain)
-                Divider()
             }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 9)
+            .background(pillBackground(radius: L.searchRadius))
+            .padding(.horizontal, L.edgeInset)
+            .padding(.vertical, 10)
+            .overlay(alignment: .bottom) { theme.border.frame(height: L.hairline) }
 
-            List(Array(displayed.enumerated()), id: \.element.command.qualifiedId) { idx, hit in
-                HStack {
-                    Button {
-                        onRun(hit.command)
-                    } label: {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(hit.command.title)
-                                .font(JugnuTokens.font(presetId: themeStore.presetId, role: .headline))
-                            Text(hit.isSuggestion ? "Did you mean this?" : hit.command.subtitle)
-                                .font(JugnuTokens.font(presetId: themeStore.presetId, role: .caption))
-                                .foregroundStyle(theme.textSecondary)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                    .buttonStyle(.plain)
-
-                    Button {
-                        model.toggleFavorite(qualifiedId: hit.command.qualifiedId)
-                    } label: {
-                        Image(systemName: model.isFavorite(qualifiedId: hit.command.qualifiedId) ? "star.fill" : "star")
-                            .foregroundStyle(theme.accent)
-                    }
-                    .buttonStyle(.plain)
-                    .help("Pin to favorites")
-                }
-                .padding(.vertical, 2)
-                .background(idx == selection ? theme.accent.opacity(0.15) : Color.clear)
-            }
-            .listStyle(.plain)
-            .scrollContentBackground(.hidden)
+            SearchResultsRegion(
+                hits: displayed,
+                selection: selection,
+                onSelect: onRun,
+                onOpenBrowseCatalog: { onOpenBrowseCatalog() },
+                isFavorite: { model.isFavorite(qualifiedId: $0.qualifiedId) },
+                onToggleFavorite: { model.toggleFavorite(qualifiedId: $0.qualifiedId) }
+            )
 
             if let status = model.statusMessage {
                 PanelErrorBanner(message: status)
+                    .padding(.horizontal, L.edgeInset)
+                    .padding(.bottom, 12)
             }
         }
-        .padding(JugnuTokens.Spacing.panelPadding)
-        .frame(width: 560, height: 360)
-        .background(theme.surface)
+        .frame(width: L.panelWidth)
+        .fixedSize(horizontal: false, vertical: true)
+        .background(theme.background)
         .clipShape(RoundedRectangle(cornerRadius: JugnuTokens.Radius.panel, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: JugnuTokens.Radius.panel, style: .continuous)

@@ -27,10 +27,10 @@ public enum ViewType: String, Codable, CaseIterable, Sendable, Equatable {
         var height: Double
         switch self {
         case .seek:
-            width = clamped(visible.width * 0.40, min: 480, max: 560)
+            width = min(640, visible.width)
             height = 120
         case .palette:
-            width = clamped(visible.width * 0.40, min: 480, max: 560)
+            width = min(640, visible.width)
             height = clamped(visible.height * 0.40, min: 280, max: 360)
         case .ask:
             width = clamped(visible.width * 0.28, min: 340, max: 420)

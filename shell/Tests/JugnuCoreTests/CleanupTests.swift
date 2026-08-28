@@ -31,7 +31,7 @@ final class CleanupTests: XCTestCase {
         try yaml.write(to: addonRoot.appendingPathComponent("addon.yaml"), atomically: true, encoding: .utf8)
 
         let manifest = try ManifestLoader.load(from: addonRoot)
-        try Cleanup.performDisable(manifest: manifest, addonRoot: addonRoot)
+        try Cleanup.performDisable(manifest: manifest, addonRoot: addonRoot, paths: paths)
         XCTAssertTrue(FileManager.default.fileExists(atPath: addonRoot.path))
         XCTAssertTrue(FileManager.default.fileExists(atPath: side.path))
 
@@ -43,5 +43,43 @@ final class CleanupTests: XCTestCase {
         XCTAssertFalse(FileManager.default.fileExists(atPath: side.path))
         let config = try ConfigStore(paths: paths).load()
         XCTAssertNil(config.addons["toy"])
+    }
+
+    func testDisableRemovesLaunchAgentPlistSoWatcherCannotReloadAtLogin() throws {
+        let home = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: home, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: home) }
+
+        let paths = JugnuPaths(home: home)
+        let addonRoot = paths.addonsDir.appendingPathComponent("watchy")
+        try FileManager.default.createDirectory(at: addonRoot, withIntermediateDirectories: true)
+
+        try FileManager.default.createDirectory(at: paths.launchAgentsDir, withIntermediateDirectories: true)
+        let plist = paths.launchAgentsDir.appendingPathComponent("com.jugnu.watchy.watch.plist")
+        try "<plist/>".write(to: plist, atomically: true, encoding: .utf8)
+
+        let yaml = """
+        id: watchy
+        name: Watchy
+        version: 1.0.0
+        api: 1
+        commands: []
+        entrypoint:
+          kind: exec
+          path: bin/run
+        cleanup:
+          paths: []
+          launchd:
+            - com.jugnu.watchy.watch
+        """
+        try yaml.write(to: addonRoot.appendingPathComponent("addon.yaml"), atomically: true, encoding: .utf8)
+
+        let manifest = try ManifestLoader.load(from: addonRoot)
+        try Cleanup.performDisable(manifest: manifest, addonRoot: addonRoot, paths: paths)
+
+        XCTAssertFalse(
+            FileManager.default.fileExists(atPath: plist.path),
+            "disable must delete the LaunchAgent plist so launchd cannot reload the watcher at next login"
+        )
     }
 }

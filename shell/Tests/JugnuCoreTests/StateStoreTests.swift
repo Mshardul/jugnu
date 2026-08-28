@@ -34,4 +34,30 @@ final class StateStoreTests: XCTestCase {
         state.toggleFavorite(qualifiedId: "mic-mute.toggle")
         XCTAssertEqual(state.favoriteCommandIDs, [])
     }
+
+    func test_moveFavorite_reordersInPlace() {
+        var state = JugnuState(favoriteCommandIDs: ["a", "b", "c"])
+        state.moveFavorite(from: 0, to: 2)
+        XCTAssertEqual(state.favoriteCommandIDs, ["b", "c", "a"])
+    }
+
+    func test_moveFavorite_outOfBounds_isNoOp() {
+        var state = JugnuState(favoriteCommandIDs: ["a", "b"])
+        state.moveFavorite(from: 0, to: 5)
+        XCTAssertEqual(state.favoriteCommandIDs, ["a", "b"])
+        state.moveFavorite(from: 9, to: 0)
+        XCTAssertEqual(state.favoriteCommandIDs, ["a", "b"])
+    }
+
+    func test_removeFavorite_removesMatchingID() {
+        var state = JugnuState(favoriteCommandIDs: ["a", "b", "c"])
+        state.removeFavorite(qualifiedId: "b")
+        XCTAssertEqual(state.favoriteCommandIDs, ["a", "c"])
+    }
+
+    func test_removeFavorite_missingID_isNoOp() {
+        var state = JugnuState(favoriteCommandIDs: ["a"])
+        state.removeFavorite(qualifiedId: "not-there")
+        XCTAssertEqual(state.favoriteCommandIDs, ["a"])
+    }
 }

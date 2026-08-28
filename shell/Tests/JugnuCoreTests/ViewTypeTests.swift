@@ -9,11 +9,11 @@ final class ViewTypeTests: XCTestCase {
 
     func testLaptopSeekAndPaletteMatchCompactAndFullLauncher() {
         let seek = ViewType.seek.size(in: laptop)
-        XCTAssertEqual(seek.width, 560, accuracy: 0.5)
+        XCTAssertEqual(seek.width, 640, accuracy: 0.5)
         XCTAssertEqual(seek.height, 120, accuracy: 0.5)
 
         let palette = ViewType.palette.size(in: laptop)
-        XCTAssertEqual(palette.width, 560, accuracy: 0.5)
+        XCTAssertEqual(palette.width, 640, accuracy: 0.5)
         XCTAssertEqual(palette.height, 360, accuracy: 0.5)
     }
 

@@ -10,12 +10,11 @@ public enum ShellPreset: String, Equatable, Sendable {
     case list
     case form
 
-    /// `compactLauncher` only affects `.launcher`; ignored for other cases.
     public func defaultViewType(compactLauncher: Bool) -> ViewType {
         switch self {
         case .launcher: compactLauncher ? .seek : .palette
-        case .catalog: .grid
-        case .settings, .detail: .rail
+        case .catalog: .canvas
+        case .settings, .detail: .canvas
         case .confirm: .ask
         case .list: .rows
         case .form: .fields

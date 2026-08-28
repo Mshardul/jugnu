@@ -18,15 +18,28 @@
 		D075254A62556C0A795B0DAB /* AddonUninstallPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7827A8A356F9392C623B554 /* AddonUninstallPresenter.swift */; };
 		D3584E6337F9B4D089C8193E /* JugnuCore in Frameworks */ = {isa = PBXBuildFile; productRef = 24FB2BFFCBA284CE5BC001B6 /* JugnuCore */; };
 		D46018A13E56874B0C944D88 /* JugnuUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5EA3A420B1701DCC99B5E95F /* JugnuUI */; };
+		EF0699E4A55CD1F769DD87CA /* SpikeTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FC0D37D8BAF5D97554D37 /* SpikeTest.swift */; };
 		F8BD7FCD72AE22D31DA008F7 /* FirstRunWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E983F2778775352830C719C /* FirstRunWindow.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		7001DC100FFE09536103762A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D00F25E2356E6333CFE8B744 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AC8E84B6A1740214913C2336;
+			remoteInfo = Jugnu;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		270E0874AB20E0EB3A96CB16 /* ScreenshotTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScreenshotTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		278F0380D93A6EEE31AD2C2F /* HotkeyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyController.swift; sourceTree = "<group>"; };
 		4E828A6B867A511A83ECEBC3 /* BrowseCatalogViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowseCatalogViewModel.swift; sourceTree = "<group>"; };
 		5E983F2778775352830C719C /* FirstRunWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstRunWindow.swift; sourceTree = "<group>"; };
 		8F65D4A1078835B0D1646C28 /* PrefsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefsView.swift; sourceTree = "<group>"; };
 		A7827A8A356F9392C623B554 /* AddonUninstallPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddonUninstallPresenter.swift; sourceTree = "<group>"; };
+		AA8FC0D37D8BAF5D97554D37 /* SpikeTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpikeTest.swift; sourceTree = "<group>"; };
 		BE92CF58DD3BE972D2AEC8CB /* MenuBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarController.swift; sourceTree = "<group>"; };
 		C5935023FD7BC462A1C14B9A /* shell */ = {isa = PBXFileReference; lastKnownFileType = folder; name = shell; path = .; sourceTree = SOURCE_ROOT; };
 		C92B9A72BEBE9AA2C83556D4 /* Jugnu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Jugnu.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -49,6 +62,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		9E29639983CEE27F74846C07 /* ScreenshotTests */ = {
+			isa = PBXGroup;
+			children = (
+				AA8FC0D37D8BAF5D97554D37 /* SpikeTest.swift */,
+			);
+			path = ScreenshotTests;
+			sourceTree = "<group>";
+		};
 		B6ED08B0E37EE61AACFA1B60 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
@@ -61,6 +82,7 @@
 			isa = PBXGroup;
 			children = (
 				C92B9A72BEBE9AA2C83556D4 /* Jugnu.app */,
+				270E0874AB20E0EB3A96CB16 /* ScreenshotTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -86,6 +108,7 @@
 			children = (
 				F57367362B9A9A9EFD13E750 /* App */,
 				B6ED08B0E37EE61AACFA1B60 /* Packages */,
+				9E29639983CEE27F74846C07 /* ScreenshotTests */,
 				E3FCC502ECCD11B845A6D16F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -93,6 +116,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		36F32137FE043B38C0083899 /* ScreenshotTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A2BEA390BA26B174EB185A7D /* Build configuration list for PBXNativeTarget "ScreenshotTests" */;
+			buildPhases = (
+				6DEA57429D558E0C8AED8FCB /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				69A9AD49B6D10852B8A54666 /* PBXTargetDependency */,
+			);
+			name = ScreenshotTests;
+			packageProductDependencies = (
+			);
+			productName = ScreenshotTests;
+			productReference = 270E0874AB20E0EB3A96CB16 /* ScreenshotTests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		AC8E84B6A1740214913C2336 /* Jugnu */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = DBD0A392E9FF0E3B2CDC9949 /* Build configuration list for PBXNativeTarget "Jugnu" */;
@@ -124,6 +165,9 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					36F32137FE043B38C0083899 = {
+						TestTargetID = AC8E84B6A1740214913C2336;
+					};
 				};
 			};
 			buildConfigurationList = B241950593C153E7FBD46BFB /* Build configuration list for PBXProject "Jugnu" */;
@@ -145,6 +189,7 @@
 			projectRoot = "";
 			targets = (
 				AC8E84B6A1740214913C2336 /* Jugnu */,
+				36F32137FE043B38C0083899 /* ScreenshotTests */,
 			);
 		};
 /* End PBXProject section */
@@ -161,6 +206,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		6DEA57429D558E0C8AED8FCB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EF0699E4A55CD1F769DD87CA /* SpikeTest.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F75565085121D698824784C3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -177,6 +230,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		69A9AD49B6D10852B8A54666 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AC8E84B6A1740214913C2336 /* Jugnu */;
+			targetProxy = 7001DC100FFE09536103762A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		61D07CE4A62E5F748D90902E /* Release */ = {
@@ -202,6 +263,23 @@
 			};
 			name = Release;
 		};
+		6A52E3EBB83A8BC0F758D412 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "app.jugnu.screenshot-tests";
+				SDKROOT = macosx;
+				TEST_TARGET_NAME = Jugnu;
+			};
+			name = Release;
+		};
 		6FC66D0D578296FFDF058A85 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -222,6 +300,23 @@
 				PRODUCT_BUNDLE_IDENTIFIER = app.jugnu.shell;
 				PRODUCT_NAME = Jugnu;
 				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		AD686EC81F6633F169AADBA6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "app.jugnu.screenshot-tests";
+				SDKROOT = macosx;
+				TEST_TARGET_NAME = Jugnu;
 			};
 			name = Debug;
 		};
@@ -349,6 +444,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		A2BEA390BA26B174EB185A7D /* Build configuration list for PBXNativeTarget "ScreenshotTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AD686EC81F6633F169AADBA6 /* Debug */,
+				6A52E3EBB83A8BC0F758D412 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		B241950593C153E7FBD46BFB /* Build configuration list for PBXProject "Jugnu" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

@@ -1,18 +1,30 @@
 import Foundation
 
+public enum CleanupError: Error, Equatable {
+    case disableIncomplete(labels: [String])
+}
+
 public enum Cleanup {
-    /// Best-effort undo of declared running side effects. Does not delete the addon directory.
-    public static func performDisable(manifest: AddonManifest, addonRoot: URL) throws {
+    public static func performDisable(manifest: AddonManifest, addonRoot: URL, paths: JugnuPaths) throws {
         _ = addonRoot
+        var survivors: [String] = []
         for label in manifest.cleanup.launchd {
+            // Remove the plist before bootout so launchd can't reload the job at next login.
+            let plist = paths.launchAgentsDir.appendingPathComponent("\(label).plist")
+            try? FileManager.default.removeItem(at: plist)
             bestEffortLaunchctlBootout(label: label)
+            if launchctlLabelIsLoaded(label) {
+                survivors.append(label)
+            }
+        }
+        if !survivors.isEmpty {
+            throw CleanupError.disableIncomplete(labels: survivors)
         }
     }
 
     /// Disable cleanup, delete declared paths, then remove the addon directory.
     public static func performUninstall(manifest: AddonManifest, addonRoot: URL, paths: JugnuPaths) throws {
-        _ = paths
-        try performDisable(manifest: manifest, addonRoot: addonRoot)
+        try performDisable(manifest: manifest, addonRoot: addonRoot, paths: paths)
         let fm = FileManager.default
         for raw in manifest.cleanup.paths {
             let url = expandHome(raw)
@@ -81,6 +93,21 @@ public enum Cleanup {
         return URL(fileURLWithPath: path)
     }
 
+    private static func launchctlLabelIsLoaded(_ label: String) -> Bool {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/bin/launchctl")
+        process.arguments = ["print", "gui/\(getuid())/\(label)"]
+        process.standardOutput = Pipe()
+        process.standardError = Pipe()
+        do {
+            try process.run()
+        } catch {
+            return false
+        }
+        process.waitUntilExit()
+        return process.terminationStatus == 0
+    }
+
     private static func bestEffortLaunchctlBootout(label: String) {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/bin/launchctl")
@@ -117,7 +144,7 @@ public struct AddonLifecycle: Sendable {
         let addonRoot = paths.addonsDir.appendingPathComponent(id)
         if !enabled, FileManager.default.fileExists(atPath: addonRoot.appendingPathComponent("addon.yaml").path) {
             let manifest = try ManifestLoader.load(from: addonRoot)
-            try Cleanup.performDisable(manifest: manifest, addonRoot: addonRoot)
+            try Cleanup.performDisable(manifest: manifest, addonRoot: addonRoot, paths: paths)
         }
         config.addons[id] = AddonConfig(enabled: enabled)
         try store.save(config)

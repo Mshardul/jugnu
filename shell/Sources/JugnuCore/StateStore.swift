@@ -50,6 +50,18 @@ public struct JugnuState: Codable, Equatable, Sendable {
             favoriteCommandIDs.append(qualifiedId)
         }
     }
+
+    public mutating func moveFavorite(from source: Int, to destination: Int) {
+        guard favoriteCommandIDs.indices.contains(source),
+              destination >= 0, destination < favoriteCommandIDs.count
+        else { return }
+        let id = favoriteCommandIDs.remove(at: source)
+        favoriteCommandIDs.insert(id, at: destination)
+    }
+
+    public mutating func removeFavorite(qualifiedId: String) {
+        favoriteCommandIDs.removeAll { $0 == qualifiedId }
+    }
 }
 
 public struct StateStore: Sendable {
