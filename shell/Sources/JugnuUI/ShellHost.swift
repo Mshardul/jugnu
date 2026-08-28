@@ -26,10 +26,7 @@ public final class ShellHost: ObservableObject {
     )?
     private let toast = ToastPresenter()
     private var cards: [String: WeakCardPanel] = [:]
-    /// Set by the caller (AppDelegate) right after `pushFollowUp`/`renderFollowUpContent` so Cancel
-    /// routes through the same Esc/pop path as every other preset (`handleEsc`), instead of duplicating
-    /// pop-and-morph logic inside `ShellHost`. AppModel-free: this only signals "user cancelled",
-    /// it doesn't decide what's next.
+    /// Set by the caller (AppDelegate) right after `pushFollowUp`/`renderFollowUpContent`
     public var onCancelFollowUp: (() -> Void)?
 
     public init(reduceMotion: @escaping () -> Bool = { NSWorkspace.shared.accessibilityDisplayShouldReduceMotion }) {
@@ -41,9 +38,12 @@ public final class ShellHost: ObservableObject {
         panel?.isVisible ?? false
     }
 
-    /// The screen the panel is currently on, if it's up. Callers that push a follow-up in response to
-    /// user interaction with the panel's own content (e.g. an uninstall button in `detail`) should
-    /// morph on this screen rather than `NSScreen.main`, matching wherever the panel already is.
+    // Panel survives hide() so reopen skips the NSPanel/NSHostingView rebuild and its cold paint.
+    var hasPanel: Bool {
+        panel != nil
+    }
+
+    /// The screen the panel is currently on, if it's up.
     public var currentScreen: NSScreen? {
         panel?.screen
     }
@@ -153,12 +153,10 @@ public final class ShellHost: ObservableObject {
 }
 
 public extension ShellHost {
-    /// Dismiss: hides the panel and empties the stack entirely (never pops). Used for click-outside,
-    /// Esc/Cmd+W at root, and hotkey-close-on-launcher.
+    // Orders the panel out and empties the stack (never pops); panel kept for the next invoke to reuse.
     func hide() {
         stopOutsideClickMonitor()
         panel?.orderOut(nil)
-        panel = nil
         stack.clear()
         followUpDescriptor = nil
         followUpError.message = nil

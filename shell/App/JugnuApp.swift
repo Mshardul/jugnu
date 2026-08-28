@@ -216,11 +216,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 onClose: { [weak shellHost] in shellHost?.hide() },
                 onOpenBrowseCatalog: { [weak self] in self?.pushCatalog() },
                 onOpenPreferences: { [weak self] in self?.pushSettings() },
+                onRunShellNative: { [weak self] cmd in self?.runShellNative(cmd) },
                 onReorderFavorite: { [weak self] from, to in self?.model?.moveFavorite(from: from, to: to) },
                 onRemoveFavorite: { [weak self] cmd in self?.model?.removeFavorite(qualifiedId: cmd.qualifiedId) }
             ),
             size: ShellPreset.launcher.size(compactLauncher: false)
         )
+    }
+
+    private func runShellNative(_ cmd: ShellNativeCommand) {
+        switch cmd.kind {
+        case .browseAddons: pushCatalog()
+        case .preferences: pushSettings()
+        }
     }
 
     /// Central dispatch: maps `stack.top.preset` to the concrete view hosted in the panel.
@@ -239,6 +247,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 onClose: { [weak shellHost] in shellHost?.hide() },
                 onOpenBrowseCatalog: { [weak self] in self?.pushCatalog() },
                 onOpenPreferences: { [weak self] in self?.pushSettings() },
+                onRunShellNative: { [weak self] cmd in self?.runShellNative(cmd) },
                 onStateChange: { [weak shellHost] state in shellHost?.updateTopState(state) },
                 onReorderFavorite: { [weak self] from, to in self?.model?.moveFavorite(from: from, to: to) },
                 onRemoveFavorite: { [weak self] cmd in self?.model?.removeFavorite(qualifiedId: cmd.qualifiedId) }

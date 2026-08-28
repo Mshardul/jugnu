@@ -22,10 +22,26 @@ public func resultSlots<T>(results: [T], slotCount: Int) -> ResultSlotLayout<T> 
     return ResultSlotLayout(rows: results, showAllLinkSlot: nil, scrolls: true)
 }
 
+// Unified up/down selection: addon hits first, shell-native rows after.
+public enum LauncherSelection: Equatable {
+    case addon(Int)
+    case shellNative(Int)
+    case none
+
+    public static func resolve(index: Int, addonCount: Int, shellNativeCount: Int) -> LauncherSelection {
+        if index >= 0, index < addonCount { return .addon(index) }
+        let shellIndex = index - addonCount
+        if shellIndex >= 0, shellIndex < shellNativeCount { return .shellNative(shellIndex) }
+        return .none
+    }
+}
+
 public struct SearchResultsRegion: View {
     let hits: [SearchHit]
+    let shellNativeRows: [ShellNativeCommand]
     let selection: Int
     let onSelect: (IndexedCommand) -> Void
+    let onSelectShellNative: (ShellNativeCommand) -> Void
     let onOpenBrowseCatalog: () -> Void
     let isFavorite: (IndexedCommand) -> Bool
     let onToggleFavorite: (IndexedCommand) -> Void
@@ -35,15 +51,19 @@ public struct SearchResultsRegion: View {
 
     public init(
         hits: [SearchHit],
+        shellNativeRows: [ShellNativeCommand] = [],
         selection: Int,
         onSelect: @escaping (IndexedCommand) -> Void,
+        onSelectShellNative: @escaping (ShellNativeCommand) -> Void = { _ in },
         onOpenBrowseCatalog: @escaping () -> Void,
         isFavorite: @escaping (IndexedCommand) -> Bool,
         onToggleFavorite: @escaping (IndexedCommand) -> Void
     ) {
         self.hits = hits
+        self.shellNativeRows = shellNativeRows
         self.selection = selection
         self.onSelect = onSelect
+        self.onSelectShellNative = onSelectShellNative
         self.onOpenBrowseCatalog = onOpenBrowseCatalog
         self.isFavorite = isFavorite
         self.onToggleFavorite = onToggleFavorite
@@ -58,31 +78,73 @@ public struct SearchResultsRegion: View {
 
     public var body: some View {
         let layout = resultSlots(results: hits, slotCount: slotCount)
-        if !layout.rows.isEmpty {
-            let content = VStack(alignment: .leading, spacing: 0) {
-                ForEach(Array(layout.rows.enumerated()), id: \.element.command.qualifiedId) { index, hit in
-                    breadcrumbRow(hit: hit, isSelected: index == selection)
+        if !layout.rows.isEmpty || !shellNativeRows.isEmpty {
+            VStack(alignment: .leading, spacing: 0) {
+                if !layout.rows.isEmpty {
+                    addonBlock(layout: layout)
                 }
-                // Blank reserved slots keep slot 5 from sliding up (spec §2.1).
-                if let linkSlot = layout.showAllLinkSlot {
-                    let blankSlots = linkSlot - 1 - layout.rows.count
-                    ForEach(0 ..< max(blankSlots, 0), id: \.self) { _ in
-                        Color.clear.frame(height: rowHeight)
-                    }
-                    showAllRow
+                if !shellNativeRows.isEmpty {
+                    shellNativeBlock(base: layout.rows.count)
                 }
             }
             .padding(.horizontal, 10)
             .padding(.top, 6)
             .padding(.bottom, 12)
-            if layout.scrolls {
-                ScrollView { content }
-                    .frame(height: rowHeight * CGFloat(slotCount))
-            } else {
-                content
-                    .frame(height: rowHeight * CGFloat(slotCount), alignment: .top)
+        }
+    }
+
+    @ViewBuilder
+    private func addonBlock(layout: ResultSlotLayout<SearchHit>) -> some View {
+        let content = VStack(alignment: .leading, spacing: 0) {
+            ForEach(Array(layout.rows.enumerated()), id: \.element.command.qualifiedId) { index, hit in
+                breadcrumbRow(hit: hit, isSelected: index == selection)
+            }
+            // Blank reserved slots keep slot 5 from sliding up (spec §2.1).
+            if let linkSlot = layout.showAllLinkSlot {
+                let blankSlots = linkSlot - 1 - layout.rows.count
+                ForEach(0 ..< max(blankSlots, 0), id: \.self) { _ in
+                    Color.clear.frame(height: rowHeight)
+                }
+                showAllRow
             }
         }
+        if layout.scrolls {
+            ScrollView { content }
+                .frame(height: rowHeight * CGFloat(slotCount))
+        } else {
+            content
+                .frame(height: rowHeight * CGFloat(slotCount), alignment: .top)
+        }
+    }
+
+    private func shellNativeBlock(base: Int) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            theme.border.frame(height: JugnuTokens.Launcher.hairline)
+            ForEach(Array(shellNativeRows.enumerated()), id: \.element.id) { offset, cmd in
+                shellNativeRow(cmd, isSelected: base + offset == selection)
+            }
+        }
+    }
+
+    private func shellNativeRow(_ cmd: ShellNativeCommand, isSelected: Bool) -> some View {
+        HStack(spacing: 10) {
+            RoundedRectangle(cornerRadius: JugnuTokens.Launcher.resultIconRadius, style: .continuous)
+                .strokeBorder(theme.textSecondary.opacity(0.4), lineWidth: JugnuTokens.Launcher.hairline)
+                .frame(width: JugnuTokens.Launcher.resultIcon, height: JugnuTokens.Launcher.resultIcon)
+                .overlay(Image(systemName: cmd.systemImage).foregroundStyle(theme.textSecondary))
+            Text(cmd.title)
+                .font(JugnuTokens.font(presetId: store.presetId, role: .body))
+                .foregroundStyle(theme.textPrimary)
+            Spacer()
+        }
+        .padding(.horizontal, 12)
+        .frame(height: rowHeight)
+        .background(
+            RoundedRectangle(cornerRadius: JugnuTokens.Launcher.favTileRadius, style: .continuous)
+                .fill(isSelected ? theme.accent.opacity(0.10) : Color.clear)
+        )
+        .contentShape(Rectangle())
+        .onTapGesture { onSelectShellNative(cmd) }
     }
 
     private func breadcrumbRow(hit: SearchHit, isSelected: Bool) -> some View {

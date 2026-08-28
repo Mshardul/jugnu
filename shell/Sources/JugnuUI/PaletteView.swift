@@ -8,6 +8,7 @@ public protocol PaletteModelProtocol: ObservableObject {
     var lastHits: [SearchHit] { get }
     var statusMessage: String? { get }
     var hiddenShellCommands: Set<String> { get }
+    var shellNativeCommands: [ShellNativeCommand] { get }
 
     func commandsForFirstView() -> [IndexedCommand]
     func search(_ query: String) -> [IndexedCommand]
@@ -22,6 +23,7 @@ public struct PaletteView<Model: PaletteModelProtocol>: View {
     var onClose: () -> Void
     var onOpenBrowseCatalog: () -> Void
     var onOpenPreferences: () -> Void
+    var onRunShellNative: (ShellNativeCommand) -> Void
     var onStateChange: (ShellViewState) -> Void
     var onReorderFavorite: (Int, Int) -> Void
     var onRemoveFavorite: (IndexedCommand) -> Void
@@ -42,6 +44,7 @@ public struct PaletteView<Model: PaletteModelProtocol>: View {
         onClose: @escaping () -> Void,
         onOpenBrowseCatalog: @escaping () -> Void,
         onOpenPreferences: @escaping () -> Void,
+        onRunShellNative: @escaping (ShellNativeCommand) -> Void = { _ in },
         onStateChange: @escaping (ShellViewState) -> Void = { _ in },
         onReorderFavorite: @escaping (Int, Int) -> Void = { _, _ in },
         onRemoveFavorite: @escaping (IndexedCommand) -> Void = { _ in }
@@ -52,6 +55,7 @@ public struct PaletteView<Model: PaletteModelProtocol>: View {
         self.onClose = onClose
         self.onOpenBrowseCatalog = onOpenBrowseCatalog
         self.onOpenPreferences = onOpenPreferences
+        self.onRunShellNative = onRunShellNative
         self.onStateChange = onStateChange
         self.onReorderFavorite = onReorderFavorite
         self.onRemoveFavorite = onRemoveFavorite
@@ -81,6 +85,35 @@ public struct PaletteView<Model: PaletteModelProtocol>: View {
         return model.lastHits
     }
 
+    // Shell-native rows sit below addon hits: all of them on an empty query, fuzzy-matched otherwise.
+    private var displayedShellNative: [ShellNativeCommand] {
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty {
+            return model.shellNativeCommands
+        }
+        return model.shellNativeCommands
+            .map { ($0, $0.matchScore(query: trimmed)) }
+            .filter { $0.1 > 0 }
+            .sorted { $0.1 > $1.1 }
+            .map(\.0)
+    }
+
+    private var selectableCount: Int {
+        displayed.count + displayedShellNative.count
+    }
+
+    private func runSelection() {
+        switch LauncherSelection.resolve(
+            index: selection,
+            addonCount: displayed.count,
+            shellNativeCount: displayedShellNative.count
+        ) {
+        case let .addon(i): onRun(displayed[i].command)
+        case let .shellNative(i): onRunShellNative(displayedShellNative[i])
+        case .none: break
+        }
+    }
+
     private var placeholder: String {
         if model.allCommands.isEmpty {
             return "No addons yet — install some to get started."
@@ -104,17 +137,7 @@ public struct PaletteView<Model: PaletteModelProtocol>: View {
                     onRemove: onRemoveFavorite,
                     onOpenAllFavorites: { onOpenBrowseCatalog() }
                 )
-                Button(action: { onOpenPreferences() }) {
-                    Text("⚙︎ All addons")
-                        .font(.system(size: 11.5))
-                        .foregroundStyle(theme.textSecondary)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(pillBackground(radius: L.favTileRadius))
-                        .fixedSize()
-                }
-                .buttonStyle(.plain)
-                .help("All addons + preferences")
+                Spacer(minLength: 0)
             }
             .padding(.horizontal, L.edgeInset)
             .frame(height: L.row1Height)
@@ -146,8 +169,10 @@ public struct PaletteView<Model: PaletteModelProtocol>: View {
 
             SearchResultsRegion(
                 hits: displayed,
+                shellNativeRows: displayedShellNative,
                 selection: selection,
                 onSelect: onRun,
+                onSelectShellNative: onRunShellNative,
                 onOpenBrowseCatalog: { onOpenBrowseCatalog() },
                 isFavorite: { model.isFavorite(qualifiedId: $0.qualifiedId) },
                 onToggleFavorite: { model.toggleFavorite(qualifiedId: $0.qualifiedId) }
@@ -182,13 +207,12 @@ public struct PaletteView<Model: PaletteModelProtocol>: View {
             }
         }
         .onKeyPress(.return) {
-            guard displayed.indices.contains(selection) else { return .handled }
-            onRun(displayed[selection].command)
+            runSelection()
             return .handled
         }
         .onKeyPress(.downArrow) {
-            if !displayed.isEmpty {
-                selection = min(selection + 1, displayed.count - 1)
+            if selectableCount > 0 {
+                selection = min(selection + 1, selectableCount - 1)
             }
             return .handled
         }

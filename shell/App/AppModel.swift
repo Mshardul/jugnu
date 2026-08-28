@@ -39,6 +39,9 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
 
     var allCommands: [IndexedCommand] { index.all }
     var hiddenShellCommands: Set<String> { config.shell.hiddenShellCommands }
+    var shellNativeCommands: [ShellNativeCommand] {
+        ShellNativeCommand.visible(hidden: config.shell.hiddenShellCommands)
+    }
 
     func bootstrap() {
         refreshIndex()

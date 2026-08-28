@@ -1,5 +1,6 @@
 import AppKit
 @testable import JugnuUI
+import SwiftUI
 import XCTest
 
 final class ShellHostFrameTests: XCTestCase {
@@ -24,5 +25,28 @@ final class ShellHostFrameTests: XCTestCase {
         let frame = clampedFrame(size: NSSize(width: 800, height: 560), centeredOn: screen)
         XCTAssertTrue(screen.contains(CGPoint(x: frame.minX, y: frame.minY)))
         XCTAssertTrue(screen.contains(CGPoint(x: frame.maxX - 1, y: frame.maxY - 1)))
+    }
+
+    @MainActor
+    func test_hide_keepsPanelAliveForReuse() {
+        let host = ShellHost(reduceMotion: { true })
+        host.ensurePanel(initialContent: EmptyView(), size: NSSize(width: 400, height: 300))
+        XCTAssertTrue(host.hasPanel)
+
+        host.hide()
+
+        XCTAssertTrue(host.hasPanel, "hide() must keep the panel so the next invoke skips a rebuild")
+        XCTAssertFalse(host.isVisible)
+    }
+
+    @MainActor
+    func test_ensurePanel_doesNotRebuildWhenPanelAlreadyExists() {
+        let host = ShellHost(reduceMotion: { true })
+        host.ensurePanel(initialContent: EmptyView(), size: NSSize(width: 400, height: 300))
+        host.hide()
+        host.ensurePanel(initialContent: EmptyView(), size: NSSize(width: 400, height: 300))
+
+        XCTAssertTrue(host.hasPanel)
+        XCTAssertFalse(host.isVisible, "re-ensuring a hidden panel must not order it front on its own")
     }
 }

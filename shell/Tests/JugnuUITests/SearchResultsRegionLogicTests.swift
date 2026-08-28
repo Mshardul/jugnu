@@ -36,4 +36,25 @@ final class SearchResultsRegionLogicTests: XCTestCase {
         XCTAssertNil(layout.showAllLinkSlot)
         XCTAssertTrue(layout.scrolls)
     }
+
+    func test_launcherSelection_addonSegmentFirst() {
+        XCTAssertEqual(LauncherSelection.resolve(index: 0, addonCount: 3, shellNativeCount: 2), .addon(0))
+        XCTAssertEqual(LauncherSelection.resolve(index: 2, addonCount: 3, shellNativeCount: 2), .addon(2))
+    }
+
+    func test_launcherSelection_shellNativeSegmentAfterAddons() {
+        XCTAssertEqual(LauncherSelection.resolve(index: 3, addonCount: 3, shellNativeCount: 2), .shellNative(0))
+        XCTAssertEqual(LauncherSelection.resolve(index: 4, addonCount: 3, shellNativeCount: 2), .shellNative(1))
+    }
+
+    func test_launcherSelection_outOfRangeIsNone() {
+        XCTAssertEqual(LauncherSelection.resolve(index: 5, addonCount: 3, shellNativeCount: 2), .none)
+        XCTAssertEqual(LauncherSelection.resolve(index: -1, addonCount: 3, shellNativeCount: 2), .none)
+        XCTAssertEqual(LauncherSelection.resolve(index: 0, addonCount: 0, shellNativeCount: 0), .none)
+    }
+
+    func test_launcherSelection_shellNativeOnlyWhenNoAddons() {
+        XCTAssertEqual(LauncherSelection.resolve(index: 0, addonCount: 0, shellNativeCount: 2), .shellNative(0))
+        XCTAssertEqual(LauncherSelection.resolve(index: 1, addonCount: 0, shellNativeCount: 2), .shellNative(1))
+    }
 }

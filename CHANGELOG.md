@@ -6,8 +6,13 @@ The project has not published a release yet. Entries currently describe unreleas
 
 ## [Unreleased]
 
+### Fixed
+
+- 2026-08-29 — Shell panel survives dismiss: `hide()` orders the `KeyablePanel` out instead of destroying it, so a reopen reuses the existing view and skips the cold-paint cost (ticket 0016).
+
 ### Added
 
+- 2026-08-29 — Browse Addons and Preferences are searchable launcher rows: type to filter them, arrow-key and Return like any command; `jugnu.yaml` `shell.hidden_shell_commands` hides either one (ticket 0012).
 - 2026-08-26 — Shared `clock` helper: versioned timer scheduling installed once and reused by addons.
 - 2026-08-26 — First-party `nudges` addon: recurring wellness reminders, three presets, custom nudges, pause/resume, and restore.
 - 2026-08-26 — Shell `card` UI pattern for detached, dismissible reminder surfaces with prominent emoji.

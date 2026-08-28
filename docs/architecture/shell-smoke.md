@@ -31,6 +31,8 @@ Walk this after the 2026-08-23 palette + addon UI product pass. Leave items unch
 - [ ] Did-you-mean row (nonsense query with installed addons) shows subtitle `Did you mean this?`
 - [ ] Star pins/unpins without running the command
 - [ ] On a multi-monitor Mac, the palette opens on the screen that contains the cursor
+- [ ] **Browse Addons** and **Preferences** appear as rows below the addon results (empty query and while typing a matching term like `pref` / `browse`); arrow down onto them, Return opens the catalog / settings (ticket 0012)
+- [ ] `shell.hidden_shell_commands: ["preferences"]` in `~/.config/jugnu/jugnu.yaml` removes the Preferences row but the menu-bar **Preferences** item still works
 
 ### Theme, motion, sound
 
