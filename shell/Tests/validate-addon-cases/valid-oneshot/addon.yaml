@@ -1,0 +1,15 @@
+id: valid-oneshot
+name: Valid Oneshot
+version: 1.0.0
+api: 1
+lifecycle: oneshot
+commands:
+  - id: run
+    title: Run
+    timeout: 5
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths: []
+  launchd: []

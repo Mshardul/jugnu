@@ -2,7 +2,7 @@
 -include .env
 export DEVELOPER_DIR ?= /Applications/Xcode.app/Contents/Developer
 
-.PHONY: sync hooks precommit lint lint-swift format format-swift spell test test-extended tools-swift stop run ci window-layouts helper-clock screenshots
+.PHONY: sync hooks precommit lint lint-swift format format-swift spell test test-extended tools-swift stop clean-agents run ci window-layouts helper-clock screenshots
 
 sync:
 	uv sync
@@ -58,6 +58,13 @@ stop:
 			break; \
 		fi; \
 		sleep 0.15; \
+	done
+
+# Dev clean slate: boot out every Jugnu launchd agent (none exist until the daemon class lands).
+clean-agents:
+	@printf 'Booting out com.jugnu.* launchd agents...\n'
+	@for label in $$(launchctl list 2>/dev/null | awk '/com\.jugnu\./ {print $$3}'); do \
+		launchctl bootout gui/$$(id -u)/$$label >/dev/null 2>&1 || true; \
 	done
 
 # Drive the real app through every page (XCUITest) and dump PNGs to screenshots/.

@@ -1,0 +1,6 @@
+#!/bin/sh
+cat > /dev/null
+( sleep 86400 ) &
+disown 2>/dev/null || true
+printf '{"ok":true,"message":"leaked"}\n'
+exit 0

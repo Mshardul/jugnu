@@ -97,12 +97,12 @@ private struct FavoriteDropDelegate: DropDelegate {
     @Binding var draggingID: String?
     let onReorder: (Int, Int) -> Void
 
-    func performDrop(info: DropInfo) -> Bool {
+    func performDrop(info _: DropInfo) -> Bool {
         draggingID = nil
         return true
     }
 
-    func dropEntered(info: DropInfo) {
+    func dropEntered(info _: DropInfo) {
         guard let draggingID,
               let sourceIndex = favorites.firstIndex(where: { $0.qualifiedId == draggingID }),
               sourceIndex != targetIndex

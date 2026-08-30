@@ -38,7 +38,7 @@ public final class ShellHost: ObservableObject {
         panel?.isVisible ?? false
     }
 
-    // Panel survives hide() so reopen skips the NSPanel/NSHostingView rebuild and its cold paint.
+    /// Panel survives hide() so reopen skips the NSPanel/NSHostingView rebuild and its cold paint.
     var hasPanel: Bool {
         panel != nil
     }
@@ -153,7 +153,7 @@ public final class ShellHost: ObservableObject {
 }
 
 public extension ShellHost {
-    // Orders the panel out and empties the stack (never pops); panel kept for the next invoke to reuse.
+    /// Orders the panel out and empties the stack (never pops); panel kept for the next invoke to reuse.
     func hide() {
         stopOutsideClickMonitor()
         panel?.orderOut(nil)
@@ -168,6 +168,13 @@ public extension ShellHost {
     /// resign-key / Cmd+Tab never trigger this.
     func armClickOutsideDismiss(onOutside: @escaping () -> Void) {
         startOutsideClickMonitor(onOutside: onOutside)
+    }
+
+    func dismissDetachedPanels() {
+        for reference in cards.values {
+            reference.value?.orderOut(nil)
+        }
+        cards.removeAll()
     }
 }
 

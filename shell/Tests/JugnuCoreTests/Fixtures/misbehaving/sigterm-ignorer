@@ -1,0 +1,5 @@
+#!/bin/sh
+trap '' TERM
+cat > /dev/null
+printf 'heartbeat\n'
+sleep 86400

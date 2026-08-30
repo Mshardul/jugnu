@@ -1,0 +1,14 @@
+id: keep-awake
+name: Keep Awake
+version: 1.0.0
+api: 1
+commands:
+  - id: watch
+    title: Watch
+    lifecycle: daemon
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths: []
+  launchd: []

@@ -7,6 +7,17 @@ public struct AddonRunner: Sendable {
         self.timeoutSeconds = timeoutSeconds
     }
 
+    public struct ShellIdentity: Sendable, Equatable {
+        public var pid: Int32
+        public var startTS: Double
+        public init(pid: Int32, startTS: Double) {
+            self.pid = pid
+            self.startTS = startTS
+        }
+
+        public static let unknown = ShellIdentity(pid: getpid(), startTS: 0)
+    }
+
     public func run(
         manifest: AddonManifest,
         addonRoot: URL,
@@ -50,13 +61,49 @@ public struct AddonRunner: Sendable {
         return env
     }
 
-    public func run(
+    public func spawn(
+        manifest: AddonManifest,
+        addonRoot: URL,
+        commandId: String,
+        args: [String: JSONValue] = [:],
+        context: [String: JSONValue]? = [:],
+        invokeUUID: UUID = UUID(),
+        lifecycleClass: LifecycleClass = .oneshot,
+        shellIdentity: ShellIdentity = .unknown,
+        markerDir: URL,
+        paths: JugnuPaths? = nil
+    ) throws -> RunningInvocation {
+        let request = RunRequest(
+            api: 1,
+            op: "run",
+            command: commandId,
+            args: args,
+            context: context
+        )
+        let extra = try Self.helperEnvironment(manifest: manifest, paths: paths)
+        let origin = "\(manifest.id):\(commandId):\(invokeUUID.uuidString)"
+        return try spawn(
+            addonRoot: addonRoot,
+            entrypoint: manifest.entrypoint,
+            request: request,
+            extraEnvironment: extra,
+            origin: origin,
+            lifecycleClass: lifecycleClass,
+            shellIdentity: shellIdentity,
+            markerDir: markerDir
+        )
+    }
+
+    public func spawn(
         addonRoot: URL,
         entrypoint: Entrypoint,
         request: RunRequest,
-        timeout: TimeInterval,
-        extraEnvironment: [String: String] = [:]
-    ) throws -> RunResponse {
+        extraEnvironment: [String: String] = [:],
+        origin: String = "test:test:test",
+        lifecycleClass: LifecycleClass = .oneshot,
+        shellIdentity: ShellIdentity = .unknown,
+        markerDir: URL
+    ) throws -> RunningInvocation {
         let entry = addonRoot.appendingPathComponent(entrypoint.path)
         let process = Process()
         let stdin = Pipe()
@@ -81,41 +128,64 @@ public struct AddonRunner: Sendable {
         process.standardInput = stdin
         process.standardOutput = stdout
         process.standardError = stderr
-        if !extraEnvironment.isEmpty {
-            var env = ProcessInfo.processInfo.environment
-            for (key, value) in extraEnvironment {
-                env[key] = value
-            }
-            process.environment = env
+
+        var env = ProcessInfo.processInfo.environment
+        for (key, value) in extraEnvironment {
+            env[key] = value
         }
+        env["JUGNU_ORIGIN"] = origin
+        env["JUGNU_SHELL_START_TS"] = String(shellIdentity.startTS)
+        process.environment = env
 
         let requestData = try RunJSON.encodeRequest(request)
 
-        let group = DispatchGroup()
-        group.enter()
-        process.terminationHandler = { _ in group.leave() }
-
         try process.run()
+        let pid = process.processIdentifier
+
+        let marker = RunMarker(
+            origin: origin,
+            lifecycleClass: lifecycleClass.rawValue,
+            shellPID: shellIdentity.pid,
+            shellStartTS: shellIdentity.startTS,
+            spawnedAt: Date().timeIntervalSince1970
+        )
+        try? RunMarker.write(marker, pid: pid, to: markerDir)
+        let liveMarkerURL = markerDir.appendingPathComponent("\(pid).json")
+
+        process.terminationHandler = { _ in
+            RunMarker.delete(pid: pid, in: markerDir)
+        }
+
         stdin.fileHandleForWriting.write(requestData)
-        try stdin.fileHandleForWriting.close()
+        try? stdin.fileHandleForWriting.close()
 
-        let waited = group.wait(timeout: .now() + timeout)
-        if waited == .timedOut {
-            process.terminate()
-            _ = group.wait(timeout: .now() + 1)
-            throw AddonRunnerError.timeout
-        }
+        return RunningInvocation(
+            process: process,
+            stdout: stdout,
+            stderr: stderr,
+            markerURL: liveMarkerURL
+        )
+    }
 
-        let outData = stdout.fileHandleForReading.readDataToEndOfFile()
-        do {
-            return try RunJSON.decodeResponse(stdout: outData)
-        } catch {
-            if process.terminationStatus != 0 {
-                let errText = String(data: stderr.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8)
-                return RunResponse(ok: false, error: errText ?? "addon exited \(process.terminationStatus)")
-            }
-            throw AddonRunnerError.invalidResponse
-        }
+    public func run(
+        addonRoot: URL,
+        entrypoint: Entrypoint,
+        request: RunRequest,
+        timeout: TimeInterval,
+        extraEnvironment: [String: String] = [:]
+    ) throws -> RunResponse {
+        let markerDir = FileManager.default.temporaryDirectory
+            .appendingPathComponent("jugnu-run-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: markerDir) }
+
+        let invocation = try spawn(
+            addonRoot: addonRoot,
+            entrypoint: entrypoint,
+            request: request,
+            extraEnvironment: extraEnvironment,
+            markerDir: markerDir
+        )
+        return try invocation.waitForResponseSync(timeout: timeout)
     }
 }
 

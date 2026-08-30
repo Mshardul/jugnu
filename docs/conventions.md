@@ -15,7 +15,7 @@ Copy the **current** pattern in the type table, not leftover names or comments. 
 | `PrefsView` in `App/` | Views in `JugnuUI` | [0013](tickets.md) |
 | Addon `Process` that outlives hide/Esc | Cancel + `cleanup` on leave | [0014](tickets.md) |
 | `hide()` setting `panel = nil` | Keep the `KeyablePanel`; `orderOut` only | [0016](tickets.md) |
-| `AddonInstaller.unzip()` as-is | Path-safe extract | [0003](tickets.md) |
+| `AddonInstaller.unzip()` as-is | Path-safe extract | [security audit](audit/prompts/security.md) |
 
 ## Vocabulary
 
@@ -229,7 +229,7 @@ See [PRIVACY.md](../PRIVACY.md).
 
 - No clipboard, credentials, tokens, or file contents in logs.
 - `context` stays empty in v1 — no screen pixels, no concealed pasteboard. Context-aware behavior is later, opt-in, and local.
-- SHA-256 via CryptoKit. New unzip/install code must reject path traversal (ticket 0003 is known debt; do not copy it).
+- SHA-256 via CryptoKit. New unzip/install code must reject path traversal (`AddonInstaller.unzip()` is known debt; do not copy it — see `docs/audit/prompts/security.md`).
 - Cleanup only declared addon-owned paths and launchd labels. The manifest is the trust boundary.
 - Permissions at point of use, with a usable fallback.
 

@@ -11,7 +11,11 @@ final class JugnuThemeColorsTests: XCTestCase {
 
     func test_border_isDerived_notEqualToSurface() {
         let colors = JugnuThemeColors(theme: ThemeConfig.firefly.dark)
-        XCTAssertNotEqual(colors.border, colors.surface, "border must be a distinct derived value, not aliased to surface")
+        XCTAssertNotEqual(
+            colors.border,
+            colors.surface,
+            "border must be a distinct derived value, not aliased to surface"
+        )
     }
 
     func test_surface2_isDerived_notEqualToSurface() {

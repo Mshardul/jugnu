@@ -21,6 +21,11 @@ public enum ManifestLoader {
             throw ManifestLoaderError.unsupportedAPI(manifest.api)
         }
         try manifest.validateViewTypes()
+        for command in manifest.commands
+            where manifest.effectiveLifecycle(commandId: command.id) == .daemon && command.daemon == nil
+        {
+            throw ManifestLoaderError.daemonBlockMissing(command: command.id)
+        }
         return manifest
     }
 
@@ -56,4 +61,7 @@ public enum ManifestLoaderError: Error, Equatable {
     case unsupportedAPI(Int)
     case unknownViewType(String)
     case commandViewNotAllowed(command: String, view: String)
+    case sessionNotSupported
+    case unknownLifecycleClass(String)
+    case daemonBlockMissing(command: String)
 }

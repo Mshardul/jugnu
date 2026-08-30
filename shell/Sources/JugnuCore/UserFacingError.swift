@@ -24,6 +24,12 @@ public enum UserFacingError {
                 return "This addon needs a newer Jugnu."
             case .unknownViewType, .commandViewNotAllowed:
                 return "This addon’s description couldn’t be read. Try reinstalling it."
+            case .sessionNotSupported:
+                return "This addon needs a newer version of Jugnu (session addons are not yet supported)."
+            case .unknownLifecycleClass:
+                return "This addon’s description couldn’t be read. Try reinstalling it."
+            case .daemonBlockMissing:
+                return "This addon’s description couldn’t be read. Try reinstalling it."
             }
         }
         if let view = error as? ViewTypeError {

@@ -15,7 +15,10 @@ Unbuilt jobs live in the packaging map and gap list below. Shipped first-party s
 | 7 | Palette + addon UI **product pass** | [2026-08-23 spec](architecture/2026-08-23-palette-ui-product-pass.md) · [plan](superpowers/plans/2026-08-23-palette-ui-product-pass.md) — search quality, AppKit→SwiftUI panel rewrite onto shared design tokens, user-editable light/dark theming, keyboard/motion accessibility, first-run recommended-set refresh, live-verification suite. **Implemented; walk [shell-smoke.md](architecture/shell-smoke.md)** |
 | 8 | Persistent latency logging (future epic) | [Ticket 0001](tickets.md) — JSON-lines, capped retention, timing/ids only, never payload |
 | 9 | Addon management / settings (future epic) | [Ticket 0002](tickets.md) taxonomy/install. Chrome: [0008](tickets.md) **done** ([one panel, presets, stack](architecture/2026-08-23-shell-surface-presets.md)). Slices [0005](tickets.md), [0009](tickets.md), [0011](tickets.md) done; [0006](tickets.md), [0007](tickets.md), [0010](tickets.md), [0012](tickets.md) still open — walk [shell-smoke.md](architecture/shell-smoke.md) manual section before closing further |
-| 10 | Security audit (future epic) | [Ticket 0003](tickets.md) — seeded with a real zip-slip finding in `AddonInstaller.unzip()`; expect more findings from a full pass on installer/runner/registry-trust |
+| 10 | Security audit (recurring) | Not a ticket — a POV audit lens: [`docs/audit/prompts/security.md`](audit/prompts/security.md). Known seed: zip-slip in `AddonInstaller.unzip()`; expect more from a full installer/runner/registry-trust pass. Findings become tickets after a run. |
+| 11 | Addon process lifecycle + crash recovery (epic) | [Ticket 0057](tickets.md) · [2026-08-30 spec](architecture/2026-08-30-addon-process-lifecycle-design.md) (Draft — revised after review). Shell owns addon process lifetime: three-class model (`oneshot`/`job`/`daemon`), `AddonProcessHost` keyed by `(addon-id, command-id)`, `AddonRunner` spawn/wait split, crash-durable marker-file reaper, `job` heartbeat watchdog, first-party gate on `daemon`, crash-loop safe mode. Absorbs [0014](tickets.md) [0026](tickets.md) [0032](tickets.md) [0034](tickets.md) [0036](tickets.md) [0041](tickets.md) [0044](tickets.md). |
+| 12 | `session` lifecycle class + addon IPC (epic) | [Ticket 0059](tickets.md) — stub, no design yet. Live process bound to an open panel + bidirectional IPC (`api: 2`). Cut from 0057 (§11); gated on the first `session`-shaped addon (most of Play). |
+| 13 | Addon install & upgrade integrity (epic) | [Ticket 0058](tickets.md) — stub, no design yet. zip-slip + atomic install + [0018](tickets.md)/[0025](tickets.md)/[0029](tickets.md)/[0031](tickets.md)/[0043](tickets.md). Split out of the 0057 discussion. |
 
 **Canonical product surfaces:** [`docs/vision.md`](vision.md) — commands + popup UI + speed; context-aware surfacing later.
 
@@ -315,6 +318,8 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | pomodoro-skip | Skip / extend / log interruption (+ other session controls) | **pomodoro** |
 
 ### Fun — Play category (one addon per id)
+
+Lifecycle split (epic [0057](architecture/2026-08-30-addon-process-lifecycle-design.md)): `dice-roll`, `coin-flip`, `pick-one`, `number-guess`, `eight-ball`, `rps`, `fortune`, `tic-tac-toe` are `oneshot` (re-invoke per move for tic-tac-toe on `canvas`) — buildable on the shipped lifecycle model. `chess-clock`, `breathing`, `reaction-time`, `stopwatch`, `memory`, `hangman` are **`session`-shaped** (a live process the panel drives / that ticks on its own) — **blocked on epic [0059](tickets.md)** (`session` class + addon IPC).
 
 | Id | One-liner | Packaging |
 |---|---|---|

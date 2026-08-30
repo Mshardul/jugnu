@@ -20,9 +20,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var model: AppModel?
     private var shellHost: ShellHost?
     private var clockHost: ClockHost?
+    private var processHost: AddonProcessHost?
     private var hotkey: HotkeyController?
     private var firstRun: FirstRunWindowController?
     private var catalogViewModel: BrowseCatalogViewModel?
+    private var inFlightInvoke: (key: CommandKey, task: Task<Void, Never>)?
+    private var sleepObserver: NSObjectProtocol?
+    private var wakeObserver: NSObjectProtocol?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         if !ScreenshotMode.isActive, yieldToRunningInstance() { return }
@@ -34,6 +38,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             model = AppModel()
         }
         self.model = model
+        let processHost = AddonProcessHost(log: LifecycleLog(fileURL: model.paths.lifecycleLogFile))
+        self.processHost = processHost
+        model.processHost = processHost
+        model.shellIdentity = ShellIdentity.current()
         model.bootstrap()
 
         let shellHost = ShellHost()
@@ -73,6 +81,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             MainActor.assumeIsolated { self?.invokeShell() }
         }
 
+        let workspaceCenter = NSWorkspace.shared.notificationCenter
+        sleepObserver = workspaceCenter.addObserver(
+            forName: NSWorkspace.willSleepNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                self?.processHost?.killAll()
+                self?.shellHost?.dismissDetachedPanels()
+            }
+        }
+        wakeObserver = workspaceCenter.addObserver(
+            forName: NSWorkspace.didWakeNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.reapOnWake() }
+        }
+
         if !model.state.firstRunCompleted, !ScreenshotMode.isActive {
             let first = FirstRunWindowController(model: model) { [weak self, weak hotkey] in
                 hotkey?.registerFromConfig()
@@ -85,6 +108,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         clockHost?.stop()
+        processHost?.killAll()
+        let workspaceCenter = NSWorkspace.shared.notificationCenter
+        if let sleepObserver {
+            workspaceCenter.removeObserver(sleepObserver)
+        }
+        if let wakeObserver {
+            workspaceCenter.removeObserver(wakeObserver)
+        }
+    }
+
+    // Reaper stub — Phase 4 wires the marker-dir sweep here.
+    private func reapOnWake() {
+        processHost?.noteWakeReapPending()
     }
 
     // Another Jugnu is already up: ask it to open the palette, then quit before touching the hotkey or menu bar.
@@ -120,6 +156,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         switch decideInvokeOutcome(stack: shellHost.stack, isVisible: shellHost.isVisible) {
         case .close:
+            tearDownInFlight()
             shellHost.hide()
         case .showHome:
             syncCatalogSnapshot()
@@ -128,13 +165,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             renderCurrentTop(model: model)
             shellHost.morphFrame(to: .launcher, compactLauncher: true, on: screen)
             shellHost.orderFront()
-            shellHost.armClickOutsideDismiss { [weak self] in self?.handleClickOutside() }
+            shellHost.armClickOutsideDismiss { [weak self] in self?.dismissFromClickOutside() }
         }
     }
 
     /// Esc / Cmd+W: pop one level if not at root; dismiss (hide, empty stack) if already at root.
-    private func handleEsc() {
+    private func popOrDismiss() {
         guard let model, let shellHost else { return }
+        tearDownInFlight()
         if shellHost.stack.isAtRoot {
             shellHost.hide()
             return
@@ -149,9 +187,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     /// Genuine click outside the app's own windows. Dismisses unless the current view type ignores it.
-    private func handleClickOutside() {
+    private func dismissFromClickOutside() {
         guard let shellHost, shellHost.dismissesOnOutsideClick else { return }
+        tearDownInFlight()
         shellHost.hide()
+    }
+
+    // Fire-and-forget so a dismiss never waits on process teardown.
+    private func tearDownInFlight() {
+        guard let inFlight = inFlightInvoke else { return }
+        inFlight.task.cancel()
+        processHost?.killTracked(key: inFlight.key)
+        inFlightInvoke = nil
     }
 
     /// Pushing `settings` from `launcher` is a push (child); replacing `catalog` with `settings` is a replace (sibling).
@@ -170,7 +217,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         renderCurrentTop(model: model)
         shellHost.morphFrame(to: .settings, compactLauncher: false, on: screen)
         shellHost.orderFront()
-        shellHost.armClickOutsideDismiss { [weak self] in self?.handleClickOutside() }
+        shellHost.armClickOutsideDismiss { [weak self] in self?.dismissFromClickOutside() }
     }
 
     /// Pushing `catalog` from `launcher` is a push (child); replacing `settings` with `catalog` is a replace (sibling).
@@ -190,7 +237,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         renderCurrentTop(model: model)
         shellHost.morphFrame(to: .catalog, compactLauncher: false, on: screen)
         shellHost.orderFront()
-        shellHost.armClickOutsideDismiss { [weak self] in self?.handleClickOutside() }
+        shellHost.armClickOutsideDismiss { [weak self] in self?.dismissFromClickOutside() }
     }
 
     /// Pushing `detail` from `catalog` is a push (child); idempotent re-push of the same addon just refocuses.
@@ -203,7 +250,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         renderCurrentTop(model: model)
         shellHost.morphFrame(to: .detail, compactLauncher: false, on: screen)
         shellHost.orderFront()
-        shellHost.armClickOutsideDismiss { [weak self] in self?.handleClickOutside() }
+        shellHost.armClickOutsideDismiss { [weak self] in self?.dismissFromClickOutside() }
     }
 
     private func ensurePanelIfNeeded(model: AppModel) {
@@ -235,7 +282,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// Every subsequent task (11+) extends this with one more case.
     private func renderCurrentTop(model: AppModel) {
         guard let shellHost else { return }
-        shellHost.setOnCancel { [weak self] in self?.handleEsc() }
+        shellHost.setOnCancel { [weak self] in self?.popOrDismiss() }
         switch shellHost.stack.top.preset {
         case .launcher:
             guard case .launcher(let query, _, _) = shellHost.stack.top.state else { return }
@@ -272,7 +319,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     onInstall: { Task { await vm.install(entry) } },
                     onEnabledChange: { vm.setEnabled(entry.id, enabled: $0) },
                     onUninstall: { vm.uninstall(id: entry.id, name: entry.name) },
-                    onClose: { [weak self] in self?.handleEsc() }
+                    onClose: { [weak self] in self?.popOrDismiss() }
                 ))
             }
         case .confirm, .list, .form:
@@ -313,10 +360,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func runCommand(_ cmd: IndexedCommand) {
         guard let model, let shellHost else { return }
         guard let screen = shellHost.currentScreen ?? NSScreen.main else { return }
-        shellHost.onCancelFollowUp = { [weak self] in self?.handleEsc() }
+        shellHost.onCancelFollowUp = { [weak self] in self?.popOrDismiss() }
+        let key = CommandKey(addonID: cmd.addonId, commandID: cmd.commandId)
         do {
             let invocation = try model.runInvocation(for: cmd)
-            Task { @MainActor in
+            let task = Task { @MainActor [weak self] in
                 await CommandInvoke.run(
                     host: shellHost,
                     commandId: cmd.qualifiedId,
@@ -324,12 +372,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     execute: invocation.execute,
                     followUp: invocation.followUp
                 )
+                if self?.inFlightInvoke?.key == key {
+                    self?.inFlightInvoke = nil
+                }
                 // A follow-up (confirm/list/form) got pushed onto the stack; leave the panel open.
                 // No follow-up (toast-only) means we're still on launcher — close per spec.
                 if shellHost.stack.top.preset == .launcher {
                     shellHost.hide()
                 }
             }
+            inFlightInvoke = (key: key, task: task)
         } catch {
             model.statusMessage = UserFacingError.message(for: error)
             playCommandSound(success: false)

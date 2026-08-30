@@ -16,6 +16,16 @@ public protocol PaletteModelProtocol: ObservableObject {
     func toggleFavorite(qualifiedId: String)
 }
 
+/// A mashing user's repeat invoke of the same command inside the window collapses to one spawn.
+public enum PaletteInvokeDebounce {
+    public static let windowSeconds: TimeInterval = 0.1
+
+    public static func shouldRun(id: String, now: Date, last: (id: String, at: Date)?) -> Bool {
+        guard let last, last.id == id else { return true }
+        return now.timeIntervalSince(last.at) >= windowSeconds
+    }
+}
+
 public struct PaletteView<Model: PaletteModelProtocol>: View {
     @ObservedObject var model: Model
     var favorites: [IndexedCommand]
@@ -31,6 +41,7 @@ public struct PaletteView<Model: PaletteModelProtocol>: View {
     @State private var query: String
     @State private var selection = 0
     @State private var searchTask: Task<Void, Never>?
+    @State private var lastInvoke: (id: String, at: Date)?
     @State private var hintIndex = 0
     @State private var bloom: Double = 0
     @Environment(\.colorScheme) private var colorScheme
@@ -85,7 +96,7 @@ public struct PaletteView<Model: PaletteModelProtocol>: View {
         return model.lastHits
     }
 
-    // Shell-native rows sit below addon hits: all of them on an empty query, fuzzy-matched otherwise.
+    /// Shell-native rows sit below addon hits: all of them on an empty query, fuzzy-matched otherwise.
     private var displayedShellNative: [ShellNativeCommand] {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         if trimmed.isEmpty {
@@ -102,13 +113,20 @@ public struct PaletteView<Model: PaletteModelProtocol>: View {
         displayed.count + displayedShellNative.count
     }
 
+    private func debouncedRun(_ command: IndexedCommand) {
+        let now = Date()
+        guard PaletteInvokeDebounce.shouldRun(id: command.qualifiedId, now: now, last: lastInvoke) else { return }
+        lastInvoke = (command.qualifiedId, now)
+        onRun(command)
+    }
+
     private func runSelection() {
         switch LauncherSelection.resolve(
             index: selection,
             addonCount: displayed.count,
             shellNativeCount: displayedShellNative.count
         ) {
-        case let .addon(i): onRun(displayed[i].command)
+        case let .addon(i): debouncedRun(displayed[i].command)
         case let .shellNative(i): onRunShellNative(displayedShellNative[i])
         case .none: break
         }
@@ -132,7 +150,7 @@ public struct PaletteView<Model: PaletteModelProtocol>: View {
                 JugnuWordmark()
                 FavoritesRow(
                     favorites: favorites,
-                    onRun: onRun,
+                    onRun: debouncedRun,
                     onReorder: onReorderFavorite,
                     onRemove: onRemoveFavorite,
                     onOpenAllFavorites: { onOpenBrowseCatalog() }
@@ -171,7 +189,7 @@ public struct PaletteView<Model: PaletteModelProtocol>: View {
                 hits: displayed,
                 shellNativeRows: displayedShellNative,
                 selection: selection,
-                onSelect: onRun,
+                onSelect: debouncedRun,
                 onSelectShellNative: onRunShellNative,
                 onOpenBrowseCatalog: { onOpenBrowseCatalog() },
                 isFavorite: { model.isFavorite(qualifiedId: $0.qualifiedId) },
@@ -219,6 +237,10 @@ public struct PaletteView<Model: PaletteModelProtocol>: View {
         .onKeyPress(.upArrow) {
             selection = max(selection - 1, 0)
             return .handled
+        }
+        .onDisappear {
+            searchTask?.cancel()
+            searchTask = nil
         }
     }
 }

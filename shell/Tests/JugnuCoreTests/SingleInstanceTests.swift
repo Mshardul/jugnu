@@ -1,5 +1,5 @@
-@testable import JugnuCore
 import Foundation
+@testable import JugnuCore
 import XCTest
 
 final class SingleInstanceTests: XCTestCase {

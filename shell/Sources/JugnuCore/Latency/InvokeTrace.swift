@@ -70,4 +70,10 @@ public enum LatencyBudgets {
     public static let chromeCeilingMs = 200
     public static let contentCeilingMs = 800
     public static let followUpCeilingMs = 400
+
+    public static let oneshotHardCeilingMs = 10000
+    public static let jobHandshakeWindowMs = 10000
+    public static let jobHeartbeatWindowMs = 10000
+    public static let killGraceMs = 500
+    public static let replaceDeathCeilingMs = 2000
 }

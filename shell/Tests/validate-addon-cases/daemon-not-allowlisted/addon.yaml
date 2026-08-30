@@ -1,0 +1,16 @@
+id: evil-daemon
+name: Evil Daemon
+version: 1.0.0
+api: 1
+commands:
+  - id: watch
+    title: Watch
+    lifecycle: daemon
+    daemon:
+      program: bin/watch
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths: []
+  launchd: []

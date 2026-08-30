@@ -170,4 +170,140 @@ final class ManifestLoaderTests: XCTestCase {
         let m = try ManifestLoader.load(from: root)
         XCTAssertEqual(m.helpers, [])
     }
+
+    private func writeManifest(_ yaml: String) throws -> URL {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        addTeardownBlock { try? FileManager.default.removeItem(at: dir) }
+        try yaml.write(to: dir.appendingPathComponent("addon.yaml"), atomically: true, encoding: .utf8)
+        return dir
+    }
+
+    func testLifecycleOmittedResolvesToOneshot() throws {
+        let dir = try writeManifest("""
+        id: demo
+        name: Demo
+        version: 1.0.0
+        api: 1
+        commands:
+          - id: go
+            title: Go
+        entrypoint:
+          kind: exec
+          path: bin/run
+        """)
+        let m = try ManifestLoader.load(from: dir)
+        XCTAssertNil(m.lifecycle)
+        XCTAssertNil(m.commands.first?.lifecycle)
+        XCTAssertEqual(m.effectiveLifecycle(commandId: "go"), .oneshot)
+    }
+
+    func testCommandLifecycleOverridesRoot() throws {
+        let dir = try writeManifest("""
+        id: demo
+        name: Demo
+        version: 1.0.0
+        api: 1
+        lifecycle: job
+        commands:
+          - id: watch
+            title: Watch
+          - id: once
+            title: Once
+            lifecycle: oneshot
+        entrypoint:
+          kind: exec
+          path: bin/run
+        """)
+        let m = try ManifestLoader.load(from: dir)
+        XCTAssertEqual(m.lifecycle, .job)
+        XCTAssertEqual(m.effectiveLifecycle(commandId: "watch"), .job)
+        XCTAssertEqual(m.effectiveLifecycle(commandId: "once"), .oneshot)
+    }
+
+    func testSessionLifecycleThrowsTypedError() throws {
+        let dir = try writeManifest("""
+        id: demo
+        name: Demo
+        version: 1.0.0
+        api: 1
+        commands:
+          - id: go
+            title: Go
+            lifecycle: session
+        entrypoint:
+          kind: exec
+          path: bin/run
+        """)
+        XCTAssertThrowsError(try ManifestLoader.load(from: dir)) { error in
+            XCTAssertEqual(error as? ManifestLoaderError, .sessionNotSupported)
+        }
+    }
+
+    func testDaemonBlockParsesAndOnReinvokeDefaults() throws {
+        let dir = try writeManifest("""
+        id: keep-awake
+        name: Keep Awake
+        version: 1.0.0
+        api: 1
+        commands:
+          - id: watch
+            title: Watch
+            lifecycle: daemon
+            on_reinvoke: replace
+            timeout: 5
+            daemon:
+              program: bin/watcher
+              args: ["--loop"]
+              keep_alive: true
+        entrypoint:
+          kind: exec
+          path: bin/run
+        """)
+        let m = try ManifestLoader.load(from: dir)
+        let cmd = try XCTUnwrap(m.commands.first)
+        XCTAssertEqual(cmd.daemon, DaemonBlock(program: "bin/watcher", args: ["--loop"], keepAlive: true))
+        XCTAssertEqual(cmd.onReinvoke, .replace)
+        XCTAssertEqual(cmd.timeout, 5)
+    }
+
+    func testOnReinvokeDefaultIsNilAndReadsReuse() throws {
+        let dir = try writeManifest("""
+        id: demo
+        name: Demo
+        version: 1.0.0
+        api: 1
+        commands:
+          - id: a
+            title: A
+          - id: b
+            title: B
+            on_reinvoke: reuse
+        entrypoint:
+          kind: exec
+          path: bin/run
+        """)
+        let m = try ManifestLoader.load(from: dir)
+        XCTAssertNil(m.commands[0].onReinvoke)
+        XCTAssertEqual(m.commands[1].onReinvoke, .reuse)
+    }
+
+    func testDaemonCommandWithoutBlockIsRejected() throws {
+        let dir = try writeManifest("""
+        id: keep-awake
+        name: Keep Awake
+        version: 1.0.0
+        api: 1
+        commands:
+          - id: watch
+            title: Watch
+            lifecycle: daemon
+        entrypoint:
+          kind: exec
+          path: bin/run
+        """)
+        XCTAssertThrowsError(try ManifestLoader.load(from: dir)) { error in
+            XCTAssertEqual(error as? ManifestLoaderError, .daemonBlockMissing(command: "watch"))
+        }
+    }
 }

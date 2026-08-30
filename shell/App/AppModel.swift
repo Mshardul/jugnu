@@ -13,6 +13,8 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
     let installer: AddonInstaller
     let lifecycle: AddonLifecycle
     let runner: AddonRunner
+    var processHost: AddonProcessHost?
+    var shellIdentity: AddonRunner.ShellIdentity = .unknown
 
     @Published var config: JugnuConfig
     @Published var state: JugnuState
@@ -112,9 +114,6 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
         }.prefix(limit))
     }
 
-    /// Presentation-free: records "recent" and runs the addon's binary, returning the raw response
-    /// (or throwing). The caller (`AppDelegate.runCommand`) owns presenting the result via
-    /// `CommandInvoke.run`/`ShellHost`.
     func runInvocation(
         for command: IndexedCommand,
         args: [String: JSONValue] = [:]
@@ -125,40 +124,79 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
         state.recordRecent(qualifiedId: command.qualifiedId)
         try? stateStore.save(state)
         let manifest = try ManifestLoader.load(from: command.addonRoot)
-        let execute: () async throws -> RunResponse = { [runner, installer, paths, args] in
-            try await Task.detached {
-                try await installer.ensureHelpers(for: manifest)
-                let response = try runner.run(
-                    manifest: manifest,
-                    addonRoot: command.addonRoot,
-                    commandId: command.commandId,
-                    args: args,
-                    paths: paths
-                )
-                return try response.resolvingView(
-                    commandView: command.defaultViewType,
-                    allowed: command.allowedViewTypes
-                )
-            }.value
+        let key = CommandKey(addonID: command.addonId, commandID: command.commandId)
+        let markerDir = paths.stateRunDir
+        let hardCeiling = TimeInterval(LatencyBudgets.oneshotHardCeilingMs) / 1000
+
+        let execute: () async throws -> RunResponse = { [runner, installer, paths, processHost, shellIdentity, args] in
+            try await installer.ensureHelpers(for: manifest)
+            let invokeUUID = UUID()
+            let inv = try runner.spawn(
+                manifest: manifest,
+                addonRoot: command.addonRoot,
+                commandId: command.commandId,
+                args: args,
+                invokeUUID: invokeUUID,
+                shellIdentity: shellIdentity,
+                markerDir: markerDir,
+                paths: paths
+            )
+            Self.track(inv, key: key, invokeUUID: invokeUUID, host: processHost)
+            let response = try await inv.waitForResponse(timeout: hardCeiling)
+            return try response.resolvingView(
+                commandView: command.defaultViewType,
+                allowed: command.allowedViewTypes
+            )
         }
-        let followUp: (RunRequest) async throws -> RunResponse = { [runner, installer, paths] request in
-            try await Task.detached {
-                try await installer.ensureHelpers(for: manifest)
-                let env = try AddonRunner.helperEnvironment(manifest: manifest, paths: paths)
-                let response = try runner.run(
-                    addonRoot: command.addonRoot,
-                    entrypoint: manifest.entrypoint,
-                    request: request,
-                    timeout: runner.timeoutSeconds,
-                    extraEnvironment: env
-                )
-                return try response.resolvingView(
-                    commandView: command.defaultViewType,
-                    allowed: command.allowedViewTypes
-                )
-            }.value
+        let followUp: (RunRequest) async throws -> RunResponse = {
+            [runner, installer, paths, processHost, shellIdentity] request in
+            try await installer.ensureHelpers(for: manifest)
+            let env = try AddonRunner.helperEnvironment(manifest: manifest, paths: paths)
+            let invokeUUID = UUID()
+            let inv = try runner.spawn(
+                addonRoot: command.addonRoot,
+                entrypoint: manifest.entrypoint,
+                request: request,
+                extraEnvironment: env,
+                origin: "\(command.addonId):\(command.commandId):\(invokeUUID.uuidString)",
+                shellIdentity: shellIdentity,
+                markerDir: markerDir
+            )
+            Self.track(inv, key: key, invokeUUID: invokeUUID, host: processHost)
+            let response = try await inv.waitForResponse(timeout: hardCeiling)
+            return try response.resolvingView(
+                commandView: command.defaultViewType,
+                allowed: command.allowedViewTypes
+            )
         }
         return (execute, followUp)
+    }
+
+    private static func track(
+        _ inv: RunningInvocation,
+        key: CommandKey,
+        invokeUUID: UUID,
+        host: AddonProcessHost?
+    ) {
+        guard let host else { return }
+        let entry = AddonProcessHost.Entry(
+            invocation: inv,
+            invocationTask: nil,
+            lifecycleClass: .oneshot,
+            startedAt: Date(),
+            invokeUUID: invokeUUID,
+            markerPath: inv.markerURL,
+            phase: .live
+        )
+        host.register(key: key, entry: entry)
+        let markerDir = inv.markerURL.deletingLastPathComponent()
+        let pid = inv.process.processIdentifier
+        inv.process.terminationHandler = { _ in
+            RunMarker.delete(pid: pid, in: markerDir)
+            Task { @MainActor in
+                host.deregister(key: key, invokeUUID: invokeUUID)
+            }
+        }
     }
 
     func setEnabled(id: String, enabled: Bool) throws {

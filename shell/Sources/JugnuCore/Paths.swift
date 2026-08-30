@@ -27,6 +27,18 @@ public struct JugnuPaths: Sendable {
         stateDir.appendingPathComponent("clock/timers.json")
     }
 
+    public var stateRunDir: URL {
+        stateDir.appendingPathComponent("run")
+    }
+
+    public var lifecycleLogFile: URL {
+        stateDir.appendingPathComponent("lifecycle.log")
+    }
+
+    public var crashCounterFile: URL {
+        stateDir.appendingPathComponent("launch-attempts")
+    }
+
     public func helperRoot(id: String, version: String) -> URL {
         helpersDir.appendingPathComponent(id).appendingPathComponent(version)
     }

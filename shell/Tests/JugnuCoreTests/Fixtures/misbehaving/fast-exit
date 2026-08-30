@@ -1,0 +1,4 @@
+#!/bin/sh
+cat > /dev/null
+printf '{"ok":true,"message":"done"}\n'
+exit 0

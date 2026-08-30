@@ -26,6 +26,7 @@ public struct BrowseCatalogView<VM: BrowseCatalogViewModelProtocol>: View {
     var onSelectCard: (String) -> Void
     @Environment(\.colorScheme) private var colorScheme
     @ObservedObject private var store = ThemeStore.shared
+    @State private var installTasks: [String: Task<Void, Never>] = [:]
 
     public init(viewModel: VM, onSelectCard: @escaping (String) -> Void) {
         self.viewModel = viewModel
@@ -68,7 +69,7 @@ public struct BrowseCatalogView<VM: BrowseCatalogViewModelProtocol>: View {
                                     isInstalled: viewModel.isInstalled(entry.id),
                                     isEnabled: viewModel.isEnabled(entry.id),
                                     isInstalling: viewModel.installingIDs.contains(entry.id),
-                                    onInstall: { Task { await viewModel.install(entry) } },
+                                    onInstall: { startInstall(entry) },
                                     onEnabledChange: { viewModel.setEnabled(entry.id, enabled: $0) },
                                     onUninstall: { viewModel.uninstall(id: entry.id, name: entry.name) },
                                     onTap: { onSelectCard(entry.id) }
@@ -83,6 +84,20 @@ public struct BrowseCatalogView<VM: BrowseCatalogViewModelProtocol>: View {
         .background(theme.background)
         .frame(minWidth: 720, minHeight: 480)
         .task { await viewModel.load() }
+        .onDisappear {
+            for task in installTasks.values {
+                task.cancel()
+            }
+            installTasks.removeAll()
+        }
+    }
+
+    private func startInstall(_ entry: RegistryEntry) {
+        guard installTasks[entry.id] == nil else { return }
+        installTasks[entry.id] = Task {
+            await viewModel.install(entry)
+            installTasks[entry.id] = nil
+        }
     }
 
     private func sidebar() -> some View {

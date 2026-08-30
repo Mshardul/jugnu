@@ -1,0 +1,5 @@
+#!/bin/sh
+cat > /dev/null
+i=0
+while [ $i -lt 5 ]; do printf '\n'; sleep 1; i=$((i+1)); done
+sleep 86400

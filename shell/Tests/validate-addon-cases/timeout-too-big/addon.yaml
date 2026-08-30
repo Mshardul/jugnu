@@ -1,0 +1,14 @@
+id: timeout-too-big
+name: Timeout Too Big
+version: 1.0.0
+api: 1
+commands:
+  - id: run
+    title: Run
+    timeout: 30
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths: []
+  launchd: []

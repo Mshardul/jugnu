@@ -1,6 +1,6 @@
 import Foundation
 
-// Mandatory palette rows ("built-in addons"): not zips, not toggles; only jugnu.yaml hides them.
+/// Mandatory palette rows ("built-in addons"): not zips, not toggles; only jugnu.yaml hides them.
 public struct ShellNativeCommand: Identifiable, Equatable, Sendable {
     public enum Kind: String, CaseIterable, Sendable {
         case browseAddons = "browse-addons"
@@ -13,7 +13,9 @@ public struct ShellNativeCommand: Identifiable, Equatable, Sendable {
     public var keywords: [String]
     public var systemImage: String
 
-    public var id: String { kind.rawValue }
+    public var id: String {
+        kind.rawValue
+    }
 
     public static let all: [ShellNativeCommand] = [
         ShellNativeCommand(

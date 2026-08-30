@@ -48,7 +48,7 @@ Omit `helpers` when the addon needs none. Distinct from catalog-addon `dependenc
 | **Declare** | Exact `id` + three-part `version`. No ranges in v0. |
 | **On disk** | `~/.local/share/jugnu/helpers/<id>/<version>/` (addons stay under `addons/<id>/`). |
 | **When** | Installing an addon: download any listed helper version that is not already on disk. A later addon that lists the same `id`+`version` reuses it. |
-| **Trust** | Same as addons: registry URL + sha256, then unpack. Addons never fetch helper URLs. Signing follows [0003](tickets.md). |
+| **Trust** | Same as addons: registry URL + sha256, then unpack. Addons never fetch helper URLs. Signing is in the [security audit](audit/prompts/security.md) scope. |
 | **Catalog** | Helpers live in `registry/helpers.json`, **not** `addons.json`. Browse Catalog does not list them. No enable key in `jugnu.yaml`. |
 | **Run** | For each declared helper, the runner sets `JUGNU_HELPER_<ID>` to that version’s directory (`id` hyphens → underscores, then uppercase: `play-runtime` → `JUGNU_HELPER_PLAY_RUNTIME`). |
 | **Offline** | Missing helper and download fails → install or invoke fails with a plain connection error and Retry. Do not hang. |

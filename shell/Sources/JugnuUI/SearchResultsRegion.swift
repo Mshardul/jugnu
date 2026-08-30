@@ -22,16 +22,20 @@ public func resultSlots<T>(results: [T], slotCount: Int) -> ResultSlotLayout<T> 
     return ResultSlotLayout(rows: results, showAllLinkSlot: nil, scrolls: true)
 }
 
-// Unified up/down selection: addon hits first, shell-native rows after.
+/// Unified up/down selection: addon hits first, shell-native rows after.
 public enum LauncherSelection: Equatable {
     case addon(Int)
     case shellNative(Int)
     case none
 
     public static func resolve(index: Int, addonCount: Int, shellNativeCount: Int) -> LauncherSelection {
-        if index >= 0, index < addonCount { return .addon(index) }
+        if index >= 0, index < addonCount {
+            return .addon(index)
+        }
         let shellIndex = index - addonCount
-        if shellIndex >= 0, shellIndex < shellNativeCount { return .shellNative(shellIndex) }
+        if shellIndex >= 0, shellIndex < shellNativeCount {
+            return .shellNative(shellIndex)
+        }
         return .none
     }
 }
@@ -73,8 +77,13 @@ public struct SearchResultsRegion: View {
         JugnuThemeColors(theme: resolvedTheme(from: store.config, colorScheme: colorScheme))
     }
 
-    private var slotCount: Int { JugnuTokens.Launcher.resultSlotCount }
-    private var rowHeight: CGFloat { JugnuTokens.Launcher.resultRowHeight }
+    private var slotCount: Int {
+        JugnuTokens.Launcher.resultSlotCount
+    }
+
+    private var rowHeight: CGFloat {
+        JugnuTokens.Launcher.resultRowHeight
+    }
 
     public var body: some View {
         let layout = resultSlots(results: hits, slotCount: slotCount)

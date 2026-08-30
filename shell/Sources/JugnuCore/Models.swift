@@ -287,6 +287,10 @@ public struct CommandDescriptor: Codable, Equatable, Sendable {
     public var keywords: [String]
     public var ui: CommandUISpec?
     public var view: ViewType?
+    public var lifecycle: LifecycleClass?
+    public var onReinvoke: OnReinvoke?
+    public var timeout: TimeInterval?
+    public var daemon: DaemonBlock?
 
     public init(
         id: String,
@@ -294,7 +298,11 @@ public struct CommandDescriptor: Codable, Equatable, Sendable {
         subtitle: String,
         keywords: [String] = [],
         ui: CommandUISpec? = nil,
-        view: ViewType? = nil
+        view: ViewType? = nil,
+        lifecycle: LifecycleClass? = nil,
+        onReinvoke: OnReinvoke? = nil,
+        timeout: TimeInterval? = nil,
+        daemon: DaemonBlock? = nil
     ) {
         self.id = id
         self.title = title
@@ -302,6 +310,10 @@ public struct CommandDescriptor: Codable, Equatable, Sendable {
         self.keywords = keywords
         self.ui = ui
         self.view = view
+        self.lifecycle = lifecycle
+        self.onReinvoke = onReinvoke
+        self.timeout = timeout
+        self.daemon = daemon
     }
 
     public var defaultUIPattern: UIPattern? {
@@ -309,7 +321,8 @@ public struct CommandDescriptor: Codable, Equatable, Sendable {
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, title, subtitle, keywords, ui, view
+        case id, title, subtitle, keywords, ui, view, lifecycle, timeout, daemon
+        case onReinvoke = "on_reinvoke"
     }
 
     public init(from decoder: Decoder) throws {
@@ -327,6 +340,10 @@ public struct CommandDescriptor: Codable, Equatable, Sendable {
         } else {
             view = nil
         }
+        lifecycle = try LifecycleClass.decodeManifestValue(c.decodeIfPresent(String.self, forKey: .lifecycle))
+        onReinvoke = try c.decodeIfPresent(OnReinvoke.self, forKey: .onReinvoke)
+        timeout = try c.decodeIfPresent(TimeInterval.self, forKey: .timeout)
+        daemon = try c.decodeIfPresent(DaemonBlock.self, forKey: .daemon)
     }
 }
 
@@ -384,9 +401,15 @@ public struct AddonManifest: Codable, Equatable, Sendable {
     public var cleanup: CleanupSpec
     public var viewTypes: [ViewType]
     public var helpers: [HelperRef]
+    public var lifecycle: LifecycleClass?
 
     public var allowedViewTypes: [ViewType] {
         viewTypes.isEmpty ? ViewType.shellDefaults : viewTypes
+    }
+
+    public func effectiveLifecycle(commandId: String) -> LifecycleClass {
+        let command = commands.first { $0.id == commandId }
+        return command?.lifecycle ?? lifecycle ?? .oneshot
     }
 
     public init(
@@ -398,7 +421,8 @@ public struct AddonManifest: Codable, Equatable, Sendable {
         entrypoint: Entrypoint,
         cleanup: CleanupSpec = CleanupSpec(),
         viewTypes: [ViewType] = [],
-        helpers: [HelperRef] = []
+        helpers: [HelperRef] = [],
+        lifecycle: LifecycleClass? = nil
     ) {
         self.id = id
         self.name = name
@@ -409,10 +433,11 @@ public struct AddonManifest: Codable, Equatable, Sendable {
         self.cleanup = cleanup
         self.viewTypes = viewTypes
         self.helpers = helpers
+        self.lifecycle = lifecycle
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, name, version, api, commands, entrypoint, cleanup, helpers
+        case id, name, version, api, commands, entrypoint, cleanup, helpers, lifecycle
         case viewTypes = "view_types"
     }
 
@@ -426,6 +451,7 @@ public struct AddonManifest: Codable, Equatable, Sendable {
         entrypoint = try c.decode(Entrypoint.self, forKey: .entrypoint)
         cleanup = try c.decodeIfPresent(CleanupSpec.self, forKey: .cleanup) ?? CleanupSpec()
         helpers = try c.decodeIfPresent([HelperRef].self, forKey: .helpers) ?? []
+        lifecycle = try LifecycleClass.decodeManifestValue(c.decodeIfPresent(String.self, forKey: .lifecycle))
         let raw = try c.decodeIfPresent([String].self, forKey: .viewTypes) ?? []
         viewTypes = try raw.map { token in
             guard let parsed = ViewType(rawValue: token) else {

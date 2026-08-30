@@ -38,5 +38,9 @@ let package = Package(
             name: "JugnuUITests",
             dependencies: ["JugnuUI"]
         ),
+        .testTarget(
+            name: "JugnuAppTests",
+            dependencies: ["Jugnu", "JugnuCore"]
+        ),
     ]
 )

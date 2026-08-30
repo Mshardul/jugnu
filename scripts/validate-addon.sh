@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Kept in sync with DaemonAgents.firstPartyDaemonIDs (Swift). See plan §3.2 consistency notes.
+FIRST_PARTY_DAEMON_IDS=(keep-awake clipboard-history)
+
 if [[ $# -ne 1 ]]; then
   echo "usage: $0 <addon-dir>" >&2
   exit 1
@@ -91,5 +94,54 @@ while read -r token; do
   token=${token//\'/}
   is_known_view "$token" || { echo "unknown view type: $token" >&2; exit 1; }
 done < <(extract_view_tokens)
+
+lifecycle_tokens=$(grep -nE '^[[:space:]]*lifecycle:[[:space:]]*' "$manifest" 2>/dev/null \
+  | sed -E 's/^[0-9]+:[[:space:]]*lifecycle:[[:space:]]*//; s/[[:space:]]*#.*$//' \
+  | tr -d '"' | tr -d "'" || true)
+
+has_daemon=no
+while read -r token; do
+  [[ -z "$token" ]] && continue
+  case "$token" in
+    oneshot|job) ;;
+    daemon) has_daemon=yes ;;
+    session) echo "session addons are not yet supported" >&2; exit 1 ;;
+    *) echo "invalid lifecycle: $token" >&2; exit 1 ;;
+  esac
+done <<< "$lifecycle_tokens"
+
+if [[ "$has_daemon" == "yes" ]]; then
+  allowed=no
+  for allow in "${FIRST_PARTY_DAEMON_IDS[@]}"; do
+    [[ "$id" == "$allow" ]] && allowed=yes
+  done
+  [[ "$allowed" == "yes" ]] || { echo "daemon lifecycle is first-party only" >&2; exit 1; }
+
+  awk '
+    function flush() {
+      if (!bad && in_cmd && is_daemon && !has_program) {
+        print "daemon command missing daemon block with program:" > "/dev/stderr"
+        bad = 1
+      }
+    }
+    /^commands:/ { in_commands = 1; next }
+    in_commands && /^[^[:space:]#]/ { flush(); in_commands = 0; in_cmd = 0 }
+    in_commands && /^[[:space:]]+-[[:space:]]+id:/ { flush(); in_cmd = 1; is_daemon = 0; has_program = 0; next }
+    in_cmd && /^[[:space:]]*lifecycle:[[:space:]]*daemon([[:space:]]|$)/ { is_daemon = 1 }
+    in_cmd && /^[[:space:]]*program:[[:space:]]*[^[:space:]#]/ { has_program = 1 }
+    END { flush(); exit bad }
+  ' "$manifest"
+fi
+
+timeout_bad=$(grep -nE '^[[:space:]]*timeout:[[:space:]]*' "$manifest" 2>/dev/null \
+  | sed -E 's/^[0-9]+:[[:space:]]*timeout:[[:space:]]*//; s/[[:space:]]*#.*$//' \
+  | tr -d '"' | tr -d "'" \
+  | awk '$1 + 0 > 10 { print; exit }' || true)
+[[ -z "$timeout_bad" ]] || { echo "timeout must be ≤ oneshotHardCeiling (10s)" >&2; exit 1; }
+
+entrypoint_file="$addon_dir/$entrypoint_path"
+if grep -qE '(^|[[:space:]])(disown|nohup)([[:space:]]|$)|&[[:space:]]*$' "$entrypoint_file"; then
+  echo "warning: $id entrypoint uses disown/nohup/trailing &; background work belongs in a daemon or the clock helper" >&2
+fi
 
 printf 'valid addon: %s %s (api %s)\n' "$id" "$version" "$api"
