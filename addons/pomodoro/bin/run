@@ -3,13 +3,20 @@ set -euo pipefail
 
 STATE_DIR="$HOME/.local/share/jugnu/state/pomodoro"
 STATE_FILE="$STATE_DIR/state.json"
+CLOCK_FILE="$HOME/.local/share/jugnu/state/clock/timers.json"
+CLOCK_BIN="${JUGNU_HELPER_CLOCK:-}/bin/clock"
+TIMER_ID="pomodoro"
+
 mkdir -p "$STATE_DIR"
 
 req=$(cat)
 
 json_get() {
-  # json_get <json> <key> — string or bare value for a top-level "key":...
-  printf '%s' "$1" | sed -n -E "s/.*\"$2\":\"?([^\",}]*)\"?.*/\1/p" | head -n1
+  printf '%s' "$1" | sed -n -E "s/.*\"$2\"[[:space:]]*:[[:space:]]*\"?([^\",}]*)\"?.*/\1/p" | head -n1
+}
+
+json_escape() {
+  printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'
 }
 
 command=$(json_get "$req" "command")
@@ -32,24 +39,48 @@ EOF
 read_phase() { sed -n -E 's/.*"phase":"([^"]*)".*/\1/p' "$STATE_FILE" 2>/dev/null; }
 read_end_ts() { sed -n -E 's/.*"end_ts":([0-9.]+).*/\1/p' "$STATE_FILE" 2>/dev/null; }
 
+clock_run() {
+  if [[ ! -x "$CLOCK_BIN" ]]; then
+    echo '{"ok":false,"error":"clock helper is not installed"}'
+    return 1
+  fi
+  mkdir -p "$(dirname "$CLOCK_FILE")"
+  local payload="$1"
+  local out
+  if ! out=$(printf '%s\n' "$payload" | "$CLOCK_BIN"); then
+    echo '{"ok":false,"error":"clock helper failed"}'
+    return 1
+  fi
+  if [[ "$out" != *'"ok":true'* ]]; then
+    echo '{"ok":false,"error":"clock helper failed"}'
+    return 1
+  fi
+  return 0
+}
+
+cancel_timer() {
+  if [[ ! -x "$CLOCK_BIN" ]]; then
+    return 0
+  fi
+  mkdir -p "$(dirname "$CLOCK_FILE")"
+  local file_esc
+  file_esc=$(json_escape "$CLOCK_FILE")
+  printf '%s\n' "{\"op\":\"cancel\",\"id\":\"${TIMER_ID}\",\"file\":\"${file_esc}\"}" | "$CLOCK_BIN" >/dev/null 2>&1 || true
+}
+
 start_phase() {
   local phase="$1" minutes="$2"
   local duration=$((minutes * 60))
-  local now end_ts
+  local now end_ts fire_at file_esc
   now=$(date +%s)
   end_ts=$((now + duration))
+  fire_at=$(date -u -v+"${duration}S" '+%Y-%m-%dT%H:%M:%SZ')
+  cancel_timer
+  file_esc=$(json_escape "$CLOCK_FILE")
+  if ! clock_run "{\"op\":\"upsert\",\"file\":\"${file_esc}\",\"timer\":{\"id\":\"${TIMER_ID}\",\"kind\":\"one-shot\",\"fire_at\":\"${fire_at}\",\"enabled\":true,\"paused\":false,\"next_fire\":\"${fire_at}\",\"group\":\"pomodoro\",\"target\":{\"addon\":\"pomodoro\",\"command\":\"chime\"}}}"; then
+    return 0
+  fi
   write_state "$phase" "$end_ts"
-
-  # Fire-and-forget notifier: sleeps in the background so this call returns
-  # immediately (addon commands must not block the palette).
-  ( sleep "$duration"
-    if [[ -f "$STATE_FILE" ]] && [[ "$(read_end_ts)" == "$end_ts" ]]; then
-      rm -f "$STATE_FILE"
-      notify "Pomodoro" "${phase} done"
-    fi
-  ) >/dev/null 2>&1 &
-  disown
-
   echo "{\"ok\":true,\"message\":\"${phase} started (${minutes}m)\"}"
 }
 
@@ -80,7 +111,16 @@ case "$command" in
     ;;
   reset)
     rm -f "$STATE_FILE"
+    cancel_timer
     echo '{"ok":true,"message":"pomodoro reset"}'
+    ;;
+  chime)
+    if [[ -f "$STATE_FILE" ]]; then
+      phase=$(read_phase)
+      rm -f "$STATE_FILE"
+      notify "Pomodoro" "${phase} done"
+    fi
+    echo '{"ok":true,"message":"chime"}'
     ;;
   *)
     echo "{\"ok\":false,\"error\":\"pomodoro: unknown command\"}"

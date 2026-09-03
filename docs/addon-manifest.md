@@ -91,3 +91,40 @@ scripts/package-addon.sh addons/<addon-id> dist/
 The entrypoint receives JSON on stdin and must return JSON on stdout using `api: 1`. A successful response preserves the compatible shape `{ "ok": true, "message": "..." }`; failures use `{ "ok": false, "error": "..." }`.
 
 See [the shell design](architecture/2026-08-22-shell-design.md) for the full protocol and lifecycle contract.
+
+## Process lifetime (`lifecycle`)
+
+Each **command** may declare how long its process may live. Omit the field to get `oneshot`. An addon-root `lifecycle:` is the default for every command.
+
+| Class | Process lives | Leave / Esc | Quit | Sleep | Re-invoke |
+|---|---|---|---|---|---|
+| `oneshot` (default) | Until one JSON result, clamped by `oneshotHardCeiling` (10s) | kills | kills | n/a | new spawn |
+| `job` | Until a result; must heartbeat | kills | kills (prompt) | kills | `on_reinvoke`: `reuse` or `replace` |
+| `daemon` | Until disable / uninstall | no | no | yes | always reuse; launchd-owned |
+
+`session` is reserved. Load and `scripts/validate-addon.sh` reject it with: *session addons are not yet supported.*
+
+```yaml
+lifecycle: oneshot          # addon-root default
+commands:
+  - id: convert
+    title: Convert
+    lifecycle: job
+    on_reinvoke: replace    # default reuse; read for job only
+    timeout: 8              # oneshot only; must be ≤ 10
+  - id: watch
+    title: Watch
+    lifecycle: daemon
+    daemon:
+      program: bin/watch    # relative to the addon root
+      args: ["--loop"]
+      keep_alive: true      # default true
+```
+
+Rules:
+
+- `lifecycle: daemon` is **first-party only** (`keep-awake`, `clipboard-history`). The shell writes `~/Library/LaunchAgents/com.jugnu.<addon-id>.<command-id>.plist`. Do not ship a `.plist`.
+- `cleanup.launchd` is filled from daemon commands at disable/uninstall even if the yaml list is empty.
+- A `job` must write stdout (a bare newline counts) within 10s of spawn, then at least every 10s, or the shell SIGKILLs it. There is no wall-clock cap.
+- `timeout` on a `oneshot` is clamped to 10 seconds.
+

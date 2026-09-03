@@ -412,6 +412,18 @@ public struct AddonManifest: Codable, Equatable, Sendable {
         return command?.lifecycle ?? lifecycle ?? .oneshot
     }
 
+    public func effectiveOnReinvoke(commandId: String) -> OnReinvoke {
+        commands.first { $0.id == commandId }?.onReinvoke ?? .reuse
+    }
+
+    public func effectiveCleanupLaunchd() -> [String] {
+        var labels = Set(cleanup.launchd)
+        for command in commands where effectiveLifecycle(commandId: command.id) == .daemon {
+            labels.insert(FirstPartyDaemons.launchdLabel(addonID: id, commandID: command.id))
+        }
+        return labels.sorted()
+    }
+
     public init(
         id: String,
         name: String,

@@ -12,6 +12,9 @@ The project has not published a release yet. Entries currently describe unreleas
 
 ### Added
 
+- 2026-09-04 — Pomodoro, Keep Awake, and Clipboard History no longer hand-roll background work: pomodoro chimes via the clock helper; keep-awake and clipboard-history use shell-owned daemons (ticket 0057 phase 5).
+- 2026-09-04 — Crash-loop safe mode, orphan process reaper, and malformed `jugnu.yaml` recovery menu (ticket 0057 phase 4).
+- 2026-09-03 — Addon process classes `oneshot` / `job` / `daemon`: job heartbeat watchdog, re-invoke reuse/replace, shell-authored first-party launchd agents, disable-while-running alert (ticket 0057 phase 3).
 - 2026-08-29 — Browse Addons and Preferences are searchable launcher rows: type to filter them, arrow-key and Return like any command; `jugnu.yaml` `shell.hidden_shell_commands` hides either one (ticket 0012).
 - 2026-08-26 — Shared `clock` helper: versioned timer scheduling installed once and reused by addons.
 - 2026-08-26 — First-party `nudges` addon: recurring wellness reminders, three presets, custom nudges, pause/resume, and restore.

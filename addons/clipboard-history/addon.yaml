@@ -9,12 +9,18 @@ commands:
     keywords: [clipboard, history, paste, copy]
     ui:
       pattern: list
+  - id: watch
+    title: Clipboard watcher
+    subtitle: Internal — records pasteboard changes
+    keywords: []
+    lifecycle: daemon
+    daemon:
+      program: bin/watch
+      keep_alive: true
 entrypoint:
   kind: exec
   path: bin/run
 cleanup:
   paths:
     - "~/.local/share/jugnu/state/clipboard-history"
-    - "~/Library/LaunchAgents/com.jugnu.clipboard-history.watch.plist"
-  launchd:
-    - com.jugnu.clipboard-history.watch
+  launchd: []

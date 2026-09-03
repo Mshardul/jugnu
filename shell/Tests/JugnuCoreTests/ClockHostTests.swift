@@ -1,3 +1,4 @@
+import Darwin
 import Foundation
 @testable import JugnuCore
 import XCTest
@@ -17,6 +18,18 @@ final class ClockHostTests: XCTestCase {
         XCTAssertEqual(invocations.map(\.target), [timer.target])
         XCTAssertEqual(invocations.map(\.timerID), ["opaque:timer-id"])
         XCTAssertEqual(service.markedIDs, ["opaque:timer-id"])
+    }
+
+    func testStartWritesClockMarkerAndStopDeletesIt() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let host = ClockHost(service: FakeClockService(dueTimers: []))
+        host.start(markerDir: dir, shellIdentity: AddonRunner.ShellIdentity(pid: 7, startTS: 8)) { _, _, _ in }
+        let markerURL = dir.appendingPathComponent("\(getpid()).json")
+        XCTAssertTrue(FileManager.default.fileExists(atPath: markerURL.path))
+        host.stop()
+        XCTAssertFalse(FileManager.default.fileExists(atPath: markerURL.path))
     }
 
     func testTickDoesNotInvokePausedTimer() async {

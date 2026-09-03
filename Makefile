@@ -60,7 +60,7 @@ stop:
 		sleep 0.15; \
 	done
 
-# Dev clean slate: boot out every Jugnu launchd agent (none exist until the daemon class lands).
+# Dev clean slate: boot out every Jugnu launchd agent.
 clean-agents:
 	@printf 'Booting out com.jugnu.* launchd agents...\n'
 	@for label in $$(launchctl list 2>/dev/null | awk '/com\.jugnu\./ {print $$3}'); do \

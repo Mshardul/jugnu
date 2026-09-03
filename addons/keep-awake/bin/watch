@@ -1,0 +1,74 @@
+#!/bin/bash
+set -euo pipefail
+
+STATE_DIR="${JUGNU_STATE_DIR:-$HOME/.local/share/jugnu/state/keep-awake}"
+SESSION="$STATE_DIR/session"
+CAFF_PID=""
+last_session=""
+
+mkdir -p "$STATE_DIR"
+
+stop_caffeinate() {
+  if [[ -n "$CAFF_PID" ]] && kill -0 "$CAFF_PID" 2>/dev/null; then
+    kill "$CAFF_PID" 2>/dev/null || true
+    wait "$CAFF_PID" 2>/dev/null || true
+  fi
+  CAFF_PID=""
+}
+
+start_caffeinate() {
+  stop_caffeinate
+  if [[ $# -ge 1 && -n "${1:-}" ]]; then
+    /usr/bin/caffeinate -di -t "$1" &
+  else
+    /usr/bin/caffeinate -di &
+  fi
+  CAFF_PID=$!
+}
+
+caffeinate_running() {
+  [[ -n "$CAFF_PID" ]] && kill -0 "$CAFF_PID" 2>/dev/null
+}
+
+trap stop_caffeinate EXIT
+
+while true; do
+  cur=""
+  if [[ -f "$SESSION" ]]; then
+    cur=$(cat "$SESSION" || true)
+  fi
+  if [[ "$cur" != "$last_session" ]]; then
+    stop_caffeinate
+    last_session="$cur"
+  fi
+
+  if [[ -z "$cur" ]]; then
+    sleep 1
+    continue
+  fi
+
+  mode=$(awk '{print $1}' <<<"$cur")
+  if [[ "$mode" == "until" ]]; then
+    if ! caffeinate_running; then
+      start_caffeinate
+    fi
+    sleep 1
+    continue
+  fi
+
+  end=$(awk '{print $3}' <<<"$cur")
+  now=$(date +%s)
+  if [[ -z "$end" ]] || (( 10#$now >= 10#$end )); then
+    rm -f "$SESSION"
+    last_session=""
+    stop_caffeinate
+    sleep 1
+    continue
+  fi
+
+  rem=$((end - now))
+  if ! caffeinate_running; then
+    start_caffeinate "$rem"
+  fi
+  sleep 1
+done

@@ -8,7 +8,7 @@ public enum Cleanup {
     public static func performDisable(manifest: AddonManifest, addonRoot: URL, paths: JugnuPaths) throws {
         _ = addonRoot
         var survivors: [String] = []
-        for label in manifest.cleanup.launchd {
+        for label in manifest.effectiveCleanupLaunchd() {
             // Remove the plist before bootout so launchd can't reload the job at next login.
             let plist = paths.launchAgentsDir.appendingPathComponent("\(label).plist")
             try? FileManager.default.removeItem(at: plist)

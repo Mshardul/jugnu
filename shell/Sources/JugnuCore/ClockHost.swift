@@ -1,3 +1,4 @@
+import Darwin
 import Foundation
 
 public protocol ClockServicing: Sendable {
@@ -16,6 +17,8 @@ public final class ClockHost {
     private var timer: Timer?
     private var inFlightTask: Task<Void, Never>?
     private var isTicking = false
+    private var markerDir: URL?
+    private var clockPID: Int32?
 
     public init(
         service: any ClockServicing,
@@ -33,6 +36,8 @@ public final class ClockHost {
     }
 
     public func start(
+        markerDir: URL? = nil,
+        shellIdentity: AddonRunner.ShellIdentity? = nil,
         invoke: @escaping (
             _ addon: String,
             _ command: String,
@@ -40,6 +45,20 @@ public final class ClockHost {
         ) async throws -> Void
     ) {
         stop()
+        self.markerDir = markerDir
+        if let markerDir {
+            let pid = getpid()
+            clockPID = pid
+            let identity = shellIdentity ?? .unknown
+            let marker = RunMarker(
+                origin: "jugnu:clock",
+                lifecycleClass: "oneshot",
+                shellPID: identity.pid,
+                shellStartTS: identity.startTS,
+                spawnedAt: Date().timeIntervalSince1970
+            )
+            try? RunMarker.write(marker, pid: pid, to: markerDir)
+        }
         timer = Timer.scheduledTimer(withTimeInterval: Self.pollInterval, repeats: true) {
             [weak self] _ in
             Task { @MainActor [weak self] in
@@ -52,6 +71,11 @@ public final class ClockHost {
         timer?.invalidate()
         timer = nil
         inFlightTask?.cancel()
+        if let markerDir, let clockPID {
+            RunMarker.delete(pid: clockPID, in: markerDir)
+        }
+        markerDir = nil
+        clockPID = nil
     }
 
     public func tick(

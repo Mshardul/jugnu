@@ -87,6 +87,12 @@ final class ValidateAddonScriptTests: XCTestCase {
         XCTAssertTrue(result.stderr.contains("background work belongs in a daemon"), result.stderr)
     }
 
+    func test_validateAddon_shippedPlist_rejected() throws {
+        let result = try run(fixture("shipped-plist"))
+        XCTAssertNotEqual(result.status, 0)
+        XCTAssertTrue(result.stderr.contains("must not ship a .plist"), result.stderr)
+    }
+
     func test_validateAddon_allShippedAddons_pass() throws {
         let addonsDir = repoRoot.appendingPathComponent("addons")
         let entries = try FileManager.default.contentsOfDirectory(at: addonsDir, includingPropertiesForKeys: nil)

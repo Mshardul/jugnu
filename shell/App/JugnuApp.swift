@@ -27,21 +27,58 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var inFlightInvoke: (key: CommandKey, task: Task<Void, Never>)?
     private var sleepObserver: NSObjectProtocol?
     private var wakeObserver: NSObjectProtocol?
+    private var reaper: AddonReaper?
+    private var launchGuard: LaunchGuard?
+    private var inRecovery = false
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         if !ScreenshotMode.isActive, yieldToRunningInstance() { return }
 
-        let model: AppModel
-        if ScreenshotMode.isActive, let paths = ScreenshotMode.makePaths() {
-            model = AppModel(paths: paths)
+        let paths: JugnuPaths
+        if ScreenshotMode.isActive, let shot = ScreenshotMode.makePaths() {
+            paths = shot
         } else {
-            model = AppModel()
+            paths = JugnuPaths()
         }
+
+        let log = LifecycleLog(fileURL: paths.lifecycleLogFile)
+        let configState = ConfigStore(paths: paths).inspect()
+        let guardFile = LaunchGuard(fileURL: paths.crashCounterFile)
+        if !ScreenshotMode.isActive {
+            guardFile.recordAttempt()
+        }
+        launchGuard = guardFile
+
+        let decision = LaunchStart.decide(
+            safeMode: guardFile.shouldEnterSafeMode,
+            configSyntaxError: configState.isSyntaxError
+        )
+
+        let model = AppModel(paths: paths, loadAddons: decision == .normal)
         self.model = model
-        let processHost = AddonProcessHost(log: LifecycleLog(fileURL: model.paths.lifecycleLogFile))
+        let processHost = AddonProcessHost(log: log)
         self.processHost = processHost
         model.processHost = processHost
         model.shellIdentity = ShellIdentity.current()
+
+        let reaper = AddonReaper(paths: paths, host: processHost, log: log)
+        self.reaper = reaper
+
+        switch decision {
+        case .recovery(let reason):
+            enterRecovery(
+                reason: reason,
+                model: model,
+                log: log,
+                reaper: reaper,
+                strikeCount: guardFile.count
+            )
+            return
+        case .normal:
+            break
+        }
+
+        reaper.reap(mode: .normal)
         model.bootstrap()
 
         let shellHost = ShellHost()
@@ -51,7 +88,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             model?.statusMessage = message
         }
         self.clockHost = clockHost
-        clockHost.start { [weak self] addon, command, timerID in
+        clockHost.start(
+            markerDir: model.paths.stateRunDir,
+            shellIdentity: model.shellIdentity
+        ) { [weak self] addon, command, timerID in
             guard let self else { throw ClockInvocationError.unavailable }
             try await self.runClockCommand(
                 addon: addon,
@@ -93,7 +133,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         wakeObserver = workspaceCenter.addObserver(
             forName: NSWorkspace.didWakeNotification, object: nil, queue: .main
         ) { [weak self] _ in
-            MainActor.assumeIsolated { self?.reapOnWake() }
+            MainActor.assumeIsolated { self?.reaper?.reap(mode: .normal) }
         }
 
         if !model.state.firstRunCompleted, !ScreenshotMode.isActive {
@@ -104,11 +144,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self.firstRun = first
             first.show()
         }
+
+        launchGuard?.markCleanLaunch()
+    }
+
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        guard processHost?.hasLiveJob() == true else { return .terminateNow }
+        let alert = NSAlert()
+        alert.messageText = "Quit Jugnu?"
+        alert.informativeText = "A long-running addon job is still working. Quitting stops it."
+        alert.addButton(withTitle: "Quit")
+        alert.addButton(withTitle: "Cancel")
+        if alert.runModal() != .alertFirstButtonReturn {
+            return .terminateCancel
+        }
+        processHost?.killAll()
+        return .terminateNow
     }
 
     func applicationWillTerminate(_ notification: Notification) {
         clockHost?.stop()
         processHost?.killAll()
+        reaper?.reap(mode: inRecovery ? .degraded : .normal)
         let workspaceCenter = NSWorkspace.shared.notificationCenter
         if let sleepObserver {
             workspaceCenter.removeObserver(sleepObserver)
@@ -118,9 +175,68 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    // Reaper stub — Phase 4 wires the marker-dir sweep here.
-    private func reapOnWake() {
-        processHost?.noteWakeReapPending()
+    private func enterRecovery(
+        reason: RecoveryReason,
+        model: AppModel,
+        log: LifecycleLog,
+        reaper: AddonReaper,
+        strikeCount: Int
+    ) {
+        inRecovery = true
+        ThemeStore.shared.config = JugnuConfig().theme
+        model.daemonAgents.bootoutAllJugnuAgents(paths: model.paths)
+        log.recordNow(
+            event: "safe_mode",
+            reason: reason == .malformedConfig ? "yaml" : "crash-loop",
+            strikeCount: strikeCount
+        )
+        reaper.reap(mode: .degraded)
+        menuBar = MenuBarController(
+            onOpenPalette: {},
+            onPreferences: {},
+            onQuit: { NSApp.terminate(nil) },
+            recovery: RecoveryMenuActions(
+                onResetConfig: { [weak self] in self?.recoveryResetConfig() },
+                onOpenConfig: { [weak self] in self?.recoveryOpenConfig() },
+                onDisableAllAddons: { [weak self] in self?.recoveryDisableAddons() },
+                onTryAgain: { [weak self] in self?.recoveryTryAgain() }
+            )
+        )
+    }
+
+    private func recoveryResetConfig() {
+        guard let model else { return }
+        try? model.store.save(JugnuConfig())
+        recoveryTryAgain()
+    }
+
+    private func recoveryOpenConfig() {
+        guard let model else { return }
+        let file = model.paths.configFile
+        try? FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
+        if !FileManager.default.fileExists(atPath: file.path) {
+            try? model.store.save(JugnuConfig())
+        }
+        NSWorkspace.shared.open(file)
+    }
+
+    private func recoveryDisableAddons() {
+        guard let model else { return }
+        var config = (try? model.store.load()) ?? JugnuConfig()
+        for id in model.installedAddonIDs() {
+            config.addons[id] = AddonConfig(enabled: false)
+        }
+        try? model.store.save(config)
+        recoveryTryAgain()
+    }
+
+    private func recoveryTryAgain() {
+        launchGuard?.markCleanLaunch()
+        NSWorkspace.shared.openApplication(at: Bundle.main.bundleURL, configuration: NSWorkspace.OpenConfiguration()) { _, _ in
+            DispatchQueue.main.async {
+                NSApp.terminate(nil)
+            }
+        }
     }
 
     // Another Jugnu is already up: ask it to open the palette, then quit before touching the hotkey or menu bar.
@@ -362,6 +478,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         guard let screen = shellHost.currentScreen ?? NSScreen.main else { return }
         shellHost.onCancelFollowUp = { [weak self] in self?.popOrDismiss() }
         let key = CommandKey(addonID: cmd.addonId, commandID: cmd.commandId)
+        let klass = (try? ManifestLoader.load(from: cmd.addonRoot))?.effectiveLifecycle(commandId: cmd.commandId) ?? .oneshot
+        if klass == .job {
+            shellHost.showJobProgress(startedAt: Date(), onScreen: screen) { [weak self] in
+                self?.processHost?.killTracked(key: key)
+                self?.popOrDismiss()
+            }
+        }
         do {
             let invocation = try model.runInvocation(for: cmd)
             let task = Task { @MainActor [weak self] in

@@ -55,7 +55,7 @@ Walk this after the 2026-08-23 palette + addon UI product pass. Leave items unch
 - [ ] First-run installs the starter set from registry (falls back to local `addons/` if offline): `mic-mute`, `focus-toggle`, `paste-plain`, `floating-note`, `ports`
 - [ ] Preferences → **Install starter addons** downloads zips + verifies sha256
 - [ ] Preferences: disable removes from palette; uninstall removes files + declared cleanup
-- [ ] **clipboard-history disable stops the watcher for good** (ticket 0023): enable it, invoke `Clipboard history` once, confirm `launchctl print gui/$(id -u)/com.jugnu.clipboard-history.watch` succeeds and `~/Library/LaunchAgents/com.jugnu.clipboard-history.watch.plist` exists → disable in Preferences → both are gone → log out and back in → watcher does **not** return, no new pasteboard entries recorded
+- [ ] **clipboard-history watcher starts on enable** (ticket 0057): enable it without invoking a command; `launchctl print gui/$(id -u)/com.jugnu.clipboard-history.watch` succeeds and `~/Library/LaunchAgents/com.jugnu.clipboard-history.watch.plist` exists. Disable in Preferences → both are gone → log out and back in → watcher does **not** return, no new pasteboard entries recorded
 - [ ] **Floating Note**: type, Cmd+S, close, reopen — text persisted by the addon
 - [ ] Menu bar uses the template firefly icon (tints with the menu bar); click opens the menu
 - [ ] **Single-instance guard** (ticket 0020): with Jugnu already running, launch `Jugnu.app` again → the second copy exits immediately, the running copy opens the palette, and Activity Monitor shows exactly one `Jugnu` process. The hotkey still works afterward.
@@ -120,3 +120,15 @@ Walk this after the 2026-08-27 launcher-catalog-foundation plan (viewA row1 favo
 ### Theme token
 
 - [ ] `subText` token resolves per preset×mode (no crash, no black text) — spot-check by eye in each of Firefly / Terminal Phosphor / Rose Quartz
+
+## Manual — Addon process lifecycle (0057)
+
+These cannot be fully CI-tested. Walk them on a Mac after phase 4.
+
+- [ ] **Reaper after a shell crash:** invoke a `disowns-child` fixture addon; `kill -9` the `Jugnu` process; relaunch; confirm `~/.local/share/jugnu/state/run/<pid>.json` is gone **and** the orphaned `sleep` child (`pgrep -f sleep`) is gone; confirm one `reap` line in `~/.local/share/jugnu/state/lifecycle.log`.
+- [ ] **Real sleep/wake:** start a `job` fixture; `pmset sleepnow`; wake; confirm the mid-flight `job` was torn down and did not resume as a zombie.
+- [ ] **`job` stops heartbeating:** run the `stops-heartbeating` fixture as a `job`; confirm SIGKILL + error toast within ~10s (`jobHeartbeatWindow`).
+- [ ] **`make stop`:** with a `job` and a `daemon` both running, `make stop`; confirm no tracked child survives **but** the `com.jugnu.*` daemon agent is **still running** (`launchctl list | grep com.jugnu`).
+- [ ] **Safe-mode entry:** force 3 hung/crashed launches (e.g. temporarily break `jugnu.yaml`); confirm safe mode boots out `com.jugnu.*` agents on entry (`launchctl list` before/after), the recovery menu shows Reset config / Open config / Disable all addons / Try normal launch again, and one `safe_mode` line is in `lifecycle.log`; fix config → **Try normal launch again** → daemons re-bootstrapped.
+- [ ] **PID reuse (best effort):** note a spawned child's `shell_pid`; after a crash + relaunch where the OS happens to reuse that pid, confirm the reaper still reaps by the start-ts mismatch.
+

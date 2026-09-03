@@ -31,6 +31,29 @@ public struct ConfigStore: Sendable {
         try save(config)
         return config
     }
+
+    public func inspect() -> ConfigFileState {
+        guard FileManager.default.fileExists(atPath: paths.configFile.path) else {
+            return .absent
+        }
+        do {
+            let config = try load()
+            return .parsed(config)
+        } catch {
+            return .syntaxError
+        }
+    }
+}
+
+public enum ConfigFileState: Equatable {
+    case absent
+    case parsed(JugnuConfig)
+    case syntaxError
+
+    public var isSyntaxError: Bool {
+        if case .syntaxError = self { return true }
+        return false
+    }
 }
 
 public enum ConfigStoreError: Error, Equatable {

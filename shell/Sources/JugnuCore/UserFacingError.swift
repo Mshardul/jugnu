@@ -30,6 +30,8 @@ public enum UserFacingError {
                 return "This addon’s description couldn’t be read. Try reinstalling it."
             case .daemonBlockMissing:
                 return "This addon’s description couldn’t be read. Try reinstalling it."
+            case .daemonNotFirstParty:
+                return "This addon’s description couldn’t be read. Try reinstalling it."
             }
         }
         if let view = error as? ViewTypeError {
@@ -38,6 +40,14 @@ public enum UserFacingError {
                 return "This addon asked for a view the shell doesn’t allow."
             case .unknown:
                 return "The addon didn’t return a result we could use."
+            }
+        }
+        if let job = error as? JobInvokeError {
+            switch job {
+            case .reuse:
+                return ""
+            case .stillStopping:
+                return JobProgressCopy.stillStopping
             }
         }
         if let runner = error as? AddonRunnerError {
@@ -50,6 +60,10 @@ public enum UserFacingError {
                 return "This addon can’t run on this Mac."
             case .helperMissing:
                 return "This addon is missing a helper. Try reinstalling it."
+            case .jobHandshakeTimeout:
+                return "The addon didn't start in time."
+            case .jobUnresponsive:
+                return "The addon stopped responding."
             }
         }
         if let installer = error as? AddonInstallerError {

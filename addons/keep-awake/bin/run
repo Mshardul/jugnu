@@ -3,10 +3,6 @@ set -euo pipefail
 
 STATE_DIR="${JUGNU_STATE_DIR:-$HOME/.local/share/jugnu/state/keep-awake}"
 SESSION="$STATE_DIR/session"
-LABEL="com.jugnu.keep-awake"
-PLIST="$HOME/Library/LaunchAgents/${LABEL}.plist"
-UID_NUM="$(id -u)"
-DOMAIN="gui/${UID_NUM}"
 
 mkdir -p "$STATE_DIR"
 
@@ -21,47 +17,7 @@ item_id=$(json_get_str "$req" "itemId")
 
 now_ts() { date +%s; }
 
-bootout() {
-  launchctl bootout "${DOMAIN}/${LABEL}" >/dev/null 2>&1 || true
-}
-
-write_plist() {
-  local timeout="${1:-}"
-  local extra=""
-  if [[ -n "$timeout" ]]; then
-    extra="    <string>-t</string>
-    <string>${timeout}</string>
-"
-  fi
-  mkdir -p "$(dirname "$PLIST")"
-  cat >"$PLIST" <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-  <key>Label</key>
-  <string>${LABEL}</string>
-  <key>RunAtLoad</key>
-  <false/>
-  <key>KeepAlive</key>
-  <false/>
-  <key>ProgramArguments</key>
-  <array>
-    <string>/usr/bin/caffeinate</string>
-    <string>-di</string>
-${extra}  </array>
-</dict>
-</plist>
-EOF
-}
-
-load_agent() {
-  launchctl bootstrap "$DOMAIN" "$PLIST" >/dev/null 2>&1 || true
-  launchctl kickstart -k "${DOMAIN}/${LABEL}" >/dev/null 2>&1 || true
-}
-
 clear_session() {
-  bootout
   rm -f "$SESSION"
 }
 
@@ -84,17 +40,11 @@ start_timed() {
   local seconds="$1"
   local label="$2"
   local end=$(( $(now_ts) + seconds ))
-  bootout
-  write_plist "$seconds"
-  load_agent
   printf 'timed %s %s\n' "$seconds" "$end" >"$SESSION"
   echo "{\"ok\":true,\"message\":\"Keeping Mac awake for ${label}\"}"
 }
 
 start_until() {
-  bootout
-  write_plist
-  load_agent
   printf 'until\n' >"$SESSION"
   echo '{"ok":true,"message":"Keeping Mac awake until you stop it"}'
 }

@@ -19,6 +19,20 @@ public enum CommandInvoke {
             let response = try await execute()
             host.present(response: response, commandId: commandId, trace: trace, onScreen: screen, followUp: followUp)
             succeeded = response.ok
+        } catch let job as JobInvokeError {
+            switch job {
+            case .reuse:
+                succeeded = true
+            case .stillStopping:
+                host.present(
+                    response: RunResponse(ok: false, error: UserFacingError.message(for: job)),
+                    commandId: commandId,
+                    trace: trace,
+                    onScreen: screen,
+                    followUp: followUp
+                )
+                succeeded = false
+            }
         } catch {
             host.present(
                 response: RunResponse(ok: false, error: UserFacingError.message(for: error)),

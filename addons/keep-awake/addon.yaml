@@ -17,12 +17,18 @@ commands:
     title: Keep-awake status
     subtitle: Whether a keep-awake session is running
     keywords: [awake, status, sleep]
+  - id: watch
+    title: Keep-awake watcher
+    subtitle: Internal — launchd-owned caffeinate
+    keywords: []
+    lifecycle: daemon
+    daemon:
+      program: bin/watch
+      keep_alive: true
 entrypoint:
   kind: exec
   path: bin/run
 cleanup:
   paths:
     - "~/.local/share/jugnu/state/keep-awake"
-    - "~/Library/LaunchAgents/com.jugnu.keep-awake.plist"
-  launchd:
-    - com.jugnu.keep-awake
+  launchd: []

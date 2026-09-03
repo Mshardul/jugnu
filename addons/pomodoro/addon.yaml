@@ -2,6 +2,9 @@ id: pomodoro
 name: Pomodoro
 version: 1.0.0
 api: 1
+helpers:
+  - id: clock
+    version: 1.0.0
 commands:
   - id: work
     title: Start focus session
@@ -19,6 +22,10 @@ commands:
     title: Reset pomodoro
     subtitle: Clear the current timer
     keywords: [pomodoro, reset, stop, cancel]
+  - id: chime
+    title: Pomodoro chime
+    subtitle: Internal — fired by clock
+    keywords: []
 entrypoint:
   kind: exec
   path: bin/run

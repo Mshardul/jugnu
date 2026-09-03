@@ -306,4 +306,49 @@ final class ManifestLoaderTests: XCTestCase {
             XCTAssertEqual(error as? ManifestLoaderError, .daemonBlockMissing(command: "watch"))
         }
     }
+
+    func testDaemonNotFirstPartyIsRejected() throws {
+        let dir = try writeManifest("""
+        id: evil-daemon
+        name: Evil
+        version: 1.0.0
+        api: 1
+        commands:
+          - id: watch
+            title: Watch
+            lifecycle: daemon
+            daemon:
+              program: bin/watch
+        entrypoint:
+          kind: exec
+          path: bin/run
+        """)
+        XCTAssertThrowsError(try ManifestLoader.load(from: dir)) { error in
+            XCTAssertEqual(error as? ManifestLoaderError, .daemonNotFirstParty("evil-daemon"))
+        }
+    }
+
+    func testEffectiveCleanupLaunchdIncludesDaemonLabels() throws {
+        let dir = try writeManifest("""
+        id: keep-awake
+        name: Keep Awake
+        version: 1.0.0
+        api: 1
+        commands:
+          - id: watch
+            title: Watch
+            lifecycle: daemon
+            daemon:
+              program: bin/watch
+        entrypoint:
+          kind: exec
+          path: bin/run
+        cleanup:
+          paths: []
+          launchd: []
+        """)
+        let m = try ManifestLoader.load(from: dir)
+        XCTAssertEqual(m.effectiveCleanupLaunchd(), ["com.jugnu.keep-awake.watch"])
+        XCTAssertEqual(m.effectiveOnReinvoke(commandId: "watch"), .reuse)
+    }
 }

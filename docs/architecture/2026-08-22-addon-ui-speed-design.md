@@ -141,6 +141,7 @@ When context-aware UI lands:
 - **No screen capture / OCR of the display by default.** If ever offered, explicit user permission + separate design.
 - Addons declare needs in `addon.yaml`, e.g. `context: [clipboardKind, frontApp]`. Shell strips undeclared fields.
 - Ranking “which popup to offer” is a **shell** problem; addons stay job-focused.
+- A context-triggered or programmatic invoke that collides with a running `job` behaves as `on_reinvoke: reuse` regardless of the field on the command. User-initiated re-invoke still honors `reuse` / `replace` ([lifecycle spec](./2026-08-30-addon-process-lifecycle-design.md) §7).
 
 Privacy one-liner (product): context stays on-device; users can disable context entirely in prefs.
 

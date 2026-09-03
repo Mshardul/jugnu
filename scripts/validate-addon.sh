@@ -95,6 +95,11 @@ while read -r token; do
   is_known_view "$token" || { echo "unknown view type: $token" >&2; exit 1; }
 done < <(extract_view_tokens)
 
+if [[ -n "$(find "$addon_dir" \( -name .build -o -name .git -o -name .swiftpm \) -prune -o -name '*.plist' -print -quit)" ]]; then
+  echo "addon must not ship a .plist; the shell authors launchd agents" >&2
+  exit 1
+fi
+
 lifecycle_tokens=$(grep -nE '^[[:space:]]*lifecycle:[[:space:]]*' "$manifest" 2>/dev/null \
   | sed -E 's/^[0-9]+:[[:space:]]*lifecycle:[[:space:]]*//; s/[[:space:]]*#.*$//' \
   | tr -d '"' | tr -d "'" || true)

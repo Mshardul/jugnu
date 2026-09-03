@@ -1,6 +1,6 @@
 #!/bin/bash
-# Background pasteboard watcher. Started/kept alive via launchd (see
-# addon.yaml cleanup.launchd + com.jugnu.clipboard-history.watch.plist).
+# Background pasteboard watcher. The shell owns the launchd agent for
+# the watch command (lifecycle: daemon).
 set -euo pipefail
 
 DB_DIR="$HOME/.local/share/jugnu/state/clipboard-history"

@@ -77,4 +77,31 @@ final class ConfigStoreTests: XCTestCase {
         XCTAssertEqual(loaded.addons["mic-mute"]?.enabled, true)
         XCTAssertEqual(loaded.addons["paste-plain"]?.enabled, false)
     }
+
+    func testInspectSyntaxErrorDoesNotParse() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let paths = JugnuPaths(home: dir)
+        try FileManager.default.createDirectory(
+            at: paths.configFile.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        try "theme: [\nunterminated".write(to: paths.configFile, atomically: true, encoding: .utf8)
+        XCTAssertEqual(ConfigStore(paths: paths).inspect(), .syntaxError)
+    }
+
+    func testInspectAbsentThenParsed() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let paths = JugnuPaths(home: dir)
+        XCTAssertEqual(ConfigStore(paths: paths).inspect(), .absent)
+        _ = try ConfigStore(paths: paths).loadOrCreateDefaults()
+        if case .parsed = ConfigStore(paths: paths).inspect() {
+            // ok
+        } else {
+            XCTFail("expected parsed config")
+        }
+    }
 }

@@ -1,0 +1,13 @@
+id: shipped-plist
+name: Shipped Plist
+version: 1.0.0
+api: 1
+commands:
+  - id: run
+    title: Run
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths: []
+  launchd: []

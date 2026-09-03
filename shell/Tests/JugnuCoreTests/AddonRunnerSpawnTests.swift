@@ -57,7 +57,12 @@ final class AddonRunnerSpawnTests: XCTestCase {
         let dir = markerDir()
         defer { try? FileManager.default.removeItem(at: dir) }
         let inv = try AddonRunner().spawn(addonRoot: root, entrypoint: entry, request: request(), markerDir: dir)
-        usleep(200_000)
+        let ready = Date().addingTimeInterval(1)
+        while !inv.process.isRunning, Date() < ready {
+            usleep(20_000)
+        }
+        usleep(300_000)
+        XCTAssertTrue(inv.process.isRunning)
         let start = Date()
         inv.terminate()
         while inv.process.isRunning, Date().timeIntervalSince(start) < 3 {

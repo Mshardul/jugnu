@@ -68,6 +68,7 @@ final class BrowseCatalogViewModel: ObservableObject, BrowseCatalogViewModelProt
         installingIDs.insert(entry.id)
         do {
             try await model.installer.install(entry: entry, enable: true)
+            try? model.bootstrapDaemons(id: entry.id)
             model.refreshIndex()
             errorMessage = nil
         } catch {
@@ -78,6 +79,9 @@ final class BrowseCatalogViewModel: ObservableObject, BrowseCatalogViewModelProt
     }
 
     func setEnabled(_ id: String, enabled: Bool) {
+        if !enabled {
+            guard DisableWhileTracked.proceed(addonID: id, host: model.processHost) else { return }
+        }
         do {
             try model.setEnabled(id: id, enabled: enabled)
             errorMessage = nil

@@ -22,9 +22,14 @@ public enum ManifestLoader {
         }
         try manifest.validateViewTypes()
         for command in manifest.commands
-            where manifest.effectiveLifecycle(commandId: command.id) == .daemon && command.daemon == nil
+            where manifest.effectiveLifecycle(commandId: command.id) == .daemon
         {
-            throw ManifestLoaderError.daemonBlockMissing(command: command.id)
+            if !FirstPartyDaemons.ids.contains(manifest.id) {
+                throw ManifestLoaderError.daemonNotFirstParty(manifest.id)
+            }
+            if command.daemon == nil {
+                throw ManifestLoaderError.daemonBlockMissing(command: command.id)
+            }
         }
         return manifest
     }
@@ -64,4 +69,5 @@ public enum ManifestLoaderError: Error, Equatable {
     case sessionNotSupported
     case unknownLifecycleClass(String)
     case daemonBlockMissing(command: String)
+    case daemonNotFirstParty(String)
 }

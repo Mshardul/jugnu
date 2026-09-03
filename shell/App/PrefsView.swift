@@ -36,6 +36,12 @@ struct PrefsView: View {
                             isOn: Binding(
                                 get: { model.config.addons[id]?.enabled == true },
                                 set: { newValue in
+                                    if !newValue {
+                                        guard DisableWhileTracked.proceed(addonID: id, host: model.processHost) else {
+                                            reload()
+                                            return
+                                        }
+                                    }
                                     do {
                                         try model.setEnabled(id: id, enabled: newValue)
                                         reload()

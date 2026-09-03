@@ -1,6 +1,8 @@
 # Keep Awake
 
-Stops the Mac from idle-sleeping and keeps the display on for 15 minutes, 1 hour, 2 hours, or until you turn it off. Closing the lid can still sleep. Uses macOS `/usr/bin/caffeinate` (already on the machine) behind a LaunchAgent so disable/uninstall can unload it.
+Stops the Mac from idle-sleeping and keeps the display on for 15 minutes, 1 hour, 2 hours, or until you turn it off. Closing the lid can still sleep.
+
+Enable the addon so Jugnu can load the watcher agent. Palette commands only write a session file; the shell-owned `watch` daemon runs `/usr/bin/caffeinate`. Disable or uninstall unloads the agent.
 
 ```bash
 echo '{"api":1,"op":"run","command":"pick","args":{}}' | ./bin/run

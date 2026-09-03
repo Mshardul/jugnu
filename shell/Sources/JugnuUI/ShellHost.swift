@@ -138,6 +138,15 @@ public final class ShellHost: ObservableObject {
         panel?.contentView = NSHostingView(rootView: view)
     }
 
+    public func showJobProgress(startedAt: Date, onScreen screen: NSScreen, onCancel: @escaping () -> Void) {
+        ensurePanel(initialContent: EmptyView(), size: ViewType.ask.size(in: screen.visibleFrame))
+        setContent(ThemedPanelBackground {
+            JobProgressView(startedAt: startedAt, onCancel: onCancel)
+        })
+        morphFrame(to: .confirm, compactLauncher: false, on: screen, viewType: .ask)
+        orderFront()
+    }
+
     /// Builds the single `KeyablePanel` with `content` if it doesn't exist yet; no-op otherwise.
     public func ensurePanel(initialContent content: some View, size: NSSize) {
         guard panel == nil else { return }

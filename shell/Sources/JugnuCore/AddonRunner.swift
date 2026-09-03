@@ -194,4 +194,6 @@ public enum AddonRunnerError: Error, Equatable {
     case timeout
     case invalidResponse
     case helperMissing(String)
+    case jobHandshakeTimeout
+    case jobUnresponsive
 }

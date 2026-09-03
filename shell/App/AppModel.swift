@@ -15,6 +15,8 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
     let runner: AddonRunner
     var processHost: AddonProcessHost?
     var shellIdentity: AddonRunner.ShellIdentity = .unknown
+    var daemonAgents = DaemonAgents()
+    private let loadAddons: Bool
 
     @Published var config: JugnuConfig
     @Published var state: JugnuState
@@ -24,8 +26,9 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
 
     private var index: CommandIndex
 
-    init(paths: JugnuPaths = JugnuPaths()) {
+    init(paths: JugnuPaths = JugnuPaths(), loadAddons: Bool = true) {
         self.paths = paths
+        self.loadAddons = loadAddons
         self.store = ConfigStore(paths: paths)
         self.stateStore = StateStore(paths: paths)
         self.installer = AddonInstaller(paths: paths)
@@ -46,7 +49,16 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
     }
 
     func bootstrap() {
+        guard loadAddons else {
+            results = []
+            lastHits = []
+            ThemeStore.shared.config = JugnuConfig().theme
+            return
+        }
         refreshIndex()
+        for id in installedAddonIDs() where config.addons[id]?.enabled == true {
+            try? bootstrapDaemons(id: id)
+        }
     }
 
     func refreshIndex() {
@@ -128,8 +140,32 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
         let markerDir = paths.stateRunDir
         let hardCeiling = TimeInterval(LatencyBudgets.oneshotHardCeilingMs) / 1000
 
+        let klass = manifest.effectiveLifecycle(commandId: command.commandId)
+        let onReinvoke = manifest.effectiveOnReinvoke(commandId: command.commandId)
+        let oneshotTimeout = min(
+            manifest.commands.first { $0.id == command.commandId }?.timeout ?? hardCeiling,
+            hardCeiling
+        )
+
+        if klass == .daemon {
+            let execute: () async throws -> RunResponse = {
+                RunResponse(ok: true, message: "Running in the background.")
+            }
+            return (execute, { _ in RunResponse(ok: true, message: "Running in the background.") })
+        }
+
         let execute: () async throws -> RunResponse = { [runner, installer, paths, processHost, shellIdentity, args] in
             try await installer.ensureHelpers(for: manifest)
+            if klass == .job, let host = processHost {
+                switch await host.prepareJobSpawn(key: key, mode: onReinvoke, programmatic: false) {
+                case .reuse:
+                    throw JobInvokeError.reuse
+                case .stillStopping:
+                    throw JobInvokeError.stillStopping
+                case .spawn:
+                    break
+                }
+            }
             let invokeUUID = UUID()
             let inv = try runner.spawn(
                 manifest: manifest,
@@ -137,12 +173,18 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
                 commandId: command.commandId,
                 args: args,
                 invokeUUID: invokeUUID,
+                lifecycleClass: klass,
                 shellIdentity: shellIdentity,
                 markerDir: markerDir,
                 paths: paths
             )
-            Self.track(inv, key: key, invokeUUID: invokeUUID, host: processHost)
-            let response = try await inv.waitForResponse(timeout: hardCeiling)
+            Self.track(inv, key: key, invokeUUID: invokeUUID, lifecycleClass: klass, host: processHost)
+            let response: RunResponse
+            if klass == .job {
+                response = try await inv.waitForJobResponse()
+            } else {
+                response = try await inv.waitForResponse(timeout: oneshotTimeout)
+            }
             return try response.resolvingView(
                 commandView: command.defaultViewType,
                 allowed: command.allowedViewTypes
@@ -159,11 +201,17 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
                 request: request,
                 extraEnvironment: env,
                 origin: "\(command.addonId):\(command.commandId):\(invokeUUID.uuidString)",
+                lifecycleClass: klass,
                 shellIdentity: shellIdentity,
                 markerDir: markerDir
             )
-            Self.track(inv, key: key, invokeUUID: invokeUUID, host: processHost)
-            let response = try await inv.waitForResponse(timeout: hardCeiling)
+            Self.track(inv, key: key, invokeUUID: invokeUUID, lifecycleClass: klass, host: processHost)
+            let response: RunResponse
+            if klass == .job {
+                response = try await inv.waitForJobResponse()
+            } else {
+                response = try await inv.waitForResponse(timeout: oneshotTimeout)
+            }
             return try response.resolvingView(
                 commandView: command.defaultViewType,
                 allowed: command.allowedViewTypes
@@ -176,13 +224,14 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
         _ inv: RunningInvocation,
         key: CommandKey,
         invokeUUID: UUID,
+        lifecycleClass: LifecycleClass,
         host: AddonProcessHost?
     ) {
         guard let host else { return }
         let entry = AddonProcessHost.Entry(
             invocation: inv,
             invocationTask: nil,
-            lifecycleClass: .oneshot,
+            lifecycleClass: lifecycleClass,
             startedAt: Date(),
             invokeUUID: invokeUUID,
             markerPath: inv.markerURL,
@@ -200,13 +249,41 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
     }
 
     func setEnabled(id: String, enabled: Bool) throws {
+        let addonRoot = paths.addonsDir.appendingPathComponent(id)
+        let manifest = try? ManifestLoader.load(from: addonRoot)
+        if !enabled, let manifest {
+            daemonAgents.bootoutAll(manifest: manifest, paths: paths)
+        }
         try lifecycle.setEnabled(id: id, enabled: enabled)
+        if enabled, let manifest {
+            try daemonAgents.syncEnabled(
+                manifest: manifest,
+                addonRoot: addonRoot,
+                paths: paths,
+                shellIdentity: shellIdentity
+            )
+        }
         refreshIndex()
     }
 
     func uninstall(id: String) throws {
+        let addonRoot = paths.addonsDir.appendingPathComponent(id)
+        if let manifest = try? ManifestLoader.load(from: addonRoot) {
+            daemonAgents.bootoutAll(manifest: manifest, paths: paths)
+        }
         try lifecycle.uninstall(id: id)
         refreshIndex()
+    }
+
+    func bootstrapDaemons(id: String) throws {
+        let addonRoot = paths.addonsDir.appendingPathComponent(id)
+        guard let manifest = try? ManifestLoader.load(from: addonRoot) else { return }
+        try daemonAgents.syncEnabled(
+            manifest: manifest,
+            addonRoot: addonRoot,
+            paths: paths,
+            shellIdentity: shellIdentity
+        )
     }
 
     func installedAddonIDs() -> [String] {
@@ -242,6 +319,7 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
                     try installer.installFromDirectory(url: root, enable: true)
                     let manifest = try ManifestLoader.load(from: root)
                     try await installer.ensureHelpers(for: manifest)
+                    try? bootstrapDaemons(id: manifest.id)
                 }
                 statusMessage = "Couldn’t reach the catalog, so the starter addons were copied from this Mac."
             }
@@ -268,6 +346,7 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
         for entry in entries where wanted.contains(entry.id) {
             guard !entry.url.isEmpty else { continue }
             try await installer.install(entry: entry, enable: true)
+            try? bootstrapDaemons(id: entry.id)
             installed.append(entry.id)
         }
         if installed.isEmpty {

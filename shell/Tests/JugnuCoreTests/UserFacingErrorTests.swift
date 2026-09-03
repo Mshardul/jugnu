@@ -15,6 +15,18 @@ final class UserFacingErrorTests: XCTestCase {
             "That took too long. Try again."
         )
         XCTAssertEqual(
+            UserFacingError.message(for: AddonRunnerError.jobHandshakeTimeout),
+            "The addon didn't start in time."
+        )
+        XCTAssertEqual(
+            UserFacingError.message(for: AddonRunnerError.jobUnresponsive),
+            "The addon stopped responding."
+        )
+        XCTAssertEqual(
+            UserFacingError.message(for: JobInvokeError.stillStopping),
+            JobProgressCopy.stillStopping
+        )
+        XCTAssertEqual(
             UserFacingError.message(for: AddonInstallerError.missingURL),
             "No download location is listed for this addon."
         )
