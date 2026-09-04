@@ -4,5 +4,11 @@
     "version": "1.0.0",
     "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/clock-1.0.0.zip",
     "sha256": "8044ac08718afe9b4ee348b02680a35330eaf41088185e7c1b782bff6b2477c3"
+  },
+  {
+    "id": "python-runtime",
+    "version": "1.0.0",
+    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/python-runtime-1.0.0.zip",
+    "sha256": "0a7aa544e7549bf5527efe78ec63e28471229fa0086bd03122ee30867c4cf540"
   }
 ]

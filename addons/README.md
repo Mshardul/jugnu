@@ -24,6 +24,7 @@ Nothing here is bundled inside `Jugnu.app`. Users install zips into `~/.local/sh
 | `mute-all` | mute mic + speakers and restore previous volumes |
 | `keep-awake` | keep Mac awake (15m / 1h / 2h / until-off) via `caffeinate` |
 | `nudges` | recurring wellness reminders with detached card UI |
+| `clip-tools` | clipboard text format / convert / line tools (requires `python-runtime` helper) |
 
 Package: `scripts/package-addon.sh addons/<id> dist/`
 

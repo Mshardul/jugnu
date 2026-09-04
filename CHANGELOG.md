@@ -12,6 +12,8 @@ The project has not published a release yet. Entries currently describe unreleas
 
 ### Added
 
+- 2026-09-05 — First-party `clip-tools` addon: clipboard text format/convert/line commands on the `python-runtime` helper (Phase 1; no Transform panel yet).
+- 2026-09-04 — Shared `python-runtime` helper: pinned standalone CPython 3.12.14 for first-party addons (`helpers/python-runtime`, registry row; Release upload still pending).
 - 2026-09-04 — Pomodoro, Keep Awake, and Clipboard History no longer hand-roll background work: pomodoro chimes via the clock helper; keep-awake and clipboard-history use shell-owned daemons (ticket 0057 phase 5).
 - 2026-09-04 — Crash-loop safe mode, orphan process reaper, and malformed `jugnu.yaml` recovery menu (ticket 0057 phase 4).
 - 2026-09-03 — Addon process classes `oneshot` / `job` / `daemon`: job heartbeat watchdog, re-invoke reuse/replace, shell-authored first-party launchd agents, disable-while-running alert (ticket 0057 phase 3).
@@ -31,6 +33,8 @@ The project has not published a release yet. Entries currently describe unreleas
 
 ### Documentation
 
+- 2026-09-04 — Drafted `python-runtime` helper and `clip-tools` Phase 1 designs + separate implementation plans (helper first).
+- 2026-09-04 — Added living command and UI catalogs (`docs/catalog-commands.md`, `docs/catalog-ui.md`) for shipped + planned addons.
 - 2026-08-25 — Approved clock helper + nudges design; plan under docs/superpowers/plans/.
 - 2026-08-25 — Removed `apps/` and `extensions/` staging nurseries; unbuilt jobs live only in `docs/backlog.md`. Dropped `docs/staging.md`.
 - 2026-08-24 — Locked view types and `window-layouts` product (zones max 6, no undo, AX-first). View types implemented in the shell; `window-layouts` addon follows.

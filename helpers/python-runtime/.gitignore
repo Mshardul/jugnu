@@ -1,0 +1,5 @@
+# Staged interpreter (fetched by scripts/fetch-python-runtime.sh)
+arch/
+bin/python3
+.stage-marker
+*.tar.gz

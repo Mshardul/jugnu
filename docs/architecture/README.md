@@ -31,5 +31,9 @@ Architecture decisions are recorded in [decisions/](decisions/). Future-work tic
 | Window management | Approved, implemented — [2026-08-24 `window-layouts`](./2026-08-24-window-layouts.md) · [ticket 0046](../tickets.md) · [plan](../superpowers/plans/2026-08-24-window-layouts.md) |
 | Clock helper + nudges | Approved — [2026-08-25](./2026-08-25-nudges-clock-helper-design.md) · [plan](../superpowers/plans/2026-08-25-nudges-clock-helper.md) · [0049](../tickets.md). First real `registry/helpers.json` consumer after [0047](../tickets.md). PNG icons: [0050](../tickets.md). |
 | Clipboard | Later |
+| Command catalog (inventory) | Living — [../catalog-commands.md](../catalog-commands.md) |
+| UI catalog (mini-apps / view assignment) | Living — [../catalog-ui.md](../catalog-ui.md) |
+| `python-runtime` helper | Approved — implemented locally — [2026-09-04](./2026-09-04-python-runtime-helper-design.md) · [plan](../superpowers/plans/2026-09-04-python-runtime-helper.md) · [0060](../tickets.md) Done (Release asset upload pending) |
+| `clip-tools` (Phase 1 commands) | Approved — Phase 1 implemented — [2026-09-04](./2026-09-04-clip-tools-design.md) · [plan](../superpowers/plans/2026-09-04-clip-tools.md) · [0061](../tickets.md) Done (Transform UI = Phase 2; Release upload pending) |
 
 Process: brainstorm → section approval → write spec here → human review → implementation plan → code.

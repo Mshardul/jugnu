@@ -1,0 +1,3 @@
+Vendored pure-Python package `yaml` from PyYAML 6.0.2 (MIT).
+Source: https://pypi.org/project/PyYAML/6.0.2/
+C extension not included; loader uses Pure Python.

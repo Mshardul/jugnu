@@ -12,4 +12,4 @@ See [shell design §2](../docs/architecture/2026-08-22-shell-design.md) and [Bro
 
 ## Helpers
 
-`helpers.json` is **not** the catalog. It lists first-party **helpers** (vision rule 4): `id`, `version`, `url`, `sha256`. The shell downloads a helper when installing an addon that declares it; Browse Catalog never shows these rows. Contract: [addon manifest — Helpers](../docs/addon-manifest.md#helpers).
+`helpers.json` is **not** the catalog. It lists first-party **helpers** (vision rule 4): `id`, `version`, `url`, `sha256`. The shell downloads a helper when installing an addon that declares it; Browse Catalog never shows these rows. Today: `clock`, `python-runtime`. Contract: [addon manifest — Helpers](../docs/addon-manifest.md#helpers).

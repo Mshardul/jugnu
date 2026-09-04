@@ -2,6 +2,8 @@
 
 Unbuilt jobs live in the packaging map and gap list below. Shipped first-party sources live under `addons/`.
 
+**Command + UI inventories (living):** [catalog-commands.md](catalog-commands.md) · [catalog-ui.md](catalog-ui.md). Prefer those for “what exists / what’s planned” from a command or panel POV; this file keeps packaging rationale and gap notes.
+
 ## Platform (build order)
 
 | Priority | Item | Notes |
@@ -33,7 +35,7 @@ Not yet staged as leaves. Candidates after shell MVP:
 5. Claude/agent mission control (lite)
 6. ~~Dev-server / common-ports bar~~ done → `addons/ports`
 7. Screenshot inbox
-8. Paste plain / strip formatting (or fold into paste-transform) — also accepted as **paste-as-plain** under clip-tools
+8. ~~Paste plain / strip formatting~~ done → `addons/paste-plain` (own zip; not folded into clip-tools)
 9. Kill hung app picker
 10. Disk pressure bar
 
@@ -63,7 +65,7 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | Appearance | **hot-corners** | show / open Hot Corners | Thin Settings surface |
 | Appearance | **finder-toggles** | **hidden-files**, **path-bar**, **status-bar**, **restart-finder** (+ tab bar / other Finder chrome) | Finder chrome — not desktop-toggles |
 | Appearance | **resolution-preset** | named resolution / HiDPI presets | Own display job |
-| Clipboard | **clip-tools** (or **paste-transform**) | slugify, json/csv/yaml/xml-pretty, base64, url-encode/decode, jwt-decode, timestamp, text-stats, uuid, md-link, clip-clear, **case**, **sort-lines**, **dedupe-lines**, **lorem**, **regex-replace**, **hash**, **paste-as-plain**, **tabs-spaces**, **invisible-chars**, **markdown-table**, **reverse-lines**, **extract-emails**, **json-path**, **csv-json** (+ yaml↔json, xml↔json, and other same-shape converters), **unicode-name**, **iso-week** | Converters/formatters as commands; paste-as-plain also gap #8 |
+| Clipboard | **clip-tools** (`addons/clip-tools`) | slugify, json/csv/yaml/xml-pretty, base64, url-encode/decode, jwt-decode, timestamp, text-stats, uuid, md-link, clip-clear, **case**, **sort-lines**, **dedupe-lines**, **lorem**, **regex-replace**, **hash**, **tabs-spaces**, **invisible-chars**, **markdown-table**, **reverse-lines**, **extract-emails**, **json-path**, **csv-json** (+ yaml↔json, xml→json), **unicode-name**, **iso-week**, line trim/join/split/number, escape/unescape | Phase 1 **shipped** (palette commands). Transform panel = Phase 2. Declares `python-runtime` helper. **paste-plain** stays its own zip. See [catalog-commands](catalog-commands.md) / [catalog-ui](catalog-ui.md). |
 | Clipboard | **clipboard-guard** | detect likely secrets / warn before history storage / clear or redact clipboard | Privacy utility for clipboard workflows; detection is heuristic |
 | Clipboard | **diff** | diff-clip | Heavier than one-shot transforms — own addon unless kept tiny on clip-tools |
 | Files | **paths** | path-copy, reveal-path, **count-files**, **folder-size** | Path/Finder folder jobs |
