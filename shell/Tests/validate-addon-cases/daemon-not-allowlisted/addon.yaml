@@ -1,4 +1,4 @@
-id: evil-daemon
+id: jugnu.daemon-not-allowlisted
 name: Evil Daemon
 version: 1.0.0
 api: 1

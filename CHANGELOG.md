@@ -12,8 +12,14 @@ The project has not published a release yet. Entries currently describe unreleas
 
 ### Added
 
-- 2026-09-05 — First-party `clip-tools` addon: clipboard text format/convert/line commands on the `python-runtime` helper (Phase 1; no Transform panel yet).
-- 2026-09-04 — Shared `python-runtime` helper: pinned standalone CPython 3.12.14 for first-party addons (`helpers/python-runtime`, registry row; Release upload still pending).
+- 2026-09-06 — Install integrity Phase 1: ZIPFoundation extract with path guards, required sha256 (addon + helper), allowlisted HTTPS download session (redirects confined).
+- 2026-09-06 — Install integrity Phase 2: atomic stage→trash→promote for addons and helpers; local directory installs use the same commit path; launch orphan recovery; replace-under-running prompt.
+- 2026-09-06 — Install integrity Phase 3: `minShellVersion` install + load gates; exec entrypoint must be universal Mach-O or `#!`; reserved `.staging`/`.trash` ids; `validate-addon.sh` mirrors gates.
+- 2026-09-06 — Install integrity Phase 4: catalog `dependencies` (exact SemVer), topo resolve + cycle/mismatch/collision refuse, install transaction with helper/addon rollback, catalog disclosure (installed ≠ enabled).
+- 2026-09-06 — Install integrity Phase 5: catalog Update badge/action when registry SemVer is newer; upgrade reuses install pipeline and preserves enabled.
+- 2026-09-06 — Install integrity Phase 6: first-party ids → `jugnu.<job>`; resumable per-addon `NamespaceMigrator`; collision refuse; recents/favorites remap.
+- 2026-09-05 — First-party `clip-tools` addon: clipboard text format/convert/line commands on the `python-runtime` helper (Phase 1; no Transform panel yet; published on `addons-v1.0.0`).
+- 2026-09-04 — Shared `python-runtime` helper: pinned standalone CPython 3.12.14 for first-party addons (`helpers/python-runtime`, registry row; published on `addons-v1.0.0`).
 - 2026-09-04 — Pomodoro, Keep Awake, and Clipboard History no longer hand-roll background work: pomodoro chimes via the clock helper; keep-awake and clipboard-history use shell-owned daemons (ticket 0057 phase 5).
 - 2026-09-04 — Crash-loop safe mode, orphan process reaper, and malformed `jugnu.yaml` recovery menu (ticket 0057 phase 4).
 - 2026-09-03 — Addon process classes `oneshot` / `job` / `daemon`: job heartbeat watchdog, re-invoke reuse/replace, shell-authored first-party launchd agents, disable-while-running alert (ticket 0057 phase 3).

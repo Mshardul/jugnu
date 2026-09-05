@@ -49,7 +49,7 @@ final class ValidateAddonScriptTests: XCTestCase {
     func test_validateAddon_validOneshot_passes() throws {
         let result = try run(fixture("valid-oneshot"))
         XCTAssertEqual(result.status, 0, result.stderr)
-        XCTAssertTrue(result.stdout.contains("valid addon: valid-oneshot"))
+        XCTAssertTrue(result.stdout.contains("valid addon: jugnu.valid-oneshot"))
     }
 
     func test_validateAddon_sessionLifecycle_rejected() throws {

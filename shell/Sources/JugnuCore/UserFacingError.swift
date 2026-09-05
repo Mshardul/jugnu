@@ -18,6 +18,12 @@ public enum UserFacingError {
             switch loader {
             case .emptyId:
                 return "This addon is missing its name. Try reinstalling it."
+            case .invalidId, .reservedId:
+                return "This addon’s id isn’t valid."
+            case .invalidMinShellVersion:
+                return "This addon’s description couldn’t be read. Try reinstalling it."
+            case .invalidDependencyVersion:
+                return "This addon’s dependency list isn’t valid."
             case .invalidEncoding:
                 return "This addon’s description couldn’t be read. Try reinstalling it."
             case .unsupportedAPI:
@@ -32,6 +38,12 @@ public enum UserFacingError {
                 return "This addon’s description couldn’t be read. Try reinstalling it."
             case .daemonNotFirstParty:
                 return "This addon’s description couldn’t be read. Try reinstalling it."
+            }
+        }
+        if let ns = error as? NamespaceMigratorError {
+            switch ns {
+            case .collision(_, let occupant):
+                return "Another addon (\(occupant)) already uses that name. Uninstall it first."
             }
         }
         if let view = error as? ViewTypeError {
@@ -70,13 +82,39 @@ public enum UserFacingError {
             switch installer {
             case .sha256Mismatch:
                 return "The download didn’t match what we expected. Nothing was installed."
+            case .sha256Required:
+                return "This package is missing a checksum. Nothing was installed."
             case .missingURL:
                 return "No download location is listed for this addon."
+            case .hostNotAllowed:
+                return "That download location isn’t allowed. Nothing was installed."
+            case .downloadFailed:
+                return "Couldn’t download the package. Check your connection and try again."
+            case .unsafeArchive, .archiveTooLarge:
+                return "The package looks unsafe or is too large. Nothing was installed."
             case .helperUnreachable:
                 return "Couldn’t download the helper. Check your connection and try again."
             case .helperNotInCatalog:
                 return "This addon needs a helper that isn’t in the catalog."
-            case .idMismatch, .addonYAMLMissing, .unzipFailed, .helperYAMLMissing, .helperManifestMismatch:
+            case .shellTooOld(let required, _):
+                return "This addon needs Jugnu \(required) or newer."
+            case .invalidMinShellVersion:
+                return "This addon’s description couldn’t be read. Try reinstalling it."
+            case .nonUniversalBinary:
+                return "This addon doesn’t support this Mac’s architecture."
+            case .dependency(.unknown):
+                return "This addon needs another addon that isn’t in the catalog."
+            case .dependency(.cycle):
+                return "These addons depend on each other in a loop. Nothing was installed."
+            case .dependency(.versionMismatch(let id, let required, let installed)):
+                return "\(id) is installed at \(installed), but this addon needs exactly \(required)."
+            case .dependency(.collision(_, let occupant)):
+                return "Another addon (\(occupant)) already uses that name. Uninstall it first."
+            case .dependency(.invalidVersion):
+                return "This addon’s dependency list isn’t valid."
+            case .dependencyDisclosureDeclined:
+                return "Install canceled."
+            case .idMismatch, .addonYAMLMissing, .helperYAMLMissing, .helperManifestMismatch:
                 return "Something went wrong. Try again."
             }
         }

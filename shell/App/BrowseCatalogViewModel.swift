@@ -44,6 +44,12 @@ final class BrowseCatalogViewModel: ObservableObject, BrowseCatalogViewModelProt
         model.config.addons[id]?.enabled == true
     }
 
+    func updateAvailable(_ id: String) -> Bool {
+        guard let entry = entries.first(where: { $0.id == id }) else { return false }
+        let installed = model.installer.readInstalledAddonVersions()[id]
+        return AddonUpdate.isAvailable(installed: installed, registry: entry.version)
+    }
+
     func load() async {
         guard let url = URL(string: model.config.shell.registryURL) else {
             errorMessage = "The catalog URL isn't valid."
@@ -66,16 +72,71 @@ final class BrowseCatalogViewModel: ObservableObject, BrowseCatalogViewModelProt
 
     func install(_ entry: RegistryEntry) async {
         installingIDs.insert(entry.id)
+        defer {
+            installingIDs.remove(entry.id)
+            refreshTick += 1
+        }
+        guard ReplaceWhileTracked.proceed(
+            addonID: entry.id,
+            paths: model.paths,
+            host: model.processHost
+        ) else { return }
         do {
-            try await model.installer.install(entry: entry, enable: true)
+            try await model.installer.install(
+                entry: entry,
+                enable: true,
+                catalog: entries,
+                installedVersions: model.installer.readInstalledAddonVersions(),
+                confirmDependencies: { plan in
+                    await MainActor.run { DependencyInstallDisclosure.confirm(plan) }
+                }
+            )
             try? model.bootstrapDaemons(id: entry.id)
             model.refreshIndex()
             errorMessage = nil
         } catch {
+            if let installer = error as? AddonInstallerError,
+               case .dependencyDisclosureDeclined = installer {
+                errorMessage = nil
+                return
+            }
             errorMessage = UserFacingError.message(for: error)
         }
-        installingIDs.remove(entry.id)
-        refreshTick += 1
+    }
+
+    func update(_ entry: RegistryEntry) async {
+        installingIDs.insert(entry.id)
+        defer {
+            installingIDs.remove(entry.id)
+            refreshTick += 1
+        }
+        guard ReplaceWhileTracked.proceed(
+            addonID: entry.id,
+            paths: model.paths,
+            host: model.processHost
+        ) else { return }
+        let preserveEnabled = model.config.addons[entry.id]?.enabled ?? false
+        do {
+            try await model.installer.install(
+                entry: entry,
+                enable: preserveEnabled,
+                catalog: entries,
+                installedVersions: model.installer.readInstalledAddonVersions(),
+                confirmDependencies: { plan in
+                    await MainActor.run { DependencyInstallDisclosure.confirm(plan) }
+                }
+            )
+            try? model.bootstrapDaemons(id: entry.id)
+            model.refreshIndex()
+            errorMessage = nil
+        } catch {
+            if let installer = error as? AddonInstallerError,
+               case .dependencyDisclosureDeclined = installer {
+                errorMessage = nil
+                return
+            }
+            errorMessage = UserFacingError.message(for: error)
+        }
     }
 
     func setEnabled(_ id: String, enabled: Bool) {

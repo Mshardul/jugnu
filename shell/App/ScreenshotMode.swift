@@ -16,18 +16,18 @@ enum ScreenshotMode {
 
     /// Favorites seeded into row1 (qualified command ids: `<addon>.<command>`).
     static let seededFavorites = [
-        "mic-mute.toggle",
-        "focus-toggle.toggle",
-        "paste-plain.paste-plain",
-        "clipboard-history.open",
-        "ports.list",
+        "jugnu.mic-mute.toggle",
+        "jugnu.focus-toggle.toggle",
+        "jugnu.paste-plain.paste-plain",
+        "jugnu.clipboard-history.open",
+        "jugnu.ports.list",
     ]
 
     /// Local addon ids to enable in the sandbox config.
     static let enabledAddons = [
-        "mic-mute", "focus-toggle", "paste-plain", "clipboard-history", "ports",
-        "floating-note", "nudges", "world-clock", "battery-eta", "window-layouts",
-        "ui-demo-confirm", "ui-demo-form", "ui-demo-list",
+        "jugnu.mic-mute", "jugnu.focus-toggle", "jugnu.paste-plain", "jugnu.clipboard-history", "jugnu.ports",
+        "jugnu.floating-note", "jugnu.nudges", "jugnu.world-clock", "jugnu.battery-eta", "jugnu.window-layouts",
+        "jugnu.ui-demo-confirm", "jugnu.ui-demo-form", "jugnu.ui-demo-list",
     ]
 
     /// Prepares the sandbox and returns the `JugnuPaths` the app should use.

@@ -16,14 +16,14 @@ final class DaemonAgentsTests: XCTestCase {
         try FileManager.default.createDirectory(at: home, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: home) }
         let paths = JugnuPaths(home: home)
-        let root = home.appendingPathComponent("keep-awake")
+        let root = home.appendingPathComponent("jugnu.keep-awake")
         try FileManager.default.createDirectory(at: root.appendingPathComponent("bin"), withIntermediateDirectories: true)
         try "#!/bin/sh\n".write(to: root.appendingPathComponent("bin/watch"), atomically: true, encoding: .utf8)
         let launchctl = RecordingLaunchctl()
         let agents = DaemonAgents(launchctl: launchctl, uid: 501)
         let identity = AddonRunner.ShellIdentity(pid: 9, startTS: 12.5)
         try agents.bootstrap(
-            addonID: "keep-awake",
+            addonID: "jugnu.keep-awake",
             commandID: "watch",
             block: DaemonBlock(program: "bin/watch", args: ["--loop"], keepAlive: true),
             addonRoot: root,
@@ -63,7 +63,7 @@ final class DaemonAgentsTests: XCTestCase {
         try FileManager.default.createDirectory(at: paths.launchAgentsDir, withIntermediateDirectories: true)
         let plist = paths.launchAgentsDir.appendingPathComponent("com.jugnu.keep-awake.watch.plist")
         try "x".write(to: plist, atomically: true, encoding: .utf8)
-        agents.bootout(addonID: "keep-awake", commandID: "watch", paths: paths)
+        agents.bootout(addonID: "jugnu.keep-awake", commandID: "watch", paths: paths)
         XCTAssertFalse(FileManager.default.fileExists(atPath: plist.path))
         XCTAssertEqual(launchctl.calls.first?.first, "bootout")
     }

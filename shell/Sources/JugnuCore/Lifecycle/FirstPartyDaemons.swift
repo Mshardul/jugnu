@@ -2,10 +2,11 @@ import Foundation
 
 public enum FirstPartyDaemons {
     // Keep in sync with scripts/validate-addon.sh FIRST_PARTY_DAEMON_IDS.
-    public static let ids: Set<String> = ["keep-awake", "clipboard-history"]
+    public static let ids: Set<String> = ["jugnu.keep-awake", "jugnu.clipboard-history"]
 
     public static func launchdLabel(addonID: String, commandID: String) -> String {
-        "com.jugnu.\(addonID).\(commandID)"
+        // Namespaced ids already include the publisher (`jugnu.keep-awake` → com.jugnu.keep-awake.watch).
+        "com.\(addonID).\(commandID)"
     }
 }
 

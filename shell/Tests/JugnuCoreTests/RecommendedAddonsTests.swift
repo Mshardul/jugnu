@@ -5,7 +5,7 @@ final class RecommendedAddonsTests: XCTestCase {
     func testRecommendedSetIsTheCuratedFive() {
         XCTAssertEqual(
             ShellConfig.recommendedAddonIDs,
-            ["mic-mute", "focus-toggle", "paste-plain", "floating-note", "ports"]
+            ["jugnu.mic-mute", "jugnu.focus-toggle", "jugnu.paste-plain", "jugnu.floating-note", "jugnu.ports"]
         )
     }
 }

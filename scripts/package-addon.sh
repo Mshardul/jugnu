@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-# usage: scripts/package-addon.sh addons/mic-mute dist/
+# usage: scripts/package-addon.sh addons/jugnu.mic-mute dist/
 # produces dist/<id>-<version>.zip and prints sha256
 
 if [[ $# -lt 2 ]]; then

@@ -237,9 +237,9 @@ Captured so they are not forgotten. Each is a real design pass, gated on a concr
 
 Gated on the first `session`-shaped addon — most of the Play category (`chess-clock`, `breathing`, `reaction-time`, `memory`) is session-shaped. `tic-tac-toe` stays a re-invoke-per-move `oneshot` on `canvas` and does **not** need this epic.
 
-### Addon install & upgrade integrity — stub epic (ticket 0058)
+### Addon install & upgrade integrity — sibling epic (ticket 0058)
 
-`AddonInstaller.unzip()` zip-slip · atomic install (unzip→temp, verify, atomic rename, cleanup-on-failure / cancel) · cancelled-install recovery · upgrade-in-place (0018) · dependency install ordering + partial-failure rollback (0025) · namespaced ids + collision resolution (0031) · universal-binary check (0029) · `minShellVersion` check (0043). Not designed here.
+Spec: [2026-09-05 addon install & upgrade integrity](./2026-09-05-addon-install-upgrade-integrity-design.md). zip-slip · atomic install · cancel recovery · upgrade UI (0018) · catalog deps (0025) · namespaces (0031) · universal binary (0029) · `minShellVersion` (0043). Not implemented in 0057.
 
 ## 12. Work items
 

@@ -1,0 +1,26 @@
+id: jugnu.clipboard-history
+name: Clipboard History
+version: 1.0.0
+api: 1
+commands:
+  - id: list
+    title: Clipboard history
+    subtitle: Browse and copy recent clipboard entries
+    keywords: [clipboard, history, paste, copy]
+    ui:
+      pattern: list
+  - id: watch
+    title: Clipboard watcher
+    subtitle: Internal — records pasteboard changes
+    keywords: []
+    lifecycle: daemon
+    daemon:
+      program: bin/watch
+      keep_alive: true
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths:
+    - "~/.local/share/jugnu/state/clipboard-history"
+  launchd: []

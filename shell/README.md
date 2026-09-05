@@ -34,7 +34,7 @@ Published-site install steps will go in the [root README](../README.md) when a d
 Dev addons without install:
 
 ```bash
-export JUGNU_ADDON_PATH="$(pwd)/../addons/mic-mute:$(pwd)/../addons/focus-toggle:$(pwd)/../addons/paste-plain"
+export JUGNU_ADDON_PATH="$(pwd)/../addons/jugnu.mic-mute:$(pwd)/../addons/jugnu.focus-toggle:$(pwd)/../addons/jugnu.paste-plain"
 ```
 
 Point `xcode-select` at Xcode once:

@@ -38,9 +38,9 @@ test-extended:
 	cd shell/TestsExtended && swift test
 
 window-layouts:
-	cd addons/window-layouts && swift build -c release
-	mkdir -p addons/window-layouts/bin
-	cp addons/window-layouts/.build/release/window-layouts addons/window-layouts/bin/helper
+	cd addons/jugnu.window-layouts && swift build -c release
+	mkdir -p addons/jugnu.window-layouts/bin
+	cp addons/jugnu.window-layouts/.build/release/window-layouts addons/jugnu.window-layouts/bin/helper
 
 helper-clock:
 	./scripts/package-helper-clock.sh dist

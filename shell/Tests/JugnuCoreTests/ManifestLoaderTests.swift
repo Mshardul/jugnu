@@ -242,7 +242,7 @@ final class ManifestLoaderTests: XCTestCase {
 
     func testDaemonBlockParsesAndOnReinvokeDefaults() throws {
         let dir = try writeManifest("""
-        id: keep-awake
+        id: jugnu.keep-awake
         name: Keep Awake
         version: 1.0.0
         api: 1
@@ -290,7 +290,7 @@ final class ManifestLoaderTests: XCTestCase {
 
     func testDaemonCommandWithoutBlockIsRejected() throws {
         let dir = try writeManifest("""
-        id: keep-awake
+        id: jugnu.keep-awake
         name: Keep Awake
         version: 1.0.0
         api: 1
@@ -330,7 +330,7 @@ final class ManifestLoaderTests: XCTestCase {
 
     func testEffectiveCleanupLaunchdIncludesDaemonLabels() throws {
         let dir = try writeManifest("""
-        id: keep-awake
+        id: jugnu.keep-awake
         name: Keep Awake
         version: 1.0.0
         api: 1

@@ -40,6 +40,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         } else {
             paths = JugnuPaths()
         }
+        AddonInstaller(paths: paths).recoverInstallOrphans()
+        do {
+            try NamespaceMigrator.migrateInstalledTree(
+                paths: paths,
+                store: ConfigStore(paths: paths),
+                stateStore: StateStore(paths: paths)
+            )
+        } catch {
+            // Collision or I/O — leave tree as-is; next launch retries remaining ids.
+            NSLog("Namespace migration deferred: \(error.localizedDescription)")
+        }
 
         let log = LifecycleLog(fileURL: paths.lifecycleLogFile)
         let configState = ConfigStore(paths: paths).inspect()
@@ -432,7 +443,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     isInstalled: vm.isInstalled(entry.id),
                     isEnabled: vm.isEnabled(entry.id),
                     isInstalling: vm.installingIDs.contains(entry.id),
+                    updateAvailable: vm.updateAvailable(entry.id),
                     onInstall: { Task { await vm.install(entry) } },
+                    onUpdate: { Task { await vm.update(entry) } },
                     onEnabledChange: { vm.setEnabled(entry.id, enabled: $0) },
                     onUninstall: { vm.uninstall(id: entry.id, name: entry.name) },
                     onClose: { [weak self] in self?.popOrDismiss() }

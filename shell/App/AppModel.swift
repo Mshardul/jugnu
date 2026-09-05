@@ -316,8 +316,13 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
             } catch {
                 if localAddonRoots.isEmpty { throw error }
                 for root in localAddonRoots {
-                    try installer.installFromDirectory(url: root, enable: true)
                     let manifest = try ManifestLoader.load(from: root)
+                    guard ReplaceWhileTracked.proceed(
+                        addonID: manifest.id,
+                        paths: paths,
+                        host: processHost
+                    ) else { continue }
+                    try installer.installFromDirectory(url: root, enable: true)
                     try await installer.ensureHelpers(for: manifest)
                     try? bootstrapDaemons(id: manifest.id)
                 }
@@ -345,7 +350,17 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
         var installed: [String] = []
         for entry in entries where wanted.contains(entry.id) {
             guard !entry.url.isEmpty else { continue }
-            try await installer.install(entry: entry, enable: true)
+            guard ReplaceWhileTracked.proceed(
+                addonID: entry.id,
+                paths: paths,
+                host: processHost
+            ) else { continue }
+            try await installer.install(
+                entry: entry,
+                enable: true,
+                catalog: entries,
+                installedVersions: installer.readInstalledAddonVersions()
+            )
             try? bootstrapDaemons(id: entry.id)
             installed.append(entry.id)
         }

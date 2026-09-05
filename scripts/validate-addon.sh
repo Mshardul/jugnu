@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Kept in sync with DaemonAgents.firstPartyDaemonIDs (Swift). See plan §3.2 consistency notes.
-FIRST_PARTY_DAEMON_IDS=(keep-awake clipboard-history)
+FIRST_PARTY_DAEMON_IDS=(jugnu.keep-awake jugnu.clipboard-history)
 
 if [[ $# -ne 1 ]]; then
   echo "usage: $0 <addon-dir>" >&2
@@ -26,8 +26,24 @@ api=$(value api)
 entrypoint_kind=$(sed -n 's/^  kind:[[:space:]]*//p' "$manifest" | head -1 | tr -d '"' | tr -d "'")
 entrypoint_path=$(sed -n 's/^  path:[[:space:]]*//p' "$manifest" | head -1 | tr -d '"' | tr -d "'")
 
-[[ "$id" =~ ^[a-z0-9][a-z0-9-]*$ ]] || { echo "invalid addon id: $id" >&2; exit 1; }
+[[ "$id" =~ ^[a-z0-9]+\.[a-z0-9][a-z0-9-]*$ ]] || { echo "invalid addon id (want publisher.job): $id" >&2; exit 1; }
+dir_base=$(basename "$addon_dir")
+if [[ "$id" != "$dir_base" ]]; then
+  echo "warning: addon id ($id) differs from directory name ($dir_base)" >&2
+fi
+[[ "$id" == ".staging" || "$id" == ".trash" ]] && { echo "reserved addon id: $id" >&2; exit 1; }
 [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "invalid addon version: $version" >&2; exit 1; }
+
+min_shell=$(value minShellVersion)
+if [[ -z "$min_shell" ]]; then
+  min_shell=$(value min_shell_version)
+fi
+if [[ -n "$min_shell" ]]; then
+  [[ "$min_shell" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || {
+    echo "invalid minShellVersion: $min_shell" >&2
+    exit 1
+  }
+fi
 [[ "$api" == "1" ]] || { echo "unsupported addon api: $api" >&2; exit 1; }
 [[ "$entrypoint_kind" == "exec" || "$entrypoint_kind" == "jxa" || "$entrypoint_kind" == "osascript" ]] || {
   echo "invalid entrypoint kind: $entrypoint_kind" >&2
@@ -38,6 +54,23 @@ entrypoint_path=$(sed -n 's/^  path:[[:space:]]*//p' "$manifest" | head -1 | tr 
   exit 1
 }
 [[ -f "$addon_dir/$entrypoint_path" ]] || { echo "missing entrypoint: $entrypoint_path" >&2; exit 1; }
+
+if [[ "$entrypoint_kind" == "exec" ]]; then
+  entrypoint_file="$addon_dir/$entrypoint_path"
+  if head -c 2 "$entrypoint_file" | grep -q '^#!'; then
+    :
+  elif command -v lipo >/dev/null 2>&1; then
+    archs=$(lipo -archs "$entrypoint_file" 2>/dev/null || true)
+    echo "$archs" | grep -qw arm64 || {
+      echo "exec entrypoint must be universal (arm64 + x86_64) or a #! script" >&2
+      exit 1
+    }
+    echo "$archs" | grep -qw x86_64 || {
+      echo "exec entrypoint must be universal (arm64 + x86_64) or a #! script" >&2
+      exit 1
+    }
+  fi
+fi
 grep -q '^commands:' "$manifest" || { echo "missing commands in addon.yaml" >&2; exit 1; }
 grep -q '^cleanup:' "$manifest" || { echo "missing cleanup in addon.yaml" >&2; exit 1; }
 

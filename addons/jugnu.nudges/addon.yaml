@@ -1,0 +1,40 @@
+id: jugnu.nudges
+name: Nudges
+version: 1.0.0
+api: 1
+helpers:
+  - id: clock
+    version: 1.0.0
+view_types: [rows, fields, ask]
+commands:
+  - id: manage
+    title: Nudges
+    subtitle: Add, edit, and enable nudge timers
+    keywords: [nudge, wellness, break, water, eyes, stretch]
+    view: rows
+  - id: nudge-now
+    title: Nudge now
+    subtitle: Show a nudge card immediately
+    keywords: [nudge, preview]
+    view: rows
+  - id: pause
+    title: Pause nudges
+  - id: resume
+    title: Resume nudges
+  - id: restore-presets
+    title: Restore nudge presets
+  - id: advanced
+    title: Nudge advanced
+    subtitle: Edit new-nudge template
+    view: fields
+  - id: show-card
+    title: Show nudge card
+    subtitle: Internal — fired by clock
+    keywords: []
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths:
+    - "~/.local/share/jugnu/state/nudges"
+  launchd: []

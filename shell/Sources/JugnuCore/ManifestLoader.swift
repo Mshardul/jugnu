@@ -17,8 +17,17 @@ public enum ManifestLoader {
         if manifest.id.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             throw ManifestLoaderError.emptyId
         }
+        try PackageGates.validateAddonId(manifest.id)
+        if let min = manifest.minShellVersion, !PackageGates.isValidSemVer(min) {
+            throw ManifestLoaderError.invalidMinShellVersion(min)
+        }
         if manifest.api != 1 {
             throw ManifestLoaderError.unsupportedAPI(manifest.api)
+        }
+        for dep in manifest.dependencies {
+            if !PackageGates.isValidSemVer(dep.version) {
+                throw ManifestLoaderError.invalidDependencyVersion(dep.id, dep.version)
+            }
         }
         try manifest.validateViewTypes()
         for command in manifest.commands
@@ -63,6 +72,10 @@ private func unwrapManifestError(_ error: Error) -> Error {
 public enum ManifestLoaderError: Error, Equatable {
     case invalidEncoding
     case emptyId
+    case invalidId(String)
+    case reservedId(String)
+    case invalidMinShellVersion(String)
+    case invalidDependencyVersion(String, String)
     case unsupportedAPI(Int)
     case unknownViewType(String)
     case commandViewNotAllowed(command: String, view: String)

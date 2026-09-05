@@ -1,0 +1,18 @@
+id: jugnu.ports
+name: Ports
+version: 1.0.0
+api: 1
+commands:
+  - id: list
+    title: Listening ports
+    subtitle: List and kill processes on local ports
+    keywords: [port, ports, listen, kill, lsof, dev, server, network]
+    ui:
+      pattern: list
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths:
+    - "~/.local/share/jugnu/state/ports"
+  launchd: []

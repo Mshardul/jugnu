@@ -22,7 +22,7 @@ cleanup:
 
 ## Required Fields
 
-- `id`: lowercase job identifier using letters, numbers, and hyphens; it must match the addon directory name.
+- `id`: `<publisher>.<job>` for catalog addons (first-party: `jugnu.<job>`); must match the addon directory name. Helpers stay un-namespaced.
 - `name`: user-facing addon name.
 - `version`: three-part Semantic Version.
 - `api`: protocol major version; published addons currently use `1`.
@@ -30,6 +30,30 @@ cleanup:
 - `entrypoint.kind`: `exec`, `jxa`, or `osascript`.
 - `entrypoint.path`: relative path to the entrypoint; absolute paths and parent traversal are forbidden.
 - `cleanup`: declared addon-owned paths and launchd labels to remove on disable or uninstall.
+
+## Optional install gates
+
+- `minShellVersion`: three-part SemVer floor on the Jugnu marketing version (separate from `api:`). Omit for no floor. Checked at install and at load (too-new floor → addon not indexed; not uninstalled).
+- `entrypoint.kind: exec` binaries must be universal (`arm64` + `x86_64`) or a `#!` script. `jxa` / `osascript` skip the binary check.
+- Addon `id` must not start with `.` and must not be `.staging` / `.trash` (reserved install directories).
+
+## Catalog dependencies
+
+Optional. Other **catalog addons** this package needs at install time ([ticket 0025](tickets.md)). Distinct from `helpers:`.
+
+```yaml
+dependencies:
+  - id: jugnu.some-addon
+    version: 1.0.0
+```
+
+| Rule | Lock |
+|---|---|
+| **Version** | Exact three-part SemVer only — no ranges. |
+| **Disclosure** | Before commit: list each dep as already installed / will install; note installed ≠ enabled. |
+| **Enable** | Newly installed deps land `enabled: false`. Only the addon the user clicked follows the installer’s enable flag. |
+| **Mismatch** | If a required id is already installed at a different version → refuse (no silent downgrade). |
+| **Uninstall** | Uninstalling A does not auto-remove its dependencies. |
 
 ## Helpers
 

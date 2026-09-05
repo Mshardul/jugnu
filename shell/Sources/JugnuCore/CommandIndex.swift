@@ -84,8 +84,13 @@ public struct CommandIndex: Sendable {
         }
 
         for (id, root) in rootsById {
+            if id.hasPrefix(".") { continue }
             guard config.addons[id]?.enabled == true else { continue }
             let manifest = try ManifestLoader.load(from: root)
+            guard PackageGates.isRunnable(
+                minShellVersion: manifest.minShellVersion,
+                running: ShellVersion.current
+            ) else { continue }
             for cmd in manifest.commands {
                 found.append(
                     IndexedCommand(

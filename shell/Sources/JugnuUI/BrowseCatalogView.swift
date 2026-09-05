@@ -15,8 +15,10 @@ public protocol BrowseCatalogViewModelProtocol: ObservableObject {
 
     func isInstalled(_ id: String) -> Bool
     func isEnabled(_ id: String) -> Bool
+    func updateAvailable(_ id: String) -> Bool
     func load() async
     func install(_ entry: RegistryEntry) async
+    func update(_ entry: RegistryEntry) async
     func setEnabled(_ id: String, enabled: Bool)
     func uninstall(id: String, name: String)
 }
@@ -69,7 +71,9 @@ public struct BrowseCatalogView<VM: BrowseCatalogViewModelProtocol>: View {
                                     isInstalled: viewModel.isInstalled(entry.id),
                                     isEnabled: viewModel.isEnabled(entry.id),
                                     isInstalling: viewModel.installingIDs.contains(entry.id),
+                                    updateAvailable: viewModel.updateAvailable(entry.id),
                                     onInstall: { startInstall(entry) },
+                                    onUpdate: { startUpdate(entry) },
                                     onEnabledChange: { viewModel.setEnabled(entry.id, enabled: $0) },
                                     onUninstall: { viewModel.uninstall(id: entry.id, name: entry.name) },
                                     onTap: { onSelectCard(entry.id) }
@@ -96,6 +100,14 @@ public struct BrowseCatalogView<VM: BrowseCatalogViewModelProtocol>: View {
         guard installTasks[entry.id] == nil else { return }
         installTasks[entry.id] = Task {
             await viewModel.install(entry)
+            installTasks[entry.id] = nil
+        }
+    }
+
+    private func startUpdate(_ entry: RegistryEntry) {
+        guard installTasks[entry.id] == nil else { return }
+        installTasks[entry.id] = Task {
+            await viewModel.update(entry)
             installTasks[entry.id] = nil
         }
     }

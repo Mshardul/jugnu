@@ -1,0 +1,125 @@
+id: jugnu.window-layouts
+name: Window Layouts
+version: 1.0.0
+api: 1
+view_types: [board, rows, fields, ask]
+commands:
+  - id: snap-board
+    title: Snap board
+    subtitle: Place the front window on a region
+    keywords: [snap, tile, layout, window]
+    view: board
+    ui:
+      pattern: list
+  - id: left-half
+    title: Left half
+    subtitle: Snap front window to the left
+    keywords: [snap, left, tile]
+  - id: right-half
+    title: Right half
+    subtitle: Snap front window to the right
+    keywords: [snap, right, tile]
+  - id: quarters
+    title: Quarter
+    subtitle: Snap front window to a quarter
+    keywords: [snap, quarter, corner]
+  - id: center-window
+    title: Center window
+    subtitle: Center the front window
+    keywords: [center, window]
+  - id: fill-desktop
+    title: Fill desktop
+    subtitle: Front window fills the visible desktop
+    keywords: [fill, desktop, maximize]
+  - id: maximize
+    title: Maximize
+    subtitle: Grow to the desktop without a fullscreen Space
+    keywords: [maximize, zoom]
+  - id: fullscreen-toggle
+    title: Fullscreen
+    subtitle: Toggle native fullscreen
+    keywords: [fullscreen]
+  - id: tile-two
+    title: Tile two
+    subtitle: Front window beside the next
+    keywords: [tile, split]
+  - id: gather-windows
+    title: Gather windows
+    subtitle: Front app’s windows to this Space
+    keywords: [gather, windows]
+  - id: hide-others
+    title: Hide others
+    subtitle: Hide every other app
+    keywords: [hide]
+  - id: minimize-all
+    title: Minimize all
+    subtitle: Minimize windows
+    keywords: [minimize]
+  - id: show-desktop
+    title: Show Desktop
+    subtitle: Hide all windows
+    keywords: [desktop]
+  - id: move-display
+    title: Move to display
+    subtitle: Front window to another display
+    keywords: [display, screen]
+    view: rows
+    ui:
+      pattern: list
+  - id: app-windows
+    title: App windows
+    subtitle: Focus a window of the front app
+    keywords: [windows, focus]
+    view: rows
+    ui:
+      pattern: list
+  - id: zone-save
+    title: Save zone
+    subtitle: Snapshot current frames (max 6)
+    keywords: [zone, save, layout]
+    view: fields
+    ui:
+      pattern: form
+  - id: zone-apply
+    title: Apply zone
+    subtitle: Apply a saved geometry
+    keywords: [zone, apply, layout]
+    view: rows
+    ui:
+      pattern: list
+  - id: zone-delete
+    title: Delete zone
+    subtitle: Remove a saved zone
+    keywords: [zone, delete]
+    view: rows
+    ui:
+      pattern: list
+  - id: pin-top
+    title: Pin on top
+    subtitle: Keep the front window above others
+    keywords: [pin, top, float]
+  - id: space-jump
+    title: Jump to Desktop
+    subtitle: Switch Space via system shortcuts
+    keywords: [space, desktop, jump]
+    view: rows
+    ui:
+      pattern: list
+  - id: stage-toggle
+    title: Stage Manager
+    subtitle: Toggle Stage Manager
+    keywords: [stage, manager]
+  - id: desktop-name
+    title: Name this Desktop
+    subtitle: Jugnu-local label for this Space
+    keywords: [desktop, name, space]
+    view: fields
+    ui:
+      pattern: form
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths:
+    - "~/.local/share/jugnu/state/window-layouts"
+  launchd: []

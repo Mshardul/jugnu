@@ -1,0 +1,35 @@
+id: jugnu.pomodoro
+name: Pomodoro
+version: 1.0.0
+api: 1
+helpers:
+  - id: clock
+    version: 1.0.0
+commands:
+  - id: work
+    title: Start focus session
+    subtitle: 25 minute pomodoro work timer
+    keywords: [pomodoro, focus, timer, work]
+  - id: break
+    title: Start break
+    subtitle: 5 minute pomodoro break timer
+    keywords: [pomodoro, break, timer, rest]
+  - id: status
+    title: Pomodoro status
+    subtitle: Time remaining in the current phase
+    keywords: [pomodoro, status, timer]
+  - id: reset
+    title: Reset pomodoro
+    subtitle: Clear the current timer
+    keywords: [pomodoro, reset, stop, cancel]
+  - id: chime
+    title: Pomodoro chime
+    subtitle: Internal — fired by clock
+    keywords: []
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths:
+    - "~/.local/share/jugnu/state/pomodoro"
+  launchd: []

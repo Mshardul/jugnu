@@ -1,0 +1,15 @@
+id: jugnu.weather-bar
+name: Weather
+version: 1.0.0
+api: 1
+commands:
+  - id: status
+    title: Current weather
+    subtitle: Temperature and conditions for your location
+    keywords: [weather, temperature, forecast]
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths: []
+  launchd: []

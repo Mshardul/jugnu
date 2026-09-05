@@ -237,7 +237,7 @@ public struct ShellConfig: Codable, Equatable, Sendable {
     }
 
     public static let recommendedAddonIDs = [
-        "mic-mute", "focus-toggle", "paste-plain", "floating-note", "ports"
+        "jugnu.mic-mute", "jugnu.focus-toggle", "jugnu.paste-plain", "jugnu.floating-note", "jugnu.ports"
     ]
 
     public init(
@@ -381,6 +381,17 @@ public struct HelperRef: Codable, Equatable, Sendable {
     }
 }
 
+/// Catalog-addon dependency (exact SemVer). Distinct from `helpers:`.
+public struct AddonDependency: Codable, Equatable, Sendable {
+    public var id: String
+    public var version: String
+
+    public init(id: String, version: String) {
+        self.id = id
+        self.version = version
+    }
+}
+
 public struct HelperManifest: Codable, Equatable, Sendable {
     public var id: String
     public var version: String
@@ -401,7 +412,9 @@ public struct AddonManifest: Codable, Equatable, Sendable {
     public var cleanup: CleanupSpec
     public var viewTypes: [ViewType]
     public var helpers: [HelperRef]
+    public var dependencies: [AddonDependency]
     public var lifecycle: LifecycleClass?
+    public var minShellVersion: String?
 
     public var allowedViewTypes: [ViewType] {
         viewTypes.isEmpty ? ViewType.shellDefaults : viewTypes
@@ -434,7 +447,9 @@ public struct AddonManifest: Codable, Equatable, Sendable {
         cleanup: CleanupSpec = CleanupSpec(),
         viewTypes: [ViewType] = [],
         helpers: [HelperRef] = [],
-        lifecycle: LifecycleClass? = nil
+        dependencies: [AddonDependency] = [],
+        lifecycle: LifecycleClass? = nil,
+        minShellVersion: String? = nil
     ) {
         self.id = id
         self.name = name
@@ -445,12 +460,16 @@ public struct AddonManifest: Codable, Equatable, Sendable {
         self.cleanup = cleanup
         self.viewTypes = viewTypes
         self.helpers = helpers
+        self.dependencies = dependencies
         self.lifecycle = lifecycle
+        self.minShellVersion = minShellVersion
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, name, version, api, commands, entrypoint, cleanup, helpers, lifecycle
+        case id, name, version, api, commands, entrypoint, cleanup, helpers, dependencies, lifecycle
         case viewTypes = "view_types"
+        case minShellVersion
+        case minShellVersionSnake = "min_shell_version"
     }
 
     public init(from decoder: Decoder) throws {
@@ -463,13 +482,37 @@ public struct AddonManifest: Codable, Equatable, Sendable {
         entrypoint = try c.decode(Entrypoint.self, forKey: .entrypoint)
         cleanup = try c.decodeIfPresent(CleanupSpec.self, forKey: .cleanup) ?? CleanupSpec()
         helpers = try c.decodeIfPresent([HelperRef].self, forKey: .helpers) ?? []
+        dependencies = try c.decodeIfPresent([AddonDependency].self, forKey: .dependencies) ?? []
         lifecycle = try LifecycleClass.decodeManifestValue(c.decodeIfPresent(String.self, forKey: .lifecycle))
+        minShellVersion =
+            try c.decodeIfPresent(String.self, forKey: .minShellVersion)
+            ?? c.decodeIfPresent(String.self, forKey: .minShellVersionSnake)
         let raw = try c.decodeIfPresent([String].self, forKey: .viewTypes) ?? []
         viewTypes = try raw.map { token in
             guard let parsed = ViewType(rawValue: token) else {
                 throw ManifestLoaderError.unknownViewType(token)
             }
             return parsed
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(id, forKey: .id)
+        try c.encode(name, forKey: .name)
+        try c.encode(version, forKey: .version)
+        try c.encode(api, forKey: .api)
+        try c.encode(commands, forKey: .commands)
+        try c.encode(entrypoint, forKey: .entrypoint)
+        try c.encode(cleanup, forKey: .cleanup)
+        try c.encode(helpers, forKey: .helpers)
+        if !dependencies.isEmpty {
+            try c.encode(dependencies, forKey: .dependencies)
+        }
+        try c.encodeIfPresent(lifecycle?.rawValue, forKey: .lifecycle)
+        try c.encodeIfPresent(minShellVersion, forKey: .minShellVersion)
+        if !viewTypes.isEmpty {
+            try c.encode(viewTypes.map(\.rawValue), forKey: .viewTypes)
         }
     }
 

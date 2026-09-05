@@ -11,8 +11,24 @@ public struct JugnuPaths: Sendable {
         home.appendingPathComponent(".local/share/jugnu/addons")
     }
 
+    public var addonsStagingDir: URL {
+        addonsDir.appendingPathComponent(".staging")
+    }
+
+    public var addonsTrashDir: URL {
+        addonsDir.appendingPathComponent(".trash")
+    }
+
     public var helpersDir: URL {
         home.appendingPathComponent(".local/share/jugnu/helpers")
+    }
+
+    public var helpersStagingDir: URL {
+        helpersDir.appendingPathComponent(".staging")
+    }
+
+    public var helpersTrashDir: URL {
+        helpersDir.appendingPathComponent(".trash")
     }
 
     public var stateDir: URL {

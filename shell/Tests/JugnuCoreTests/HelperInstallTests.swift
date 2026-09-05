@@ -33,8 +33,14 @@ final class HelperInstallTests: XCTestCase {
         defer { ctx.tearDown() }
 
         let zip = try makeHelperZip(in: ctx.home, id: "play-runtime", version: "1.0.0")
+        let digest = try sha256(of: zip)
         let installer = AddonInstaller(paths: ctx.paths)
-        try installer.installHelperFromLocalZip(url: zip, expectedSHA256: nil, id: "play-runtime", version: "1.0.0")
+        try installer.installHelperFromLocalZip(
+            url: zip,
+            expectedSHA256: digest,
+            id: "play-runtime",
+            version: "1.0.0"
+        )
 
         try writeRegistryURL(home: ctx.home, addonsJSON: "not-a-url")
         let manifest = AddonManifest(
@@ -77,7 +83,7 @@ final class HelperInstallTests: XCTestCase {
             addonsJSON: catalogDir.appendingPathComponent("addons.json").absoluteString
         )
 
-        let installer = AddonInstaller(paths: ctx.paths)
+        let installer = AddonInstaller(paths: ctx.paths, downloads: TestFileDownloader())
         let manifest = AddonManifest(
             id: "nudges",
             name: "Nudges",
@@ -130,8 +136,14 @@ final class HelperInstallTests: XCTestCase {
         defer { ctx.tearDown() }
 
         let zip = try makeHelperZip(in: ctx.home, id: "play-runtime", version: "1.0.0")
+        let digest = try sha256(of: zip)
         let installer = AddonInstaller(paths: ctx.paths)
-        try installer.installHelperFromLocalZip(url: zip, expectedSHA256: nil, id: "play-runtime", version: "1.0.0")
+        try installer.installHelperFromLocalZip(
+            url: zip,
+            expectedSHA256: digest,
+            id: "play-runtime",
+            version: "1.0.0"
+        )
         try installAddonDeclaringHelper(id: "dice-roll", paths: ctx.paths)
 
         let life = AddonLifecycle(paths: ctx.paths)
@@ -149,9 +161,10 @@ final class HelperInstallTests: XCTestCase {
         defer { ctx.tearDown() }
 
         let zip = try makeHelperZip(in: ctx.home, id: "play-runtime", version: "1.0.0")
+        let digest = try sha256(of: zip)
         try AddonInstaller(paths: ctx.paths).installHelperFromLocalZip(
             url: zip,
-            expectedSHA256: nil,
+            expectedSHA256: digest,
             id: "play-runtime",
             version: "1.0.0"
         )
@@ -257,5 +270,16 @@ final class HelperInstallTests: XCTestCase {
         try process.run()
         process.waitUntilExit()
         XCTAssertEqual(process.terminationStatus, 0)
+    }
+}
+
+/// Test-only downloader: allows `file://` catalog fixtures. Production uses allowlisted HTTPS.
+private struct TestFileDownloader: InstallDownloading {
+    func download(_ url: URL) async throws -> URL {
+        guard url.isFileURL else { throw AddonInstallerError.hostNotAllowed }
+        let tmp = FileManager.default.temporaryDirectory
+            .appendingPathComponent("jugnu-test-\(UUID().uuidString).zip")
+        try FileManager.default.copyItem(at: url, to: tmp)
+        return tmp
     }
 }

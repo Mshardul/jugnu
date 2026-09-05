@@ -25,20 +25,25 @@ public struct RegistryEntry: Codable, Equatable, Sendable {
     public var tags: [String]
     public var description: String?
     public var commands: [RegistryCommand]
+    /// Catalog-side copy of manifest `dependencies` for disclosure before download.
+    public var dependencies: [AddonDependency]
 
     public init(
         id: String, name: String, version: String, api: Int, url: String, sha256: String, summary: String,
         category: String, subcategory: String? = nil, tags: [String] = [],
-        description: String? = nil, commands: [RegistryCommand] = []
+        description: String? = nil, commands: [RegistryCommand] = [],
+        dependencies: [AddonDependency] = []
     ) {
         self.id = id; self.name = name; self.version = version; self.api = api
         self.url = url; self.sha256 = sha256; self.summary = summary
         self.category = category; self.subcategory = subcategory; self.tags = tags
         self.description = description; self.commands = commands
+        self.dependencies = dependencies
     }
 
     enum CodingKeys: String, CodingKey {
         case id, name, version, api, url, sha256, summary, category, subcategory, tags, description, commands
+        case dependencies
     }
 
     public init(from decoder: Decoder) throws {
@@ -55,6 +60,7 @@ public struct RegistryEntry: Codable, Equatable, Sendable {
         tags = try c.decodeIfPresent([String].self, forKey: .tags) ?? []
         description = try c.decodeIfPresent(String.self, forKey: .description)
         commands = try c.decodeIfPresent([RegistryCommand].self, forKey: .commands) ?? []
+        dependencies = try c.decodeIfPresent([AddonDependency].self, forKey: .dependencies) ?? []
     }
 }
 

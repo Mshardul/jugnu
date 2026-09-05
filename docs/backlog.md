@@ -20,7 +20,7 @@ Unbuilt jobs live in the packaging map and gap list below. Shipped first-party s
 | 10 | Security audit (recurring) | Not a ticket — a POV audit lens: [`docs/audit/prompts/security.md`](audit/prompts/security.md). Known seed: zip-slip in `AddonInstaller.unzip()`; expect more from a full installer/runner/registry-trust pass. Findings become tickets after a run. |
 | 11 | ~~Addon process lifecycle + crash recovery (epic)~~ | **Done 2026-09-04** — [Ticket 0057](tickets.md) · [2026-08-30 spec](architecture/2026-08-30-addon-process-lifecycle-design.md) · [plan](superpowers/plans/2026-08-30-addon-process-lifecycle.md). Phases 1–5 shipped. Spec §10 deferred items stay in the spec. Absorbed [0014](tickets.md) [0026](tickets.md) [0032](tickets.md) [0034](tickets.md) [0036](tickets.md) [0041](tickets.md) [0044](tickets.md). |
 | 12 | `session` lifecycle class + addon IPC (epic) | [Ticket 0059](tickets.md) — stub, no design yet. Live process bound to an open panel + bidirectional IPC (`api: 2`). Cut from 0057 (§11); gated on the first `session`-shaped addon (most of Play). |
-| 13 | Addon install & upgrade integrity (epic) | [Ticket 0058](tickets.md) — stub, no design yet. zip-slip + atomic install + [0018](tickets.md)/[0025](tickets.md)/[0029](tickets.md)/[0031](tickets.md)/[0043](tickets.md). Split out of the 0057 discussion. |
+| 13 | Addon install & upgrade integrity (epic) | [Ticket 0058](tickets.md) — draft spec [2026-09-05](architecture/2026-09-05-addon-install-upgrade-integrity-design.md). Six phases: trust/extract → atomic commit → gates (0043/0029) → deps (0025) → upgrade UI (0018) → namespaces (0031). |
 
 **Canonical product surfaces:** [`docs/vision.md`](vision.md) — commands + popup UI + speed; context-aware surfacing later.
 

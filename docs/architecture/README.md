@@ -23,7 +23,7 @@ Architecture decisions are recorded in [decisions/](decisions/). Future-work tic
 | Convention retrofit (names/comments) | Future — [ticket 0013](../tickets.md) |
 | Addon process lifecycle + crash recovery | Draft — under review (revised after review pass) — [2026-08-30 spec](./2026-08-30-addon-process-lifecycle-design.md) · epic [ticket 0057](../tickets.md). Three-class model (`oneshot` / `job` / `daemon`), `AddonProcessHost` keyed by `(addon-id, command-id)`, `AddonRunner` spawn/wait split, crash-durable marker-file reaper, `job` heartbeat watchdog, first-party gate on `lifecycle: daemon`, crash-loop safe mode. Absorbs [0014](../tickets.md), [0026](../tickets.md), [0032](../tickets.md), [0034](../tickets.md), [0036](../tickets.md), [0041](../tickets.md), [0044](../tickets.md). |
 | `session` lifecycle class + addon IPC | Stub epic — [ticket 0059](../tickets.md). Cut from 0057 (§11): live process bound to an open panel, bidirectional newline-JSON IPC (`api: 2`), SIGTERM flush hook, multi-panel window management. Gated on the first `session`-shaped addon. No design doc yet. |
-| Addon install & upgrade integrity | Stub epic — [ticket 0058](../tickets.md). zip-slip + atomic install + [0018](../tickets.md)/[0025](../tickets.md)/[0029](../tickets.md)/[0031](../tickets.md)/[0043](../tickets.md). No design doc yet. |
+| Addon install & upgrade integrity | Approved — [2026-09-05](./2026-09-05-addon-install-upgrade-integrity-design.md) · [plan](../superpowers/plans/2026-09-05-addon-install-upgrade-integrity.md) · epic [ticket 0058](../tickets.md). L2 pipeline; phases absorb [0018](../tickets.md)/[0025](../tickets.md)/[0029](../tickets.md)/[0031](../tickets.md)/[0043](../tickets.md). |
 | SwiftFormat as commit/CI gate | Future epic — [ticket 0015](../tickets.md) |
 | Keep KeyablePanel across hide | Future — [ticket 0016](../tickets.md) |
 | Security audit (installer/runner/registry-trust hardening) | Recurring POV audit, not a ticket — [`docs/audit/prompts/security.md`](../audit/prompts/security.md); seeded with a real zip-slip finding in `AddonInstaller.unzip()`. Findings become tickets after a run. |
@@ -33,7 +33,7 @@ Architecture decisions are recorded in [decisions/](decisions/). Future-work tic
 | Clipboard | Later |
 | Command catalog (inventory) | Living — [../catalog-commands.md](../catalog-commands.md) |
 | UI catalog (mini-apps / view assignment) | Living — [../catalog-ui.md](../catalog-ui.md) |
-| `python-runtime` helper | Approved — implemented locally — [2026-09-04](./2026-09-04-python-runtime-helper-design.md) · [plan](../superpowers/plans/2026-09-04-python-runtime-helper.md) · [0060](../tickets.md) Done (Release asset upload pending) |
-| `clip-tools` (Phase 1 commands) | Approved — Phase 1 implemented — [2026-09-04](./2026-09-04-clip-tools-design.md) · [plan](../superpowers/plans/2026-09-04-clip-tools.md) · [0061](../tickets.md) Done (Transform UI = Phase 2; Release upload pending) |
+| `python-runtime` helper | Approved — published — [2026-09-04](./2026-09-04-python-runtime-helper-design.md) · [plan](../superpowers/plans/2026-09-04-python-runtime-helper.md) · [0060](../tickets.md) Done |
+| `clip-tools` (Phase 1 commands) | Approved — Phase 1 published — [2026-09-04](./2026-09-04-clip-tools-design.md) · [plan](../superpowers/plans/2026-09-04-clip-tools.md) · [0061](../tickets.md) Done (Transform UI = Phase 2) |
 
 Process: brainstorm → section approval → write spec here → human review → implementation plan → code.

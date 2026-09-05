@@ -6,8 +6,10 @@ public struct AddonCardView: View {
     let isInstalled: Bool
     let isEnabled: Bool
     let isInstalling: Bool
+    let updateAvailable: Bool
     let errorMessage: String?
     let onInstall: () -> Void
+    let onUpdate: () -> Void
     let onEnabledChange: (Bool) -> Void
     let onUninstall: () -> Void
     var onTap: (() -> Void)?
@@ -17,16 +19,21 @@ public struct AddonCardView: View {
 
     public init(
         entry: RegistryEntry, isInstalled: Bool, isEnabled: Bool, isInstalling: Bool,
+        updateAvailable: Bool = false,
         errorMessage: String? = nil,
-        onInstall: @escaping () -> Void, onEnabledChange: @escaping (Bool) -> Void,
+        onInstall: @escaping () -> Void,
+        onUpdate: @escaping () -> Void = {},
+        onEnabledChange: @escaping (Bool) -> Void,
         onUninstall: @escaping () -> Void, onTap: (() -> Void)? = nil
     ) {
         self.entry = entry
         self.isInstalled = isInstalled
         self.isEnabled = isEnabled
         self.isInstalling = isInstalling
+        self.updateAvailable = updateAvailable
         self.errorMessage = errorMessage
         self.onInstall = onInstall
+        self.onUpdate = onUpdate
         self.onEnabledChange = onEnabledChange
         self.onUninstall = onUninstall
         self.onTap = onTap
@@ -41,9 +48,16 @@ public struct AddonCardView: View {
         VStack(alignment: .leading, spacing: JugnuTokens.Spacing.row) {
             Button(action: { onTap?() }) {
                 VStack(alignment: .leading, spacing: JugnuTokens.Spacing.row) {
-                    Text(entry.name)
-                        .font(JugnuTokens.font(presetId: store.presetId, role: .headline))
-                        .foregroundStyle(theme.textPrimary)
+                    HStack(alignment: .firstTextBaseline) {
+                        Text(entry.name)
+                            .font(JugnuTokens.font(presetId: store.presetId, role: .headline))
+                            .foregroundStyle(theme.textPrimary)
+                        if updateAvailable {
+                            Text("Update available")
+                                .font(.caption2)
+                                .foregroundStyle(theme.accent)
+                        }
+                    }
                     Text(entry.summary)
                         .font(JugnuTokens.font(presetId: store.presetId, role: .caption))
                         .foregroundStyle(theme.textSecondary)
@@ -67,8 +81,15 @@ public struct AddonCardView: View {
             .buttonStyle(.plain)
 
             AddonActionRow(
-                isInstalled: isInstalled, isEnabled: isEnabled, isInstalling: isInstalling, theme: theme,
-                onInstall: onInstall, onEnabledChange: onEnabledChange, onUninstall: onUninstall
+                isInstalled: isInstalled,
+                isEnabled: isEnabled,
+                isInstalling: isInstalling,
+                updateAvailable: updateAvailable,
+                theme: theme,
+                onInstall: onInstall,
+                onUpdate: onUpdate,
+                onEnabledChange: onEnabledChange,
+                onUninstall: onUninstall
             )
 
             if let errorMessage {

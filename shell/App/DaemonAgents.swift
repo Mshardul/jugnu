@@ -161,3 +161,56 @@ enum DisableWhileTracked {
         return alert.runModal() == .alertFirstButtonReturn
     }
 }
+
+/// Same kill/accept policy when an install or upgrade would replace a live addon tree.
+@MainActor
+enum ReplaceWhileTracked {
+    static func proceed(
+        addonID: String,
+        paths: JugnuPaths,
+        host: AddonProcessHost?,
+        prompt: ((String) -> Bool)? = nil
+    ) -> Bool {
+        let live = paths.addonsDir.appendingPathComponent(addonID)
+        guard FileManager.default.fileExists(atPath: live.path) else { return true }
+        let ask = prompt ?? { ReplaceWhileTracked.appKitPrompt($0) }
+        guard let host, host.hasTracked(addonID: addonID) else { return true }
+        guard ask(addonID) else { return false }
+        host.killTracked(addonID: addonID)
+        return true
+    }
+
+    static func appKitPrompt(_ addonID: String) -> Bool {
+        let alert = NSAlert()
+        alert.messageText = "Stop this addon’s running work?"
+        alert.informativeText =
+            "“\(addonID)” is still running. Reinstalling or updating will replace its files and stop it."
+        alert.addButton(withTitle: "Stop and continue")
+        alert.addButton(withTitle: "Cancel")
+        return alert.runModal() == .alertFirstButtonReturn
+    }
+}
+
+/// Confirm catalog dependencies before the install transaction commits.
+@MainActor
+enum DependencyInstallDisclosure {
+    static func confirm(_ plan: DependencyPlan) -> Bool {
+        let alert = NSAlert()
+        alert.messageText = "Install \(plan.primaryName)?"
+        var lines: [String] = ["This will also handle these addons:"]
+        for dep in plan.dependencies {
+            switch dep.status {
+            case .alreadyInstalled:
+                lines.append("• \(dep.name) — already installed")
+            case .willInstall:
+                lines.append("• \(dep.name) — will be installed now")
+            }
+        }
+        lines.append("")
+        lines.append("Installed is not the same as enabled. You’ll enable each addon yourself.")
+        alert.informativeText = lines.joined(separator: "\n")
+        alert.addButton(withTitle: "Install")
+        alert.addButton(withTitle: "Cancel")
+        return alert.runModal() == .alertFirstButtonReturn
+    }
+}
