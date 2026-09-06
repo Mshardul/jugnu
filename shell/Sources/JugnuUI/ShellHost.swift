@@ -179,6 +179,10 @@ public extension ShellHost {
         startOutsideClickMonitor(onOutside: onOutside)
     }
 
+    func showToast(message: String, isError: Bool) {
+        toast.show(message: message, isError: isError)
+    }
+
     func dismissDetachedPanels() {
         for reference in cards.values {
             reference.value?.orderOut(nil)

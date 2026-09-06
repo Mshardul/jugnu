@@ -52,7 +52,7 @@ Walk this after the 2026-08-23 palette + addon UI product pass. Leave items unch
 
 ### First-run, addons, chrome
 
-- [ ] First-run installs the starter set from registry (falls back to local `addons/` if offline): `jugnu.mic-mute`, `jugnu.focus-toggle`, `jugnu.paste-plain`, `jugnu.floating-note`, `jugnu.ports`
+- [ ] First-run: two steps (keep-current toggles, then checkbox catalog). Skip/close rules and Browse after close are in **Manual — keep current (0063)** below.
 - [ ] Preferences → **Install starter addons** downloads zips + verifies sha256
 - [ ] Preferences: disable removes from palette; uninstall removes files + declared cleanup
 - [ ] **clipboard-history watcher starts on enable** (ticket 0057): enable it without invoking a command; `launchctl print gui/$(id -u)/com.jugnu.clipboard-history.watch` succeeds and `~/Library/LaunchAgents/com.jugnu.clipboard-history.watch.plist` exists. Disable in Preferences → both are gone → log out and back in → watcher does **not** return, no new pasteboard entries recorded
@@ -142,4 +142,13 @@ Walk on a Mac after the namespaced `jugnu.*` zips are on `addons-v1.0.0` and `re
 - [ ] **Dependency disclosure:** install an addon that declares a helper (`jugnu.clip-tools` → `python-runtime`) or a catalog dep. The sheet lists what is already installed vs what will be installed, and notes installed ≠ enabled. Helper lands under `helpers/<id>/<version>/`.
 - [ ] **Update badge:** with an installed addon older than the registry SemVer, the catalog card shows Update; running it preserves enabled and replaces the tree. Same-version republish does **not** badge.
 - [ ] **Namespace migrate (existing install):** a pre-0058 `addons/mic-mute/` tree becomes `addons/jugnu.mic-mute/` on next launch; recents/favorites remap; a second launch is a no-op (completion marker present).
+
+## Manual — keep current (0063)
+
+- [ ] First launch: step 1 defaults on; Skip still leaves both on; step 2 recommended pre-checked; Skip installs nothing and Browse opens
+- [ ] Continue step 2 installs checked addons (including a non-recommended if checked)
+- [ ] Preferences → Updates toggles persist in jugnu.yaml
+- [ ] Menu Check for Updates… with matching 0.1.0 registry: “You’re up to date.”
+- [ ] Later on an app prompt does not download; next launch prompts again
+- [ ] Keep-addons on + outdated catalog row: bulk confirm; Cancel downloads nothing; catalog per-card Update still works with keep-addons off
 

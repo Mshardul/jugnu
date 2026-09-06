@@ -12,5 +12,13 @@ final class PathsTests: XCTestCase {
             paths.helperRoot(id: "play-runtime", version: "1.0.0").path,
             "/tmp/jugnu-home-test/.local/share/jugnu/helpers/play-runtime/1.0.0"
         )
+        XCTAssertEqual(
+            paths.appUpdateDir.path,
+            "/tmp/jugnu-home-test/.local/share/jugnu/state/app-update"
+        )
+        XCTAssertEqual(
+            paths.appUpdateStagingDir.path,
+            "/tmp/jugnu-home-test/.local/share/jugnu/state/app-update/.staging"
+        )
     }
 }

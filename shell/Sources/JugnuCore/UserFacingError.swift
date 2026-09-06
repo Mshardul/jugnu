@@ -124,6 +124,26 @@ public enum UserFacingError {
             case .invalid: return catalogInvalid
             }
         }
+        if let app = error as? AppUpdateError {
+            switch app {
+            case .sha256Required:
+                return "This package is missing a checksum. Nothing was installed."
+            case .invalidId:
+                return "The app update catalog couldn’t be read."
+            case .invalidRegistryURL:
+                return "The catalog URL isn't valid."
+            case .versionMismatch:
+                return "The downloaded app didn’t match the catalog. Nothing was installed."
+            case .bundleIdentity:
+                return "The downloaded app isn’t a Jugnu app. Nothing was installed."
+            case .destNotWritable:
+                return "Jugnu can’t replace itself here. Move it to Applications and try again."
+            case .helperSpawnFailed:
+                return "Couldn’t start the updater. Try again."
+            case .macOSTooOld(let required):
+                return "This version needs macOS \(required) or newer."
+            }
+        }
         if let registry = error as? RegistryClientError {
             switch registry {
             case .httpStatus:

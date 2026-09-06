@@ -16,7 +16,9 @@ This process covers the native Jugnu shell and independently distributed addons.
 2. Run the macOS smoke checklist in [shell-smoke.md](architecture/shell-smoke.md).
 3. Update `CHANGELOG.md` with dated, single-line entries and a release heading.
 4. Build and verify the shell-only app; do not include addon payloads or zip files in `Jugnu.app`.
-5. Publish the app using the repository's chosen distribution and signing process.
+5. Zip the universal `Jugnu.app`, record its sha256, and publish a GitHub Release tagged `shell-vX.Y.Z` with asset `Jugnu-X.Y.Z.zip`. Never silently replace a published zip.
+6. Update `registry/jugnu-app.json` `version`, `url`, and `sha256` (and optional `notes`) to match that release.
+7. Publish the app using the repository's chosen distribution and signing process.
 
 ## Addon Packaging
 

@@ -306,13 +306,23 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
     }
 
     func completeFirstRun(
-        installRecommended: Bool,
+        keepAppCurrent: Bool,
+        keepAddonsCurrent: Bool,
         useCommandSpace: Bool,
+        selectedAddonIDs: [String],
         localAddonRoots: [URL]
     ) async throws {
-        if installRecommended {
+        var c = try store.loadOrCreateDefaults()
+        c.shell.keepAppCurrent = keepAppCurrent
+        c.shell.keepAddonsCurrent = keepAddonsCurrent
+        if useCommandSpace {
+            c.shell.hotkey = "cmd+space"
+        }
+        try saveConfig(c)
+
+        if !selectedAddonIDs.isEmpty {
             do {
-                try await installFromRegistry(ids: ShellConfig.recommendedAddonIDs)
+                try await installFromRegistry(ids: selectedAddonIDs)
             } catch {
                 if localAddonRoots.isEmpty { throw error }
                 for root in localAddonRoots {
@@ -328,11 +338,6 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
                 }
                 statusMessage = "Couldn’t reach the catalog, so the starter addons were copied from this Mac."
             }
-        }
-        if useCommandSpace {
-            var c = try store.loadOrCreateDefaults()
-            c.shell.hotkey = "cmd+space"
-            try saveConfig(c)
         }
         state.firstRunCompleted = true
         try stateStore.save(state)

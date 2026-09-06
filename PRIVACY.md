@@ -17,7 +17,7 @@ Permissions are requested only when a feature needs them and should be explained
 
 ## Network Access
 
-The shell may use the network to fetch the addon registry and release assets. Addons may use the network only when their documented job requires it. Network access should be visible in the addon documentation and should not transmit unrelated user data.
+The shell may use the network to fetch the addon registry, the app registry (`jugnu-app.json`), and release assets when keep-current is on or the user checks for updates. Addons may use the network only when their documented job requires it. Network access should be visible in the addon documentation and should not transmit unrelated user data.
 
 ## Local Storage
 

@@ -67,6 +67,18 @@ public struct JugnuPaths: Sendable {
         home.appendingPathComponent(".local/share/jugnu/state/registry-cache.json")
     }
 
+    public var appUpdateDir: URL {
+        stateDir.appendingPathComponent("app-update")
+    }
+
+    public var appUpdateStagingDir: URL {
+        appUpdateDir.appendingPathComponent(".staging")
+    }
+
+    public var appUpdateTrashDir: URL {
+        appUpdateDir.appendingPathComponent(".trash")
+    }
+
     public init(home: URL = FileManager.default.homeDirectoryForCurrentUser) {
         self.home = home
     }

@@ -7,6 +7,7 @@ struct PrefsView: View {
     @ObservedObject var model: AppModel
     var shellHost: ShellHost
     var onOpenCatalog: () -> Void
+    var onCheckForUpdates: () -> Void
     @State private var ids: [String] = []
     @State private var errorText: String?
     @Environment(\.colorScheme) private var colorScheme
@@ -109,6 +110,19 @@ struct PrefsView: View {
                 }
                 .pickerStyle(.segmented)
 
+                Divider()
+
+                Text("Updates")
+                    .font(JugnuTokens.font(presetId: themeStore.presetId, role: .title2))
+                Text("Jugnu \(ShellVersion.current)")
+                    .font(JugnuTokens.font(presetId: themeStore.presetId, role: .caption))
+                    .foregroundStyle(theme.textSecondary)
+                Toggle("Keep Jugnu current", isOn: keepAppBinding)
+                Toggle("Keep addons current", isOn: keepAddonsBinding)
+                Button("Check for Updates") {
+                    onCheckForUpdates()
+                }
+
                 Text("Catalog: \(model.config.shell.registryURL)")
                     .font(.caption2)
                     .foregroundStyle(theme.textSecondary)
@@ -145,6 +159,28 @@ struct PrefsView: View {
             set: { value in
                 var config = model.config
                 config.palette.firstView = value
+                try? model.saveConfig(config)
+            }
+        )
+    }
+
+    private var keepAppBinding: Binding<Bool> {
+        Binding(
+            get: { model.config.shell.keepAppCurrent },
+            set: { value in
+                var config = model.config
+                config.shell.keepAppCurrent = value
+                try? model.saveConfig(config)
+            }
+        )
+    }
+
+    private var keepAddonsBinding: Binding<Bool> {
+        Binding(
+            get: { model.config.shell.keepAddonsCurrent },
+            set: { value in
+                var config = model.config
+                config.shell.keepAddonsCurrent = value
                 try? model.saveConfig(config)
             }
         )

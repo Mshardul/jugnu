@@ -35,5 +35,6 @@ Architecture decisions are recorded in [decisions/](decisions/). Future-work tic
 | UI catalog (mini-apps / view assignment) | Living — [../catalog-ui.md](../catalog-ui.md) |
 | `python-runtime` helper | Approved — published — [2026-09-04](./2026-09-04-python-runtime-helper-design.md) · [plan](../superpowers/plans/2026-09-04-python-runtime-helper.md) · [0060](../tickets.md) Done |
 | `clip-tools` (Phase 1 commands) | Approved — Phase 1 published — [2026-09-04](./2026-09-04-clip-tools-design.md) · [plan](../superpowers/plans/2026-09-04-clip-tools.md) · [0061](../tickets.md) Done (Transform UI = Phase 2) |
+| Keep current (app + addons + first launch) | Approved — [2026-09-07](./2026-09-07-keep-current-design.md) · [plan](../superpowers/plans/2026-09-07-keep-current.md) · epic [ticket 0063](../tickets.md). Unified installer for the shell zip; keep-app / keep-addons confirms; two-step first-run. Absorbs [0017](../tickets.md) [0062](../tickets.md) [0004](../tickets.md). |
 
 Process: brainstorm → section approval → write spec here → human review → implementation plan → code.

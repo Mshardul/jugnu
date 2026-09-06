@@ -30,6 +30,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var reaper: AddonReaper?
     private var launchGuard: LaunchGuard?
     private var inRecovery = false
+    private var keepCurrent: KeepCurrentCoordinator?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         if !ScreenshotMode.isActive, yieldToRunningInstance() { return }
@@ -114,9 +115,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let menuBar = MenuBarController(
             onOpenPalette: { [weak self] in self?.invokeShell() },
             onPreferences: { [weak self] in self?.pushSettings() },
-            onQuit: { NSApp.terminate(nil) }
+            onQuit: { NSApp.terminate(nil) },
+            onCheckForUpdates: { [weak self] in
+                Task { await self?.keepCurrent?.checkManual() }
+            }
         )
         self.menuBar = menuBar
+
+        wireKeepCurrent(model: model, shellHost: shellHost)
 
         let hotkey = HotkeyController(model: model) { [weak self] in
             self?.invokeShell()
@@ -151,12 +157,55 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             let first = FirstRunWindowController(model: model) { [weak self, weak hotkey] in
                 hotkey?.registerFromConfig()
                 self?.firstRun = nil
+                self?.pushCatalog()
             }
             self.firstRun = first
             first.show()
         }
 
         launchGuard?.markCleanLaunch()
+
+        Task { [weak self] in
+            await self?.keepCurrent?.checkOnLaunch()
+        }
+    }
+
+    private func wireKeepCurrent(model: AppModel, shellHost: ShellHost) {
+        let coordinator = KeepCurrentCoordinator(model: model, shellHost: shellHost)
+        coordinator.preparePanel = { [weak self] in
+            guard let self, let model = self.model else { return }
+            self.ensurePanelIfNeeded(model: model)
+            self.shellHost?.setOnCancel { [weak self] in self?.popOrDismiss() }
+        }
+        coordinator.onDismissConfirm = { [weak self] in self?.popOrDismiss() }
+        coordinator.onApplyAppUpdate = { [weak self] staged in
+            self?.applyStagedAppUpdate(staged)
+        }
+        keepCurrent = coordinator
+    }
+
+    private func applyStagedAppUpdate(_ stagedApp: URL) {
+        guard let model, let processHost else { return }
+        do {
+            let script = try AppApplyHelper.write(
+                dir: model.paths.appUpdateDir,
+                pid: ProcessInfo.processInfo.processIdentifier,
+                sourceApp: stagedApp,
+                destApp: Bundle.main.bundleURL
+            )
+            processHost.killAll()
+            let process = Process()
+            process.executableURL = URL(fileURLWithPath: "/bin/sh")
+            process.arguments = [script.path]
+            process.standardOutput = FileHandle.nullDevice
+            process.standardError = FileHandle.nullDevice
+            try process.run()
+            NSApp.terminate(nil)
+        } catch {
+            let message = UserFacingError.message(for: AppUpdateError.helperSpawnFailed)
+            model.statusMessage = message
+            shellHost?.showToast(message: message, isError: true)
+        }
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
@@ -427,7 +476,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 onRemoveFavorite: { [weak self] cmd in self?.model?.removeFavorite(qualifiedId: cmd.qualifiedId) }
             ))
         case .settings:
-            shellHost.setContent(PrefsView(model: model, shellHost: shellHost, onOpenCatalog: { [weak self] in self?.pushCatalog() }))
+            shellHost.setContent(PrefsView(
+                model: model,
+                shellHost: shellHost,
+                onOpenCatalog: { [weak self] in self?.pushCatalog() },
+                onCheckForUpdates: { [weak self] in
+                    Task { await self?.keepCurrent?.checkManual() }
+                }
+            ))
         case .catalog:
             let vm = catalogViewModel(model: model)
             shellHost.setContent(BrowseCatalogView(

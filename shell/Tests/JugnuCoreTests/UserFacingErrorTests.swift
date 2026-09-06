@@ -55,4 +55,32 @@ final class UserFacingErrorTests: XCTestCase {
         )
         XCTAssertNotEqual(UserFacingError.catalogInvalid, UserFacingError.catalogUnreachable)
     }
+
+    func testAppUpdateErrorsArePlainLanguage() {
+        XCTAssertEqual(
+            UserFacingError.message(for: AppUpdateError.sha256Required),
+            "This package is missing a checksum. Nothing was installed."
+        )
+        XCTAssertEqual(
+            UserFacingError.message(for: AppUpdateError.invalidRegistryURL),
+            "The catalog URL isn't valid."
+        )
+        XCTAssertFalse(UserFacingError.message(for: AppUpdateError.invalidId("x")).contains("invalidId"))
+        XCTAssertEqual(
+            UserFacingError.message(for: AppUpdateError.versionMismatch(expected: "0.2.0", actual: "0.1.0")),
+            "The downloaded app didn’t match the catalog. Nothing was installed."
+        )
+        XCTAssertEqual(
+            UserFacingError.message(for: AppUpdateError.bundleIdentity),
+            "The downloaded app isn’t a Jugnu app. Nothing was installed."
+        )
+        XCTAssertEqual(
+            UserFacingError.message(for: AppUpdateError.destNotWritable),
+            "Jugnu can’t replace itself here. Move it to Applications and try again."
+        )
+        XCTAssertEqual(
+            UserFacingError.message(for: AppUpdateError.helperSpawnFailed),
+            "Couldn’t start the updater. Try again."
+        )
+    }
 }

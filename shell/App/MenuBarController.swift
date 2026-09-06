@@ -17,9 +17,15 @@ final class MenuBarController {
         onOpenPalette: @escaping () -> Void,
         onPreferences: @escaping () -> Void,
         onQuit: @escaping () -> Void,
+        onCheckForUpdates: (() -> Void)? = nil,
         recovery: RecoveryMenuActions? = nil
     ) {
-        proxy = Proxy(onOpenPalette: onOpenPalette, onPreferences: onPreferences, onQuit: onQuit)
+        proxy = Proxy(
+            onOpenPalette: onOpenPalette,
+            onPreferences: onPreferences,
+            onQuit: onQuit,
+            onCheckForUpdates: onCheckForUpdates
+        )
         recoveryProxy = recovery.map { RecoveryProxy(actions: $0) }
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let button = statusItem.button {
@@ -47,6 +53,15 @@ final class MenuBarController {
             menu.addItem(open)
             menu.addItem(prefs)
             menu.addItem(.separator())
+            if onCheckForUpdates != nil {
+                let updates = NSMenuItem(
+                    title: "Check for Updates…",
+                    action: #selector(Proxy.checkForUpdates),
+                    keyEquivalent: ""
+                )
+                updates.target = proxy
+                menu.addItem(updates)
+            }
         }
         let quit = NSMenuItem(title: "Quit Jugnu", action: #selector(Proxy.quit), keyEquivalent: "q")
         quit.target = proxy
@@ -70,16 +85,24 @@ private final class Proxy: NSObject {
     let onOpenPalette: () -> Void
     let onPreferences: () -> Void
     let onQuit: () -> Void
+    let onCheckForUpdates: (() -> Void)?
 
-    init(onOpenPalette: @escaping () -> Void, onPreferences: @escaping () -> Void, onQuit: @escaping () -> Void) {
+    init(
+        onOpenPalette: @escaping () -> Void,
+        onPreferences: @escaping () -> Void,
+        onQuit: @escaping () -> Void,
+        onCheckForUpdates: (() -> Void)?
+    ) {
         self.onOpenPalette = onOpenPalette
         self.onPreferences = onPreferences
         self.onQuit = onQuit
+        self.onCheckForUpdates = onCheckForUpdates
     }
 
     @objc func openPalette() { onOpenPalette() }
     @objc func preferences() { onPreferences() }
     @objc func quit() { onQuit() }
+    @objc func checkForUpdates() { onCheckForUpdates?() }
 }
 
 @MainActor

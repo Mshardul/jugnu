@@ -14,7 +14,44 @@ final class ConfigStoreTests: XCTestCase {
         XCTAssertEqual(config.theme.dark.accent, "#F5A623")
         XCTAssertEqual(config.sound, true)
         XCTAssertEqual(config.shell.hiddenShellCommands, [])
+        XCTAssertTrue(config.shell.keepAppCurrent)
+        XCTAssertTrue(config.shell.keepAddonsCurrent)
         XCTAssertTrue(FileManager.default.fileExists(atPath: store.paths.configFile.path))
+    }
+
+    func testOmittedKeepCurrentKeysDefaultTrue() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let paths = JugnuPaths(home: dir)
+        try FileManager.default.createDirectory(
+            at: paths.configFile.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        try """
+        version: 1
+        shell:
+          hotkey: option+space
+        addons: {}
+        """.write(to: paths.configFile, atomically: true, encoding: .utf8)
+        let loaded = try ConfigStore(paths: paths).load()
+        XCTAssertTrue(loaded.shell.keepAppCurrent)
+        XCTAssertTrue(loaded.shell.keepAddonsCurrent)
+    }
+
+    func testRoundTripKeepCurrentFalse() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+
+        let store = ConfigStore(paths: JugnuPaths(home: dir))
+        var config = try store.loadOrCreateDefaults()
+        config.shell.keepAppCurrent = false
+        config.shell.keepAddonsCurrent = false
+        try store.save(config)
+        let loaded = try store.load()
+        XCTAssertFalse(loaded.shell.keepAppCurrent)
+        XCTAssertFalse(loaded.shell.keepAddonsCurrent)
     }
 
     func testRoundTripHiddenShellCommands() throws {

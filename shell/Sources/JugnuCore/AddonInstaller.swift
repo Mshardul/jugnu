@@ -130,6 +130,7 @@ public struct AddonInstaller: Sendable {
     public func recoverInstallOrphans() {
         AtomicCommit.recoverOrphans(stagingParent: paths.addonsStagingDir, trashParent: paths.addonsTrashDir)
         AtomicCommit.recoverOrphans(stagingParent: paths.helpersStagingDir, trashParent: paths.helpersTrashDir)
+        AtomicCommit.recoverOrphans(stagingParent: paths.appUpdateStagingDir, trashParent: paths.appUpdateTrashDir)
     }
 
     public func readInstalledAddonVersions() -> [String: String] {

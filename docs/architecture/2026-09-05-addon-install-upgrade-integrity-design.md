@@ -208,7 +208,7 @@ Discover → disclose → **same** pipeline (not a second updater).
 | Topic | Decision |
 |---|---|
 | Detection | Installed `addon.yaml` `version` vs registry `version` (SemVer). Registry newer → update available. |
-| Auto | Never. Manual **Update** on catalog card/detail only. |
+| Auto | Never silent. Manual **Update** on catalog card/detail stays. Launch/bulk confirm when the user has keep-addons on is [keep current](./2026-09-07-keep-current-design.md) — same pipeline, one prompt, not per-card. |
 | Helpers | No catalog update UI. New helper pin on upgraded addon → ensure via staged helper commit; old helper version may drop via last-consumer cleanup. |
 | Deps on update | If the new version needs new dependencies, reuse phase 4 disclosure (including exact-version refuse). |
 | Enable | Upgrade does not change enabled/disabled. |
