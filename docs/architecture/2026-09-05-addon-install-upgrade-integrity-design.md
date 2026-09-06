@@ -79,7 +79,7 @@ copy/source tree into stage → load manifest → package gates → atomic commi
 | sha256 | Registry / helper catalog entries **must** have non-empty `sha256`. Empty or nil → hard fail. **Both** current skip sites (`installFromLocalZip` and `installHelperFromLocalZip`) lose the skip path. |
 | When | Hash verified on zip bytes **before** any extract. |
 | Transport | `https` only. Reject `file://` for download URLs. |
-| Host allowlist (v0) | `github.com`, `objects.githubusercontent.com` (extend only by explicit list change). |
+| Host allowlist (v0) | `github.com`, `objects.githubusercontent.com`, `release-assets.githubusercontent.com`, `github-releases.githubusercontent.com` (extend only by explicit list change). |
 | Redirects | **Mechanism required:** do not use `URLSession.shared` for registry/helper downloads. Use a dedicated `URLSession` whose delegate implements `urlSession(_:task:willPerformHTTPRedirection:…)` (or equivalent) and **cancels** any hop whose host leaves the allowlist. Transparent follow-then-hope is insufficient. |
 | Signing seam | Optional signature verify may sit beside/after hash, still **before** extract; same pipeline. |
 

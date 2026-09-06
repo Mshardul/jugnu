@@ -9,16 +9,22 @@
 /* Begin PBXBuildFile section */
 		0C269B59DB0AD928393F514F /* JugnuApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFC6769799C763B68AB9458E /* JugnuApp.swift */; };
 		2EF413B28BA833B1BA5D290B /* PrefsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F65D4A1078835B0D1646C28 /* PrefsView.swift */; };
+		3A4D0C19C22EC9C67CBCFB55 /* AddonProcessHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68333462923074742BE70CAB /* AddonProcessHost.swift */; };
+		3AF25473E76FCC6758730646 /* ScreenshotFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91CC5912906B1489BE2F8456 /* ScreenshotFlow.swift */; };
+		53E92CA35345AB32F40039EA /* ShellIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0098016C87FA73A4C628AA /* ShellIdentity.swift */; };
 		548EE8613579A3EE86FFEA1F /* BrowseCatalogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E828A6B867A511A83ECEBC3 /* BrowseCatalogViewModel.swift */; };
 		A1EBD9F94A85D7D3946C0860 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EF23787A5713452BFF2A17F8 /* Assets.xcassets */; };
 		AC65EF4AD2F34CBB13F2E6F9 /* HotKey in Frameworks */ = {isa = PBXBuildFile; productRef = 7EEF6C210640E38020837ACD /* HotKey */; };
 		AD78C530AE4729B3D27FE654 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D00E1FEF0969F288E08FF6 /* AppModel.swift */; };
+		B8F039298B98F8132CFD3642 /* ScreenshotMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D8FD74A5590757484AB56B4 /* ScreenshotMode.swift */; };
+		C20F5AFFCD6A18EB835C7F57 /* LaunchGuard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7D9128B1EEA5448DD3A1F9F /* LaunchGuard.swift */; };
 		CF46D9EC5366F66E608B763D /* MenuBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE92CF58DD3BE972D2AEC8CB /* MenuBarController.swift */; };
 		CFFE550ED2B1ABABCBF8B52D /* HotkeyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 278F0380D93A6EEE31AD2C2F /* HotkeyController.swift */; };
 		D075254A62556C0A795B0DAB /* AddonUninstallPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7827A8A356F9392C623B554 /* AddonUninstallPresenter.swift */; };
+		D0B2FD226431EDEE3D340434 /* DaemonAgents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 250A8E808389C83FDDFEF2A5 /* DaemonAgents.swift */; };
 		D3584E6337F9B4D089C8193E /* JugnuCore in Frameworks */ = {isa = PBXBuildFile; productRef = 24FB2BFFCBA284CE5BC001B6 /* JugnuCore */; };
 		D46018A13E56874B0C944D88 /* JugnuUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5EA3A420B1701DCC99B5E95F /* JugnuUI */; };
-		EF0699E4A55CD1F769DD87CA /* SpikeTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8FC0D37D8BAF5D97554D37 /* SpikeTest.swift */; };
+		F6D1A03B6F3606EAC5C6A914 /* AddonReaper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B75FD8B95BC991E13A258885 /* AddonReaper.swift */; };
 		F8BD7FCD72AE22D31DA008F7 /* FirstRunWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E983F2778775352830C719C /* FirstRunWindow.swift */; };
 /* End PBXBuildFile section */
 
@@ -33,13 +39,19 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		250A8E808389C83FDDFEF2A5 /* DaemonAgents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DaemonAgents.swift; sourceTree = "<group>"; };
 		270E0874AB20E0EB3A96CB16 /* ScreenshotTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScreenshotTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		278F0380D93A6EEE31AD2C2F /* HotkeyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyController.swift; sourceTree = "<group>"; };
 		4E828A6B867A511A83ECEBC3 /* BrowseCatalogViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowseCatalogViewModel.swift; sourceTree = "<group>"; };
 		5E983F2778775352830C719C /* FirstRunWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstRunWindow.swift; sourceTree = "<group>"; };
+		68333462923074742BE70CAB /* AddonProcessHost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddonProcessHost.swift; sourceTree = "<group>"; };
+		6A0098016C87FA73A4C628AA /* ShellIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShellIdentity.swift; sourceTree = "<group>"; };
 		8F65D4A1078835B0D1646C28 /* PrefsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefsView.swift; sourceTree = "<group>"; };
+		91CC5912906B1489BE2F8456 /* ScreenshotFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotFlow.swift; sourceTree = "<group>"; };
+		9D8FD74A5590757484AB56B4 /* ScreenshotMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotMode.swift; sourceTree = "<group>"; };
 		A7827A8A356F9392C623B554 /* AddonUninstallPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddonUninstallPresenter.swift; sourceTree = "<group>"; };
-		AA8FC0D37D8BAF5D97554D37 /* SpikeTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpikeTest.swift; sourceTree = "<group>"; };
+		A7D9128B1EEA5448DD3A1F9F /* LaunchGuard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchGuard.swift; sourceTree = "<group>"; };
+		B75FD8B95BC991E13A258885 /* AddonReaper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddonReaper.swift; sourceTree = "<group>"; };
 		BE92CF58DD3BE972D2AEC8CB /* MenuBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarController.swift; sourceTree = "<group>"; };
 		C5935023FD7BC462A1C14B9A /* shell */ = {isa = PBXFileReference; lastKnownFileType = folder; name = shell; path = .; sourceTree = SOURCE_ROOT; };
 		C92B9A72BEBE9AA2C83556D4 /* Jugnu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Jugnu.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -65,7 +77,7 @@
 		9E29639983CEE27F74846C07 /* ScreenshotTests */ = {
 			isa = PBXGroup;
 			children = (
-				AA8FC0D37D8BAF5D97554D37 /* SpikeTest.swift */,
+				91CC5912906B1489BE2F8456 /* ScreenshotFlow.swift */,
 			);
 			path = ScreenshotTests;
 			sourceTree = "<group>";
@@ -90,15 +102,21 @@
 		F57367362B9A9A9EFD13E750 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				68333462923074742BE70CAB /* AddonProcessHost.swift */,
+				B75FD8B95BC991E13A258885 /* AddonReaper.swift */,
 				A7827A8A356F9392C623B554 /* AddonUninstallPresenter.swift */,
 				D3D00E1FEF0969F288E08FF6 /* AppModel.swift */,
 				EF23787A5713452BFF2A17F8 /* Assets.xcassets */,
 				4E828A6B867A511A83ECEBC3 /* BrowseCatalogViewModel.swift */,
+				250A8E808389C83FDDFEF2A5 /* DaemonAgents.swift */,
 				5E983F2778775352830C719C /* FirstRunWindow.swift */,
 				278F0380D93A6EEE31AD2C2F /* HotkeyController.swift */,
 				EFC6769799C763B68AB9458E /* JugnuApp.swift */,
+				A7D9128B1EEA5448DD3A1F9F /* LaunchGuard.swift */,
 				BE92CF58DD3BE972D2AEC8CB /* MenuBarController.swift */,
 				8F65D4A1078835B0D1646C28 /* PrefsView.swift */,
+				9D8FD74A5590757484AB56B4 /* ScreenshotMode.swift */,
+				6A0098016C87FA73A4C628AA /* ShellIdentity.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -210,7 +228,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EF0699E4A55CD1F769DD87CA /* SpikeTest.swift in Sources */,
+				3AF25473E76FCC6758730646 /* ScreenshotFlow.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -218,14 +236,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3A4D0C19C22EC9C67CBCFB55 /* AddonProcessHost.swift in Sources */,
+				F6D1A03B6F3606EAC5C6A914 /* AddonReaper.swift in Sources */,
 				D075254A62556C0A795B0DAB /* AddonUninstallPresenter.swift in Sources */,
 				AD78C530AE4729B3D27FE654 /* AppModel.swift in Sources */,
 				548EE8613579A3EE86FFEA1F /* BrowseCatalogViewModel.swift in Sources */,
+				D0B2FD226431EDEE3D340434 /* DaemonAgents.swift in Sources */,
 				F8BD7FCD72AE22D31DA008F7 /* FirstRunWindow.swift in Sources */,
 				CFFE550ED2B1ABABCBF8B52D /* HotkeyController.swift in Sources */,
 				0C269B59DB0AD928393F514F /* JugnuApp.swift in Sources */,
+				C20F5AFFCD6A18EB835C7F57 /* LaunchGuard.swift in Sources */,
 				CF46D9EC5366F66E608B763D /* MenuBarController.swift in Sources */,
 				2EF413B28BA833B1BA5D290B /* PrefsView.swift in Sources */,
+				B8F039298B98F8132CFD3642 /* ScreenshotMode.swift in Sources */,
+				53E92CA35345AB32F40039EA /* ShellIdentity.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

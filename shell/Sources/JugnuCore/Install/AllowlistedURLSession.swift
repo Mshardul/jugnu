@@ -16,11 +16,19 @@ public final class AllowlistedDownloadSession: NSObject, URLSessionTaskDelegate,
             throw AddonInstallerError.hostNotAllowed
         }
         do {
-            let (tempURL, _) = try await session.download(from: url)
+            let (tempURL, response) = try await session.download(from: url)
+            try Self.requireSuccess(response)
             return tempURL
         } catch let error as AddonInstallerError {
             throw error
         } catch {
+            throw AddonInstallerError.downloadFailed
+        }
+    }
+
+    /// Rejects cancelled-redirect leftovers (empty 302 body) instead of hashing them.
+    public static func requireSuccess(_ response: URLResponse) throws {
+        guard let http = response as? HTTPURLResponse, (200 ..< 300).contains(http.statusCode) else {
             throw AddonInstallerError.downloadFailed
         }
     }

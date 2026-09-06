@@ -11,6 +11,26 @@ final class InstallHostAllowlistTests: XCTestCase {
                 URL(string: "https://objects.githubusercontent.com/github-production-release-asset/1")!
             )
         )
+        XCTAssertTrue(
+            InstallHostAllowlist.isAllowed(
+                URL(string: "https://release-assets.githubusercontent.com/github-production-release-asset/1")!
+            )
+        )
+        XCTAssertTrue(
+            InstallHostAllowlist.isAllowed(
+                URL(string: "https://github-releases.githubusercontent.com/github-production-release-asset/1")!
+            )
+        )
+    }
+
+    func testDownloadRejectsNonSuccessHTTPStatus() throws {
+        let url = URL(string: "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/x.zip")!
+        let redirect = HTTPURLResponse(url: url, statusCode: 302, httpVersion: nil, headerFields: nil)!
+        XCTAssertThrowsError(try AllowlistedDownloadSession.requireSuccess(redirect)) {
+            XCTAssertEqual($0 as? AddonInstallerError, .downloadFailed)
+        }
+        let ok = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
+        XCTAssertNoThrow(try AllowlistedDownloadSession.requireSuccess(ok))
     }
 
     func testRejectsFileAndForeignHosts() {

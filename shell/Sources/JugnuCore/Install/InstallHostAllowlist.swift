@@ -4,6 +4,8 @@ public enum InstallHostAllowlist {
     public static let hosts: Set<String> = [
         "github.com",
         "objects.githubusercontent.com",
+        "release-assets.githubusercontent.com",
+        "github-releases.githubusercontent.com",
     ]
 
     /// Returns true when `url` is https and its host is on the allowlist.
