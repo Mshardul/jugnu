@@ -26,7 +26,7 @@ Nothing here is bundled inside `Jugnu.app`. Users install zips into `~/.local/sh
 | `nudges` | recurring wellness reminders with detached card UI |
 | `clip-tools` | clipboard text format / convert / line tools (requires `python-runtime` helper) |
 
-Package: `scripts/package-addon.sh addons/<id> dist/`
+Package: `scripts/package-addon.sh addons/jugnu.<job> dist/` → `dist/jugnu.<job>-<version>.zip`
 
 ## Hierarchy (user POV)
 

@@ -211,11 +211,11 @@ dependencies:
 
 ## Docs checklist (fold into the phase that introduces the field)
 
-- [ ] `docs/addon-manifest.md` — `minShellVersion`, `dependencies`, namespaced `id`, reserved names
-- [ ] `docs/architecture/README.md` — link plan; status Approved when implementing
-- [ ] `docs/tickets.md` — 0018/0025/0029/0031/0043/0058 remarks as phases complete
-- [ ] `CHANGELOG.md` — one line per phase ship (or one epic summary at end — prefer per phase)
-- [ ] `docs/architecture/shell-smoke.md` — manual: install, cancel, replace-under-running, dep disclosure, update, namespaced install
+- [x] `docs/addon-manifest.md` — `minShellVersion`, `dependencies`, namespaced `id`, reserved names
+- [x] `docs/architecture/README.md` — link plan; status Approved when implementing
+- [x] `docs/tickets.md` — 0018/0025/0029/0031/0043/0058 remarks as phases complete
+- [x] `CHANGELOG.md` — one line per phase ship (or one epic summary at end — prefer per phase)
+- [x] `docs/architecture/shell-smoke.md` — manual: install, cancel, replace-under-running, dep disclosure, update, namespaced install
 
 ---
 

@@ -10,9 +10,10 @@ final class RegistryLiveTests: XCTestCase {
         } catch {
             throw XCTSkip("Registry unreachable: \(error)")
         }
-        let mic = try XCTUnwrap(entries.first { $0.id == "mic-mute" })
+        let mic = try XCTUnwrap(entries.first { $0.id == "jugnu.mic-mute" })
         XCTAssertFalse(mic.sha256.isEmpty)
         XCTAssertFalse(mic.url.isEmpty)
+        XCTAssertTrue(mic.url.contains("jugnu.mic-mute"))
 
         let home = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: home, withIntermediateDirectories: true)
@@ -21,8 +22,10 @@ final class RegistryLiveTests: XCTestCase {
         let paths = JugnuPaths(home: home)
         let installer = AddonInstaller(paths: paths)
         try await installer.install(entry: mic, enable: true)
-        let manifestURL = paths.addonsDir.appendingPathComponent("mic-mute/addon.yaml")
+        let manifestURL = paths.addonsDir.appendingPathComponent("jugnu.mic-mute/addon.yaml")
         XCTAssertTrue(FileManager.default.fileExists(atPath: manifestURL.path))
+        let yaml = try String(contentsOf: manifestURL, encoding: .utf8)
+        XCTAssertTrue(yaml.contains("id: jugnu.mic-mute"))
     }
 
     func testClipboardHistoryUninstallCleansTempAddonWithoutTouchingExistingAgent() async throws {
@@ -39,8 +42,8 @@ final class RegistryLiveTests: XCTestCase {
         } catch {
             throw XCTSkip("Registry unreachable: \(error)")
         }
-        let clip = try XCTUnwrap(entries.first { $0.id == "clipboard-history" })
-        XCTAssertTrue(clip.url.contains("clipboard-history"))
+        let clip = try XCTUnwrap(entries.first { $0.id == "jugnu.clipboard-history" })
+        XCTAssertTrue(clip.url.contains("jugnu.clipboard-history"))
 
         let home = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: home, withIntermediateDirectories: true)
@@ -52,13 +55,13 @@ final class RegistryLiveTests: XCTestCase {
         try await installer.install(entry: clip, enable: true)
         XCTAssertTrue(
             FileManager.default.fileExists(
-                atPath: paths.addonsDir.appendingPathComponent("clipboard-history/addon.yaml").path
+                atPath: paths.addonsDir.appendingPathComponent("jugnu.clipboard-history/addon.yaml").path
             )
         )
-        try lifecycle.uninstall(id: "clipboard-history")
+        try lifecycle.uninstall(id: "jugnu.clipboard-history")
         XCTAssertFalse(
             FileManager.default.fileExists(
-                atPath: paths.addonsDir.appendingPathComponent("clipboard-history").path
+                atPath: paths.addonsDir.appendingPathComponent("jugnu.clipboard-history").path
             )
         )
         XCTAssertFalse(launchctlListsClipboardHistory())

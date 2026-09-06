@@ -3,7 +3,7 @@
 Every published addon must include `addon.yaml` at the root of its package. The manifest is the shell's trusted description of the addon; it must not contain paths or commands that escape the addon directory.
 
 ```yaml
-id: mic-mute
+id: jugnu.mic-mute
 name: Mic Mute
 version: 1.0.0
 api: 1

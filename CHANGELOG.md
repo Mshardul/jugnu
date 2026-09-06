@@ -12,6 +12,7 @@ The project has not published a release yet. Entries currently describe unreleas
 
 ### Added
 
+- 2026-09-06 — Catalog zips republished on `addons-v1.0.0` as `jugnu.<job>-1.0.0.zip` (roots and `addon.yaml` ids match namespaced registry rows); `clock` helper asset uploaded.
 - 2026-09-06 — Install integrity Phase 1: ZIPFoundation extract with path guards, required sha256 (addon + helper), allowlisted HTTPS download session (redirects confined).
 - 2026-09-06 — Install integrity Phase 2: atomic stage→trash→promote for addons and helpers; local directory installs use the same commit path; launch orphan recovery; replace-under-running prompt.
 - 2026-09-06 — Install integrity Phase 3: `minShellVersion` install + load gates; exec entrypoint must be universal Mach-O or `#!`; reserved `.staging`/`.trash` ids; `validate-addon.sh` mirrors gates.

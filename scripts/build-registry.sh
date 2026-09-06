@@ -58,7 +58,11 @@ for addon_dir in "$repo_root"/addons/*/; do
   [[ -f "$manifest" ]] || continue
 
   id=$(manifest_value "$manifest" id)
-  [[ "$id" == ui-demo-* ]] && continue
+  # Demos are not catalog products. window-layouts is shipped in-tree but not
+  # on the public registry yet (ticket 0046: zip/sha on a later addons release).
+  case "$id" in
+    ui-demo-*|*.ui-demo-*|window-layouts|*.window-layouts) continue ;;
+  esac
 
   name=$(manifest_value "$manifest" name)
   version=$(manifest_value "$manifest" version)

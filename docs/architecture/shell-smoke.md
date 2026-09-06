@@ -52,7 +52,7 @@ Walk this after the 2026-08-23 palette + addon UI product pass. Leave items unch
 
 ### First-run, addons, chrome
 
-- [ ] First-run installs the starter set from registry (falls back to local `addons/` if offline): `mic-mute`, `focus-toggle`, `paste-plain`, `floating-note`, `ports`
+- [ ] First-run installs the starter set from registry (falls back to local `addons/` if offline): `jugnu.mic-mute`, `jugnu.focus-toggle`, `jugnu.paste-plain`, `jugnu.floating-note`, `jugnu.ports`
 - [ ] Preferences → **Install starter addons** downloads zips + verifies sha256
 - [ ] Preferences: disable removes from palette; uninstall removes files + declared cleanup
 - [ ] **clipboard-history watcher starts on enable** (ticket 0057): enable it without invoking a command; `launchctl print gui/$(id -u)/com.jugnu.clipboard-history.watch` succeeds and `~/Library/LaunchAgents/com.jugnu.clipboard-history.watch.plist` exists. Disable in Preferences → both are gone → log out and back in → watcher does **not** return, no new pasteboard entries recorded
@@ -131,4 +131,15 @@ These cannot be fully CI-tested. Walk them on a Mac after phase 4.
 - [ ] **`make stop`:** with a `job` and a `daemon` both running, `make stop`; confirm no tracked child survives **but** the `com.jugnu.*` daemon agent is **still running** (`launchctl list | grep com.jugnu`).
 - [ ] **Safe-mode entry:** force 3 hung/crashed launches (e.g. temporarily break `jugnu.yaml`); confirm safe mode boots out `com.jugnu.*` agents on entry (`launchctl list` before/after), the recovery menu shows Reset config / Open config / Disable all addons / Try normal launch again, and one `safe_mode` line is in `lifecycle.log`; fix config → **Try normal launch again** → daemons re-bootstrapped.
 - [ ] **PID reuse (best effort):** note a spawned child's `shell_pid`; after a crash + relaunch where the OS happens to reuse that pid, confirm the reaper still reaps by the start-ts mismatch.
+
+## Manual — Addon install & upgrade integrity (0058)
+
+Walk on a Mac after the namespaced `jugnu.*` zips are on `addons-v1.0.0` and `registry/addons.json` is on `main`. Catalog cards use `jugnu.<job>` ids; zip roots match.
+
+- [ ] **Fresh namespaced install:** Browse Catalog → install `jugnu.mic-mute` (or any first-party zip). Confirm `~/.local/share/jugnu/addons/jugnu.mic-mute/addon.yaml` has `id: jugnu.mic-mute` (no bare `id: mic-mute` rewrite needed). Enable → palette row runs.
+- [ ] **Cancel mid-install:** start an install, cancel before it finishes. Live `addons/` has no half-tree; `.staging` / `.trash` are empty afterward.
+- [ ] **Replace while running:** with an addon process in flight (e.g. `jugnu.keep-awake` duration), trigger Update / reinstall. Confirm the prompt; accept → old process dies before the new tree is live; reject → install aborted, running process stays.
+- [ ] **Dependency disclosure:** install an addon that declares a helper (`jugnu.clip-tools` → `python-runtime`) or a catalog dep. The sheet lists what is already installed vs what will be installed, and notes installed ≠ enabled. Helper lands under `helpers/<id>/<version>/`.
+- [ ] **Update badge:** with an installed addon older than the registry SemVer, the catalog card shows Update; running it preserves enabled and replaces the tree. Same-version republish does **not** badge.
+- [ ] **Namespace migrate (existing install):** a pre-0058 `addons/mic-mute/` tree becomes `addons/jugnu.mic-mute/` on next launch; recents/favorites remap; a second launch is a no-op (completion marker present).
 

@@ -33,9 +33,20 @@ zip_name="${id}-${version}.zip"
 zip_path="$dist_dir/$zip_name"
 rm -f "$zip_path"
 
+# Release process: source + runtime only — no tests, caches, or build trees.
+base=$(basename "$addon_dir")
 (
   cd "$(dirname "$addon_dir")"
-  zip -qr "$zip_path" "$(basename "$addon_dir")"
+  zip -qr "$zip_path" "$base" \
+    -x "${base}/tests/*" \
+    -x "${base}/test/*" \
+    -x "${base}/*/.DS_Store" \
+    -x "${base}/.DS_Store" \
+    -x "${base}/.build/*" \
+    -x "${base}/.swiftpm/*" \
+    -x "${base}/.git/*" \
+    -x "*/__pycache__/*" \
+    -x "*.pyc"
 )
 
 shasum -a 256 "$zip_path" | awk '{print $1}'
