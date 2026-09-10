@@ -556,13 +556,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         do {
             let invocation = try model.runInvocation(for: cmd)
+            let manifest = try ManifestLoader.load(from: cmd.addonRoot)
+            let gated = Self.tccGated(
+                invocation: invocation,
+                addonName: manifest.name,
+                permissions: manifest.permissions,
+                shellHost: shellHost,
+                commandId: cmd.qualifiedId
+            )
             let task = Task { @MainActor [weak self] in
                 await CommandInvoke.run(
                     host: shellHost,
                     commandId: cmd.qualifiedId,
                     onScreen: screen,
-                    execute: invocation.execute,
-                    followUp: invocation.followUp
+                    execute: gated.execute,
+                    followUp: gated.followUp
                 )
                 if self?.inFlightInvoke?.key == key {
                     self?.inFlightInvoke = nil
@@ -599,14 +607,55 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             for: indexed,
             args: ["timerId": .string(timerID)]
         )
+        let manifest = try ManifestLoader.load(from: indexed.addonRoot)
+        let gated = Self.tccGated(
+            invocation: invocation,
+            addonName: manifest.name,
+            permissions: manifest.permissions,
+            shellHost: shellHost,
+            commandId: indexed.qualifiedId
+        )
         let succeeded = await CommandInvoke.run(
             host: shellHost,
             commandId: indexed.qualifiedId,
             onScreen: screen,
-            execute: invocation.execute,
-            followUp: invocation.followUp
+            execute: gated.execute,
+            followUp: gated.followUp
         )
         guard succeeded else { throw ClockInvocationError.commandFailed }
+    }
+
+    private static func tccGated(
+        invocation: (
+            execute: () async throws -> RunResponse,
+            followUp: (RunRequest) async throws -> RunResponse
+        ),
+        addonName: String,
+        permissions: [AddonPermission],
+        shellHost: ShellHost,
+        commandId: String
+    ) -> (
+        execute: () async throws -> RunResponse,
+        followUp: (RunRequest) async throws -> RunResponse
+    ) {
+        let ensure: () async throws -> Void = {
+            try await TCCExplainerGate.ensureReady(
+                addonName: addonName,
+                permissions: permissions,
+                shellHost: shellHost,
+                commandId: commandId
+            )
+        }
+        return (
+            execute: {
+                try await ensure()
+                return try await invocation.execute()
+            },
+            followUp: { request in
+                try await ensure()
+                return try await invocation.followUp(request)
+            }
+        )
     }
 }
 

@@ -72,6 +72,19 @@ public func confirmInstallDisclosureUI(
     )
 }
 
+public func confirmPreTCCExplainerUI(
+    addonName: String,
+    permission: AddonPermission
+) -> UIDescriptor {
+    UIDescriptor(
+        pattern: .confirm,
+        title: addonName,
+        message: "\(addonName) needs \(permission.displayTitle) to \(permission.reason).",
+        confirmLabel: "Open System Settings",
+        cancelLabel: "Not now"
+    )
+}
+
 private func bulletList(_ permissions: [AddonPermission]) -> String {
     PermissionsSet.sort(permissions).map { "• \($0.displayTitle)" }.joined(separator: "\n")
 }

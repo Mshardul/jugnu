@@ -4,7 +4,7 @@
 **Status:** Approved  
 **Plan (Now / 0038):** [2026-09-10 permissions disclosure](../superpowers/plans/2026-09-10-permissions-disclosure.md)  
 **Ship slice (first):** [ticket 0038](../tickets.md) — install / first-launch / update disclosure  
-**Same design, later phases:** [0054](../tickets.md) A (pre-TCC explainer) · [0054](../tickets.md) B (detail + prefs Permissions chrome) · [0022](../tickets.md) (TCC reset detection)  
+**Same design, later phases:** [0054](../tickets.md) A (pre-TCC explainer) — [plan](../superpowers/plans/2026-09-10-permissions-pre-tcc-explainer.md) · [0054](../tickets.md) B (detail + prefs Permissions row; prefs chrome is [0064](../tickets.md)) · [0022](../tickets.md) (TCC reset detection)  
 **Depends on:** [Shell surface](./2026-08-23-shell-surface-presets.md) (`confirm`), [Catalog browse](./2026-08-23-addon-catalog-browse-design.md) + [launcher-catalog](./2026-08-25-launcher-catalog-design.md) (card / detail Permissions tab), [Install integrity](./2026-09-05-addon-install-upgrade-integrity-design.md) (dep disclosure), [Keep current](./2026-09-07-keep-current-design.md) (first-launch Continue), [Shell design](./2026-08-22-shell-design.md) (honest permission UX, shell Permissions table)  
 **Supersedes:** [2026-08-26 permissions, privacy & security](./2026-08-26-permissions-privacy-security-design.md) (findings-only)  
 **Not this product:** per-addon sandboxing ([0021](../tickets.md)) · free-text permission strings · binary inference · signing / notarization · permission glyph art ([0051](../tickets.md)) · rebuilding the full 0825 prefs rail IA (this design binds keys/rows into today’s surfaces first)
@@ -260,11 +260,12 @@ Criteria land in the implementation plan for that phase; must reuse this vocabul
 
 ## 12. Implementation order
 
-1. **Now — 0038** — implementation plan after this design is approved.  
-2. **0054 A** — separate plan against §6.  
-3. **0054 B** — separate plan against §5.2–5.3.  
-4. **0022** — separate plan against §7.  
-5. **Later still** — as tickets / design amendments.
+1. **Now — 0038** — Done. Plan: [2026-09-10 permissions disclosure](../superpowers/plans/2026-09-10-permissions-disclosure.md).  
+2. **0054 A** — plan against §6: [2026-09-10 permissions pre-TCC explainer](../superpowers/plans/2026-09-10-permissions-pre-tcc-explainer.md).  
+3. **Preferences chrome** — [0064](../tickets.md) against [launcher-catalog §3.4](./2026-08-25-launcher-catalog-design.md) (parked; unblocks 0054 B prefs row).  
+4. **0054 B** — separate plan against §5.2–5.3 (after or with 0064 for prefs Permissions).  
+5. **0022** — separate plan against §7.  
+6. **Later still** — as tickets / design amendments.
 
 ## Related
 

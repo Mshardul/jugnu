@@ -83,4 +83,15 @@ final class UserFacingErrorTests: XCTestCase {
             "Couldn’t start the updater. Try again."
         )
     }
+
+    func testTCCGateErrors() {
+        XCTAssertEqual(
+            UserFacingError.message(for: TCCGateError.declined(.accessibility)),
+            "Accessibility is required. Try again when you’re ready."
+        )
+        XCTAssertEqual(
+            UserFacingError.message(for: TCCGateError.openedSettings(.accessibility)),
+            "Turn on Accessibility in System Settings, then try again."
+        )
+    }
 }

@@ -154,6 +154,14 @@ public enum UserFacingError {
                 return catalogInvalid
             }
         }
+        if let tcc = error as? TCCGateError {
+            switch tcc {
+            case .declined(let permission):
+                return "\(permission.displayTitle) is required. Try again when you’re ready."
+            case .openedSettings(let permission):
+                return "Turn on \(permission.displayTitle) in System Settings, then try again."
+            }
+        }
         return "Something went wrong. Try again."
     }
 }

@@ -21,9 +21,7 @@ struct ManagedWindow {
 
 enum AXWindows {
     static func ensureTrusted() throws {
-        let prompt = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String
-        let opts = [prompt: true] as CFDictionary
-        guard AXIsProcessTrustedWithOptions(opts) else {
+        guard AXIsProcessTrusted() else {
             throw AXFailure.notTrusted
         }
     }

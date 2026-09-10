@@ -161,3 +161,10 @@ Walk on a Mac after the namespaced `jugnu.*` zips are on `addons-v1.0.0` and `re
 - [ ] Detail for `jugnu.clipboard-history` lists Clipboard and Background agent with reasons.
 - [ ] Upgrade fixture: installed without `accessibility`, registry newer with it → Update confirm “newly needs”.
 
+## Manual — pre-TCC explainer (0054 A)
+
+- [ ] With Accessibility **off** for Jugnu: run a Window Layouts snap → in-panel explainer (“…needs Accessibility to…”); **Not now** → no OS TCC dialog, command does not complete successfully.
+- [ ] Same, **Open System Settings** → Privacy Accessibility opens (or Settings opens); invoke ends with try-again copy; after granting and re-invoking → no explainer, snap works.
+- [ ] With Accessibility **already on**: snap runs with no explainer.
+- [ ] Invoke `jugnu.floating-note` / clip-tools: no pre-TCC explainer (non-TCC / none).
+

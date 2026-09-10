@@ -55,4 +55,19 @@ final class PermissionsConfirmationTests: XCTestCase {
         XCTAssertTrue(ui.message?.contains("will be installed now") == true)
         XCTAssertTrue(ui.message?.contains("Installed is not the same as enabled") == true)
     }
+
+    func testConfirmPreTCCExplainerUI() {
+        let ui = confirmPreTCCExplainerUI(
+            addonName: "Window Layouts",
+            permission: .accessibility
+        )
+        XCTAssertEqual(ui.pattern, .confirm)
+        XCTAssertEqual(ui.title, "Window Layouts")
+        XCTAssertEqual(
+            ui.message,
+            "Window Layouts needs Accessibility to Control other apps’ windows."
+        )
+        XCTAssertEqual(ui.confirmLabel, "Open System Settings")
+        XCTAssertEqual(ui.cancelLabel, "Not now")
+    }
 }

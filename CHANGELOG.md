@@ -13,6 +13,8 @@ The project has not published a release yet. Entries currently describe unreleas
 
 ### Added
 
+- 2026-09-10 — Pre-TCC explainer (ticket 0054 A): before running an addon that declared a TCC capability (e.g. Accessibility), Jugnu shows an in-panel explainer with Open System Settings / Not now when the grant is missing. Window Layouts no longer triggers the OS prompt itself. Prefs Permissions chrome stays [0064](docs/tickets.md) / 0054 B.
+
 - 2026-09-10 — Honest capability disclosure (ticket 0038): closed `permissions` on addon.yaml + registry, confirm before download, card one-liner, detail list, first-launch union confirm, grew-only update / bulk keep-current. Pre-TCC explainer (0054 A), prefs Permissions (0054 B), and TCC-reset (0022) remain later.
 
 - 2026-09-07 — Keep current: app + addon updates (confirm before write), yaml switches default on, and a two-step first-run that opens Browse.
