@@ -5,8 +5,9 @@
     "version": "1.0.0",
     "api": 1,
     "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.battery-eta-1.0.0.zip",
-    "sha256": "d637e8794043216f1b03f96f6eba42182fc8273bf94f6a090a4e7b77c6b94fa8",
+    "sha256": "78a8d11589ee4a99d6e5ad0a1f584b5fcb2a0bf09ae46fb273772a8e3e98ac0d",
     "summary": "Battery status",
+    "permissions": [],
     "category": "System",
     "subcategory": "Monitoring",
     "tags": [
@@ -27,8 +28,11 @@
     "version": "1.0.0",
     "api": 1,
     "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.brew-outdated-1.0.0.zip",
-    "sha256": "7a7ddb57b2d8bf22bacb88348c8d686ed66678f40939a683dbe0ea7da6dc3316",
+    "sha256": "7b4e4915ee9cca9b3c1f4b71674a0a30e27df7404e92b7995c015b2027ebdc3e",
     "summary": "Outdated Homebrew packages",
+    "permissions": [
+      "network"
+    ],
     "category": "System",
     "subcategory": "Dev Tools",
     "tags": [
@@ -51,8 +55,11 @@
     "version": "1.0.0",
     "api": 1,
     "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.clip-tools-1.0.0.zip",
-    "sha256": "f3f303bb88ce344250ca3ea3707c9ffeafa32e9c233a80f692ff17e7e1a87c9e",
+    "sha256": "dbbb9dcd2cbc5469a1507c00e83fbfabc01ddd1016752dd8c17e37b1906a8f99",
     "summary": "Text stats",
+    "permissions": [
+      "clipboard"
+    ],
     "category": "Clipboard",
     "tags": [
       "quick-glance",
@@ -313,8 +320,12 @@
     "version": "1.0.0",
     "api": 1,
     "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.clipboard-history-1.0.0.zip",
-    "sha256": "51524b45b13aac0931a72c6edd96b38e818060269e5a624d8a1c523c14f625dd",
+    "sha256": "dd0787bb0cbbc13b424f1d2226f6071f17b2b92f1536e22ce7887980a4ee43f1",
     "summary": "Clipboard history",
+    "permissions": [
+      "clipboard",
+      "background"
+    ],
     "category": "Clipboard",
     "tags": [
       "background",
@@ -340,8 +351,9 @@
     "version": "1.0.0",
     "api": 1,
     "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.floating-note-1.0.0.zip",
-    "sha256": "8ed71f81e2f4952becba68f0adc4157074e410889763d6645a489c85423e3c15",
+    "sha256": "d48692ccca987c2581c0c0fbd0f2200cefaade37de547b0e748a25a59428b469",
     "summary": "Open scratch note",
+    "permissions": [],
     "category": "Notes",
     "tags": [
       "popup-ui",
@@ -362,8 +374,9 @@
     "version": "1.0.0",
     "api": 1,
     "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.focus-toggle-1.0.0.zip",
-    "sha256": "c45522b600e175f0cbebb47e155541f054c112e01a8b8db8afeb502bad7c8efa",
+    "sha256": "a4df92960fce7ef4f3edd9ab3f2ea24f331d39e1af7bf2da7dabbfaf4939025f",
     "summary": "Toggle Focus",
+    "permissions": [],
     "category": "Focus",
     "tags": [
       "toggle",
@@ -384,8 +397,11 @@
     "version": "1.0.0",
     "api": 1,
     "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.keep-awake-1.0.0.zip",
-    "sha256": "0617c351d28f4124e1e124bfe2a061b04c25813b151a479e1ecd4ed31426d309",
+    "sha256": "30d6a2020a839dd80900d8b75157d91c622c5dd2893ef37e7e1b5d987fe70f8f",
     "summary": "Keep awake",
+    "permissions": [
+      "background"
+    ],
     "category": "System",
     "tags": [
       "background",
@@ -421,8 +437,9 @@
     "version": "1.0.0",
     "api": 1,
     "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.mic-mute-1.0.0.zip",
-    "sha256": "79e0f6c8d5b301df4b2d9de877ff18da9e3ef966dfa225405944a2c199caff65",
+    "sha256": "7039aef6b9d7be97cfe3eda054cf505d0d646ae0e508afb3e5ac4b3c9e08a2c4",
     "summary": "Toggle microphone mute",
+    "permissions": [],
     "category": "Focus",
     "tags": [
       "toggle",
@@ -443,8 +460,9 @@
     "version": "1.0.0",
     "api": 1,
     "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.mute-all-1.0.0.zip",
-    "sha256": "dc0fb5af65d63de4181d5e196320a1199765db715b85d7820f629969520c351b",
+    "sha256": "a3cc9e8fd4eed461ee524ec3be0bc628a8ab542827aa8bfe14f6c2c160dc3eac",
     "summary": "Mute all",
+    "permissions": [],
     "category": "Focus",
     "tags": [
       "toggle"
@@ -464,8 +482,9 @@
     "version": "1.0.0",
     "api": 1,
     "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.nudges-1.0.0.zip",
-    "sha256": "74975b3d925879f0ef5a3bf17cce158d6b684e1387919453f9c8fe551519d104",
+    "sha256": "aa8920989f6cc1904f21d55808823e6cbf82fc8ac1b11f9ad1962a2a78306066",
     "summary": "Nudges",
+    "permissions": [],
     "category": "System",
     "tags": [
       "background",
@@ -516,8 +535,9 @@
     "version": "1.0.0",
     "api": 1,
     "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.open-terminal-here-1.0.0.zip",
-    "sha256": "9b69358a2dd6cbcd6f0cbfb06cc85429941225c374f18406bdfdb9043ef8c452",
+    "sha256": "fc24fe8f1251d2c21f12c1ac2bc03e182ddb932dc4edefbd5cfad30e0fbf1ca2",
     "summary": "Open Terminal here",
+    "permissions": [],
     "category": "System",
     "subcategory": "Dev Tools",
     "tags": [
@@ -539,8 +559,11 @@
     "version": "1.0.0",
     "api": 1,
     "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.paste-plain-1.0.0.zip",
-    "sha256": "a0d3f354bb7281657c70f0bac8b33fab9f0403013f19b77000ad7712a4d4e107",
+    "sha256": "ff86a9f649d5e317cfcc1ad90f551d54a103eb37a5452b402a24cca4feae2f96",
     "summary": "Paste as plain text",
+    "permissions": [
+      "clipboard"
+    ],
     "category": "Clipboard",
     "tags": [
       "quick-glance",
@@ -561,8 +584,9 @@
     "version": "1.0.0",
     "api": 1,
     "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.pomodoro-1.0.0.zip",
-    "sha256": "b30586f6a2a30bd9909a0d3489befb911eb2d77e5b110d5b7810accf798be5ca",
+    "sha256": "c26bf51a71865505f099f2098d549debf22d9c85cc946763780f999829283d13",
     "summary": "Start focus session",
+    "permissions": [],
     "category": "Focus",
     "tags": [
       "background",
@@ -603,8 +627,9 @@
     "version": "1.0.0",
     "api": 1,
     "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.ports-1.0.0.zip",
-    "sha256": "ff298b32d954ae3629a537914eec2986fbad48aa24b395a8ed11b0a37c727d9c",
+    "sha256": "917271077806599be963de5283761d547c7e214127d52b4adc7c78802a066b06",
     "summary": "Listening ports",
+    "permissions": [],
     "category": "System",
     "subcategory": "Dev Tools",
     "tags": [
@@ -627,8 +652,11 @@
     "version": "1.0.0",
     "api": 1,
     "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.weather-bar-1.0.0.zip",
-    "sha256": "5cb75e92236d1a2464cd772db1fbcec1af466c03178d71a40c8fc9c8e2ea1549",
+    "sha256": "5e34e0cbdb8601256bdf1e4c8f9b5862638d46b44d2916582c03268cd0a68671",
     "summary": "Current weather",
+    "permissions": [
+      "network"
+    ],
     "category": "Info",
     "tags": [
       "quick-glance"
@@ -648,8 +676,9 @@
     "version": "1.0.0",
     "api": 1,
     "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.world-clock-1.0.0.zip",
-    "sha256": "7cf4bcca4ccf7e075247750a445b98b26c29bd53ee0e7491323b453db4d822ea",
+    "sha256": "247051af176c2cd8e5a9d2cf8ff9b28709d016a7f3c4ae010ebeaeb1d4b8b4ba",
     "summary": "World clock",
+    "permissions": [],
     "category": "Info",
     "tags": [
       "quick-glance",

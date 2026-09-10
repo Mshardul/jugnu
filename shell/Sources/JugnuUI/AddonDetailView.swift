@@ -73,6 +73,20 @@ public struct AddonDetailView: View {
                 }
 
                 Divider()
+                Text("Permissions").font(.headline)
+                if entry.permissions.isEmpty {
+                    Text("This addon does not need special permissions.")
+                        .font(.caption)
+                        .foregroundStyle(theme.textSecondary)
+                } else {
+                    ForEach(PermissionsSet.sort(entry.permissions), id: \.rawValue) { permission in
+                        Text("\(permission.displayTitle) — \(permission.reason)")
+                            .font(.caption)
+                            .foregroundStyle(theme.textSecondary)
+                    }
+                }
+
+                Divider()
                 AddonActionRow(
                     isInstalled: isInstalled,
                     isEnabled: isEnabled,

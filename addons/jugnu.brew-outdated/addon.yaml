@@ -2,6 +2,8 @@ id: jugnu.brew-outdated
 name: Brew Outdated
 version: 1.0.0
 api: 1
+permissions:
+  - network
 commands:
   - id: list
     title: Outdated Homebrew packages

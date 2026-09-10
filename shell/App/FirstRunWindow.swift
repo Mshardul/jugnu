@@ -133,6 +133,7 @@ struct FirstRunView: View {
     @ObservedObject var session: FirstRunSession
     var model: AppModel
     var onFinish: ([String]) -> Void
+    @State private var showPermissionsConfirm = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -149,6 +150,22 @@ struct FirstRunView: View {
             guard session.page == 2, session.entries.isEmpty else { return }
             await loadCatalog()
         }
+        .confirmationDialog(
+            "Install these addons?",
+            isPresented: $showPermissionsConfirm,
+            titleVisibility: .visible
+        ) {
+            Button("Install") {
+                onFinish(Array(session.selectedIDs))
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text(FirstRunPermissions.confirmMessage(expand: pendingPermissionsExpand))
+        }
+    }
+
+    private var pendingPermissionsExpand: [(permission: AddonPermission, addonNames: [String])] {
+        FirstRunPermissions.expand(entries: session.entries, selectedIDs: session.selectedIDs)
     }
 
     private var stepOne: some View {
@@ -209,7 +226,11 @@ struct FirstRunView: View {
                 }
                 Spacer()
                 Button("Continue") {
-                    onFinish(Array(session.selectedIDs))
+                    guard !pendingPermissionsExpand.isEmpty else {
+                        onFinish(Array(session.selectedIDs))
+                        return
+                    }
+                    showPermissionsConfirm = true
                 }
                 .keyboardShortcut(.defaultAction)
             }

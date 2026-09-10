@@ -194,10 +194,15 @@ final class KeepCurrentCoordinator {
         guard !outdated.isEmpty else { return false }
         preparePanel()
         guard let screen = shellHost.currentScreen ?? NSScreen.main else { return false }
+        let growthExpand = AddonBulkPermissions.growthExpand(outdated: outdated) { id in
+            let root = model.paths.addonsDir.appendingPathComponent(id)
+            guard let manifest = try? ManifestLoader.load(from: root) else { return [] }
+            return manifest.permissions
+        }
         shellHost.setOnCancel { [weak self] in self?.onDismissConfirm() }
         shellHost.onCancelFollowUp = { [weak self] in self?.onDismissConfirm() }
         shellHost.pushFollowUp(
-            ui: confirmAddonBulkUI(count: outdated.count),
+            ui: confirmAddonBulkUI(count: outdated.count, growthExpand: growthExpand),
             commandId: "shell.addon-bulk-update",
             trace: nil,
             onScreen: screen,
@@ -228,8 +233,17 @@ final class KeepCurrentCoordinator {
                     enable: preserveEnabled,
                     catalog: catalog,
                     installedVersions: model.installer.readInstalledAddonVersions(),
-                    confirmDependencies: { plan in
-                        await MainActor.run { DependencyInstallDisclosure.confirm(plan) }
+                    confirmDependencies: { [weak self] plan in
+                        guard let self else { return false }
+                        return await InstallDisclosurePresenter.confirm(
+                            ui: confirmInstallDisclosureUI(
+                                permissionsTitle: "Install \(plan.primaryName)?",
+                                permissionsBody: nil,
+                                dependencyPlan: plan
+                            ),
+                            shellHost: self.shellHost,
+                            commandId: "shell.install-deps.\(entry.id)"
+                        )
                     }
                 )
                 try? model.bootstrapDaemons(id: entry.id)

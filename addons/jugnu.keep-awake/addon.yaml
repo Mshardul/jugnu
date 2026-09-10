@@ -2,6 +2,8 @@ id: jugnu.keep-awake
 name: Keep Awake
 version: 1.0.0
 api: 1
+permissions:
+  - background
 commands:
   - id: pick
     title: Keep awake

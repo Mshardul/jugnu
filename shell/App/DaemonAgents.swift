@@ -191,26 +191,3 @@ enum ReplaceWhileTracked {
     }
 }
 
-/// Confirm catalog dependencies before the install transaction commits.
-@MainActor
-enum DependencyInstallDisclosure {
-    static func confirm(_ plan: DependencyPlan) -> Bool {
-        let alert = NSAlert()
-        alert.messageText = "Install \(plan.primaryName)?"
-        var lines: [String] = ["This will also handle these addons:"]
-        for dep in plan.dependencies {
-            switch dep.status {
-            case .alreadyInstalled:
-                lines.append("• \(dep.name) — already installed")
-            case .willInstall:
-                lines.append("• \(dep.name) — will be installed now")
-            }
-        }
-        lines.append("")
-        lines.append("Installed is not the same as enabled. You’ll enable each addon yourself.")
-        alert.informativeText = lines.joined(separator: "\n")
-        alert.addButton(withTitle: "Install")
-        alert.addButton(withTitle: "Cancel")
-        return alert.runModal() == .alertFirstButtonReturn
-    }
-}

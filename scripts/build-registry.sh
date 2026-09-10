@@ -50,6 +50,40 @@ first_command_title() {
   ' "$manifest" | tr -d '"' | tr -d "'"
 }
 
+# Prints a JSON array of permission strings from addon.yaml (or []).
+manifest_permissions_json() {
+  local manifest="$1"
+  python3 - "$manifest" <<'PY'
+import json, sys
+from pathlib import Path
+text = Path(sys.argv[1]).read_text()
+perms = []
+in_p = False
+for line in text.splitlines():
+    if line.startswith("permissions:"):
+        in_p = True
+        rest = line[len("permissions:"):].strip()
+        if rest.startswith("[") and rest.endswith("]"):
+            inner = rest[1:-1].strip()
+            if inner:
+                for part in inner.split(","):
+                    tok = part.strip().strip("\"'")
+                    if tok:
+                        perms.append(tok)
+            in_p = False
+        continue
+    if in_p:
+        if line and not line[0].isspace() and not line.startswith("-"):
+            break
+        s = line.strip()
+        if s.startswith("-"):
+            tok = s[1:].strip().strip("\"'").split("#", 1)[0].strip()
+            if tok:
+                perms.append(tok)
+print(json.dumps(perms))
+PY
+}
+
 entries=()
 
 for addon_dir in "$repo_root"/addons/*/; do
@@ -68,6 +102,7 @@ for addon_dir in "$repo_root"/addons/*/; do
   version=$(manifest_value "$manifest" version)
   api=$(manifest_value "$manifest" api)
   summary=$(first_command_title "$manifest")
+  permissions_json=$(manifest_permissions_json "$manifest")
 
   sha256=$("$script_dir/package-addon.sh" "$addon_dir" "$dist_dir" 2>/dev/null)
   zip_name="${id}-${version}.zip"
@@ -80,7 +115,8 @@ for addon_dir in "$repo_root"/addons/*/; do
     "api": ${api},
     "url": "${release_base_url}/${zip_name}",
     "sha256": "${sha256}",
-    "summary": "${summary}"
+    "summary": "${summary}",
+    "permissions": ${permissions_json}
   }
 JSON
 )
@@ -115,6 +151,9 @@ for entry in new_entries:
     for key in preserve:
         if key in old:
             entry[key] = old[key]
+    # permissions always come from the packaged manifest (already on entry).
+    if "permissions" not in entry:
+        entry["permissions"] = []
     if not entry.get("category"):
         missing.append(entry["id"])
 if missing:

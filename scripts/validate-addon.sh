@@ -91,6 +91,46 @@ if grep -q '^helpers:' "$manifest"; then
   ' "$manifest"
 fi
 
+if grep -q '^permissions:' "$manifest"; then
+  awk '
+    function is_known(p) {
+      return (p == "accessibility" || p == "input-monitoring" || p == "camera" ||
+              p == "microphone" || p == "screen-recording" || p == "network" ||
+              p == "clipboard" || p == "background")
+    }
+    /^permissions:/ {
+      line = $0
+      sub(/^permissions:[[:space:]]*/, "", line)
+      if (line != "" && line !~ /^\[/) {
+        # inline list not used; fall through to list items
+      }
+      in_p = 1
+      if (line ~ /^\[/) {
+        gsub(/[][,]/, " ", line)
+        n = split(line, parts, /[[:space:]]+/)
+        for (i = 1; i <= n; i++) {
+          tok = parts[i]
+          gsub(/["'\'']/, "", tok)
+          if (tok == "") continue
+          if (!is_known(tok)) { print "invalid permission: " tok > "/dev/stderr"; exit 1 }
+        }
+        in_p = 0
+      }
+      next
+    }
+    in_p && /^[^[:space:]-]/ { in_p = 0 }
+    in_p && /^[[:space:]]*-[[:space:]]*/ {
+      tok = $0
+      sub(/^[[:space:]]*-[[:space:]]*/, "", tok)
+      gsub(/["'\'']/, "", tok)
+      sub(/[[:space:]]*#.*$/, "", tok)
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", tok)
+      if (tok == "") next
+      if (!is_known(tok)) { print "invalid permission: " tok > "/dev/stderr"; exit 1 }
+    }
+  ' "$manifest"
+fi
+
 if grep -E '^[[:space:]]*(width|height|percent)[[:space:]]*:' "$manifest" >/dev/null; then
   echo "addon.yaml must not declare width, height, or percent; use view_types" >&2
   exit 1

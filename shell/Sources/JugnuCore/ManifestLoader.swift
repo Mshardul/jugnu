@@ -83,4 +83,5 @@ public enum ManifestLoaderError: Error, Equatable {
     case unknownLifecycleClass(String)
     case daemonBlockMissing(command: String)
     case daemonNotFirstParty(String)
+    case unknownPermission(String)
 }

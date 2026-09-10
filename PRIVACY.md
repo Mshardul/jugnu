@@ -13,7 +13,7 @@ Jugnu is designed as a local-first macOS command platform. This policy describes
 
 ## Permissions
 
-Permissions are requested only when a feature needs them and should be explained at the point of use. An addon may require additional permissions, but it must document those requirements and provide a useful fallback where possible.
+Permissions are requested only when a feature needs them and should be explained at the point of use. Catalog install shows each addon’s declared capabilities and confirms before download when any are listed. An addon may require additional OS permissions at runtime, but it must document those requirements and provide a useful fallback where possible.
 
 ## Network Access
 

@@ -2,6 +2,8 @@ id: jugnu.clip-tools
 name: Clip Tools
 version: 1.0.0
 api: 1
+permissions:
+  - clipboard
 helpers:
   - id: python-runtime
     version: 1.0.0

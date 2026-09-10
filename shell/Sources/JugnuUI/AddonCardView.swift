@@ -61,6 +61,11 @@ public struct AddonCardView: View {
                     Text(entry.summary)
                         .font(JugnuTokens.font(presetId: store.presetId, role: .caption))
                         .foregroundStyle(theme.textSecondary)
+                    if let needs = PermissionsSet.needsLine(entry.permissions) {
+                        Text(needs)
+                            .font(JugnuTokens.font(presetId: store.presetId, role: .caption2))
+                            .foregroundStyle(theme.textSecondary)
+                    }
                     Text(entry.category)
                         .font(JugnuTokens.font(presetId: store.presetId, role: .caption2))
                         .foregroundStyle(theme.textSecondary)

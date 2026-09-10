@@ -2,6 +2,8 @@ id: jugnu.window-layouts
 name: Window Layouts
 version: 1.0.0
 api: 1
+permissions:
+  - accessibility
 view_types: [board, rows, fields, ask]
 commands:
   - id: snap-board

@@ -49,5 +49,33 @@ final class RegistryClientTests: XCTestCase {
             entries[0].commands,
             [RegistryCommand(id: "list", title: "List ports", subtitle: "Show listening ports")]
         )
+        XCTAssertEqual(entries[0].permissions, [])
+    }
+
+    func testDecodesPermissions() throws {
+        let json = """
+        [{
+          "id": "ports", "name": "Ports", "version": "1.0.0", "api": 1,
+          "url": "https://example.com/ports.zip", "sha256": "abc",
+          "summary": "List listening ports",
+          "category": "System",
+          "permissions": ["clipboard", "background"]
+        }]
+        """
+        let entries = try JSONDecoder().decode([RegistryEntry].self, from: Data(json.utf8))
+        XCTAssertEqual(entries[0].permissions, [.clipboard, .background])
+    }
+
+    func testUnknownPermissionFailsDecode() {
+        let json = """
+        [{
+          "id": "ports", "name": "Ports", "version": "1.0.0", "api": 1,
+          "url": "https://example.com/ports.zip", "sha256": "abc",
+          "summary": "List listening ports",
+          "category": "System",
+          "permissions": ["telepathy"]
+        }]
+        """
+        XCTAssertThrowsError(try JSONDecoder().decode([RegistryEntry].self, from: Data(json.utf8)))
     }
 }

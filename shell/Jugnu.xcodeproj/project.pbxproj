@@ -21,6 +21,7 @@
 		CF46D9EC5366F66E608B763D /* MenuBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE92CF58DD3BE972D2AEC8CB /* MenuBarController.swift */; };
 		CFFE550ED2B1ABABCBF8B52D /* HotkeyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 278F0380D93A6EEE31AD2C2F /* HotkeyController.swift */; };
 		D075254A62556C0A795B0DAB /* AddonUninstallPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7827A8A356F9392C623B554 /* AddonUninstallPresenter.swift */; };
+		E4A1B2C3D4E5F60718293A4B /* InstallDisclosurePresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A60718293A4B5C /* InstallDisclosurePresenter.swift */; };
 		D0B2FD226431EDEE3D340434 /* DaemonAgents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 250A8E808389C83FDDFEF2A5 /* DaemonAgents.swift */; };
 		D3584E6337F9B4D089C8193E /* JugnuCore in Frameworks */ = {isa = PBXBuildFile; productRef = 24FB2BFFCBA284CE5BC001B6 /* JugnuCore */; };
 		D46018A13E56874B0C944D88 /* JugnuUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5EA3A420B1701DCC99B5E95F /* JugnuUI */; };
@@ -50,6 +51,7 @@
 		91CC5912906B1489BE2F8456 /* ScreenshotFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotFlow.swift; sourceTree = "<group>"; };
 		9D8FD74A5590757484AB56B4 /* ScreenshotMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotMode.swift; sourceTree = "<group>"; };
 		A7827A8A356F9392C623B554 /* AddonUninstallPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddonUninstallPresenter.swift; sourceTree = "<group>"; };
+		B1C2D3E4F5A60718293A4B5C /* InstallDisclosurePresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstallDisclosurePresenter.swift; sourceTree = "<group>"; };
 		A7D9128B1EEA5448DD3A1F9F /* LaunchGuard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchGuard.swift; sourceTree = "<group>"; };
 		B75FD8B95BC991E13A258885 /* AddonReaper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddonReaper.swift; sourceTree = "<group>"; };
 		BE92CF58DD3BE972D2AEC8CB /* MenuBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarController.swift; sourceTree = "<group>"; };
@@ -106,6 +108,7 @@
 				B75FD8B95BC991E13A258885 /* AddonReaper.swift */,
 				A7827A8A356F9392C623B554 /* AddonUninstallPresenter.swift */,
 				D3D00E1FEF0969F288E08FF6 /* AppModel.swift */,
+				B1C2D3E4F5A60718293A4B5C /* InstallDisclosurePresenter.swift */,
 				EF23787A5713452BFF2A17F8 /* Assets.xcassets */,
 				4E828A6B867A511A83ECEBC3 /* BrowseCatalogViewModel.swift */,
 				250A8E808389C83FDDFEF2A5 /* DaemonAgents.swift */,
@@ -240,6 +243,7 @@
 				F6D1A03B6F3606EAC5C6A914 /* AddonReaper.swift in Sources */,
 				D075254A62556C0A795B0DAB /* AddonUninstallPresenter.swift in Sources */,
 				AD78C530AE4729B3D27FE654 /* AppModel.swift in Sources */,
+				E4A1B2C3D4E5F60718293A4B /* InstallDisclosurePresenter.swift in Sources */,
 				548EE8613579A3EE86FFEA1F /* BrowseCatalogViewModel.swift in Sources */,
 				D0B2FD226431EDEE3D340434 /* DaemonAgents.swift in Sources */,
 				F8BD7FCD72AE22D31DA008F7 /* FirstRunWindow.swift in Sources */,

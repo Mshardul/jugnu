@@ -38,6 +38,8 @@ public enum UserFacingError {
                 return "This addon’s description couldn’t be read. Try reinstalling it."
             case .daemonNotFirstParty:
                 return "This addon’s description couldn’t be read. Try reinstalling it."
+            case .unknownPermission:
+                return "This addon’s description couldn’t be read. Try reinstalling it."
             }
         }
         if let ns = error as? NamespaceMigratorError {

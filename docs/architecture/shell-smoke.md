@@ -152,3 +152,12 @@ Walk on a Mac after the namespaced `jugnu.*` zips are on `addons-v1.0.0` and `re
 - [ ] Later on an app prompt does not download; next launch prompts again
 - [ ] Keep-addons on + outdated catalog row: bulk confirm; Cancel downloads nothing; catalog per-card Update still works with keep-addons off
 
+## Manual — permissions disclosure (0038)
+
+- [ ] Install `jugnu.window-layouts` from Browse: confirm lists Accessibility; Cancel leaves no tree; Install then enable → first use still OS TCC (Phase A not required yet).
+- [ ] Install `jugnu.floating-note`: no permissions confirm.
+- [ ] First-launch Continue with recommended including clipboard + network addons: one confirm; expand shows which addons per capability.
+- [ ] Card for `jugnu.clip-tools` shows `Needs Clipboard`.
+- [ ] Detail for `jugnu.clipboard-history` lists Clipboard and Background agent with reasons.
+- [ ] Upgrade fixture: installed without `accessibility`, registry newer with it → Update confirm “newly needs”.
+

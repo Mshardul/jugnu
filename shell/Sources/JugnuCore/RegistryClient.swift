@@ -27,23 +27,27 @@ public struct RegistryEntry: Codable, Equatable, Sendable {
     public var commands: [RegistryCommand]
     /// Catalog-side copy of manifest `dependencies` for disclosure before download.
     public var dependencies: [AddonDependency]
+    /// Catalog-side copy of manifest `permissions` for disclosure before download.
+    public var permissions: [AddonPermission]
 
     public init(
         id: String, name: String, version: String, api: Int, url: String, sha256: String, summary: String,
         category: String, subcategory: String? = nil, tags: [String] = [],
         description: String? = nil, commands: [RegistryCommand] = [],
-        dependencies: [AddonDependency] = []
+        dependencies: [AddonDependency] = [],
+        permissions: [AddonPermission] = []
     ) {
         self.id = id; self.name = name; self.version = version; self.api = api
         self.url = url; self.sha256 = sha256; self.summary = summary
         self.category = category; self.subcategory = subcategory; self.tags = tags
         self.description = description; self.commands = commands
         self.dependencies = dependencies
+        self.permissions = permissions
     }
 
     enum CodingKeys: String, CodingKey {
         case id, name, version, api, url, sha256, summary, category, subcategory, tags, description, commands
-        case dependencies
+        case dependencies, permissions
     }
 
     public init(from decoder: Decoder) throws {
@@ -61,6 +65,35 @@ public struct RegistryEntry: Codable, Equatable, Sendable {
         description = try c.decodeIfPresent(String.self, forKey: .description)
         commands = try c.decodeIfPresent([RegistryCommand].self, forKey: .commands) ?? []
         dependencies = try c.decodeIfPresent([AddonDependency].self, forKey: .dependencies) ?? []
+        do {
+            permissions = try PermissionsSet.parse(c.decodeIfPresent([String].self, forKey: .permissions) ?? [])
+        } catch is PermissionsParseError {
+            throw DecodingError.dataCorrupted(
+                DecodingError.Context(codingPath: c.codingPath + [CodingKeys.permissions], debugDescription: "unknown permission")
+            )
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(id, forKey: .id)
+        try c.encode(name, forKey: .name)
+        try c.encode(version, forKey: .version)
+        try c.encode(api, forKey: .api)
+        try c.encode(url, forKey: .url)
+        try c.encode(sha256, forKey: .sha256)
+        try c.encode(summary, forKey: .summary)
+        try c.encode(category, forKey: .category)
+        try c.encodeIfPresent(subcategory, forKey: .subcategory)
+        try c.encode(tags, forKey: .tags)
+        try c.encodeIfPresent(description, forKey: .description)
+        try c.encode(commands, forKey: .commands)
+        if !dependencies.isEmpty {
+            try c.encode(dependencies, forKey: .dependencies)
+        }
+        if !permissions.isEmpty {
+            try c.encode(permissions.map(\.rawValue), forKey: .permissions)
+        }
     }
 }
 

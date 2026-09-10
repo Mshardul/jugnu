@@ -441,6 +441,7 @@ public struct AddonManifest: Codable, Equatable, Sendable {
     public var viewTypes: [ViewType]
     public var helpers: [HelperRef]
     public var dependencies: [AddonDependency]
+    public var permissions: [AddonPermission]
     public var lifecycle: LifecycleClass?
     public var minShellVersion: String?
 
@@ -476,6 +477,7 @@ public struct AddonManifest: Codable, Equatable, Sendable {
         viewTypes: [ViewType] = [],
         helpers: [HelperRef] = [],
         dependencies: [AddonDependency] = [],
+        permissions: [AddonPermission] = [],
         lifecycle: LifecycleClass? = nil,
         minShellVersion: String? = nil
     ) {
@@ -489,12 +491,13 @@ public struct AddonManifest: Codable, Equatable, Sendable {
         self.viewTypes = viewTypes
         self.helpers = helpers
         self.dependencies = dependencies
+        self.permissions = permissions
         self.lifecycle = lifecycle
         self.minShellVersion = minShellVersion
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, name, version, api, commands, entrypoint, cleanup, helpers, dependencies, lifecycle
+        case id, name, version, api, commands, entrypoint, cleanup, helpers, dependencies, permissions, lifecycle
         case viewTypes = "view_types"
         case minShellVersion
         case minShellVersionSnake = "min_shell_version"
@@ -511,6 +514,11 @@ public struct AddonManifest: Codable, Equatable, Sendable {
         cleanup = try c.decodeIfPresent(CleanupSpec.self, forKey: .cleanup) ?? CleanupSpec()
         helpers = try c.decodeIfPresent([HelperRef].self, forKey: .helpers) ?? []
         dependencies = try c.decodeIfPresent([AddonDependency].self, forKey: .dependencies) ?? []
+        do {
+            permissions = try PermissionsSet.parse(c.decodeIfPresent([String].self, forKey: .permissions) ?? [])
+        } catch let PermissionsParseError.unknown(token) {
+            throw ManifestLoaderError.unknownPermission(token)
+        }
         lifecycle = try LifecycleClass.decodeManifestValue(c.decodeIfPresent(String.self, forKey: .lifecycle))
         minShellVersion =
             try c.decodeIfPresent(String.self, forKey: .minShellVersion)
@@ -536,6 +544,9 @@ public struct AddonManifest: Codable, Equatable, Sendable {
         try c.encode(helpers, forKey: .helpers)
         if !dependencies.isEmpty {
             try c.encode(dependencies, forKey: .dependencies)
+        }
+        if !permissions.isEmpty {
+            try c.encode(permissions.map(\.rawValue), forKey: .permissions)
         }
         try c.encodeIfPresent(lifecycle?.rawValue, forKey: .lifecycle)
         try c.encodeIfPresent(minShellVersion, forKey: .minShellVersion)

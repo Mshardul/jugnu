@@ -351,4 +351,70 @@ final class ManifestLoaderTests: XCTestCase {
         XCTAssertEqual(m.effectiveCleanupLaunchd(), ["com.jugnu.keep-awake.watch"])
         XCTAssertEqual(m.effectiveOnReinvoke(commandId: "watch"), .reuse)
     }
+
+    func testLoadsPermissions() throws {
+        let dir = try writeManifest("""
+        id: jugnu.clip-tools
+        name: Clip Tools
+        version: 1.0.0
+        api: 1
+        permissions:
+          - clipboard
+          - background
+        commands:
+          - id: slugify
+            title: Slugify
+        entrypoint:
+          kind: exec
+          path: bin/run
+        cleanup:
+          paths: []
+          launchd: []
+        """)
+        let m = try ManifestLoader.load(from: dir)
+        XCTAssertEqual(m.permissions, [.clipboard, .background])
+    }
+
+    func testRejectsUnknownPermission() throws {
+        let dir = try writeManifest("""
+        id: jugnu.bad
+        name: Bad
+        version: 1.0.0
+        api: 1
+        permissions:
+          - telepathy
+        commands:
+          - id: x
+            title: X
+        entrypoint:
+          kind: exec
+          path: bin/run
+        cleanup:
+          paths: []
+          launchd: []
+        """)
+        XCTAssertThrowsError(try ManifestLoader.load(from: dir)) { error in
+            XCTAssertEqual(error as? ManifestLoaderError, .unknownPermission("telepathy"))
+        }
+    }
+
+    func testOmitsPermissionsDefaultsEmpty() throws {
+        let dir = try writeManifest("""
+        id: jugnu.plain
+        name: Plain
+        version: 1.0.0
+        api: 1
+        commands:
+          - id: x
+            title: X
+        entrypoint:
+          kind: exec
+          path: bin/run
+        cleanup:
+          paths: []
+          launchd: []
+        """)
+        let m = try ManifestLoader.load(from: dir)
+        XCTAssertEqual(m.permissions, [])
+    }
 }

@@ -55,6 +55,25 @@ dependencies:
 | **Mismatch** | If a required id is already installed at a different version → refuse (no silent downgrade). |
 | **Uninstall** | Uninstalling A does not auto-remove its dependencies. |
 
+## Permissions
+
+Optional closed list of capabilities the addon needs for its job ([ticket 0038](tickets.md)). Surfaced on catalog cards, detail, and confirmed before download when non-empty.
+
+```yaml
+permissions:
+  - clipboard
+  - background
+```
+
+| Rule | Lock |
+|---|---|
+| **Ids** | Closed set only: `accessibility`, `input-monitoring`, `camera`, `microphone`, `screen-recording`, `network`, `clipboard`, `background`. |
+| **Omit / `[]`** | No special capabilities — install skips the permissions confirm. |
+| **Registry** | `build-registry.sh` copies `permissions` into `addons.json` for pre-download disclosure. |
+| **Unknown** | `validate-addon.sh` and manifest/registry load refuse unknown tokens. |
+| **Clipboard** | Any pasteboard read or write. |
+| **Background** | A background agent that keeps running after the panel closes. |
+
 ## Helpers
 
 Optional. A **helper** is shared runtime the user would not install alone (vision rule 4). It is **not** a catalog addon and **not** an enable key. Do not copy helper code into each addon zip. An in-zip binary (e.g. window-layouts AX exec) is not a Helper.

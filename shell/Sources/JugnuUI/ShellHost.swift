@@ -311,6 +311,13 @@ extension ShellHost {
         onCancelFollowUp?()
     }
 
+    // Awaitable confirms dismiss via onCancelFollowUp first; clear so submitFollowUp won't pop/toast again.
+    public func acknowledgeFollowUpHandled() {
+        activeFollowUp = nil
+        followUpDescriptor = nil
+        followUpError.message = nil
+    }
+
     /// Opens `.note` as a detached `NSPanel`, separate from the in-panel stack. Resets the launcher
     /// (hides the in-panel host) so the note doesn't leave the palette panel sitting behind it.
     /// AppModel-free: `followUp` is the same closure `present` already received, reused to persist

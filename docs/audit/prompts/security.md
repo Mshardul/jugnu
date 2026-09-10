@@ -88,7 +88,8 @@ Concern-defined. Inspect these regardless of directory:
 
 - `docs/architecture/2026-08-22-shell-design.md` — the trust model, sha256 story,
   stated v0 non-goals (code signing, sandboxing)
-- `docs/architecture/2026-08-26-permissions-privacy-security-design.md`
+- `docs/architecture/2026-09-10-permissions-disclosure-design.md`
+  (supersedes `2026-08-26-permissions-privacy-security-design.md`)
 - `docs/architecture/2026-08-27-addon-state-and-config-design.md` — the state-dir /
   config-passthrough contract (locked decisions table)
 - `docs/architecture/2026-08-25-nudges-clock-helper-design.md` — helper download /

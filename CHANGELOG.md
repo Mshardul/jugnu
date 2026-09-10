@@ -13,6 +13,8 @@ The project has not published a release yet. Entries currently describe unreleas
 
 ### Added
 
+- 2026-09-10 — Honest capability disclosure (ticket 0038): closed `permissions` on addon.yaml + registry, confirm before download, card one-liner, detail list, first-launch union confirm, grew-only update / bulk keep-current. Pre-TCC explainer (0054 A), prefs Permissions (0054 B), and TCC-reset (0022) remain later.
+
 - 2026-09-07 — Keep current: app + addon updates (confirm before write), yaml switches default on, and a two-step first-run that opens Browse.
 
 - 2026-09-06 — Catalog zips republished on `addons-v1.0.0` as `jugnu.<job>-1.0.0.zip` (roots and `addon.yaml` ids match namespaced registry rows); `clock` helper asset uploaded.
@@ -43,6 +45,7 @@ The project has not published a release yet. Entries currently describe unreleas
 
 ### Documentation
 
+- 2026-09-10 — Drafted honest-capability permissions design (install disclosure now; pre-TCC explainer, detail/prefs, TCC-reset as later phases). Supersedes 2026-08-26 findings-only permissions doc.
 - 2026-09-04 — Drafted `python-runtime` helper and `clip-tools` Phase 1 designs + separate implementation plans (helper first).
 - 2026-09-04 — Added living command and UI catalogs (`docs/catalog-commands.md`, `docs/catalog-ui.md`) for shipped + planned addons.
 - 2026-08-25 — Approved clock helper + nudges design; plan under docs/superpowers/plans/.
