@@ -31,6 +31,13 @@ commands:
     title: Show nudge card
     subtitle: Internal — fired by clock
     keywords: []
+config:
+  - key: default_interval_minutes
+    type: int
+    default: 30
+  - key: show_nudge_now_in_manage
+    type: bool
+    default: true
 entrypoint:
   kind: exec
   path: bin/run

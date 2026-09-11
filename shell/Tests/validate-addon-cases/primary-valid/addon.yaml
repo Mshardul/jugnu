@@ -1,0 +1,19 @@
+id: jugnu.primary-valid
+name: Primary Valid
+version: 1.0.0
+api: 1
+lifecycle: oneshot
+primary: open
+commands:
+  - id: open
+    title: Open
+    timeout: 5
+  - id: clear
+    title: Clear
+    timeout: 5
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths: []
+  launchd: []

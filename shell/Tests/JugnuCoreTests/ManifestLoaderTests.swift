@@ -398,6 +398,73 @@ final class ManifestLoaderTests: XCTestCase {
         }
     }
 
+    func testLoadsPrimaryCommand() throws {
+        let dir = try writeManifest("""
+        id: jugnu.notes
+        name: Notes
+        version: 1.0.0
+        api: 1
+        primary: open
+        commands:
+          - id: open
+            title: Open
+          - id: clear
+            title: Clear
+        entrypoint:
+          kind: exec
+          path: bin/run
+        cleanup:
+          paths: []
+          launchd: []
+        """)
+        let m = try ManifestLoader.load(from: dir)
+        XCTAssertEqual(m.primary, "open")
+        XCTAssertEqual(m.primaryCommand?.id, "open")
+    }
+
+    func testRejectsPrimaryWithNoMatchingCommand() throws {
+        let dir = try writeManifest("""
+        id: jugnu.notes
+        name: Notes
+        version: 1.0.0
+        api: 1
+        primary: nope
+        commands:
+          - id: open
+            title: Open
+        entrypoint:
+          kind: exec
+          path: bin/run
+        cleanup:
+          paths: []
+          launchd: []
+        """)
+        XCTAssertThrowsError(try ManifestLoader.load(from: dir)) { error in
+            XCTAssertEqual(error as? ManifestLoaderError, .unknownPrimary("nope"))
+        }
+    }
+
+    func testOmitsPrimaryDefaultsNil() throws {
+        let dir = try writeManifest("""
+        id: jugnu.plain
+        name: Plain
+        version: 1.0.0
+        api: 1
+        commands:
+          - id: x
+            title: X
+        entrypoint:
+          kind: exec
+          path: bin/run
+        cleanup:
+          paths: []
+          launchd: []
+        """)
+        let m = try ManifestLoader.load(from: dir)
+        XCTAssertNil(m.primary)
+        XCTAssertNil(m.primaryCommand)
+    }
+
     func testOmitsPermissionsDefaultsEmpty() throws {
         let dir = try writeManifest("""
         id: jugnu.plain

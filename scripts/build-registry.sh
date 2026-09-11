@@ -103,9 +103,13 @@ for addon_dir in "$repo_root"/addons/*/; do
   api=$(manifest_value "$manifest" api)
   summary=$(first_command_title "$manifest")
   permissions_json=$(manifest_permissions_json "$manifest")
+  primary=$(manifest_value "$manifest" primary)
 
   sha256=$("$script_dir/package-addon.sh" "$addon_dir" "$dist_dir" 2>/dev/null)
   zip_name="${id}-${version}.zip"
+
+  primary_json="null"
+  [[ -n "$primary" ]] && primary_json="\"${primary}\""
 
   entry=$(cat <<JSON
   {
@@ -116,7 +120,8 @@ for addon_dir in "$repo_root"/addons/*/; do
     "url": "${release_base_url}/${zip_name}",
     "sha256": "${sha256}",
     "summary": "${summary}",
-    "permissions": ${permissions_json}
+    "permissions": ${permissions_json},
+    "primary": ${primary_json}
   }
 JSON
 )
@@ -151,9 +156,11 @@ for entry in new_entries:
     for key in preserve:
         if key in old:
             entry[key] = old[key]
-    # permissions always come from the packaged manifest (already on entry).
+    # permissions and primary always come from the packaged manifest (already on entry).
     if "permissions" not in entry:
         entry["permissions"] = []
+    if entry.get("primary") is None:
+        entry.pop("primary", None)
     if not entry.get("category"):
         missing.append(entry["id"])
 if missing:

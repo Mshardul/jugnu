@@ -30,10 +30,15 @@ final class CleanupTests: XCTestCase {
         """
         try yaml.write(to: addonRoot.appendingPathComponent("addon.yaml"), atomically: true, encoding: .utf8)
 
+        let stateRoot = paths.addonStateRoot(id: "toy")
+        try FileManager.default.createDirectory(at: stateRoot, withIntermediateDirectories: true)
+        try "state".write(to: stateRoot.appendingPathComponent("data.txt"), atomically: true, encoding: .utf8)
+
         let manifest = try ManifestLoader.load(from: addonRoot)
         try Cleanup.performDisable(manifest: manifest, addonRoot: addonRoot, paths: paths)
         XCTAssertTrue(FileManager.default.fileExists(atPath: addonRoot.path))
         XCTAssertTrue(FileManager.default.fileExists(atPath: side.path))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: stateRoot.path))
 
         let life = AddonLifecycle(paths: paths)
         try life.setEnabled(id: "toy", enabled: true)
@@ -41,6 +46,7 @@ final class CleanupTests: XCTestCase {
 
         XCTAssertFalse(FileManager.default.fileExists(atPath: addonRoot.path))
         XCTAssertFalse(FileManager.default.fileExists(atPath: side.path))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: stateRoot.path), "uninstall must remove addon state root")
         let config = try ConfigStore(paths: paths).load()
         XCTAssertNil(config.addons["toy"])
     }

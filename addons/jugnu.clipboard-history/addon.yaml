@@ -2,6 +2,7 @@ id: jugnu.clipboard-history
 name: Clipboard History
 version: 1.0.0
 api: 1
+primary: list
 permissions:
   - clipboard
   - background

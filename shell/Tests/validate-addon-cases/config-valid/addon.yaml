@@ -1,0 +1,23 @@
+id: jugnu.config-valid
+name: Config Valid
+version: 1.0.0
+api: 1
+lifecycle: oneshot
+config:
+  - key: show_scoreboard
+    type: bool
+    default: true
+  - key: ai_difficulty
+    type: enum
+    values: [easy, medium, hard]
+    default: medium
+commands:
+  - id: run
+    title: Run
+    timeout: 5
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths: []
+  launchd: []

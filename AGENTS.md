@@ -11,6 +11,7 @@ Coding standards: [docs/conventions.md](docs/conventions.md). Product intent: [d
 
 ## Change discipline
 
+- **Decide for the long-term end-state.** Every design, architecture, tooling, and library choice is judged against Jugnu's full vision ([docs/vision.md](docs/vision.md), [docs/backlog.md](docs/backlog.md)) — hundreds of addons, third-party authors, an open registry — not the current ~21 addons or the "near-term backlog." Never justify an option with "enough for now" / "won't need that for a while" / "revisit later"; if it does not survive the end-state view, pick the one that does. Scope of *work* can be phased; scope of the *decision* cannot. Settled decisions are not re-litigated.
 - Inspect nearby implementations, tests, and current user changes before editing. Make the smallest coherent change.
 - Preserve changes you did not make. Never reset, checkout, or otherwise discard user work.
 - Report what changed, what was validated, and any remaining risks. Never claim an item is complete without executable validation when the environment provides it.

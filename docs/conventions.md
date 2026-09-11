@@ -10,9 +10,6 @@ Copy the **current** pattern in the type table, not leftover names or comments. 
 
 | Do not copy | Copy instead | Cleanup |
 |---|---|---|
-| `handleEsc` / `handleClickOutside` | Outcome names (`popOrDismiss`, `dismiss`) | [0013](tickets.md) |
-| `///` / `/* */` / “Task N” notes | No comment, or one `//` **why** | [0013](tickets.md) |
-| `PrefsView` in `App/` | Views in `JugnuUI` | [0013](tickets.md) |
 | Addon `Process` that outlives hide/Esc | Cancel + `cleanup` on leave | [0014](tickets.md) |
 | `hide()` setting `panel = nil` | Keep the `KeyablePanel`; `orderOut` only | [0016](tickets.md) |
 | `AddonInstaller.unzip()` as-is | Path-safe extract | [security audit](audit/prompts/security.md) |

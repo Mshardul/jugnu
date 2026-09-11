@@ -40,6 +40,22 @@ public enum UserFacingError {
                 return "This addon’s description couldn’t be read. Try reinstalling it."
             case .unknownPermission:
                 return "This addon’s description couldn’t be read. Try reinstalling it."
+            case .invalidConfigSchema:
+                return "This addon’s settings description couldn’t be read. Try reinstalling it."
+            case .unknownPrimary:
+                return "This addon’s description couldn’t be read. Try reinstalling it."
+            }
+        }
+        if let config = error as? AddonConfigError {
+            switch config {
+            case .invalidSchema:
+                return "This addon’s settings description couldn’t be read. Try reinstalling it."
+            case .syntaxError:
+                return "This addon’s config file is invalid."
+            case .unknownKey(let key):
+                return "This addon’s config file has an unknown setting (\(key))."
+            case .invalidValue(let key, _):
+                return "This addon’s config file has an invalid value for \(key)."
             }
         }
         if let ns = error as? NamespaceMigratorError {

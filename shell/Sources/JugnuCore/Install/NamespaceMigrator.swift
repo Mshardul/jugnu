@@ -4,7 +4,6 @@ public enum NamespaceMigratorError: Error, Equatable {
     case collision(job: String, occupant: String)
 }
 
-/// Resumable per-addon migration of un-prefixed first-party dirs → `jugnu.<job>`.
 public enum NamespaceMigrator {
     public static let firstPartyPublisher = "jugnu"
     public static let completionMarkerName = "namespace-migration-v1-complete"
@@ -21,7 +20,7 @@ public enum NamespaceMigrator {
         paths.stateDir.appendingPathComponent(completionMarkerName)
     }
 
-    /// Migrate remaining un-prefixed addon dirs one id at a time. Safe to call every launch.
+    // resumable one id at a time; safe to call every launch
     @discardableResult
     public static func migrateInstalledTree(
         paths: JugnuPaths,
@@ -129,7 +128,7 @@ public enum NamespaceMigrator {
         }
     }
 
-    /// Recents/favorites use `addonId.commandId` (addon id may itself contain dots after namespace).
+    // qualified ids are `addonId.commandId`, and addonId itself contains dots after namespacing
     public static func remapQualifiedIds(state: inout JugnuState, fromAddon: String, toAddon: String) {
         func remap(_ id: String) -> String? {
             if id == fromAddon { return toAddon }

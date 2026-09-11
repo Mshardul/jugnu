@@ -32,9 +32,14 @@ public struct AddonRunner: Sendable {
             op: "run",
             command: commandId,
             args: args,
-            context: context
+            context: context,
+            config: try Self.resolveConfig(manifest: manifest, paths: paths)
         )
-        let extra = try Self.helperEnvironment(manifest: manifest, paths: paths)
+        var extra = try Self.helperEnvironment(manifest: manifest, paths: paths)
+        if let paths {
+            extra["JUGNU_STATE_DIR"] = paths.addonStateRoot(id: manifest.id).path
+            extra["JUGNU_CONFIG_DIR"] = paths.addonConfigDir(id: manifest.id).path
+        }
         return try run(
             addonRoot: addonRoot,
             entrypoint: manifest.entrypoint,
@@ -42,6 +47,13 @@ public struct AddonRunner: Sendable {
             timeout: timeout ?? timeoutSeconds,
             extraEnvironment: extra
         )
+    }
+
+    public static func resolveConfig(manifest: AddonManifest, paths: JugnuPaths?) throws -> [String: JSONValue] {
+        guard !manifest.config.isEmpty else { return [:] }
+        let file = paths?.addonConfigFile(id: manifest.id)
+            ?? URL(fileURLWithPath: "/tmp/jugnu-missing-config-\(manifest.id).yaml")
+        return try AddonConfigResolver.resolve(schema: manifest.config, fileURL: file)
     }
 
     public static func helperEnvironment(manifest: AddonManifest, paths: JugnuPaths?) throws -> [String: String] {
@@ -78,9 +90,14 @@ public struct AddonRunner: Sendable {
             op: "run",
             command: commandId,
             args: args,
-            context: context
+            context: context,
+            config: try Self.resolveConfig(manifest: manifest, paths: paths)
         )
-        let extra = try Self.helperEnvironment(manifest: manifest, paths: paths)
+        var extra = try Self.helperEnvironment(manifest: manifest, paths: paths)
+        if let paths {
+            extra["JUGNU_STATE_DIR"] = paths.addonStateRoot(id: manifest.id).path
+            extra["JUGNU_CONFIG_DIR"] = paths.addonConfigDir(id: manifest.id).path
+        }
         let origin = "\(manifest.id):\(commandId):\(invokeUUID.uuidString)"
         return try spawn(
             addonRoot: addonRoot,

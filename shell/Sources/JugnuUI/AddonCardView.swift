@@ -13,6 +13,8 @@ public struct AddonCardView: View {
     let onEnabledChange: (Bool) -> Void
     let onUninstall: () -> Void
     var onTap: (() -> Void)?
+    var onOpenSettings: (() -> Void)?
+    var onOpen: (() -> Void)?
 
     @Environment(\.colorScheme) private var colorScheme
     @ObservedObject private var store = ThemeStore.shared
@@ -24,7 +26,10 @@ public struct AddonCardView: View {
         onInstall: @escaping () -> Void,
         onUpdate: @escaping () -> Void = {},
         onEnabledChange: @escaping (Bool) -> Void,
-        onUninstall: @escaping () -> Void, onTap: (() -> Void)? = nil
+        onUninstall: @escaping () -> Void,
+        onTap: (() -> Void)? = nil,
+        onOpenSettings: (() -> Void)? = nil,
+        onOpen: (() -> Void)? = nil
     ) {
         self.entry = entry
         self.isInstalled = isInstalled
@@ -37,6 +42,8 @@ public struct AddonCardView: View {
         self.onEnabledChange = onEnabledChange
         self.onUninstall = onUninstall
         self.onTap = onTap
+        self.onOpenSettings = onOpenSettings
+        self.onOpen = onOpen
     }
 
     private var displayTags: [String] {
@@ -56,6 +63,17 @@ public struct AddonCardView: View {
                             Text("Update available")
                                 .font(.caption2)
                                 .foregroundStyle(theme.accent)
+                        }
+                        Spacer(minLength: 0)
+                        if isInstalled {
+                            Button {
+                                onOpenSettings?()
+                            } label: {
+                                Text("⚙︎")
+                                    .foregroundStyle(theme.textSecondary)
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel("Settings")
                         }
                     }
                     Text(entry.summary)
@@ -90,11 +108,13 @@ public struct AddonCardView: View {
                 isEnabled: isEnabled,
                 isInstalling: isInstalling,
                 updateAvailable: updateAvailable,
+                primary: entry.primary,
                 theme: theme,
                 onInstall: onInstall,
                 onUpdate: onUpdate,
                 onEnabledChange: onEnabledChange,
-                onUninstall: onUninstall
+                onUninstall: onUninstall,
+                onOpen: { onOpen?() }
             )
 
             if let errorMessage {

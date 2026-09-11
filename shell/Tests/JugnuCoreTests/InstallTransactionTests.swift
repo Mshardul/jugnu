@@ -43,6 +43,10 @@ final class InstallTransactionTests: XCTestCase {
 
         XCTAssertTrue(FileManager.default.fileExists(atPath: paths.addonsDir.appendingPathComponent("dep").path))
         XCTAssertTrue(
+            FileManager.default.fileExists(atPath: paths.addonStateRoot(id: "dep").path),
+            "commit must create per-addon state root"
+        )
+        XCTAssertTrue(
             FileManager.default.fileExists(atPath: paths.helperRoot(id: "clock", version: "1.0.0").path)
         )
         XCTAssertEqual(try store.loadOrCreateDefaults().addons["dep"]?.enabled, false)
@@ -50,6 +54,10 @@ final class InstallTransactionTests: XCTestCase {
         tx.rollback()
 
         XCTAssertFalse(FileManager.default.fileExists(atPath: paths.addonsDir.appendingPathComponent("dep").path))
+        XCTAssertFalse(
+            FileManager.default.fileExists(atPath: paths.addonStateRoot(id: "dep").path),
+            "rollback must remove state root created by commit"
+        )
         XCTAssertFalse(
             FileManager.default.fileExists(atPath: paths.helperRoot(id: "clock", version: "1.0.0").path)
         )

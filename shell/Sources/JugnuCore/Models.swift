@@ -218,10 +218,8 @@ public struct JugnuConfig: Codable, Equatable, Sendable {
 
 public struct ShellConfig: Codable, Equatable, Sendable {
     public var hotkey: String
-    /// Catalog JSON URL (GitHub raw or release-pinned).
     public var registryURL: String
-    /// Shell-native palette commands to hide: "browse-addons", "preferences".
-    /// These are mandatory chrome, not addons, so there is no My Addons toggle for them.
+    // mandatory chrome, not addons — hidden only here, never via a My Addons toggle
     public var hiddenShellCommands: Set<String>
     public var keepAppCurrent: Bool
     public var keepAddonsCurrent: Bool
@@ -409,7 +407,6 @@ public struct HelperRef: Codable, Equatable, Sendable {
     }
 }
 
-/// Catalog-addon dependency (exact SemVer). Distinct from `helpers:`.
 public struct AddonDependency: Codable, Equatable, Sendable {
     public var id: String
     public var version: String
@@ -442,11 +439,18 @@ public struct AddonManifest: Codable, Equatable, Sendable {
     public var helpers: [HelperRef]
     public var dependencies: [AddonDependency]
     public var permissions: [AddonPermission]
+    public var config: [AddonConfigField]
     public var lifecycle: LifecycleClass?
     public var minShellVersion: String?
+    public var primary: String?
 
     public var allowedViewTypes: [ViewType] {
         viewTypes.isEmpty ? ViewType.shellDefaults : viewTypes
+    }
+
+    public var primaryCommand: CommandDescriptor? {
+        guard let primary else { return nil }
+        return commands.first { $0.id == primary }
     }
 
     public func effectiveLifecycle(commandId: String) -> LifecycleClass {
@@ -478,8 +482,10 @@ public struct AddonManifest: Codable, Equatable, Sendable {
         helpers: [HelperRef] = [],
         dependencies: [AddonDependency] = [],
         permissions: [AddonPermission] = [],
+        config: [AddonConfigField] = [],
         lifecycle: LifecycleClass? = nil,
-        minShellVersion: String? = nil
+        minShellVersion: String? = nil,
+        primary: String? = nil
     ) {
         self.id = id
         self.name = name
@@ -492,15 +498,18 @@ public struct AddonManifest: Codable, Equatable, Sendable {
         self.helpers = helpers
         self.dependencies = dependencies
         self.permissions = permissions
+        self.config = config
         self.lifecycle = lifecycle
         self.minShellVersion = minShellVersion
+        self.primary = primary
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, name, version, api, commands, entrypoint, cleanup, helpers, dependencies, permissions, lifecycle
+        case id, name, version, api, commands, entrypoint, cleanup, helpers, dependencies, permissions, config, lifecycle
         case viewTypes = "view_types"
         case minShellVersion
         case minShellVersionSnake = "min_shell_version"
+        case primary
     }
 
     public init(from decoder: Decoder) throws {
@@ -519,10 +528,17 @@ public struct AddonManifest: Codable, Equatable, Sendable {
         } catch let PermissionsParseError.unknown(token) {
             throw ManifestLoaderError.unknownPermission(token)
         }
+        config = try c.decodeIfPresent([AddonConfigField].self, forKey: .config) ?? []
+        do {
+            try AddonConfigResolver.validateSchema(config)
+        } catch let AddonConfigError.invalidSchema(reason) {
+            throw ManifestLoaderError.invalidConfigSchema(reason)
+        }
         lifecycle = try LifecycleClass.decodeManifestValue(c.decodeIfPresent(String.self, forKey: .lifecycle))
         minShellVersion =
             try c.decodeIfPresent(String.self, forKey: .minShellVersion)
             ?? c.decodeIfPresent(String.self, forKey: .minShellVersionSnake)
+        primary = try c.decodeIfPresent(String.self, forKey: .primary)
         let raw = try c.decodeIfPresent([String].self, forKey: .viewTypes) ?? []
         viewTypes = try raw.map { token in
             guard let parsed = ViewType(rawValue: token) else {
@@ -547,6 +563,9 @@ public struct AddonManifest: Codable, Equatable, Sendable {
         }
         if !permissions.isEmpty {
             try c.encode(permissions.map(\.rawValue), forKey: .permissions)
+        }
+        if !config.isEmpty {
+            try c.encode(config, forKey: .config)
         }
         try c.encodeIfPresent(lifecycle?.rawValue, forKey: .lifecycle)
         try c.encodeIfPresent(minShellVersion, forKey: .minShellVersion)

@@ -16,7 +16,7 @@ public protocol PaletteModelProtocol: ObservableObject {
     func toggleFavorite(qualifiedId: String)
 }
 
-/// A mashing user's repeat invoke of the same command inside the window collapses to one spawn.
+// repeat invoke of the same command inside the window collapses to one spawn
 public enum PaletteInvokeDebounce {
     public static let windowSeconds: TimeInterval = 0.1
 
@@ -96,7 +96,6 @@ public struct PaletteView<Model: PaletteModelProtocol>: View {
         return model.lastHits
     }
 
-    /// Shell-native rows sit below addon hits: all of them on an empty query, fuzzy-matched otherwise.
     private var displayedShellNative: [ShellNativeCommand] {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         if trimmed.isEmpty {

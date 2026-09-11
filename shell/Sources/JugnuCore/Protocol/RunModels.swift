@@ -8,7 +8,6 @@ public enum UIPattern: String, Codable, Sendable, Equatable {
     case card
 }
 
-/// Minimal JSON value for `args` / `context` / form fields.
 public enum JSONValue: Codable, Sendable, Equatable {
     case string(String)
     case number(Double)
@@ -88,12 +87,9 @@ public struct UIDescriptor: Codable, Sendable, Equatable {
     public var fields: [UIFormField]?
     public var confirmLabel: String?
     public var cancelLabel: String?
-    /// `.note` pattern: initial editable text content.
-    public var content: String?
-    /// `.card` pattern: optional emoji shown above the message.
-    public var emoji: String?
-    /// `.card` pattern: CSS-like accent color (`#RRGGBB` or `#RRGGBBAA`).
-    public var accent: String?
+    public var content: String? // .note: initial editable text
+    public var emoji: String? // .card: emoji above the message
+    public var accent: String? // .card: #RRGGBB or #RRGGBBAA
     public var view: ViewType?
 
     public init(
@@ -131,19 +127,22 @@ public struct RunRequest: Codable, Sendable, Equatable {
     public var command: String
     public var args: [String: JSONValue]
     public var context: [String: JSONValue]?
+    public var config: [String: JSONValue]
 
     public init(
         api: Int = 1,
         op: String = "run",
         command: String,
         args: [String: JSONValue] = [:],
-        context: [String: JSONValue]? = nil
+        context: [String: JSONValue]? = nil,
+        config: [String: JSONValue] = [:]
     ) {
         self.api = api
         self.op = op
         self.command = command
         self.args = args
         self.context = context
+        self.config = config
     }
 }
 

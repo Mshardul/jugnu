@@ -89,6 +89,17 @@ public extension Color {
         let b = Double(value & 0xFF) / 255
         self = Color(red: r, green: g, blue: b)
     }
+
+    var jugnuHex: String {
+        let ns = NSColor(self)
+        guard let rgb = ns.usingColorSpace(.sRGB) else { return "#888888" }
+        return String(
+            format: "#%02X%02X%02X",
+            Int(round(rgb.redComponent * 255)),
+            Int(round(rgb.greenComponent * 255)),
+            Int(round(rgb.blueComponent * 255))
+        )
+    }
 }
 
 public func resolvedTheme(from config: ThemeConfig, colorScheme: ColorScheme) -> JugnuTheme {

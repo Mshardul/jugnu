@@ -109,6 +109,50 @@ final class AddonRunnerTests: XCTestCase {
         XCTAssertEqual(response.message, helperRoot.path)
     }
 
+    func testSetsStateAndConfigEnvironmentVariables() throws {
+        let home = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: home, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: home) }
+        let paths = JugnuPaths(home: home)
+
+        let work = home.appendingPathComponent("addon")
+        try FileManager.default.createDirectory(
+            at: work.appendingPathComponent("bin"),
+            withIntermediateDirectories: true
+        )
+        let yaml = """
+        id: jugnu.env-probe
+        name: Env Probe
+        version: 1.0.0
+        api: 1
+        commands:
+          - id: ping
+            title: Ping
+        entrypoint:
+          kind: exec
+          path: bin/run
+        """
+        try yaml.write(to: work.appendingPathComponent("addon.yaml"), atomically: true, encoding: .utf8)
+        let script = """
+        #!/bin/sh
+        printf '{"ok":true,"message":"%s|%s"}\\n' "$JUGNU_STATE_DIR" "$JUGNU_CONFIG_DIR"
+        """
+        let runURL = work.appendingPathComponent("bin/run")
+        try script.write(to: runURL, atomically: true, encoding: .utf8)
+        try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: runURL.path)
+
+        let manifest = try ManifestLoader.load(from: work)
+        let response = try AddonRunner(timeoutSeconds: 5).run(
+            manifest: manifest,
+            addonRoot: work,
+            commandId: "ping",
+            paths: paths
+        )
+        XCTAssertTrue(response.ok)
+        let expected = "\(paths.addonStateRoot(id: "jugnu.env-probe").path)|\(paths.addonConfigDir(id: "jugnu.env-probe").path)"
+        XCTAssertEqual(response.message, expected)
+    }
+
     private func copyUIHostFixtures() throws -> URL {
         let bundleRoot = try XCTUnwrap(
             Bundle.module.url(forResource: "echo-list", withExtension: "sh", subdirectory: "Fixtures/ui-host")?

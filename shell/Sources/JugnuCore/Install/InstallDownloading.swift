@@ -1,7 +1,7 @@
 import Foundation
 
 public protocol InstallDownloading: Sendable {
-    /// Downloads `url` to a temporary file. Caller owns cleanup.
+    // caller owns cleanup of the returned temp file
     func download(_ url: URL) async throws -> URL
 }
 

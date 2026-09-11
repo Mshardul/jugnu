@@ -12,9 +12,7 @@ final class BrowseCatalogViewModel: ObservableObject, BrowseCatalogViewModelProt
     @Published var staleMessage: String?
     @Published var errorMessage: String?
     @Published var installingIDs: Set<String> = []
-    /// Bumped after install/enable/uninstall mutate `model` so views reading
-    /// `isInstalled`/`isEnabled` (which pull live from `model`, not `@Published`
-    /// state) redraw. Those two methods have no other observable output.
+    // isInstalled/isEnabled read live from model, not @Published — bump this to force their redraw
     @Published private(set) var refreshTick = 0
 
     let categories = CatalogTaxonomy.categories

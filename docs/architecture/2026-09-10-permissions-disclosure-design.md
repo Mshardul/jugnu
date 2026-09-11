@@ -4,7 +4,7 @@
 **Status:** Approved  
 **Plan (Now / 0038):** [2026-09-10 permissions disclosure](../superpowers/plans/2026-09-10-permissions-disclosure.md)  
 **Ship slice (first):** [ticket 0038](../tickets.md) — install / first-launch / update disclosure  
-**Same design, later phases:** [0054](../tickets.md) A (pre-TCC explainer) — [plan](../superpowers/plans/2026-09-10-permissions-pre-tcc-explainer.md) · [0054](../tickets.md) B (detail + prefs Permissions row; prefs chrome is [0064](../tickets.md)) · [0022](../tickets.md) (TCC reset detection)  
+**Same design, later phases:** [0054](../tickets.md) A (pre-TCC explainer) — [plan](../superpowers/plans/2026-09-10-permissions-pre-tcc-explainer.md) · [0054](../tickets.md) B (prefs Addons→Permissions inventory; detail Settings permissions via [0065](../tickets.md); prefs chrome [0064](../tickets.md)) · [0022](../tickets.md) (TCC reset detection)  
 **Depends on:** [Shell surface](./2026-08-23-shell-surface-presets.md) (`confirm`), [Catalog browse](./2026-08-23-addon-catalog-browse-design.md) + [launcher-catalog](./2026-08-25-launcher-catalog-design.md) (card / detail Permissions tab), [Install integrity](./2026-09-05-addon-install-upgrade-integrity-design.md) (dep disclosure), [Keep current](./2026-09-07-keep-current-design.md) (first-launch Continue), [Shell design](./2026-08-22-shell-design.md) (honest permission UX, shell Permissions table)  
 **Supersedes:** [2026-08-26 permissions, privacy & security](./2026-08-26-permissions-privacy-security-design.md) (findings-only)  
 **Not this product:** per-addon sandboxing ([0021](../tickets.md)) · free-text permission strings · binary inference · signing / notarization · permission glyph art ([0051](../tickets.md)) · rebuilding the full 0825 prefs rail IA (this design binds keys/rows into today’s surfaces first)
@@ -23,7 +23,7 @@ Helpers do not declare capabilities. The **consuming catalog addon** does. Shell
 |---|---|---|---|
 | **Now** | [0038](../tickets.md) | Closed `permissions` on `addon.yaml` + registry copy; validate unknown ids; card one-liner; detail list (data + thin chrome); confirm before zip write if non-empty (catalog Install, first-launch Continue, install-with-deps); re-confirm only when an update’s set **grew**; merge with dependency disclosure; first-party yaml fills + packaging | Pre-TCC explainer UI; prefs Permissions page polish; TCC reset detection; glyphs |
 | **0054 A** | [0054](../tickets.md) | In-app explainer immediately before the macOS TCC prompt on first use of a declared TCC capability; Open System Settings / Not now; same titles + shell-owned reasons | Prefs inventory; TCC reset |
-| **0054 B** | [0054](../tickets.md) | Detail **Permissions** tab as durable home (0825 gallery + tabs); Prefs → Addons → Permissions (granted vs needed for installed addons) | Icon system |
+| **0054 B** | [0054](../tickets.md) | Prefs → Addons → Permissions (granted vs needed for installed addons). Detail **Settings** tab permissions body ships with [0065](../tickets.md) (Overview / Commands / Settings). Prefs canvas chrome is [0064](../tickets.md). | Icon system |
 | **0022** | [0022](../tickets.md) | Launch (or after-paint) check: shell Input Monitoring + enabled addons’ declared TCC ids; if previously granted and now denied → same explainer chrome | Periodic background polling |
 | **Later still** | — | Revoke UX polish; permission glyphs ([0051](../tickets.md)); shell Input Monitoring / shell network first-run or prefs disclosure (separate from addon `permissions`) | Sandboxing ([0021](../tickets.md)) |
 
@@ -261,11 +261,12 @@ Criteria land in the implementation plan for that phase; must reuse this vocabul
 ## 12. Implementation order
 
 1. **Now — 0038** — Done. Plan: [2026-09-10 permissions disclosure](../superpowers/plans/2026-09-10-permissions-disclosure.md).  
-2. **0054 A** — plan against §6: [2026-09-10 permissions pre-TCC explainer](../superpowers/plans/2026-09-10-permissions-pre-tcc-explainer.md).  
-3. **Preferences chrome** — [0064](../tickets.md) against [launcher-catalog §3.4](./2026-08-25-launcher-catalog-design.md) (parked; unblocks 0054 B prefs row).  
-4. **0054 B** — separate plan against §5.2–5.3 (after or with 0064 for prefs Permissions).  
-5. **0022** — separate plan against §7.  
-6. **Later still** — as tickets / design amendments.
+2. **0054 A** — Done. Plan: [2026-09-10 permissions pre-TCC explainer](../superpowers/plans/2026-09-10-permissions-pre-tcc-explainer.md).  
+3. **Preferences chrome** — [0064](../tickets.md) / [prefs canvas](./2026-09-10-prefs-canvas-design.md) (Theme / Updates / General); long-term rail still [launcher-catalog §3.4](./2026-08-25-launcher-catalog-design.md).  
+4. **Addon detail tabs** — [0065](../tickets.md); then **Open primary** [0066](../tickets.md).  
+5. **0054 B prefs inventory** + **Hotkeys** ([0037](../tickets.md)) — separate e2e epics after canvas exists.  
+6. **0022** — separate plan against §7.  
+7. **Later still** — as tickets / design amendments.
 
 ## Related
 

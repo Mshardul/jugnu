@@ -36,12 +36,19 @@ Walk this after the 2026-08-23 palette + addon UI product pass. Leave items unch
 
 ### Theme, motion, sound
 
-- [ ] Preferences → Theme: Firefly / Terminal Phosphor / Rose Quartz each restyle an already-open palette without restart
+- [ ] Preferences opens as rail + pane (Theme / Addons→Updates / General); default selection is **Theme** (ticket 0064)
+- [ ] Preferences → **Addons → Installed** lists installed addons and opens detail **Settings** (ticket 0065)
+- [ ] Catalog card **gear** (installed) opens detail Settings; card tap opens Overview (0065)
+- [ ] Detail tabs Overview / Commands / Settings; **Run** only when installed+enabled (0065)
+- [ ] Settings shows permissions + config editors when `config:` present; Open/Reset when config file is invalid (0065)
+- [ ] Nudges Settings: `default_interval_minutes` / `show_nudge_now_in_manage` persist under `~/.config/jugnu/addons/jugnu.nudges.yaml` and affect Add form / manage list (0065)
+- [ ] Preferences → **Theme**: Firefly / Terminal Phosphor / Rose Quartz each restyle an already-open palette without restart
 - [ ] A ColorPicker change on one token (light or dark) pushes live to the open palette
 - [ ] Invalid hex in `~/.config/jugnu/jugnu.yaml` falls back per-field instead of crashing
 - [ ] Terminal Phosphor uses monospaced UI type; the other two stay SF Pro
 - [ ] Reduce Motion on: no glow-bloom; palette fade is instant (or near-instant); toasts do not fade
-- [ ] Command success plays Tink, failure plays Basso; Preferences sound toggle silences both
+- [ ] Command success plays Tink, failure plays Basso; Preferences → **General** sound toggle silences both
+- [ ] Preferences → **Addons → Updates**: keep-app / keep-addons toggles persist; Check for Updates runs
 
 ### Keyboard-only panels
 
@@ -53,9 +60,9 @@ Walk this after the 2026-08-23 palette + addon UI product pass. Leave items unch
 ### First-run, addons, chrome
 
 - [ ] First-run: two steps (keep-current toggles, then checkbox catalog). Skip/close rules and Browse after close are in **Manual — keep current (0063)** below.
-- [ ] Preferences → **Install starter addons** downloads zips + verifies sha256
-- [ ] Preferences: disable removes from palette; uninstall removes files + declared cleanup
-- [ ] **clipboard-history watcher starts on enable** (ticket 0057): enable it without invoking a command; `launchctl print gui/$(id -u)/com.jugnu.clipboard-history.watch` succeeds and `~/Library/LaunchAgents/com.jugnu.clipboard-history.watch.plist` exists. Disable in Preferences → both are gone → log out and back in → watcher does **not** return, no new pasteboard entries recorded
+- [ ] Browse Catalog: install / enable / uninstall (not Preferences — ticket 0064); recommended install still works from first-run Continue
+- [ ] Browse Catalog: disable removes from palette; uninstall removes files + declared cleanup
+- [ ] **clipboard-history watcher starts on enable** (ticket 0057): enable it from Browse without invoking a command; `launchctl print gui/$(id -u)/com.jugnu.clipboard-history.watch` succeeds and `~/Library/LaunchAgents/com.jugnu.clipboard-history.watch.plist` exists. Disable from Browse → both are gone → log out and back in → watcher does **not** return, no new pasteboard entries recorded
 - [ ] **Floating Note**: type, Cmd+S, close, reopen — text persisted by the addon
 - [ ] Menu bar uses the template firefly icon (tints with the menu bar); click opens the menu
 - [ ] **Single-instance guard** (ticket 0020): with Jugnu already running, launch `Jugnu.app` again → the second copy exits immediately, the running copy opens the palette, and Activity Monitor shows exactly one `Jugnu` process. The hotkey still works afterward.
@@ -147,7 +154,7 @@ Walk on a Mac after the namespaced `jugnu.*` zips are on `addons-v1.0.0` and `re
 
 - [ ] First launch: step 1 defaults on; Skip still leaves both on; step 2 recommended pre-checked; Skip installs nothing and Browse opens
 - [ ] Continue step 2 installs checked addons (including a non-recommended if checked)
-- [ ] Preferences → Updates toggles persist in jugnu.yaml
+- [ ] Preferences → **Addons → Updates** toggles persist in jugnu.yaml
 - [ ] Menu Check for Updates… with matching 0.1.0 registry: “You’re up to date.”
 - [ ] Later on an app prompt does not download; next launch prompts again
 - [ ] Keep-addons on + outdated catalog row: bulk confirm; Cancel downloads nothing; catalog per-card Update still works with keep-addons off

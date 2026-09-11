@@ -74,6 +74,22 @@ fi
 grep -q '^commands:' "$manifest" || { echo "missing commands in addon.yaml" >&2; exit 1; }
 grep -q '^cleanup:' "$manifest" || { echo "missing cleanup in addon.yaml" >&2; exit 1; }
 
+primary=$(value primary)
+if [[ -n "$primary" ]]; then
+  awk -v want="$primary" '
+    /^commands:/ { in_commands = 1; next }
+    in_commands && /^[^[:space:]-]/ { in_commands = 0 }
+    in_commands && /^[[:space:]]+-[[:space:]]+id:[[:space:]]*/ {
+      line = $0
+      sub(/^[[:space:]]+-[[:space:]]+id:[[:space:]]*/, "", line)
+      gsub(/["'\'']/, "", line)
+      sub(/[[:space:]]*#.*$/, "", line)
+      if (line == want) { found = 1 }
+    }
+    END { exit !found }
+  ' "$manifest" || { echo "unknown primary command: $primary" >&2; exit 1; }
+fi
+
 if grep -q '^helpers:' "$manifest"; then
   awk '
     /^helpers:/ { in_h = 1; next }
@@ -89,6 +105,122 @@ if grep -q '^helpers:' "$manifest"; then
       if (ver !~ /^[0-9]+\.[0-9]+\.[0-9]+$/) { print "invalid helper version: " ver > "/dev/stderr"; exit 1 }
     }
   ' "$manifest"
+fi
+
+if grep -q '^config:' "$manifest"; then
+  python3 - "$manifest" <<'PY' || exit 1
+import re, sys
+
+try:
+    import yaml
+except ImportError:
+    # Prefer PyYAML when present; otherwise a tiny subset parser for list-of-maps.
+    yaml = None
+
+path = sys.argv[1]
+text = open(path, encoding="utf-8").read()
+allowed_types = {"string", "int", "bool", "enum"}
+key_re = re.compile(r"^[a-z][a-z0-9_]*$")
+
+def fail(msg):
+    print(f"invalid config schema: {msg}", file=sys.stderr)
+    sys.exit(1)
+
+def load_config(doc):
+    if not isinstance(doc, dict):
+        fail("root must be a mapping")
+    cfg = doc.get("config")
+    if cfg is None:
+        return []
+    if not isinstance(cfg, list):
+        fail("config must be a list")
+    return cfg
+
+if yaml is not None:
+    doc = yaml.safe_load(text)
+    fields = load_config(doc)
+else:
+    # Fallback: extract config: block items with key/type/default/values lines.
+    lines = text.splitlines()
+    fields = []
+    i = 0
+    while i < len(lines):
+        if re.match(r"^config:\s*$", lines[i]) or re.match(r"^config:\s*\[", lines[i]):
+            i += 1
+            while i < len(lines):
+                line = lines[i]
+                if line and not line[0].isspace() and not line.startswith("#"):
+                    break
+                m = re.match(r"^\s*-\s+key:\s*(.+)$", line)
+                if m:
+                    field = {"key": m.group(1).strip().strip("\"'")}
+                    i += 1
+                    while i < len(lines):
+                        sub = lines[i]
+                        if re.match(r"^\s*-\s+key:", sub) or (sub and not sub[0].isspace() and not sub.startswith("#")):
+                            break
+                        if re.match(r"^\s+type:\s*", sub):
+                            field["type"] = re.sub(r"^\s+type:\s*", "", sub).split("#")[0].strip().strip("\"'")
+                        elif re.match(r"^\s+default:\s*", sub):
+                            raw = re.sub(r"^\s+default:\s*", "", sub).split("#")[0].strip()
+                            if raw in ("true", "false"):
+                                field["default"] = raw == "true"
+                            elif re.fullmatch(r"-?\d+", raw):
+                                field["default"] = int(raw)
+                            else:
+                                field["default"] = raw.strip("\"'")
+                        elif re.match(r"^\s+values:\s*", sub):
+                            rest = re.sub(r"^\s+values:\s*", "", sub).split("#")[0].strip()
+                            if rest.startswith("["):
+                                inner = rest.strip("[]")
+                                field["values"] = [p.strip().strip("\"'") for p in inner.split(",") if p.strip()]
+                            else:
+                                vals = []
+                                i += 1
+                                while i < len(lines) and re.match(r"^\s+-\s+", lines[i]):
+                                    vals.append(re.sub(r"^\s+-\s+", "", lines[i]).split("#")[0].strip().strip("\"'"))
+                                    i += 1
+                                field["values"] = vals
+                                continue
+                        i += 1
+                    fields.append(field)
+                    continue
+                i += 1
+            break
+        i += 1
+
+seen = set()
+for field in fields:
+    if not isinstance(field, dict):
+        fail("each config entry must be a mapping")
+    key = field.get("key")
+    typ = field.get("type")
+    if not isinstance(key, str) or not key_re.match(key):
+        fail(f"bad key {key!r}")
+    if key in seen:
+        fail(f"duplicate key {key}")
+    seen.add(key)
+    if typ not in allowed_types:
+        fail(f"unsupported type {typ!r} for {key}")
+    if "default" not in field:
+        fail(f"missing default for {key}")
+    default = field["default"]
+    values = field.get("values")
+    if typ == "enum":
+        if not isinstance(values, list) or not values or not all(isinstance(v, str) for v in values):
+            fail(f"enum {key} needs values")
+        if default not in values:
+            fail(f"default for {key} must be enum value")
+    else:
+        if values is not None:
+            fail(f"{key} values only for enum")
+        if typ == "string" and not isinstance(default, str):
+            fail(f"default for {key} must be string")
+        if typ == "int" and not (isinstance(default, int) and not isinstance(default, bool)):
+            fail(f"default for {key} must be int")
+        if typ == "bool" and not isinstance(default, bool):
+            fail(f"default for {key} must be bool")
+PY
 fi
 
 if grep -q '^permissions:' "$manifest"; then

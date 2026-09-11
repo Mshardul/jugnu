@@ -26,7 +26,6 @@ public final class ShellHost: ObservableObject {
     )?
     private let toast = ToastPresenter()
     private var cards: [String: WeakCardPanel] = [:]
-    /// Set by the caller (AppDelegate) right after `pushFollowUp`/`renderFollowUpContent`
     public var onCancelFollowUp: (() -> Void)?
 
     public init(reduceMotion: @escaping () -> Bool = { NSWorkspace.shared.accessibilityDisplayShouldReduceMotion }) {
@@ -38,12 +37,11 @@ public final class ShellHost: ObservableObject {
         panel?.isVisible ?? false
     }
 
-    /// Panel survives hide() so reopen skips the NSPanel/NSHostingView rebuild and its cold paint.
+    // panel survives hide() so reopen skips the NSPanel/NSHostingView rebuild and its cold paint
     var hasPanel: Bool {
         panel != nil
     }
 
-    /// The screen the panel is currently on, if it's up.
     public var currentScreen: NSScreen? {
         panel?.screen
     }
@@ -54,12 +52,11 @@ public final class ShellHost: ObservableObject {
         currentViewType.dismissesOnOutsideClick
     }
 
-    /// Sets the panel's Esc/Cmd+. handler. Callers should rebind this whenever the hosted content changes.
     public func setOnCancel(_ handler: (() -> Void)?) {
         panel?.escHandler = handler
     }
 
-    /// Pops one stack entry. Returns false (no-op) if already at root — caller decides dismiss vs pop.
+    // returns false at root so the caller can decide dismiss vs pop
     @discardableResult
     public func popTop() -> Bool {
         guard !stack.isAtRoot else { return false }
@@ -67,12 +64,10 @@ public final class ShellHost: ObservableObject {
         return true
     }
 
-    /// Resets the stack to a fresh `[launcher]` (home), per the invoke-hotkey home rule.
     public func goHome() {
         stack.home(initial: .launcher(query: "", selection: nil, scroll: 0))
     }
 
-    /// Genuine click outside the app's own windows (not resign-key, not Cmd+Tab). Always dismisses, never pops.
     private func startOutsideClickMonitor(onOutside: @escaping () -> Void) {
         stopOutsideClickMonitor()
         outsideClickMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { _ in
@@ -109,31 +104,24 @@ public final class ShellHost: ObservableObject {
         }
     }
 
-    /// Exposed for Task 5+ to attach the real KeyablePanel once content views exist.
     func attach(panel: KeyablePanel) {
         self.panel = panel
     }
 
-    /// Pushes a child entry onto the stack (or refocuses in place if it's an idempotent re-push of the current top).
     public func push(_ entry: ShellStackEntry) {
         stack.push(entry)
     }
 
-    /// Replaces the top entry with a sibling, keeping the same parent.
     public func replace(_ entry: ShellStackEntry) {
         stack.replace(entry)
     }
 
-    /// Live-updates the current top entry's snapshot in place (same preset, new state) without
-    /// pushing/popping. Called by content views as the user types/scrolls/selects, so a later pop
-    /// restores what was actually on screen. Silently drops stale callbacks from a view that's no
-    /// longer on top (e.g. the frame right after a push, before the new content's onAppear fires).
+    // drops stale callbacks from a view no longer on top (the frame right after a push, before onAppear)
     public func updateTopState(_ state: ShellViewState) {
         guard !stack.entries.isEmpty, state.preset == stack.top.preset else { return }
         stack.replace(ShellStackEntry(state))
     }
 
-    /// Swaps the panel's hosted content to `view`. Callers own the mapping from `stack.top.preset` to a concrete view.
     public func setContent(_ view: some View) {
         panel?.contentView = NSHostingView(rootView: view)
     }
@@ -147,13 +135,11 @@ public final class ShellHost: ObservableObject {
         orderFront()
     }
 
-    /// Builds the single `KeyablePanel` with `content` if it doesn't exist yet; no-op otherwise.
     public func ensurePanel(initialContent content: some View, size: NSSize) {
         guard panel == nil else { return }
         attach(panel: PanelChrome.borderless(size: size, content: content))
     }
 
-    /// Brings the panel to front and makes it key, without rebuilding or touching the stack.
     public func orderFront() {
         guard let panel else { return }
         NSApp.activate(ignoringOtherApps: true)
@@ -162,7 +148,7 @@ public final class ShellHost: ObservableObject {
 }
 
 public extension ShellHost {
-    /// Orders the panel out and empties the stack (never pops); panel kept for the next invoke to reuse.
+    // empties the stack (never pops); panel kept for the next invoke to reuse
     func hide() {
         stopOutsideClickMonitor()
         panel?.orderOut(nil)
@@ -172,9 +158,6 @@ public extension ShellHost {
         activeFollowUp = nil
     }
 
-    /// Starts (or restarts) the global click-outside monitor. Call once the panel is visible;
-    /// `hide()` stops it. Fires only for genuine mouse-down outside the app's own windows —
-    /// resign-key / Cmd+Tab never trigger this.
     func armClickOutsideDismiss(onOutside: @escaping () -> Void) {
         startOutsideClickMonitor(onOutside: onOutside)
     }
@@ -192,10 +175,6 @@ public extension ShellHost {
 }
 
 extension ShellHost {
-    /// Presents `response`'s follow-up UI (confirm/list/form) as a stack push, or shows a toast and
-    /// leaves the stack untouched if there's no UI. AppModel-free: `followUp` is a plain
-    /// `RunRequest -> RunResponse` closure supplied by the caller (AppDelegate/AddonUninstallPresenter),
-    /// so no dependency on the App target is introduced here.
     public func present(
         response: RunResponse,
         commandId: String,
@@ -228,9 +207,6 @@ extension ShellHost {
         trace.markContent()
     }
 
-    /// Pushes a `confirm`/`list`/`form` follow-up as a child of the current top (spec §4) instead of
-    /// opening a separate panel. Idempotent re-push (same preset already on top) just refocuses, per
-    /// `ShellStack.push`'s existing rule.
     public func pushFollowUp(
         ui: UIDescriptor,
         commandId: String,
@@ -243,7 +219,7 @@ extension ShellHost {
         case .confirm: state = .confirm
         case .list: state = .list(query: "", highlightedID: nil, scroll: 0)
         case .form: state = .form(values: [:], focusedFieldID: nil)
-        case .note: return // note is detached, not a stack push — handled separately (Task 12)
+        case .note: return // note is detached, not a stack push
         case .card: return
         }
         let resolvedTrace = trace ?? InvokeTrace(commandId: commandId)
@@ -262,8 +238,6 @@ extension ShellHost {
         resolvedTrace.markContent()
     }
 
-    /// Re-hosts the confirm/list/form view for whatever's currently on top, if it's a follow-up preset
-    /// and a descriptor is stashed for it. No-op otherwise.
     public func renderFollowUpContent() {
         guard let ui = followUpDescriptor else { return }
         switch stack.top.preset {
@@ -299,8 +273,6 @@ extension ShellHost {
         }
     }
 
-    /// Cancel button / Esc on a follow-up: same as any other pop. Caller (AppDelegate) still owns
-    /// popping the stack and morphing the frame, via `onCancelFollowUp`.
     private func cancelFollowUp() {
         if let trace = activeFollowUp?.trace {
             trace.markDismiss()
@@ -318,18 +290,13 @@ extension ShellHost {
         followUpError.message = nil
     }
 
-    /// Opens `.note` as a detached `NSPanel`, separate from the in-panel stack. Resets the launcher
-    /// (hides the in-panel host) so the note doesn't leave the palette panel sitting behind it.
-    /// AppModel-free: `followUp` is the same closure `present` already received, reused to persist
-    /// the note's content on close via a synthetic `RunRequest` — there's no response UI to show back
-    /// (the note window is already gone), so a failed save surfaces as a toast instead.
+    // hide() first so the note doesn't leave the palette panel sitting behind it
     private func openNote(ui: UIDescriptor, followUp: @escaping (RunRequest) async throws -> RunResponse) {
         hide()
         let commandId = ui.title ?? "note"
         let note = NotePanel(
             ui: ui,
-            persist: true, // today's shipped command is a persist:true scratchpad; persist:false Quick Note is backlog
-            // (spec §2)
+            persist: true,
             onSave: { [weak self] text in
                 Task { @MainActor in
                     do {

@@ -1,7 +1,6 @@
 import Foundation
 
 public struct AppUpdateSkip {
-    /// App zip check (launch). True → do not fetch app registry.
     public static func shouldSkipAppCheck(
         firstRunCompleted: Bool,
         screenshotMode: Bool,
@@ -17,7 +16,6 @@ public struct AppUpdateSkip {
         return false
     }
 
-    /// Addon bulk on launch. True → do not fetch addon catalog for bulk.
     public static func shouldSkipAddonLaunchCheck(
         firstRunCompleted: Bool,
         screenshotMode: Bool

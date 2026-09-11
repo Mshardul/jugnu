@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		0C269B59DB0AD928393F514F /* JugnuApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFC6769799C763B68AB9458E /* JugnuApp.swift */; };
-		2EF413B28BA833B1BA5D290B /* PrefsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F65D4A1078835B0D1646C28 /* PrefsView.swift */; };
 		3A4D0C19C22EC9C67CBCFB55 /* AddonProcessHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68333462923074742BE70CAB /* AddonProcessHost.swift */; };
 		3AF25473E76FCC6758730646 /* ScreenshotFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91CC5912906B1489BE2F8456 /* ScreenshotFlow.swift */; };
 		53E92CA35345AB32F40039EA /* ShellIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0098016C87FA73A4C628AA /* ShellIdentity.swift */; };
@@ -50,7 +49,6 @@
 		5E983F2778775352830C719C /* FirstRunWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstRunWindow.swift; sourceTree = "<group>"; };
 		68333462923074742BE70CAB /* AddonProcessHost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddonProcessHost.swift; sourceTree = "<group>"; };
 		6A0098016C87FA73A4C628AA /* ShellIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShellIdentity.swift; sourceTree = "<group>"; };
-		8F65D4A1078835B0D1646C28 /* PrefsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefsView.swift; sourceTree = "<group>"; };
 		91CC5912906B1489BE2F8456 /* ScreenshotFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotFlow.swift; sourceTree = "<group>"; };
 		9D8FD74A5590757484AB56B4 /* ScreenshotMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotMode.swift; sourceTree = "<group>"; };
 		A7827A8A356F9392C623B554 /* AddonUninstallPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddonUninstallPresenter.swift; sourceTree = "<group>"; };
@@ -124,7 +122,6 @@
 				EFC6769799C763B68AB9458E /* JugnuApp.swift */,
 				A7D9128B1EEA5448DD3A1F9F /* LaunchGuard.swift */,
 				BE92CF58DD3BE972D2AEC8CB /* MenuBarController.swift */,
-				8F65D4A1078835B0D1646C28 /* PrefsView.swift */,
 				9D8FD74A5590757484AB56B4 /* ScreenshotMode.swift */,
 				6A0098016C87FA73A4C628AA /* ShellIdentity.swift */,
 				C3D4E5F60718293A4B5C6D7E /* TCCExplainerGate.swift */,
@@ -261,7 +258,6 @@
 				0C269B59DB0AD928393F514F /* JugnuApp.swift in Sources */,
 				C20F5AFFCD6A18EB835C7F57 /* LaunchGuard.swift in Sources */,
 				CF46D9EC5366F66E608B763D /* MenuBarController.swift in Sources */,
-				2EF413B28BA833B1BA5D290B /* PrefsView.swift in Sources */,
 				B8F039298B98F8132CFD3642 /* ScreenshotMode.swift in Sources */,
 				53E92CA35345AB32F40039EA /* ShellIdentity.swift in Sources */,
 				A2B3C4D5E6F708192A3B4C5D /* TCCExplainerGate.swift in Sources */,

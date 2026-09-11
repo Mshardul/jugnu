@@ -1,5 +1,11 @@
 import Foundation
 
+public enum AddonDetailTab: String, Equatable, Sendable {
+    case overview
+    case commands
+    case settings
+}
+
 public enum ShellViewState: Equatable, Sendable {
     case launcher(query: String, selection: String?, scroll: CGFloat)
     case catalog(
@@ -11,7 +17,7 @@ public enum ShellViewState: Equatable, Sendable {
         selectedCardID: String?
     )
     case settings(scroll: CGFloat, focusedControlID: String?)
-    case detail(addonID: String)
+    case detail(addonID: String, tab: AddonDetailTab = .overview)
     case confirm
     case list(query: String, highlightedID: String?, scroll: CGFloat)
     case form(values: [String: String], focusedFieldID: String?)
@@ -59,7 +65,7 @@ public struct ShellStack: Equatable, Sendable {
         entries.count == 1
     }
 
-    /// Push a child. No-op (updates the top entry's state in place) if `entry.preset == top.preset` (idempotent rule).
+    // re-push of the same preset updates the top entry's state in place instead of stacking
     public mutating func push(_ entry: ShellStackEntry) {
         if let lastIndex = entries.indices.last, entries[lastIndex].preset == entry.preset {
             entries[lastIndex] = entry
@@ -68,7 +74,6 @@ public struct ShellStack: Equatable, Sendable {
         entries.append(entry)
     }
 
-    /// Replace the top entry with a sibling.
     public mutating func replace(_ entry: ShellStackEntry) {
         guard !entries.isEmpty else {
             entries = [entry]
@@ -77,18 +82,16 @@ public struct ShellStack: Equatable, Sendable {
         entries[entries.count - 1] = entry
     }
 
-    /// Pop one entry. No-op if already at root.
     public mutating func pop() {
         guard entries.count > 1 else { return }
         entries.removeLast()
     }
 
-    /// Reset to a fresh `[launcher]` (home).
     public mutating func home(initial: ShellViewState) {
         entries = [ShellStackEntry(initial)]
     }
 
-    /// Empty the stack entirely (dismiss/close). Do not call `top`/`isAtRoot` until `home` or a fresh push.
+    // leaves the stack empty; do not call top/isAtRoot until home or a fresh push
     public mutating func clear() {
         entries = []
     }
@@ -99,7 +102,6 @@ public enum InvokeOutcome: Equatable, Sendable {
     case close
 }
 
-/// Invoke hotkey / Open Palette decision: not visible or not on launcher -> home; visible and on launcher -> close.
 public func decideInvokeOutcome(stack: ShellStack, isVisible: Bool) -> InvokeOutcome {
     guard isVisible else { return .showHome }
     return stack.top.preset == .launcher ? .close : .showHome

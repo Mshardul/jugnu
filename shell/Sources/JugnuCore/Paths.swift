@@ -35,6 +35,18 @@ public struct JugnuPaths: Sendable {
         home.appendingPathComponent(".local/share/jugnu/state")
     }
 
+    public func addonStateRoot(id: String) -> URL {
+        stateDir.appendingPathComponent(id)
+    }
+
+    public func addonConfigFile(id: String) -> URL {
+        home.appendingPathComponent(".config/jugnu/addons/\(id).yaml")
+    }
+
+    public func addonConfigDir(id: String) -> URL {
+        home.appendingPathComponent(".config/jugnu/addons/\(id)")
+    }
+
     public var launchAgentsDir: URL {
         home.appendingPathComponent("Library/LaunchAgents")
     }

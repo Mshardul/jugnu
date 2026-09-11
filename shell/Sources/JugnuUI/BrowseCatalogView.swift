@@ -26,13 +26,22 @@ public protocol BrowseCatalogViewModelProtocol: ObservableObject {
 public struct BrowseCatalogView<VM: BrowseCatalogViewModelProtocol>: View {
     @ObservedObject var viewModel: VM
     var onSelectCard: (String) -> Void
+    var onOpenSettings: (String) -> Void
+    var onOpen: (String) -> Void
     @Environment(\.colorScheme) private var colorScheme
     @ObservedObject private var store = ThemeStore.shared
     @State private var installTasks: [String: Task<Void, Never>] = [:]
 
-    public init(viewModel: VM, onSelectCard: @escaping (String) -> Void) {
+    public init(
+        viewModel: VM,
+        onSelectCard: @escaping (String) -> Void,
+        onOpenSettings: @escaping (String) -> Void = { _ in },
+        onOpen: @escaping (String) -> Void = { _ in }
+    ) {
         self.viewModel = viewModel
         self.onSelectCard = onSelectCard
+        self.onOpenSettings = onOpenSettings
+        self.onOpen = onOpen
     }
 
     public var body: some View {
@@ -76,7 +85,9 @@ public struct BrowseCatalogView<VM: BrowseCatalogViewModelProtocol>: View {
                                     onUpdate: { startUpdate(entry) },
                                     onEnabledChange: { viewModel.setEnabled(entry.id, enabled: $0) },
                                     onUninstall: { viewModel.uninstall(id: entry.id, name: entry.name) },
-                                    onTap: { onSelectCard(entry.id) }
+                                    onTap: { onSelectCard(entry.id) },
+                                    onOpenSettings: { onOpenSettings(entry.id) },
+                                    onOpen: { onOpen(entry.id) }
                                 )
                             }
                         }

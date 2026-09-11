@@ -13,7 +13,11 @@ The project has not published a release yet. Entries currently describe unreleas
 
 ### Added
 
-- 2026-09-10 — Pre-TCC explainer (ticket 0054 A): before running an addon that declared a TCC capability (e.g. Accessibility), Jugnu shows an in-panel explainer with Open System Settings / Not now when the grant is missing. Window Layouts no longer triggers the OS prompt itself. Prefs Permissions chrome stays [0064](docs/tickets.md) / 0054 B.
+- 2026-09-12 — Open via manifest `primary` (ticket 0066): `addon.yaml` `primary:` names a command; catalog card and detail show a leftmost, accent-tinted **Open** for installed+enabled addons with a valid primary; missing/invalid primary shows no button. `jugnu.clipboard-history` is the first consumer (`primary: list`).
+- 2026-09-10 — Addon detail tabs + config (ticket 0065): Overview / Commands / Settings; Run; prefs Installed + gear → Settings; 0827 config pipeline; nudges first `config:` consumer. Visual polish → [0067](docs/tickets.md).
+- 2026-09-10 — Preferences canvas (ticket 0064): rail + panes for Theme / Addons→Updates / General; enable/uninstall / starter install leave prefs (Browse owns them). Hotkeys / Installed / Permissions rows stay [0037](docs/tickets.md) / [0065](docs/tickets.md) / [0054](docs/tickets.md) B.
+
+- 2026-09-10 — Pre-TCC explainer (ticket 0054 A): before running an addon that declared a TCC capability (e.g. Accessibility), Jugnu shows an in-panel explainer with Open System Settings / Not now when the grant is missing. Window Layouts no longer triggers the OS prompt itself. Prefs Permissions inventory stays [0054](docs/tickets.md) B after canvas [0064](docs/tickets.md).
 
 - 2026-09-10 — Honest capability disclosure (ticket 0038): closed `permissions` on addon.yaml + registry, confirm before download, card one-liner, detail list, first-launch union confirm, grew-only update / bulk keep-current. Pre-TCC explainer (0054 A), prefs Permissions (0054 B), and TCC-reset (0022) remain later.
 

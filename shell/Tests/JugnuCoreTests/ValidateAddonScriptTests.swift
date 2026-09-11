@@ -93,6 +93,28 @@ final class ValidateAddonScriptTests: XCTestCase {
         XCTAssertTrue(result.stderr.contains("must not ship a .plist"), result.stderr)
     }
 
+    func test_validateAddon_configUnsupportedType_rejected() throws {
+        let result = try run(fixture("config-bad-type"))
+        XCTAssertNotEqual(result.status, 0)
+        XCTAssertTrue(result.stderr.contains("invalid config schema"), result.stderr)
+    }
+
+    func test_validateAddon_configValid_passes() throws {
+        let result = try run(fixture("config-valid"))
+        XCTAssertEqual(result.status, 0, result.stderr)
+    }
+
+    func test_validateAddon_primaryMatchingCommand_passes() throws {
+        let result = try run(fixture("primary-valid"))
+        XCTAssertEqual(result.status, 0, result.stderr)
+    }
+
+    func test_validateAddon_primaryUnknownCommand_rejected() throws {
+        let result = try run(fixture("primary-unknown"))
+        XCTAssertNotEqual(result.status, 0)
+        XCTAssertTrue(result.stderr.contains("unknown primary command"), result.stderr)
+    }
+
     func test_validateAddon_allShippedAddons_pass() throws {
         let addonsDir = repoRoot.appendingPathComponent("addons")
         let entries = try FileManager.default.contentsOfDirectory(at: addonsDir, includingPropertiesForKeys: nil)

@@ -78,4 +78,40 @@ final class RegistryClientTests: XCTestCase {
         """
         XCTAssertThrowsError(try JSONDecoder().decode([RegistryEntry].self, from: Data(json.utf8)))
     }
+
+    func testDecodesPrimary() throws {
+        let json = """
+        [{
+          "id": "clipboard-history", "name": "Clipboard History", "version": "1.0.0", "api": 1,
+          "url": "https://example.com/clipboard-history.zip", "sha256": "abc",
+          "summary": "Clipboard history",
+          "category": "System",
+          "primary": "open"
+        }]
+        """
+        let entries = try JSONDecoder().decode([RegistryEntry].self, from: Data(json.utf8))
+        XCTAssertEqual(entries[0].primary, "open")
+    }
+
+    func testOmitsPrimaryDefaultsNil() throws {
+        let patched = baseJSON.replacingOccurrences(
+            of: "\"summary\": \"A widget\"",
+            with: "\"summary\": \"A widget\", \"category\": \"System\""
+        )
+        let entries = try JSONDecoder().decode(
+            [RegistryEntry].self, from: Data(("[" + patched + "]").utf8)
+        )
+        XCTAssertNil(entries[0].primary)
+    }
+
+    func testEncodesPrimaryWhenPresent() throws {
+        let entry = RegistryEntry(
+            id: "clipboard-history", name: "Clipboard History", version: "1.0.0", api: 1,
+            url: "https://example.com/clipboard-history.zip", sha256: "abc", summary: "Clipboard history",
+            category: "System", primary: "open"
+        )
+        let data = try JSONEncoder().encode(entry)
+        let json = try XCTUnwrap(String(data: data, encoding: .utf8))
+        XCTAssertTrue(json.contains("\"primary\":\"open\""))
+    }
 }

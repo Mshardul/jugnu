@@ -1,0 +1,16 @@
+id: jugnu.primary-unknown
+name: Primary Unknown
+version: 1.0.0
+api: 1
+lifecycle: oneshot
+primary: nope
+commands:
+  - id: open
+    title: Open
+    timeout: 5
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths: []
+  launchd: []

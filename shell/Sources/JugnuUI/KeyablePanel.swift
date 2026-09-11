@@ -1,8 +1,7 @@
 import AppKit
 
 public class KeyablePanel: NSPanel {
-    /// Called on Esc / Cmd+. (AppKit's cancelOperation route). Rebindable per stack top so callers
-    /// don't need each hosted content view to implement its own Esc handler.
+    // rebound per stack top so hosted content views don't each implement Esc
     public var escHandler: (() -> Void)?
 
     override public var canBecomeKey: Bool {

@@ -13,7 +13,7 @@ public struct RunningInstance: Sendable, Equatable {
 public enum SingleInstance {
     public static let openPaletteNotification = Notification.Name("com.jugnu.open-palette")
 
-    /// The oldest instance owns the hotkey and menu bar; ties break to the lower pid.
+    // oldest instance owns the hotkey and menu bar; ties break to the lower pid
     public static func shouldYield(running: [RunningInstance], selfPID: Int) -> Bool {
         guard let me = running.first(where: { $0.pid == selfPID }) else { return false }
         return running.contains { other in

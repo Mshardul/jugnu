@@ -1,6 +1,5 @@
 import Foundation
 
-/// Declared addon node for resolve (from registry and/or manifest).
 public struct DeclaredAddon: Equatable, Sendable {
     public var id: String
     public var name: String
@@ -44,10 +43,8 @@ public struct DependencyPlanItem: Equatable, Sendable {
 public struct DependencyPlan: Equatable, Sendable {
     public var primaryId: String
     public var primaryName: String
-    /// Dependencies only (not the primary), disclosure order.
-    public var dependencies: [DependencyPlanItem]
-    /// Topological install order including primary last.
-    public var installOrder: [String]
+    public var dependencies: [DependencyPlanItem] // disclosure order, primary excluded
+    public var installOrder: [String] // topological, primary last
 
     public init(
         primaryId: String,
@@ -73,8 +70,7 @@ public enum DependencyResolverError: Error, Equatable {
 }
 
 public enum DependencyResolver {
-    /// Plan install of `root` using `catalog` (must include root and every reachable dep id)
-    /// and `installed` id→exact version currently on disk.
+    // catalog must include root and every reachable dep id; installed maps id → exact on-disk version
     public static func plan(
         root: DeclaredAddon,
         catalog: [String: DeclaredAddon],
@@ -172,7 +168,7 @@ public enum DependencyResolver {
         )
     }
 
-    /// Job key for collision: segment after last `.`, or the whole id.
+    // collision key: segment after the last `.`, or the whole id
     public static func jobKey(for id: String) -> String {
         if let dot = id.lastIndex(of: ".") {
             return String(id[id.index(after: dot)...])

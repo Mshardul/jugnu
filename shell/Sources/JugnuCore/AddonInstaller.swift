@@ -16,8 +16,7 @@ public struct AddonInstaller: Sendable {
         self.downloads = downloads
     }
 
-    /// Install a catalog entry. When the package (or registry row) declares `dependencies`,
-    /// resolves a plan, optionally discloses via `confirmDependencies`, then commits as one transaction.
+    // dependencies (if any) resolve to a plan, disclose via confirmDependencies, then commit as one transaction
     public func install(
         entry: RegistryEntry,
         enable: Bool,
@@ -75,7 +74,7 @@ public struct AddonInstaller: Sendable {
         try commitAddonPackage(from: packageRoot, id: id, enable: enable)
     }
 
-    /// Install an already-unpacked addon directory (dev / first-run local path).
+    // dev / first-run local path: the addon directory is already unpacked
     public func installFromDirectory(url: URL, enable: Bool) throws {
         let manifest = try ManifestLoader.load(from: url)
         try commitAddonPackage(from: url, id: manifest.id, enable: enable)
@@ -126,7 +125,7 @@ public struct AddonInstaller: Sendable {
         }
     }
 
-    /// Wipe orphaned `.staging` / `.trash` trees (call on launch).
+    // call on launch
     public func recoverInstallOrphans() {
         AtomicCommit.recoverOrphans(stagingParent: paths.addonsStagingDir, trashParent: paths.addonsTrashDir)
         AtomicCommit.recoverOrphans(stagingParent: paths.helpersStagingDir, trashParent: paths.helpersTrashDir)
@@ -152,8 +151,6 @@ public struct AddonInstaller: Sendable {
         }
         return out
     }
-
-    // MARK: - Dependency-aware install
 
     private func installZipWithDependencies(
         zipURL: URL,
@@ -302,8 +299,6 @@ public struct AddonInstaller: Sendable {
         }
     }
 
-    // MARK: - Stage / commit
-
     private func stageAddonPackage(from packageRoot: URL, id: String) throws -> URL {
         let manifest = try ManifestLoader.load(from: packageRoot)
         try PackageGates.checkMinShellVersion(
@@ -327,6 +322,10 @@ public struct AddonInstaller: Sendable {
         let staging = try stageAddonPackage(from: packageRoot, id: id)
         let live = paths.addonsDir.appendingPathComponent(id)
         try AtomicCommit.promote(staging: staging, live: live, trashParent: paths.addonsTrashDir)
+        try FileManager.default.createDirectory(
+            at: paths.addonStateRoot(id: id),
+            withIntermediateDirectories: true
+        )
 
         var config = try store.loadOrCreateDefaults()
         config.addons[id] = AddonConfig(enabled: enable)
@@ -450,8 +449,7 @@ public struct AddonInstaller: Sendable {
         }
     }
 
-    /// Transitional: rewrite bare `id: job` → `jugnu.job` when installing an older published zip
-    /// against a namespaced registry row.
+    // transitional: an older published zip carries a bare `id: job` against a namespaced registry row
     private func rewriteManifestId(at packageRoot: URL, from oldId: String, to newId: String) throws {
         let file = packageRoot.appendingPathComponent("addon.yaml")
         var text = try String(contentsOf: file, encoding: .utf8)

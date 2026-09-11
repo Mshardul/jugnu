@@ -1,8 +1,7 @@
 import Foundation
 
 public enum AtomicCommit {
-    /// Promote `staging` to `live`. If `live` exists, move it aside under `trashParent` first.
-    /// On failure after live was moved aside, attempts to restore it from trash.
+    // existing live is moved aside to trashParent first, and restored from there if promote fails
     public static func promote(staging: URL, live: URL, trashParent: URL) throws {
         let fm = FileManager.default
         try fm.createDirectory(at: trashParent, withIntermediateDirectories: true)
@@ -30,7 +29,6 @@ public enum AtomicCommit {
         }
     }
 
-    /// Delete orphaned staging trees and empty-able trash under the given parents.
     public static func recoverOrphans(stagingParent: URL, trashParent: URL) {
         let fm = FileManager.default
         for parent in [stagingParent, trashParent] {

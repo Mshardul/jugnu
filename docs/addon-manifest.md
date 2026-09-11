@@ -74,6 +74,50 @@ permissions:
 | **Clipboard** | Any pasteboard read or write. |
 | **Background** | A background agent that keeps running after the panel closes. |
 
+## Primary command
+
+Optional. Names one command id as the addon's default action ([ticket 0066](tickets.md)). Catalog card and detail show an **Open** button that runs it, for installed+enabled addons only.
+
+```yaml
+primary: list
+```
+
+| Rule | Lock |
+|---|---|
+| **Value** | Must match a `commands[].id` in this manifest. |
+| **Omit** | No Open button. |
+| **Unknown** | `validate-addon.sh` and manifest load refuse a `primary` with no matching command. |
+| **Registry** | `build-registry.sh` copies `primary` into `addons.json`. |
+
+## Config
+
+Optional. Scalar settings the shell merges and passes on every invoke ([0827](architecture/2026-08-27-addon-state-and-config-design.md)).
+
+```yaml
+config:
+  - key: default_interval_minutes
+    type: int
+    default: 30
+  - key: show_nudge_now_in_manage
+    type: bool
+    default: true
+  - key: ai_difficulty
+    type: enum
+    values: [easy, medium, hard]
+    default: medium
+```
+
+| Rule | Lock |
+|---|---|
+| **Types** | `string`, `int`, `bool`, `enum` only — no objects/arrays. |
+| **key** | `^[a-z][a-z0-9_]*$`, unique in the block. |
+| **values** | Required and non-empty iff `type: enum`. |
+| **default** | Required; must match `type` / `values`. |
+| **User file** | `~/.config/jugnu/addons/<id>.yaml` — flat map; unknown keys block invoke. |
+| **Request** | Resolved map is always on `config` (possibly `{}`). |
+| **Env** | `JUGNU_STATE_DIR` → `~/.local/share/jugnu/state/<id>/`; `JUGNU_CONFIG_DIR` → `~/.config/jugnu/addons/<id>/`. |
+| **Validate** | `validate-addon.sh` rejects malformed / non-scalar `config:` blocks. |
+
 ## Helpers
 
 Optional. A **helper** is shared runtime the user would not install alone (vision rule 4). It is **not** a catalog addon and **not** an enable key. Do not copy helper code into each addon zip. An in-zip binary (e.g. window-layouts AX exec) is not a Helper.

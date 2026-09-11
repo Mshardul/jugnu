@@ -1,7 +1,7 @@
 # Jugnu — addon state dir + config passthrough
 
 **Date:** 2026-08-27
-**Status:** Draft — under review
+**Status:** Approved — Epic A shipped with [0065](../tickets.md) (2026-09-10); Epic B (`tic-tac-toe`) still parked
 **Depends on:** [Shell design](./2026-08-22-shell-design.md) (`api: 1` run protocol), [Addon UI host + speed](./2026-08-22-addon-ui-speed-design.md) (§5 protocol, §6 budgets), [Addon manifest](../addon-manifest.md)
 **Related tickets:** 0034 (malformed yaml recovery), 0023 / 0024 (cleanup), 0033 (storage view), 0050 / 0049 (nudges)
 **Not this spec:** clipboard-in-request, notify effects, HTTP/keychain services, live-hold process model, theme tokens. All parked — see §8.

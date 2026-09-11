@@ -10,7 +10,6 @@ public enum JugnuTokens {
         public static let row: CGFloat = 8
     }
 
-    /// viewA (Opt+Space launcher) geometry — values from 2026-08-25-launcher-catalog-mockup.html.
     public enum Launcher {
         public static let panelWidth: CGFloat = 640
         public static let hairline: CGFloat = 1

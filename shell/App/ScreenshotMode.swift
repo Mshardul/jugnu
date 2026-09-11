@@ -1,20 +1,12 @@
 import Foundation
 import JugnuCore
 
-/// Deterministic setup for the screenshot UI-test flow. Active only when
-/// `JUGNU_SCREENSHOT_MODE=1` is in the environment. Everything it does is
-/// gated behind that check, so a normal launch is completely unaffected.
-///
-/// It builds a throwaway `$HOME` under a temp directory, copies the repo's
-/// local `addons/` into place, marks first-run complete, and seeds a fixed
-/// favorites list — so every screenshot run starts from the same state and
-/// never touches the developer's real `~/.config/jugnu`.
+// builds a throwaway $HOME so screenshot runs never touch the real ~/.config/jugnu
 enum ScreenshotMode {
     static var isActive: Bool {
         ProcessInfo.processInfo.environment["JUGNU_SCREENSHOT_MODE"] == "1"
     }
 
-    /// Favorites seeded into row1 (qualified command ids: `<addon>.<command>`).
     static let seededFavorites = [
         "jugnu.mic-mute.toggle",
         "jugnu.focus-toggle.toggle",
@@ -23,15 +15,13 @@ enum ScreenshotMode {
         "jugnu.ports.list",
     ]
 
-    /// Local addon ids to enable in the sandbox config.
     static let enabledAddons = [
         "jugnu.mic-mute", "jugnu.focus-toggle", "jugnu.paste-plain", "jugnu.clipboard-history", "jugnu.ports",
         "jugnu.floating-note", "jugnu.nudges", "jugnu.world-clock", "jugnu.battery-eta", "jugnu.window-layouts",
         "jugnu.ui-demo-confirm", "jugnu.ui-demo-form", "jugnu.ui-demo-list",
     ]
 
-    /// Prepares the sandbox and returns the `JugnuPaths` the app should use.
-    /// Returns `nil` (and the caller falls back to the normal paths) if anything fails.
+    // nil on any failure; caller falls back to the normal paths
     static func makePaths() -> JugnuPaths? {
         let fm = FileManager.default
         let env = ProcessInfo.processInfo.environment

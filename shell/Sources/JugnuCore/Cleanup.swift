@@ -22,7 +22,6 @@ public enum Cleanup {
         }
     }
 
-    /// Disable cleanup, delete declared paths, then remove the addon directory.
     public static func performUninstall(manifest: AddonManifest, addonRoot: URL, paths: JugnuPaths) throws {
         try performDisable(manifest: manifest, addonRoot: addonRoot, paths: paths)
         let fm = FileManager.default
@@ -31,6 +30,10 @@ public enum Cleanup {
             if fm.fileExists(atPath: url.path) {
                 try fm.removeItem(at: url)
             }
+        }
+        let stateRoot = paths.addonStateRoot(id: manifest.id)
+        if fm.fileExists(atPath: stateRoot.path) {
+            try fm.removeItem(at: stateRoot)
         }
         if fm.fileExists(atPath: addonRoot.path) {
             try fm.removeItem(at: addonRoot)

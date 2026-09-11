@@ -317,7 +317,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return true
     }
 
-    /// Invoke hotkey / Open Palette: not on launcher (or not visible) -> home; on launcher -> close.
     private func invokeShell() {
         guard let model, let shellHost else { return }
         model.refreshIndex()
@@ -345,7 +344,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    /// Esc / Cmd+W: pop one level if not at root; dismiss (hide, empty stack) if already at root.
     private func popOrDismiss() {
         guard let model, let shellHost else { return }
         tearDownInFlight()
@@ -362,7 +360,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         shellHost.morphFrame(to: shellHost.stack.top.preset, compactLauncher: compact, on: screen)
     }
 
-    /// Genuine click outside the app's own windows. Dismisses unless the current view type ignores it.
     private func dismissFromClickOutside() {
         guard let shellHost, shellHost.dismissesOnOutsideClick else { return }
         tearDownInFlight()
@@ -377,7 +374,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         inFlightInvoke = nil
     }
 
-    /// Pushing `settings` from `launcher` is a push (child); replacing `catalog` with `settings` is a replace (sibling).
     private func pushSettings() {
         guard let model, let shellHost else { return }
         let screen = NSScreen.main ?? NSScreen.screens.first
@@ -396,7 +392,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         shellHost.armClickOutsideDismiss { [weak self] in self?.dismissFromClickOutside() }
     }
 
-    /// Pushing `catalog` from `launcher` is a push (child); replacing `settings` with `catalog` is a replace (sibling).
     private func pushCatalog() {
         guard let model, let shellHost else { return }
         let screen = NSScreen.main ?? NSScreen.screens.first
@@ -416,13 +411,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         shellHost.armClickOutsideDismiss { [weak self] in self?.dismissFromClickOutside() }
     }
 
-    /// Pushing `detail` from `catalog` is a push (child); idempotent re-push of the same addon just refocuses.
-    private func pushDetail(addonID: String) {
+    private func pushDetail(addonID: String, tab: AddonDetailTab = .overview) {
         guard let model, let shellHost else { return }
         let screen = NSScreen.main ?? NSScreen.screens.first
         guard let screen else { return }
         syncCatalogSnapshot()
-        shellHost.push(ShellStackEntry(.detail(addonID: addonID)))
+        shellHost.push(ShellStackEntry(.detail(addonID: addonID, tab: tab)))
         renderCurrentTop(model: model)
         shellHost.morphFrame(to: .detail, compactLauncher: false, on: screen)
         shellHost.orderFront()
@@ -454,8 +448,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    /// Central dispatch: maps `stack.top.preset` to the concrete view hosted in the panel.
-    /// Every subsequent task (11+) extends this with one more case.
     private func renderCurrentTop(model: AppModel) {
         guard let shellHost else { return }
         shellHost.setOnCancel { [weak self] in self?.popOrDismiss() }
@@ -477,34 +469,121 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             ))
         case .settings:
             shellHost.setContent(PrefsView(
-                model: model,
-                shellHost: shellHost,
-                onOpenCatalog: { [weak self] in self?.pushCatalog() },
+                themeConfig: Binding(
+                    get: { model.config.theme },
+                    set: { newTheme in
+                        var config = model.config
+                        config.theme = newTheme
+                        try? model.saveConfig(config)
+                    }
+                ),
+                sound: Binding(
+                    get: { model.config.sound },
+                    set: { value in
+                        var config = model.config
+                        config.sound = value
+                        try? model.saveConfig(config)
+                    }
+                ),
+                firstView: Binding(
+                    get: { model.config.palette.firstView },
+                    set: { value in
+                        var config = model.config
+                        config.palette.firstView = value
+                        try? model.saveConfig(config)
+                    }
+                ),
+                keepAppCurrent: Binding(
+                    get: { model.config.shell.keepAppCurrent },
+                    set: { value in
+                        var config = model.config
+                        config.shell.keepAppCurrent = value
+                        try? model.saveConfig(config)
+                    }
+                ),
+                keepAddonsCurrent: Binding(
+                    get: { model.config.shell.keepAddonsCurrent },
+                    set: { value in
+                        var config = model.config
+                        config.shell.keepAddonsCurrent = value
+                        try? model.saveConfig(config)
+                    }
+                ),
+                shellVersion: ShellVersion.current,
+                registryURL: model.config.shell.registryURL,
+                errorText: model.statusMessage,
+                installedAddons: model.installedAddonIDs().map { id in
+                    (
+                        id: id,
+                        name: model.addonDisplayName(id: id),
+                        enabled: model.config.addons[id]?.enabled == true
+                    )
+                },
                 onCheckForUpdates: { [weak self] in
                     Task { await self?.keepCurrent?.checkManual() }
+                },
+                onClose: { [weak self] in self?.popOrDismiss() },
+                onApplyPreset: { preset in
+                    var config = model.config
+                    config.theme = preset
+                    try? model.saveConfig(config)
+                },
+                onSelectInstalled: { [weak self] id in
+                    self?.pushDetail(addonID: id, tab: .settings)
                 }
             ))
         case .catalog:
             let vm = catalogViewModel(model: model)
             shellHost.setContent(BrowseCatalogView(
                 viewModel: vm,
-                onSelectCard: { [weak self] addonID in self?.pushDetail(addonID: addonID) }
+                onSelectCard: { [weak self] addonID in self?.pushDetail(addonID: addonID) },
+                onOpenSettings: { [weak self] addonID in
+                    self?.pushDetail(addonID: addonID, tab: .settings)
+                },
+                onOpen: { [weak self] addonID in self?.runPrimary(addonID: addonID) }
             ))
         case .detail:
-            guard case .detail(let addonID) = shellHost.stack.top.state else { return }
+            guard case .detail(let addonID, let tab) = shellHost.stack.top.state else { return }
             let vm = catalogViewModel(model: model)
             if let entry = vm.entries.first(where: { $0.id == addonID }) {
+                var grants: [AddonPermission: Bool] = [:]
+                for permission in entry.permissions where permission.isTCC {
+                    grants[permission] = TCCGrantStatus.isGranted(permission)
+                }
+                let configState = self.addonConfigState(for: addonID)
                 shellHost.setContent(AddonDetailView(
                     entry: entry,
                     isInstalled: vm.isInstalled(entry.id),
                     isEnabled: vm.isEnabled(entry.id),
                     isInstalling: vm.installingIDs.contains(entry.id),
                     updateAvailable: vm.updateAvailable(entry.id),
+                    errorMessage: vm.errorMessage,
+                    initialTab: tab,
+                    permissionGrants: grants,
+                    configSchema: configState.schema,
+                    configValues: configState.values,
+                    configError: configState.error,
                     onInstall: { Task { await vm.install(entry) } },
                     onUpdate: { Task { await vm.update(entry) } },
                     onEnabledChange: { vm.setEnabled(entry.id, enabled: $0) },
                     onUninstall: { vm.uninstall(id: entry.id, name: entry.name) },
-                    onClose: { [weak self] in self?.popOrDismiss() }
+                    onRun: { [weak self] commandId in
+                        self?.runDetailCommand(addonID: addonID, commandId: commandId)
+                    },
+                    onConfigChange: { [weak self] key, value in
+                        self?.saveAddonConfigValue(addonID: addonID, key: key, value: value)
+                    },
+                    onOpenConfig: { [weak self] in
+                        self?.openAddonConfigFile(addonID: addonID)
+                    },
+                    onResetConfig: { [weak self] in
+                        self?.resetAddonConfigFile(addonID: addonID)
+                        if let model = self?.model {
+                            self?.renderCurrentTop(model: model)
+                        }
+                    },
+                    onClose: { [weak self] in self?.popOrDismiss() },
+                    onOpen: { [weak self] in self?.runPrimary(addonID: addonID) }
                 ))
             }
         case .confirm, .list, .form:
@@ -512,7 +591,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    /// Lazily builds (once) and reuses the catalog's view model so entries/filters survive push/pop.
+    // built once and reused so entries/filters survive push/pop
     private func catalogViewModel(model: AppModel) -> BrowseCatalogViewModel {
         if let catalogViewModel { return catalogViewModel }
         guard let shellHost else { preconditionFailure("catalogViewModel(model:) requires shellHost to be set") }
@@ -521,15 +600,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return vm
     }
 
-    /// Keeps `stack.top`'s `.catalog` snapshot (spec §7) mirroring the live view model's
-    /// category/subcategory/tags/query. No-op unless catalog is actually the current top and its
-    /// view model has been built. The view model's own @Published state (not this snapshot) is what
-    /// actually makes catalog survive push/pop — see Task 10 notes — but the snapshot still needs to
-    /// be accurate for anything that inspects the stack directly. Call this right before leaving
-    /// catalog (pushing a child, replacing with a sibling, or popping away) so the snapshot reflects
-    /// what the user was looking at, not whatever it was when catalog was first pushed. Scroll
-    /// position and selected-card-id aren't tracked by the view model yet, so those two fields stay
-    /// at their last-pushed value rather than being kept live.
+    // call before leaving catalog: the view model's @Published state survives push/pop, but the stack
+    // snapshot needs updating for anything that reads the stack directly. scroll/selectedCardID aren't
+    // tracked by the view model yet, so they keep their last-pushed value.
     private func syncCatalogSnapshot() {
         guard let shellHost, let catalogViewModel, shellHost.stack.top.preset == .catalog else { return }
         shellHost.updateTopState(.catalog(
@@ -540,6 +613,113 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             scroll: 0,
             selectedCardID: nil
         ))
+    }
+
+    private func runDetailCommand(addonID: String, commandId: String) {
+        guard let model else { return }
+        let qualified = "\(addonID).\(commandId)"
+        if let cmd = model.allCommands.first(where: { $0.qualifiedId == qualified }) {
+            runCommand(cmd)
+            return
+        }
+        model.statusMessage = "That command isn’t available."
+    }
+
+    private func runPrimary(addonID: String) {
+        guard let model else { return }
+        let root = model.paths.addonsDir.appendingPathComponent(addonID)
+        guard let primary = (try? ManifestLoader.load(from: root))?.primaryCommand?.id else {
+            model.statusMessage = "This addon has no default action."
+            return
+        }
+        runDetailCommand(addonID: addonID, commandId: primary)
+    }
+
+    private func addonConfigState(for addonID: String) -> (
+        schema: [AddonConfigField],
+        values: [String: JSONValue],
+        error: String?
+    ) {
+        guard let model else { return ([], [:], nil) }
+        let root = model.paths.addonsDir.appendingPathComponent(addonID)
+        guard let manifest = try? ManifestLoader.load(from: root) else {
+            return ([], [:], nil)
+        }
+        do {
+            let values = try AddonConfigResolver.resolve(
+                schema: manifest.config,
+                fileURL: model.paths.addonConfigFile(id: addonID)
+            )
+            return (manifest.config, values, nil)
+        } catch let error as AddonConfigError {
+            return (
+                manifest.config,
+                [:],
+                "Config for \"\(manifest.name)\" is invalid: \(AddonConfigResolver.reason(for: error))."
+            )
+        } catch {
+            return (manifest.config, [:], UserFacingError.message(for: error))
+        }
+    }
+
+    private func saveAddonConfigValue(addonID: String, key: String, value: JSONValue) {
+        guard let model else { return }
+        let root = model.paths.addonsDir.appendingPathComponent(addonID)
+        guard let manifest = try? ManifestLoader.load(from: root) else { return }
+        let file = model.paths.addonConfigFile(id: addonID)
+        var values = (try? AddonConfigResolver.resolve(schema: manifest.config, fileURL: file)) ?? [:]
+        for field in manifest.config where values[field.key] == nil {
+            values[field.key] = field.default
+        }
+        values[key] = value
+        try? AddonConfigResolver.writeFile(schema: manifest.config, values: values, to: file)
+        renderCurrentTop(model: model)
+    }
+
+    private func openAddonConfigFile(addonID: String) {
+        guard let model else { return }
+        let file = model.paths.addonConfigFile(id: addonID)
+        let parent = file.deletingLastPathComponent()
+        try? FileManager.default.createDirectory(at: parent, withIntermediateDirectories: true)
+        if !FileManager.default.fileExists(atPath: file.path) {
+            let root = model.paths.addonsDir.appendingPathComponent(addonID)
+            if let manifest = try? ManifestLoader.load(from: root) {
+                try? AddonConfigResolver.writeFile(
+                    schema: manifest.config,
+                    values: Dictionary(uniqueKeysWithValues: manifest.config.map { ($0.key, $0.default) }),
+                    to: file
+                )
+            }
+        }
+        NSWorkspace.shared.activateFileViewerSelecting([file])
+    }
+
+    private func resetAddonConfigFile(addonID: String) {
+        guard let model else { return }
+        let root = model.paths.addonsDir.appendingPathComponent(addonID)
+        guard let manifest = try? ManifestLoader.load(from: root) else { return }
+        try? AddonConfigResolver.writeFile(
+            schema: manifest.config,
+            values: Dictionary(uniqueKeysWithValues: manifest.config.map { ($0.key, $0.default) }),
+            to: model.paths.addonConfigFile(id: addonID)
+        )
+    }
+
+    private func presentAddonConfigRecovery(addonID: String, name: String, error: AddonConfigError) {
+        let alert = NSAlert()
+        alert.messageText = "Config for \"\(name)\" is invalid"
+        alert.informativeText = AddonConfigResolver.reason(for: error)
+        alert.addButton(withTitle: "Open")
+        alert.addButton(withTitle: "Reset")
+        alert.addButton(withTitle: "Cancel")
+        switch alert.runModal() {
+        case .alertFirstButtonReturn:
+            openAddonConfigFile(addonID: addonID)
+        case .alertSecondButtonReturn:
+            resetAddonConfigFile(addonID: addonID)
+        default:
+            break
+        }
     }
 
     private func runCommand(_ cmd: IndexedCommand) {
@@ -555,8 +735,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
         do {
-            let invocation = try model.runInvocation(for: cmd)
             let manifest = try ManifestLoader.load(from: cmd.addonRoot)
+            do {
+                _ = try AddonRunner.resolveConfig(manifest: manifest, paths: model.paths)
+            } catch let error as AddonConfigError {
+                presentAddonConfigRecovery(addonID: cmd.addonId, name: manifest.name, error: error)
+                playCommandSound(success: false)
+                return
+            }
+            let invocation = try model.runInvocation(for: cmd)
             let gated = Self.tccGated(
                 invocation: invocation,
                 addonName: manifest.name,
@@ -575,13 +762,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 if self?.inFlightInvoke?.key == key {
                     self?.inFlightInvoke = nil
                 }
-                // A follow-up (confirm/list/form) got pushed onto the stack; leave the panel open.
-                // No follow-up (toast-only) means we're still on launcher — close per spec.
+                // still on launcher = toast-only result, no follow-up pushed; close
                 if shellHost.stack.top.preset == .launcher {
                     shellHost.hide()
                 }
             }
             inFlightInvoke = (key: key, task: task)
+        } catch let error as AddonConfigError {
+            if let manifest = try? ManifestLoader.load(from: cmd.addonRoot) {
+                presentAddonConfigRecovery(addonID: cmd.addonId, name: manifest.name, error: error)
+            } else {
+                model.statusMessage = UserFacingError.message(for: error)
+            }
+            playCommandSound(success: false)
         } catch {
             model.statusMessage = UserFacingError.message(for: error)
             playCommandSound(success: false)

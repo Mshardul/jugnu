@@ -326,6 +326,7 @@
       "clipboard",
       "background"
     ],
+    "primary": "list",
     "category": "Clipboard",
     "tags": [
       "background",

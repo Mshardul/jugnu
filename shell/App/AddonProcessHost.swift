@@ -113,8 +113,7 @@ final class AddonProcessHost {
         let blocking = current.filter { $0.lifecycleClass == .job }
         guard !blocking.isEmpty else { return .spawn }
 
-        // Context-triggered / programmatic invoke that collides with a running
-        // instance behaves as reuse regardless of on_reinvoke (UI-speed spec §7).
+        // a programmatic invoke colliding with a running instance always reuses, ignoring on_reinvoke
         let effective: OnReinvoke = programmatic ? .reuse : mode
 
         if blocking.contains(where: { $0.phase == .dying }) {

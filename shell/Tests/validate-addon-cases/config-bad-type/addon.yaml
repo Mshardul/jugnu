@@ -1,0 +1,19 @@
+id: jugnu.config-bad-type
+name: Config Bad Type
+version: 1.0.0
+api: 1
+lifecycle: oneshot
+config:
+  - key: nested
+    type: object
+    default: {}
+commands:
+  - id: run
+    title: Run
+    timeout: 5
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths: []
+  launchd: []

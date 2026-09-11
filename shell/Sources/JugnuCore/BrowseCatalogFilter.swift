@@ -48,8 +48,7 @@ public func filterCatalog(
     return result
 }
 
-/// Tags present in the current category/subcategory/search scope, ignoring the
-/// tag filter itself so chips reflect what's actually selectable, not the full vocabulary.
+// ignores the active tag filter so chips show what's still selectable, not the full vocabulary
 public func availableTags(
     entries: [RegistryEntry],
     category: String?,

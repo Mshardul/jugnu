@@ -402,7 +402,7 @@ function validatedValues(args) {
     };
 }
 
-function manage(state, timersByID, request) {
+function manage(state, timersByID, request, config) {
     const args = request.args || {};
     const rowID = selectedRowID(request);
     const action = actionFor(rowID);
@@ -420,7 +420,31 @@ function manage(state, timersByID, request) {
     }
 
     if (rowID === "add") {
-        return rowForm({ ...state.template, id: "", enabled: true }, "Add nudge");
+        return rowForm({
+            ...state.template,
+            interval_minutes: config.default_interval_minutes,
+            id: "",
+            enabled: true,
+        }, "Add nudge");
+    }
+
+    if (rowID === "nudge-now") {
+        return {
+            ok: true,
+            ui: {
+                pattern: "list",
+                title: "Nudge now",
+                placeholder: "Choose a nudge",
+                items: rowItems(
+                    { rows: state.rows.filter((row) => row.enabled !== false) },
+                    ["select"],
+                ).map((item) => ({ ...item, id: `now:${item.id}` })),
+            },
+        };
+    }
+
+    if (typeof rowID === "string" && rowID.indexOf("now:") === 0) {
+        return cardFor(state, rowID.slice(4));
     }
 
     if (action && action.name === "edit") {
@@ -503,29 +527,42 @@ function manage(state, timersByID, request) {
         return row ? actionList(row) : { ok: false, error: "Nudge not found." };
     }
 
+    const items = [
+        ...rowItems(state, ["select"]),
+        {
+            id: "add",
+            title: "➕ Add nudge",
+            subtitle: "Create a new nudge",
+            actions: ["select"],
+        },
+    ];
+    if (config.show_nudge_now_in_manage) {
+        items.push({
+            id: "nudge-now",
+            title: "⚡ Nudge now",
+            subtitle: "Show a nudge card immediately",
+            actions: ["select"],
+        });
+    }
+
     return {
         ok: true,
         ui: {
             pattern: "list",
             title: "Nudges",
             placeholder: "Filter nudges",
-            items: [
-                ...rowItems(state, ["select"]),
-                {
-                    id: "add",
-                    title: "➕ Add nudge",
-                    subtitle: "Create a new nudge",
-                    actions: ["select"],
-                },
-            ],
+            items,
         },
     };
 }
 
-function advanced(state, request) {
+function advanced(state, request, config) {
     const args = request.args || {};
     if (args.confirmed === true) {
-        state.template = { ...template };
+        state.template = {
+            ...template,
+            interval_minutes: config.default_interval_minutes,
+        };
         writeState(state);
         return { ok: true, message: "Template reset." };
     }
@@ -585,12 +622,29 @@ function cardFor(state, rowID) {
     return { ok: true, ui };
 }
 
+function readConfig(request) {
+    const config = request.config || {};
+    let interval = 30;
+    if (typeof config.default_interval_minutes === "number") {
+        interval = config.default_interval_minutes;
+    }
+    let showNudgeNow = true;
+    if (typeof config.show_nudge_now_in_manage === "boolean") {
+        showNudgeNow = config.show_nudge_now_in_manage;
+    }
+    return {
+        default_interval_minutes: interval,
+        show_nudge_now_in_manage: showNudgeNow,
+    };
+}
+
 function runCommand(request) {
+    const config = readConfig(request);
     const state = readState();
     const timersByID = reconcile(state);
 
     if (request.command === "manage") {
-        return manage(state, timersByID, request);
+        return manage(state, timersByID, request, config);
     }
     if (request.command === "nudge-now") {
         const rowID = selectedRowID(request);
@@ -636,7 +690,7 @@ function runCommand(request) {
         return { ok: true, message: "Nudge presets restored." };
     }
     if (request.command === "advanced") {
-        return advanced(state, request);
+        return advanced(state, request, config);
     }
     return { ok: false, error: "Unknown nudge command." };
 }

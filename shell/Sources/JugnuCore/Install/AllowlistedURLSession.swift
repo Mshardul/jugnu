@@ -1,6 +1,6 @@
 import Foundation
 
-/// Downloads over HTTPS with redirect hops confined to `InstallHostAllowlist`.
+// redirect hops are confined to InstallHostAllowlist, not just the initial URL
 public final class AllowlistedDownloadSession: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
     private var session: URLSession!
 
@@ -10,7 +10,7 @@ public final class AllowlistedDownloadSession: NSObject, URLSessionTaskDelegate,
         self.session = URLSession(configuration: config, delegate: self, delegateQueue: nil)
     }
 
-    /// Downloads `url` to a temporary file. Caller owns cleanup of the returned URL.
+    // caller owns cleanup of the returned temp file
     public func download(_ url: URL) async throws -> URL {
         guard InstallHostAllowlist.isAllowed(url) else {
             throw AddonInstallerError.hostNotAllowed
@@ -26,7 +26,7 @@ public final class AllowlistedDownloadSession: NSObject, URLSessionTaskDelegate,
         }
     }
 
-    /// Rejects cancelled-redirect leftovers (empty 302 body) instead of hashing them.
+    // an empty 302 body is a cancelled redirect leftover — reject instead of hashing it
     public static func requireSuccess(_ response: URLResponse) throws {
         guard let http = response as? HTTPURLResponse, (200 ..< 300).contains(http.statusCode) else {
             throw AddonInstallerError.downloadFailed

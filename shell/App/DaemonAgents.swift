@@ -162,7 +162,6 @@ enum DisableWhileTracked {
     }
 }
 
-/// Same kill/accept policy when an install or upgrade would replace a live addon tree.
 @MainActor
 enum ReplaceWhileTracked {
     static func proceed(

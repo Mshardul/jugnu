@@ -9,6 +9,21 @@ final class UserFacingErrorTests: XCTestCase {
         XCTAssertFalse(msg.contains("ManifestLoader"))
     }
 
+    func testInvalidConfigSchemaAndAddonConfigErrors() {
+        XCTAssertEqual(
+            UserFacingError.message(for: ManifestLoaderError.invalidConfigSchema("bad key")),
+            "This addon’s settings description couldn’t be read. Try reinstalling it."
+        )
+        XCTAssertEqual(
+            UserFacingError.message(for: AddonConfigError.syntaxError),
+            "This addon’s config file is invalid."
+        )
+        XCTAssertEqual(
+            UserFacingError.message(for: AddonConfigError.unknownKey("typo")),
+            "This addon’s config file has an unknown setting (typo)."
+        )
+    }
+
     func testTimeoutAndUnknownFallbacks() {
         XCTAssertEqual(
             UserFacingError.message(for: AddonRunnerError.timeout),

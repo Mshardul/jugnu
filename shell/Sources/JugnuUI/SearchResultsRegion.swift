@@ -22,7 +22,6 @@ public func resultSlots<T>(results: [T], slotCount: Int) -> ResultSlotLayout<T> 
     return ResultSlotLayout(rows: results, showAllLinkSlot: nil, scrolls: true)
 }
 
-/// Unified up/down selection: addon hits first, shell-native rows after.
 public enum LauncherSelection: Equatable {
     case addon(Int)
     case shellNative(Int)
@@ -108,7 +107,7 @@ public struct SearchResultsRegion: View {
             ForEach(Array(layout.rows.enumerated()), id: \.element.command.qualifiedId) { index, hit in
                 breadcrumbRow(hit: hit, isSelected: index == selection)
             }
-            // Blank reserved slots keep slot 5 from sliding up (spec §2.1).
+            // blank reserved slots keep the show-all link from sliding up
             if let linkSlot = layout.showAllLinkSlot {
                 let blankSlots = linkSlot - 1 - layout.rows.count
                 ForEach(0 ..< max(blankSlots, 0), id: \.self) { _ in

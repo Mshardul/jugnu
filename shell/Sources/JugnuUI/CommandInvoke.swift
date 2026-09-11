@@ -1,8 +1,6 @@
 import AppKit
 import JugnuCore
 
-/// Recommended invoke path: run, then present the response (toast, or a confirm/list/form follow-up
-/// pushed onto `host`'s stack).
 @MainActor
 public enum CommandInvoke {
     @discardableResult

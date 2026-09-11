@@ -30,6 +30,9 @@ public enum ManifestLoader {
             }
         }
         try manifest.validateViewTypes()
+        if let primary = manifest.primary, manifest.primaryCommand == nil {
+            throw ManifestLoaderError.unknownPrimary(primary)
+        }
         for command in manifest.commands
             where manifest.effectiveLifecycle(commandId: command.id) == .daemon
         {
@@ -84,4 +87,6 @@ public enum ManifestLoaderError: Error, Equatable {
     case daemonBlockMissing(command: String)
     case daemonNotFirstParty(String)
     case unknownPermission(String)
+    case invalidConfigSchema(String)
+    case unknownPrimary(String)
 }

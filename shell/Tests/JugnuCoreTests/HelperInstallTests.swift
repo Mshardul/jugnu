@@ -273,7 +273,7 @@ final class HelperInstallTests: XCTestCase {
     }
 }
 
-/// Test-only downloader: allows `file://` catalog fixtures. Production uses allowlisted HTTPS.
+// allows file:// catalog fixtures, which the production allowlisted-HTTPS session rejects
 private struct TestFileDownloader: InstallDownloading {
     func download(_ url: URL) async throws -> URL {
         guard url.isFileURL else { throw AddonInstallerError.hostNotAllowed }

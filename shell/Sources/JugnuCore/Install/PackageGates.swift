@@ -1,7 +1,7 @@
 import Foundation
 
 public enum ShellVersion {
-    /// Marketing version of the running app (`CFBundleShortVersionString`), or `0.1.0` in tests/CLI.
+    // CFBundleShortVersionString, or 0.1.0 in tests/CLI where there's no bundle
     public static var current: String {
         if let v = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String, !v.isEmpty {
             return v
@@ -21,7 +21,6 @@ public enum PackageGates {
         }
     }
 
-    /// Returns true when the installed addon may be indexed/invoked on this shell.
     public static func isRunnable(minShellVersion: String?, running: String) -> Bool {
         do {
             try checkMinShellVersion(required: minShellVersion, running: running)
@@ -78,7 +77,6 @@ public enum PackageGates {
         }
     }
 
-    /// Strict catalog rule after migration sources are namespaced.
     public static func validateNamespacedAddonId(_ id: String) throws {
         let trimmed = id.trimmingCharacters(in: .whitespacesAndNewlines)
         if trimmed.isEmpty { throw ManifestLoaderError.emptyId }

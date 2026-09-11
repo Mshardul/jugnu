@@ -52,5 +52,24 @@ final class RunModelsTests: XCTestCase {
         XCTAssertEqual(obj["api"] as? Int, 1)
         XCTAssertEqual(obj["command"] as? String, "toggle")
         XCTAssertNotNil(obj["context"])
+        let config = try XCTUnwrap(obj["config"] as? [String: Any])
+        XCTAssertTrue(config.isEmpty, "config must always be present, possibly empty")
+    }
+
+    func testRequestEncodesMergedConfig() throws {
+        let req = RunRequest(
+            api: 1,
+            op: "run",
+            command: "manage",
+            config: [
+                "default_interval_minutes": .number(12),
+                "show_nudge_now_in_manage": .bool(false),
+            ]
+        )
+        let data = try JSONEncoder().encode(req)
+        let obj = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        let config = try XCTUnwrap(obj["config"] as? [String: Any])
+        XCTAssertEqual((config["default_interval_minutes"] as? NSNumber)?.intValue, 12)
+        XCTAssertEqual(config["show_nudge_now_in_manage"] as? Bool, false)
     }
 }

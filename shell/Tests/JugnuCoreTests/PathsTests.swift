@@ -20,5 +20,13 @@ final class PathsTests: XCTestCase {
             paths.appUpdateStagingDir.path,
             "/tmp/jugnu-home-test/.local/share/jugnu/state/app-update/.staging"
         )
+        XCTAssertEqual(
+            paths.addonStateRoot(id: "jugnu.nudges").path,
+            "/tmp/jugnu-home-test/.local/share/jugnu/state/jugnu.nudges"
+        )
+        XCTAssertEqual(
+            paths.addonConfigFile(id: "jugnu.nudges").path,
+            "/tmp/jugnu-home-test/.config/jugnu/addons/jugnu.nudges.yaml"
+        )
     }
 }

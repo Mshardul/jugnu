@@ -25,17 +25,18 @@ public struct RegistryEntry: Codable, Equatable, Sendable {
     public var tags: [String]
     public var description: String?
     public var commands: [RegistryCommand]
-    /// Catalog-side copy of manifest `dependencies` for disclosure before download.
+    // catalog-side copies of the manifest fields, so disclosure works before download
     public var dependencies: [AddonDependency]
-    /// Catalog-side copy of manifest `permissions` for disclosure before download.
     public var permissions: [AddonPermission]
+    public var primary: String?
 
     public init(
         id: String, name: String, version: String, api: Int, url: String, sha256: String, summary: String,
         category: String, subcategory: String? = nil, tags: [String] = [],
         description: String? = nil, commands: [RegistryCommand] = [],
         dependencies: [AddonDependency] = [],
-        permissions: [AddonPermission] = []
+        permissions: [AddonPermission] = [],
+        primary: String? = nil
     ) {
         self.id = id; self.name = name; self.version = version; self.api = api
         self.url = url; self.sha256 = sha256; self.summary = summary
@@ -43,11 +44,12 @@ public struct RegistryEntry: Codable, Equatable, Sendable {
         self.description = description; self.commands = commands
         self.dependencies = dependencies
         self.permissions = permissions
+        self.primary = primary
     }
 
     enum CodingKeys: String, CodingKey {
         case id, name, version, api, url, sha256, summary, category, subcategory, tags, description, commands
-        case dependencies, permissions
+        case dependencies, permissions, primary
     }
 
     public init(from decoder: Decoder) throws {
@@ -65,6 +67,7 @@ public struct RegistryEntry: Codable, Equatable, Sendable {
         description = try c.decodeIfPresent(String.self, forKey: .description)
         commands = try c.decodeIfPresent([RegistryCommand].self, forKey: .commands) ?? []
         dependencies = try c.decodeIfPresent([AddonDependency].self, forKey: .dependencies) ?? []
+        primary = try c.decodeIfPresent(String.self, forKey: .primary)
         do {
             permissions = try PermissionsSet.parse(c.decodeIfPresent([String].self, forKey: .permissions) ?? [])
         } catch is PermissionsParseError {
@@ -94,6 +97,7 @@ public struct RegistryEntry: Codable, Equatable, Sendable {
         if !permissions.isEmpty {
             try c.encode(permissions.map(\.rawValue), forKey: .permissions)
         }
+        try c.encodeIfPresent(primary, forKey: .primary)
     }
 }
 

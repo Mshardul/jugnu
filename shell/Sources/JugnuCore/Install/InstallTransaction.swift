@@ -1,6 +1,6 @@
 import Foundation
 
-/// Multi-package install: stage missing addons + helpers, commit helpers then addons, rollback created on failure.
+// helpers commit before addons; anything created rolls back on failure
 public struct InstallTransaction: Sendable {
     public struct CreatedHelper: Equatable, Sendable {
         public var id: String
@@ -22,8 +22,7 @@ public struct InstallTransaction: Sendable {
         self.store = store
     }
 
-    /// Promote already-staged addon package trees. `staged` maps id → staging directory.
-    /// `enablePrimary` applies only to `primaryId`; other new addons get `enabled: false`.
+    // enablePrimary applies only to primaryId; other new addons commit as enabled: false
     public mutating func commitAddons(
         staged: [String: URL],
         order: [String],
@@ -36,6 +35,10 @@ public struct InstallTransaction: Sendable {
             let live = paths.addonsDir.appendingPathComponent(id)
             let existed = fm.fileExists(atPath: live.path)
             try AtomicCommit.promote(staging: staging, live: live, trashParent: paths.addonsTrashDir)
+            try FileManager.default.createDirectory(
+                at: paths.addonStateRoot(id: id),
+                withIntermediateDirectories: true
+            )
             if !existed {
                 createdAddonIds.append(id)
             }
@@ -64,6 +67,7 @@ public struct InstallTransaction: Sendable {
         for id in createdAddonIds.reversed() {
             let live = paths.addonsDir.appendingPathComponent(id)
             try? fm.removeItem(at: live)
+            try? fm.removeItem(at: paths.addonStateRoot(id: id))
             if var config = try? store.loadOrCreateDefaults() {
                 config.addons.removeValue(forKey: id)
                 try? store.save(config)
