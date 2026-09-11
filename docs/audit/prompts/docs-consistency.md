@@ -142,7 +142,7 @@ findings inside its scope get tagged `covered by meta-docs-cleanup-plan`.
     `.env.example` matches what the code and `SECURITY.md` say about env vars.
     **Re-derive the live `JUGNU_*` set** (grep `environment[` in `shell/Sources/`)
     rather than trusting a hard-coded list — as of this writing it's
-    `JUGNU_ADDON_PATH`, `JUGNU_REPO_ADDONS`, `JUGNU_HELPER_CLOCK`,
+    `JUGNU_REPO_ADDONS`, `JUGNU_HELPER_CLOCK`,
     `JUGNU_SCREENSHOT_MODE`; `JUGNU_HELPER_PLAY_RUNTIME` is test-only;
     `JUGNU_STATE_DIR` / `JUGNU_CONFIG_DIR` / `JUGNU_LOG_FD` are spec-only. Flag
     `.env.example` or `SECURITY.md` naming vars that don't exist in code, or

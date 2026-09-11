@@ -31,10 +31,10 @@ The Xcode project is generated from `project.yml` ([XcodeGen](https://github.com
 
 Published-site install steps will go in the [root README](../README.md) when a download exists.
 
-Dev addons without install:
+Dev addons: symlink (or copy) the addon directory into the real install path, then enable it in `~/.config/jugnu/jugnu.yaml`.
 
 ```bash
-export JUGNU_ADDON_PATH="$(pwd)/../addons/jugnu.mic-mute:$(pwd)/../addons/jugnu.focus-toggle:$(pwd)/../addons/jugnu.paste-plain"
+ln -s "$(pwd)/../addons/jugnu.mic-mute" ~/.local/share/jugnu/addons/jugnu.mic-mute
 ```
 
 Point `xcode-select` at Xcode once:

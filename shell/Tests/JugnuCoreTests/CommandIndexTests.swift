@@ -64,24 +64,4 @@ final class CommandIndexTests: XCTestCase {
         XCTAssertEqual(index.search("mcmt").first?.title, "Mic Mute")
     }
 
-    func testExtraAddonRoots() throws {
-        let home = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
-        try FileManager.default.createDirectory(at: home, withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: home) }
-
-        let fixtureRoot = try XCTUnwrap(
-            Bundle.module.url(forResource: "addon", withExtension: "yaml", subdirectory: "Fixtures/mic-mute")?
-                .deletingLastPathComponent()
-        )
-        var config = JugnuConfig()
-        config.addons["mic-mute"] = AddonConfig(enabled: true)
-
-        var index = CommandIndex(
-            paths: JugnuPaths(home: home),
-            config: config,
-            extraAddonRoots: [fixtureRoot]
-        )
-        try index.rebuild()
-        XCTAssertEqual(index.all.first?.addonId, "mic-mute")
-    }
 }

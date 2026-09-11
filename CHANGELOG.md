@@ -11,6 +11,10 @@ The project has not published a release yet. Entries currently describe unreleas
 - 2026-09-06 — Catalog zip downloads follow GitHub's current release CDN (`release-assets.githubusercontent.com` / `github-releases.githubusercontent.com`); a cancelled redirect no longer hashes an empty file as a sha256 mismatch.
 - 2026-08-29 — Shell panel survives dismiss: `hide()` orders the `KeyablePanel` out instead of destroying it, so a reopen reuses the existing view and skips the cold-paint cost (ticket 0016).
 
+### Removed
+
+- 2026-09-12 — `JUGNU_ADDON_PATH` dev override (ticket 0035, dropped rather than built): removed instead of warned-on. Its only real job — run addons straight from a repo checkout without packaging — was already superseded by `AddonInstaller.installFromDirectory`, which goes through the normal verified-install path. `AppModel.devRoots()` and the now-dead `CommandIndex.extraAddonRoots` are deleted; dev workflow is now a symlink into the real addons dir (see `shell/README.md`).
+
 ### Added
 
 - 2026-09-12 — Open via manifest `primary` (ticket 0066): `addon.yaml` `primary:` names a command; catalog card and detail show a leftmost, accent-tinted **Open** for installed+enabled addons with a valid primary; missing/invalid primary shows no button. `jugnu.clipboard-history` is the first consumer (`primary: list`).

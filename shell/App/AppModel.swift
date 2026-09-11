@@ -38,7 +38,7 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
         let loadedState = (try? stateStore.load()) ?? JugnuState()
         self.config = loadedConfig
         self.state = loadedState
-        self.index = CommandIndex(paths: paths, config: loadedConfig, extraAddonRoots: Self.devRoots())
+        self.index = CommandIndex(paths: paths, config: loadedConfig)
         publishTheme()
     }
 
@@ -63,13 +63,7 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
 
     func refreshIndex() {
         config = (try? store.loadOrCreateDefaults()) ?? config
-        for root in Self.devRoots() {
-            if let manifest = try? ManifestLoader.load(from: root),
-               config.addons[manifest.id] == nil {
-                config.addons[manifest.id] = AddonConfig(enabled: true)
-            }
-        }
-        index = CommandIndex(paths: paths, config: config, extraAddonRoots: Self.devRoots())
+        index = CommandIndex(paths: paths, config: config)
         do {
             try index.rebuild()
             results = index.all
@@ -389,16 +383,6 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
     private func publishTheme() {
         ThemeStore.shared.config = config.theme
         ThemeStore.shared.soundEnabled = config.sound
-    }
-
-    private static func devRoots() -> [URL] {
-        var roots: [URL] = []
-        if let env = ProcessInfo.processInfo.environment["JUGNU_ADDON_PATH"], !env.isEmpty {
-            for part in env.split(separator: ":") {
-                roots.append(URL(fileURLWithPath: String(part)))
-            }
-        }
-        return roots
     }
 }
 

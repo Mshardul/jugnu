@@ -134,7 +134,7 @@ Decisions from the meta-file review pass (2026-08-24). Each bullet is one action
 - Intro — keep as-is.
 - §JugnuCore (SPM) — trim to a pointer at CONTRIBUTING.md's Local Checks; stop restating `swift test` / `make test-extended`.
 - §Run locally — trim to a pointer at root README.md's Run locally; keep only shell-specific bits not stated there (XcodeGen/project.yml regen note).
-- §Dev addons without install (`JUGNU_ADDON_PATH` example) — keep, shell-specific, not duplicated.
+- §Dev addons without install (symlink-into-addons-dir example) — keep, shell-specific, not duplicated.
 - §Point xcode-select at Xcode — keep, shell-specific one-time setup.
 - Smoke link — keep.
 

@@ -41,17 +41,15 @@ public struct IndexedCommand: Equatable, Sendable {
 public struct CommandIndex: Sendable {
     public let paths: JugnuPaths
     public var config: JugnuConfig
-    public var extraAddonRoots: [URL]
     private var commands: [IndexedCommand] = []
 
     public var all: [IndexedCommand] {
         commands
     }
 
-    public init(paths: JugnuPaths, config: JugnuConfig, extraAddonRoots: [URL] = []) {
+    public init(paths: JugnuPaths, config: JugnuConfig) {
         self.paths = paths
         self.config = config
-        self.extraAddonRoots = extraAddonRoots
     }
 
     public mutating func rebuild() throws {
@@ -71,16 +69,6 @@ public struct CommandIndex: Sendable {
                 guard fm.fileExists(atPath: child.path, isDirectory: &isDir), isDir.boolValue else { continue }
                 rootsById[child.lastPathComponent] = child
             }
-        }
-
-        for root in extraAddonRoots {
-            let manifest: AddonManifest
-            do {
-                manifest = try ManifestLoader.load(from: root)
-            } catch {
-                continue
-            }
-            rootsById[manifest.id] = root
         }
 
         for (id, root) in rootsById {

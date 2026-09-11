@@ -49,8 +49,11 @@ Concern-defined. Inspect these regardless of directory:
   - env overrides — **re-derive the live set at audit time**: grep
     `ProcessInfo.processInfo.environment` and `environment[` across
     `shell/Sources/`, plus `JUGNU_` across the repo. As of this writing the
-    code-referenced set is `JUGNU_ADDON_PATH`, `JUGNU_REPO_ADDONS`,
+    code-referenced set is `JUGNU_REPO_ADDONS`,
     `JUGNU_HELPER_CLOCK` (derived from a helper ref), `JUGNU_SCREENSHOT_MODE`.
+    (`JUGNU_ADDON_PATH` was removed — [0035](../../tickets.md) dropped it rather
+    than warn on it: `installFromDirectory` was the only real dev need and
+    already goes through the normal verified-install path.)
     `JUGNU_HELPER_PLAY_RUNTIME` appears in tests only (a fixture helper id).
     `JUGNU_STATE_DIR` / `JUGNU_CONFIG_DIR` / `JUGNU_LOG_FD` are named in the
     2026-08-27 spec but not yet in code — treat their *appearance* as a signal
@@ -116,8 +119,7 @@ move**): **0021** (per-addon sandboxing), **0022** (TCC reset detection),
 the fix held and check the re-enable residual its Remarks flag as not-fixed:
 `bin/run`'s lazy `ensure_watcher`), **0024** (full uninstall cleanup), **0026**
 (single-process enforce — `SingleInstance.swift` exists but is app-level, not
-the per-addon invoke guard 0026 asks for), **0035** (`JUGNU_ADDON_PATH`
-visible), **0038** (permission disclosure pre-install), **0041** (no orphan
+the per-addon invoke guard 0026 asks for), **0038** (permission disclosure pre-install), **0041** (no orphan
 processes on sleep), **0044** (kill in-flight on quit), **0054**
 (permissions/privacy/security epic).
 
@@ -153,9 +155,8 @@ too-narrow ticket surfaces.
    addon-controlled or clipboard-controlled data into a command line?
    **Child environment: `AddonRunner.swift:85` does
    `var env = ProcessInfo.processInfo.environment` then overlays helper vars —
-   the addon inherits Jugnu's *entire* environment** (`JUGNU_ADDON_PATH`,
-   `JUGNU_REPO_ADDONS`, the user's `PATH`, any token in the parent env). See
-   "what to flag".
+   the addon inherits Jugnu's *entire* environment** (`JUGNU_REPO_ADDONS`,
+   the user's `PATH`, any token in the parent env). See "what to flag".
 5. **Addon privilege.** Every addon runs with full host privilege today (known —
    0021). Beyond that: does anything an addon emits on stdout get eval'd,
    path-joined, or written to disk without validation? Check `RunJSON` /
@@ -169,9 +170,8 @@ too-narrow ticket surfaces.
    `~/.local/share/jugnu/state/<id>`) constructed safely? Any `String` path
    concatenation with an addon id (`state/<id>/`, `addons/<id>.yaml`) that isn't
    validated as a safe single path component?
-8. **Env overrides.** `JUGNU_ADDON_PATH` skips verification entirely. Is that
-   gated to debug builds or at least visibly flagged (0035)? Walk every var in
-   the re-derived live set (grep first, see Scope) — as of now
+8. **Env overrides.** Walk every var in the re-derived live set (grep first,
+   see Scope) — as of now
    `JUGNU_REPO_ADDONS`, `JUGNU_HELPER_CLOCK`, `JUGNU_SCREENSHOT_MODE` — does any
    weaken a check, redirect a download, or relocate a trusted dir without a
    visible signal?
@@ -215,8 +215,8 @@ too-narrow ticket surfaces.
 - A redirect from a trusted registry/download host to `file://` or another host
   being followed — **Major**, **Critical** if chained with an unverified install.
 - Child process inheriting the full parent environment — **Major**; escalate to
-  **Critical** if a specific inherited var (a token, `JUGNU_ADDON_PATH`) is
-  reachable by addon code in a way that weakens a trust boundary.
+  **Critical** if a specific inherited var (a token, an unverified-source
+  override) is reachable by addon code in a way that weakens a trust boundary.
 - A documented v0 non-goal (signing, sandboxing) that has become exploitable in
   practice, or where the addon count / trust surface has grown enough to change
   the risk calculus — **Major**.
