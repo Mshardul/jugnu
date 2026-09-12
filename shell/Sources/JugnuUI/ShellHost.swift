@@ -37,7 +37,7 @@ public final class ShellHost: ObservableObject {
         panel?.isVisible ?? false
     }
 
-    // panel survives hide() so reopen skips the NSPanel/NSHostingView rebuild and its cold paint
+    /// panel survives hide() so reopen skips the NSPanel/NSHostingView rebuild and its cold paint
     var hasPanel: Bool {
         panel != nil
     }
@@ -56,7 +56,7 @@ public final class ShellHost: ObservableObject {
         panel?.escHandler = handler
     }
 
-    // returns false at root so the caller can decide dismiss vs pop
+    /// returns false at root so the caller can decide dismiss vs pop
     @discardableResult
     public func popTop() -> Bool {
         guard !stack.isAtRoot else { return false }
@@ -116,7 +116,7 @@ public final class ShellHost: ObservableObject {
         stack.replace(entry)
     }
 
-    // drops stale callbacks from a view no longer on top (the frame right after a push, before onAppear)
+    /// drops stale callbacks from a view no longer on top (the frame right after a push, before onAppear)
     public func updateTopState(_ state: ShellViewState) {
         guard !stack.entries.isEmpty, state.preset == stack.top.preset else { return }
         stack.replace(ShellStackEntry(state))
@@ -148,7 +148,7 @@ public final class ShellHost: ObservableObject {
 }
 
 public extension ShellHost {
-    // empties the stack (never pops); panel kept for the next invoke to reuse
+    /// empties the stack (never pops); panel kept for the next invoke to reuse
     func hide() {
         stopOutsideClickMonitor()
         panel?.orderOut(nil)
@@ -219,6 +219,7 @@ extension ShellHost {
         case .confirm: state = .confirm
         case .list: state = .list(query: "", highlightedID: nil, scroll: 0)
         case .form: state = .form(values: [:], focusedFieldID: nil)
+        case .grid: state = .grid(highlightedID: nil)
         case .note: return // note is detached, not a stack push
         case .card: return
         }
@@ -268,6 +269,19 @@ extension ShellHost {
                 onSubmit: { [weak self] values in self?.submitFollowUp(args: values) },
                 onCancel: { [weak self] in self?.cancelFollowUp() }
             ))
+        case .grid:
+            setContent(GridPanelView(
+                ui: ui,
+                errorState: followUpError,
+                onSelect: { [weak self] item, action in
+                    var args: [String: JSONValue] = ["itemId": .string(item.id)]
+                    if let action {
+                        args["action"] = .string(action)
+                    }
+                    self?.submitFollowUp(args: args)
+                },
+                onCancel: { [weak self] in self?.cancelFollowUp() }
+            ))
         default:
             break
         }
@@ -283,14 +297,14 @@ extension ShellHost {
         onCancelFollowUp?()
     }
 
-    // Awaitable confirms dismiss via onCancelFollowUp first; clear so submitFollowUp won't pop/toast again.
+    /// Awaitable confirms dismiss via onCancelFollowUp first; clear so submitFollowUp won't pop/toast again.
     public func acknowledgeFollowUpHandled() {
         activeFollowUp = nil
         followUpDescriptor = nil
         followUpError.message = nil
     }
 
-    // hide() first so the note doesn't leave the palette panel sitting behind it
+    /// hide() first so the note doesn't leave the palette panel sitting behind it
     private func openNote(ui: UIDescriptor, followUp: @escaping (RunRequest) async throws -> RunResponse) {
         hide()
         let commandId = ui.title ?? "note"

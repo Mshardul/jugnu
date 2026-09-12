@@ -1,16 +1,14 @@
 import Foundation
 
-// redirect hops are confined to InstallHostAllowlist, not just the initial URL
+/// redirect hops are confined to InstallHostAllowlist, not just the initial URL
 public final class AllowlistedDownloadSession: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
-    private var session: URLSession!
+    private lazy var session = URLSession(configuration: .ephemeral, delegate: self, delegateQueue: nil)
 
-    public override init() {
+    override public init() {
         super.init()
-        let config = URLSessionConfiguration.ephemeral
-        self.session = URLSession(configuration: config, delegate: self, delegateQueue: nil)
     }
 
-    // caller owns cleanup of the returned temp file
+    /// caller owns cleanup of the returned temp file
     public func download(_ url: URL) async throws -> URL {
         guard InstallHostAllowlist.isAllowed(url) else {
             throw AddonInstallerError.hostNotAllowed
@@ -26,7 +24,7 @@ public final class AllowlistedDownloadSession: NSObject, URLSessionTaskDelegate,
         }
     }
 
-    // an empty 302 body is a cancelled redirect leftover — reject instead of hashing it
+    /// an empty 302 body is a cancelled redirect leftover — reject instead of hashing it
     public static func requireSuccess(_ response: URLResponse) throws {
         guard let http = response as? HTTPURLResponse, (200 ..< 300).contains(http.statusCode) else {
             throw AddonInstallerError.downloadFailed
@@ -34,9 +32,9 @@ public final class AllowlistedDownloadSession: NSObject, URLSessionTaskDelegate,
     }
 
     public func urlSession(
-        _ session: URLSession,
-        task: URLSessionTask,
-        willPerformHTTPRedirection response: HTTPURLResponse,
+        _: URLSession,
+        task _: URLSessionTask,
+        willPerformHTTPRedirection _: HTTPURLResponse,
         newRequest request: URLRequest,
         completionHandler: @escaping (URLRequest?) -> Void
     ) {

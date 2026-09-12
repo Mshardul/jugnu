@@ -19,7 +19,7 @@ final class PermissionsConfirmationTests: XCTestCase {
     func testMultiUINestsAddonNames() {
         let ui = confirmPermissionsMultiUI(expand: [
             (permission: .accessibility, addonNames: ["Window Layouts"]),
-            (permission: .clipboard, addonNames: ["Clip Tools", "History"]),
+            (permission: .clipboard, addonNames: ["Clip Tools", "History"])
         ])
         XCTAssertEqual(ui.title, "Install these addons?")
         XCTAssertTrue(ui.message?.contains("They will need:") == true)
@@ -40,7 +40,7 @@ final class PermissionsConfirmationTests: XCTestCase {
             primaryId: "jugnu.root",
             primaryName: "Root",
             dependencies: [
-                DependencyPlanItem(id: "jugnu.dep", name: "Dep", version: "1.0.0", status: .willInstall),
+                DependencyPlanItem(id: "jugnu.dep", name: "Dep", version: "1.0.0", status: .willInstall)
             ],
             installOrder: ["jugnu.dep", "jugnu.root"]
         )

@@ -45,6 +45,22 @@ final class RunModelsTests: XCTestCase {
         XCTAssertEqual(decoded.ui?.accent, "#4A90D9")
     }
 
+    func testGridResponseRoundTrip() throws {
+        let json = Data("""
+        {"ok":true,"ui":{"pattern":"grid","title":"Audio","gridItems":[
+          {"id":"mic","title":"Microphone","icon":"mic.fill","active":false,"actions":["mute-mic"]},
+          {"id":"all","title":"Mute All","icon":"speaker.slash.fill","active":true,"actions":["mute-all"]}
+        ]}}
+        """.utf8)
+        let decoded = try JSONDecoder().decode(RunResponse.self, from: json)
+        XCTAssertEqual(decoded.ui?.pattern, .grid)
+        XCTAssertEqual(decoded.ui?.gridItems?.count, 2)
+        XCTAssertEqual(decoded.ui?.gridItems?.first?.id, "mic")
+        XCTAssertEqual(decoded.ui?.gridItems?.first?.icon, "mic.fill")
+        XCTAssertEqual(decoded.ui?.gridItems?.first?.active, false)
+        XCTAssertEqual(decoded.ui?.gridItems?.last?.active, true)
+    }
+
     func testRequestEncodesEmptyContext() throws {
         let req = RunRequest(api: 1, op: "run", command: "toggle", args: [:], context: [:])
         let data = try JSONEncoder().encode(req)
@@ -63,7 +79,7 @@ final class RunModelsTests: XCTestCase {
             command: "manage",
             config: [
                 "default_interval_minutes": .number(12),
-                "show_nudge_now_in_manage": .bool(false),
+                "show_nudge_now_in_manage": .bool(false)
             ]
         )
         let data = try JSONEncoder().encode(req)

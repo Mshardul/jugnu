@@ -91,7 +91,8 @@ def split_lines(text: str, args: dict) -> tuple[str, str]:
     if not isinstance(sep, str) or sep == "":
         raise OpError("sep must be a non-empty string")
     parts = text.split(sep)
-    return "\n".join(parts) + ("\n" if text.endswith("\n") else ""), f"Split into {len(parts)} lines"
+    joined = "\n".join(parts) + ("\n" if text.endswith("\n") else "")
+    return joined, f"Split into {len(parts)} lines"
 
 
 def prefix_suffix(text: str, args: dict) -> tuple[str, str]:

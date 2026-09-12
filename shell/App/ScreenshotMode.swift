@@ -8,7 +8,7 @@ enum ScreenshotMode {
     }
 
     static let seededFavorites = [
-        "jugnu.mic-mute.toggle",
+        "jugnu.audio-toggles.mute-mic",
         "jugnu.focus-toggle.toggle",
         "jugnu.paste-plain.paste-plain",
         "jugnu.clipboard-history.open",
@@ -16,7 +16,7 @@ enum ScreenshotMode {
     ]
 
     static let enabledAddons = [
-        "jugnu.mic-mute", "jugnu.focus-toggle", "jugnu.paste-plain", "jugnu.clipboard-history", "jugnu.ports",
+        "jugnu.audio-toggles", "jugnu.focus-toggle", "jugnu.paste-plain", "jugnu.clipboard-history", "jugnu.ports",
         "jugnu.floating-note", "jugnu.nudges", "jugnu.world-clock", "jugnu.battery-eta", "jugnu.window-layouts",
         "jugnu.ui-demo-confirm", "jugnu.ui-demo-form", "jugnu.ui-demo-list",
     ]

@@ -1,0 +1,26 @@
+id: jugnu.audio-toggles
+name: Audio
+version: 1.0.0
+api: 1
+view_types: [grid]
+commands:
+  - id: audio-toggles
+    title: Audio
+    subtitle: Mic and mute-all status — tap to toggle
+    keywords: [audio, mic, mute, speaker, volume]
+    view: grid
+  - id: mute-mic
+    title: Toggle microphone mute
+    subtitle: Mute or unmute input
+    keywords: [mic, mute, audio]
+  - id: mute-all
+    title: Mute all
+    subtitle: Mute mic and speakers, or restore the previous volumes
+    keywords: [mute, mic, speaker, volume, meeting]
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths:
+    - "~/.local/share/jugnu/state/audio-toggles"
+  launchd: []

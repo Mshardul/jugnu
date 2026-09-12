@@ -21,6 +21,7 @@ public enum ShellViewState: Equatable, Sendable {
     case confirm
     case list(query: String, highlightedID: String?, scroll: CGFloat)
     case form(values: [String: String], focusedFieldID: String?)
+    case grid(highlightedID: String?)
 
     public var preset: ShellPreset {
         switch self {
@@ -31,6 +32,7 @@ public enum ShellViewState: Equatable, Sendable {
         case .confirm: .confirm
         case .list: .list
         case .form: .form
+        case .grid: .grid
         }
     }
 }
@@ -65,7 +67,7 @@ public struct ShellStack: Equatable, Sendable {
         entries.count == 1
     }
 
-    // re-push of the same preset updates the top entry's state in place instead of stacking
+    /// re-push of the same preset updates the top entry's state in place instead of stacking
     public mutating func push(_ entry: ShellStackEntry) {
         if let lastIndex = entries.indices.last, entries[lastIndex].preset == entry.preset {
             entries[lastIndex] = entry
@@ -91,7 +93,7 @@ public struct ShellStack: Equatable, Sendable {
         entries = [ShellStackEntry(initial)]
     }
 
-    // leaves the stack empty; do not call top/isAtRoot until home or a fresh push
+    /// leaves the stack empty; do not call top/isAtRoot until home or a fresh push
     public mutating func clear() {
         entries = []
     }

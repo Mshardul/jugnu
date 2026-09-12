@@ -25,6 +25,8 @@ default-groups = ["dev"]
 target-version = "py311"
 line-length = 100
 src = ["addons"]
+# vendor/ holds unmodified third-party code bundled into an addon; lint the addon, not its deps.
+extend-exclude = ["**/vendor/**"]
 
 [tool.ruff.lint]
 # Keep leaf packages readable; skip opinionated SIM rewrites for now.
@@ -34,10 +36,10 @@ select = ["E", "F", "I", "UP", "B"]
 "**/tests/**" = ["B011", "B904"]
 
 [tool.codespell]
-skip = ".git,.venv,uv.lock,.mypy_cache,.ruff_cache,.pytest_cache,__pycache__"
+skip = ".git,.venv,uv.lock,.mypy_cache,.ruff_cache,.pytest_cache,__pycache__,*/vendor/*"
 # jugnu = brand; rime = WMO weather label; iterm = iTerm app name;
 # inout = Swift keyword; wit/statics/pre-selected = correct words; assertin = test helper name
-ignore-words-list = "jugnu,crate,rime,iterm,assertin,inout,wit,statics,pre-selected"
+ignore-words-list = "jugnu,crate,rime,iterm,assertin,inout,wit,statics,pre-selected,uptodate"
 
 [tool.pytest.ini_options]
 testpaths = ["addons"]

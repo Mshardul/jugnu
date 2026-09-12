@@ -59,7 +59,7 @@ final class AddonRunnerSpawnTests: XCTestCase {
         let inv = try AddonRunner().spawn(addonRoot: root, entrypoint: entry, request: request(), markerDir: dir)
         let ready = Date().addingTimeInterval(1)
         while !inv.process.isRunning, Date() < ready {
-            usleep(20_000)
+            usleep(20000)
         }
         usleep(300_000)
         XCTAssertTrue(inv.process.isRunning)

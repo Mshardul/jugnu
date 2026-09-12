@@ -1,7 +1,7 @@
 import Foundation
 
 public enum AtomicCommit {
-    // existing live is moved aside to trashParent first, and restored from there if promote fails
+    /// existing live is moved aside to trashParent first, and restored from there if promote fails
     public static func promote(staging: URL, live: URL, trashParent: URL) throws {
         let fm = FileManager.default
         try fm.createDirectory(at: trashParent, withIntermediateDirectories: true)

@@ -1,5 +1,5 @@
-import XCTest
 import JugnuCore
+import XCTest
 
 final class PrefsPaneTitleTests: XCTestCase {
     func testPaneTitle() {

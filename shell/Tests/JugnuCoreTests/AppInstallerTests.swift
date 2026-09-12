@@ -1,5 +1,5 @@
-@testable import JugnuCore
 import CryptoKit
+@testable import JugnuCore
 import XCTest
 
 final class AppInstallerTests: XCTestCase {
@@ -167,7 +167,7 @@ private func writeSlipZip(to zipURL: URL) throws {
     process.arguments = [
         "-c",
         "import zipfile,sys; z=zipfile.ZipFile(sys.argv[1],'w'); z.writestr('../evil.txt','x'); z.close()",
-        zipURL.path,
+        zipURL.path
     ]
     process.standardOutput = Pipe()
     process.standardError = Pipe()

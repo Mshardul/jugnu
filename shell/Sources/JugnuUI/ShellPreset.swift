@@ -9,6 +9,7 @@ public enum ShellPreset: String, Equatable, Sendable {
     case confirm
     case list
     case form
+    case grid
 
     public func defaultViewType(compactLauncher: Bool) -> ViewType {
         switch self {
@@ -18,6 +19,7 @@ public enum ShellPreset: String, Equatable, Sendable {
         case .confirm: .ask
         case .list: .rows
         case .form: .fields
+        case .grid: .grid
         }
     }
 

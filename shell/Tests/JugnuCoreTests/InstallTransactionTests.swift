@@ -1,10 +1,10 @@
-import XCTest
 @testable import JugnuCore
+import XCTest
 
 final class InstallTransactionTests: XCTestCase {
-    private var root: URL!
-    private var paths: JugnuPaths!
-    private var store: ConfigStore!
+    private var root = FileManager.default.temporaryDirectory
+    private var paths = JugnuPaths(home: FileManager.default.temporaryDirectory)
+    private var store = ConfigStore(paths: JugnuPaths(home: FileManager.default.temporaryDirectory))
 
     override func setUpWithError() throws {
         root = FileManager.default.temporaryDirectory

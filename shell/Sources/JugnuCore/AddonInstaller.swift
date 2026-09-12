@@ -16,7 +16,7 @@ public struct AddonInstaller: Sendable {
         self.downloads = downloads
     }
 
-    // dependencies (if any) resolve to a plan, disclose via confirmDependencies, then commit as one transaction
+    /// dependencies (if any) resolve to a plan, disclose via confirmDependencies, then commit as one transaction
     public func install(
         entry: RegistryEntry,
         enable: Bool,
@@ -74,7 +74,7 @@ public struct AddonInstaller: Sendable {
         try commitAddonPackage(from: packageRoot, id: id, enable: enable)
     }
 
-    // dev / first-run local path: the addon directory is already unpacked
+    /// dev / first-run local path: the addon directory is already unpacked
     public func installFromDirectory(url: URL, enable: Bool) throws {
         let manifest = try ManifestLoader.load(from: url)
         try commitAddonPackage(from: url, id: manifest.id, enable: enable)
@@ -125,7 +125,7 @@ public struct AddonInstaller: Sendable {
         }
     }
 
-    // call on launch
+    /// call on launch
     public func recoverInstallOrphans() {
         AtomicCommit.recoverOrphans(stagingParent: paths.addonsStagingDir, trashParent: paths.addonsTrashDir)
         AtomicCommit.recoverOrphans(stagingParent: paths.helpersStagingDir, trashParent: paths.helpersTrashDir)
@@ -144,7 +144,9 @@ public struct AddonInstaller: Sendable {
             var isDir: ObjCBool = false
             guard fm.fileExists(atPath: dir.path, isDirectory: &isDir), isDir.boolValue else { continue }
             let name = dir.lastPathComponent
-            if name.hasPrefix(".") { continue }
+            if name.hasPrefix(".") {
+                continue
+            }
             if let manifest = try? ManifestLoader.load(from: dir) {
                 out[manifest.id] = manifest.version
             }
@@ -170,38 +172,9 @@ public struct AddonInstaller: Sendable {
 
         try ZipExtractor.extract(zipURL: zipURL, to: extractRoot)
         let packageRoot = try ZipExtractor.findPackageRoot(in: extractRoot, manifestName: "addon.yaml")
-        var manifest = try ManifestLoader.load(from: packageRoot)
-        if let expectedId, expectedId != manifest.id {
-            if expectedId == NamespaceMigrator.namespacedId(forJob: manifest.id) {
-                try rewriteManifestId(at: packageRoot, from: manifest.id, to: expectedId)
-                manifest = try ManifestLoader.load(from: packageRoot)
-            } else {
-                throw AddonInstallerError.idMismatch(expected: expectedId, actual: manifest.id)
-            }
-        }
+        let manifest = try resolveRootManifest(at: packageRoot, expectedId: expectedId)
 
-        let root = DeclaredAddon(
-            id: manifest.id,
-            name: manifest.name,
-            version: manifest.version,
-            dependencies: manifest.dependencies
-        )
-        var declared: [String: DeclaredAddon] = Dictionary(
-            uniqueKeysWithValues: catalog.map { ($0.id, DeclaredAddon(entry: $0)) }
-        )
-        declared[root.id] = root
-
-        // Prefer manifest deps; if registry listed deps for root, merge unknown ids only via catalog.
-        let plan: DependencyPlan
-        do {
-            plan = try DependencyResolver.plan(
-                root: root,
-                catalog: declared,
-                installed: installedVersions
-            )
-        } catch let error as DependencyResolverError {
-            throw AddonInstallerError.dependency(error)
-        }
+        let plan = try planDependencies(for: manifest, catalog: catalog, installedVersions: installedVersions)
 
         if plan.needsDisclosure {
             let ok = await confirmDependencies?(plan) ?? true
@@ -216,67 +189,73 @@ public struct AddonInstaller: Sendable {
             return
         }
 
+        try await commitPlannedInstall(
+            plan: plan,
+            rootManifest: manifest,
+            rootPackageRoot: packageRoot,
+            catalog: catalog,
+            enable: enable
+        )
+    }
+
+    /// caller-supplied id wins when it matches the namespaced form of an older bare manifest id
+    private func resolveRootManifest(at packageRoot: URL, expectedId: String?) throws -> AddonManifest {
+        var manifest = try ManifestLoader.load(from: packageRoot)
+        guard let expectedId, expectedId != manifest.id else { return manifest }
+        guard expectedId == NamespaceMigrator.namespacedId(forJob: manifest.id) else {
+            throw AddonInstallerError.idMismatch(expected: expectedId, actual: manifest.id)
+        }
+        try rewriteManifestId(at: packageRoot, from: manifest.id, to: expectedId)
+        manifest = try ManifestLoader.load(from: packageRoot)
+        return manifest
+    }
+
+    private func planDependencies(
+        for manifest: AddonManifest,
+        catalog: [RegistryEntry],
+        installedVersions: [String: String]
+    ) throws -> DependencyPlan {
+        let root = DeclaredAddon(
+            id: manifest.id,
+            name: manifest.name,
+            version: manifest.version,
+            dependencies: manifest.dependencies
+        )
+        var declared: [String: DeclaredAddon] = Dictionary(
+            uniqueKeysWithValues: catalog.map { ($0.id, DeclaredAddon(entry: $0)) }
+        )
+        declared[root.id] = root
+
+        // Prefer manifest deps; if registry listed deps for root, merge unknown ids only via catalog.
+        do {
+            return try DependencyResolver.plan(root: root, catalog: declared, installed: installedVersions)
+        } catch let error as DependencyResolverError {
+            throw AddonInstallerError.dependency(error)
+        }
+    }
+
+    /// stage every addon + helper in the plan, then commit as one transaction; rollback and clean staging on any
+    /// failure
+    private func commitPlannedInstall(
+        plan: DependencyPlan,
+        rootManifest: AddonManifest,
+        rootPackageRoot: URL,
+        catalog: [RegistryEntry],
+        enable: Bool
+    ) async throws {
         var tx = InstallTransaction(paths: paths, store: store)
         var stagedAddons: [String: URL] = [:]
         var stagedHelpers: [(ref: HelperRef, staging: URL)] = []
-        var manifestsById: [String: AddonManifest] = [manifest.id: manifest]
 
         do {
-            for id in plan.installOrder {
-                let pkgRoot: URL
-                if id == manifest.id {
-                    pkgRoot = packageRoot
-                } else {
-                    guard let entry = catalog.first(where: { $0.id == id }) else {
-                        throw AddonInstallerError.dependency(.unknown(id: id))
-                    }
-                    pkgRoot = try await downloadAndExtractAddon(entry: entry)
-                }
-                let m: AddonManifest
-                do {
-                    var loaded = try ManifestLoader.load(from: pkgRoot)
-                    if id != loaded.id,
-                       id == NamespaceMigrator.namespacedId(forJob: loaded.id)
-                    {
-                        try rewriteManifestId(at: pkgRoot, from: loaded.id, to: id)
-                        loaded = try ManifestLoader.load(from: pkgRoot)
-                    } else if id != loaded.id {
-                        throw AddonInstallerError.idMismatch(expected: id, actual: loaded.id)
-                    }
-                    m = loaded
-                }
-                manifestsById[id] = m
-                stagedAddons[id] = try stageAddonPackage(from: pkgRoot, id: id)
-                if id != manifest.id {
-                    try? FileManager.default.removeItem(at: pkgRoot)
-                }
-            }
-
-            var helperRefs: [HelperRef] = []
-            var seenHelper = Set<String>()
-            for id in plan.installOrder {
-                guard let m = manifestsById[id] else { continue }
-                for ref in m.helpers {
-                    let key = "\(ref.id)@\(ref.version)"
-                    if seenHelper.insert(key).inserted {
-                        helperRefs.append(ref)
-                    }
-                }
-            }
-
-            for ref in helperRefs {
-                let yaml = paths.helperRoot(id: ref.id, version: ref.version).appendingPathComponent("helper.yaml")
-                if FileManager.default.fileExists(atPath: yaml.path) { continue }
-                let (entry, zip) = try await fetchHelperZip(ref: ref)
-                defer { try? FileManager.default.removeItem(at: zip) }
-                let staging = try stageHelperFromZip(
-                    url: zip,
-                    expectedSHA256: entry.sha256,
-                    id: ref.id,
-                    version: ref.version
-                )
-                stagedHelpers.append((ref, staging))
-            }
+            let manifestsById = try await stageDependencyAddons(
+                plan: plan,
+                rootManifest: rootManifest,
+                rootPackageRoot: rootPackageRoot,
+                catalog: catalog,
+                stagedAddons: &stagedAddons
+            )
+            stagedHelpers = try await stagePlannedHelpers(plan: plan, manifestsById: manifestsById)
 
             for item in stagedHelpers {
                 try tx.commitHelper(staging: item.staging, id: item.ref.id, version: item.ref.version)
@@ -284,7 +263,7 @@ public struct AddonInstaller: Sendable {
             try tx.commitAddons(
                 staged: stagedAddons,
                 order: plan.installOrder,
-                primaryId: manifest.id,
+                primaryId: rootManifest.id,
                 enablePrimary: enable
             )
         } catch {
@@ -297,6 +276,80 @@ public struct AddonInstaller: Sendable {
             }
             throw error
         }
+    }
+
+    private func stageDependencyAddons(
+        plan: DependencyPlan,
+        rootManifest: AddonManifest,
+        rootPackageRoot: URL,
+        catalog: [RegistryEntry],
+        stagedAddons: inout [String: URL]
+    ) async throws -> [String: AddonManifest] {
+        var manifestsById: [String: AddonManifest] = [rootManifest.id: rootManifest]
+        for id in plan.installOrder {
+            let pkgRoot: URL
+            if id == rootManifest.id {
+                pkgRoot = rootPackageRoot
+            } else {
+                guard let entry = catalog.first(where: { $0.id == id }) else {
+                    throw AddonInstallerError.dependency(.unknown(id: id))
+                }
+                pkgRoot = try await downloadAndExtractAddon(entry: entry)
+            }
+            let m = try loadDependencyManifest(at: pkgRoot, expectedId: id)
+            manifestsById[id] = m
+            stagedAddons[id] = try stageAddonPackage(from: pkgRoot, id: id)
+            if id != rootManifest.id {
+                try? FileManager.default.removeItem(at: pkgRoot)
+            }
+        }
+        return manifestsById
+    }
+
+    private func loadDependencyManifest(at pkgRoot: URL, expectedId id: String) throws -> AddonManifest {
+        var loaded = try ManifestLoader.load(from: pkgRoot)
+        if id != loaded.id, id == NamespaceMigrator.namespacedId(forJob: loaded.id) {
+            try rewriteManifestId(at: pkgRoot, from: loaded.id, to: id)
+            loaded = try ManifestLoader.load(from: pkgRoot)
+        } else if id != loaded.id {
+            throw AddonInstallerError.idMismatch(expected: id, actual: loaded.id)
+        }
+        return loaded
+    }
+
+    private func stagePlannedHelpers(
+        plan: DependencyPlan,
+        manifestsById: [String: AddonManifest]
+    ) async throws -> [(ref: HelperRef, staging: URL)] {
+        var helperRefs: [HelperRef] = []
+        var seenHelper = Set<String>()
+        for id in plan.installOrder {
+            guard let m = manifestsById[id] else { continue }
+            for ref in m.helpers {
+                let key = "\(ref.id)@\(ref.version)"
+                if seenHelper.insert(key).inserted {
+                    helperRefs.append(ref)
+                }
+            }
+        }
+
+        var stagedHelpers: [(ref: HelperRef, staging: URL)] = []
+        for ref in helperRefs {
+            let yaml = paths.helperRoot(id: ref.id, version: ref.version).appendingPathComponent("helper.yaml")
+            if FileManager.default.fileExists(atPath: yaml.path) {
+                continue
+            }
+            let (entry, zip) = try await fetchHelperZip(ref: ref)
+            defer { try? FileManager.default.removeItem(at: zip) }
+            let staging = try stageHelperFromZip(
+                url: zip,
+                expectedSHA256: entry.sha256,
+                id: ref.id,
+                version: ref.version
+            )
+            stagedHelpers.append((ref, staging))
+        }
+        return stagedHelpers
     }
 
     private func stageAddonPackage(from packageRoot: URL, id: String) throws -> URL {
@@ -430,7 +483,9 @@ public struct AddonInstaller: Sendable {
             try? FileManager.default.removeItem(at: zipURL)
             try FileManager.default.moveItem(at: tempURL, to: zipURL)
         } catch let error as AddonInstallerError {
-            if case .hostNotAllowed = error { throw error }
+            if case .hostNotAllowed = error {
+                throw error
+            }
             throw AddonInstallerError.helperUnreachable
         } catch {
             throw AddonInstallerError.helperUnreachable
@@ -484,5 +539,7 @@ public enum AddonInstallerError: Error, Equatable {
     case dependencyDisclosureDeclined
 
     @available(*, deprecated, renamed: "unsafeArchive")
-    public static var unzipFailed: AddonInstallerError { .unsafeArchive }
+    public static var unzipFailed: AddonInstallerError {
+        .unsafeArchive
+    }
 }

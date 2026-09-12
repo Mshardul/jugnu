@@ -5,12 +5,9 @@ from __future__ import annotations
 import re
 import unicodedata
 
-from .lines import OpError, _join, _lines
+from .lines import OpError, _lines
 
-
-_INVISIBLE = re.compile(
-    r"[\u200b\u200c\u200d\u2060\ufeff\u00a0\u202a-\u202e\u2066-\u2069]"
-)
+_INVISIBLE = re.compile(r"[\u200b\u200c\u200d\u2060\ufeff\u00a0\u202a-\u202e\u2066-\u2069]")
 
 
 def tabs_spaces(text: str, args: dict) -> tuple[str, str]:
@@ -41,6 +38,7 @@ def invisible_chars(text: str, args: dict) -> tuple[str, str]:
     if mode == "strip":
         return _INVISIBLE.sub("", text), "Stripped invisible chars"
     if mode == "show":
+
         def repl(m: re.Match[str]) -> str:
             cp = ord(m.group(0))
             return f"<U+{cp:04X}>"
@@ -64,8 +62,10 @@ def markdown_table(text: str, args: dict) -> tuple[str, str]:
         rows = [r + [""] * (width - len(r)) for r in rows]
         header = rows[0]
         body = rows[1:] if len(rows) > 1 else []
+
         def fmt(row: list[str]) -> str:
             return "| " + " | ".join(cell.strip() for cell in row) + " |"
+
         out = [fmt(header), "| " + " | ".join("---" for _ in header) + " |"]
         out.extend(fmt(r) for r in body)
         return "\n".join(out) + "\n", "TSV/CSV → Markdown table"

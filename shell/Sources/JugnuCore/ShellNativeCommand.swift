@@ -1,6 +1,6 @@
 import Foundation
 
-// mandatory palette rows: not zips, not toggles — hidden only via jugnu.yaml
+/// mandatory palette rows: not zips, not toggles — hidden only via jugnu.yaml
 public struct ShellNativeCommand: Identifiable, Equatable, Sendable {
     public enum Kind: String, CaseIterable, Sendable {
         case browseAddons = "browse-addons"

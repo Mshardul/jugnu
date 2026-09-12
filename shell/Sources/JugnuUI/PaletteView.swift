@@ -16,7 +16,7 @@ public protocol PaletteModelProtocol: ObservableObject {
     func toggleFavorite(qualifiedId: String)
 }
 
-// repeat invoke of the same command inside the window collapses to one spawn
+/// repeat invoke of the same command inside the window collapses to one spawn
 public enum PaletteInvokeDebounce {
     public static let windowSeconds: TimeInterval = 0.1
 

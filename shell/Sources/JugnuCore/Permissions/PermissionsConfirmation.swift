@@ -13,7 +13,7 @@ public func confirmPermissionsInstallUI(addonName: String, permissions: [AddonPe
 public func confirmPermissionsMultiUI(
     expand: [(permission: AddonPermission, addonNames: [String])]
 ) -> UIDescriptor {
-    var lines: [String] = ["They will need:"]
+    var lines = ["They will need:"]
     for row in expand {
         lines.append(row.permission.displayTitle)
         for name in row.addonNames {
@@ -50,7 +50,7 @@ public func confirmInstallDisclosureUI(
         parts.append(permissionsBody)
     }
     if let plan = dependencyPlan, plan.needsDisclosure {
-        var depLines: [String] = ["This will also handle these addons:"]
+        var depLines = ["This will also handle these addons:"]
         for dep in plan.dependencies {
             switch dep.status {
             case .alreadyInstalled:

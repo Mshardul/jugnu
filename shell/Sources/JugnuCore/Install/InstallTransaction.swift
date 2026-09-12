@@ -1,6 +1,6 @@
 import Foundation
 
-// helpers commit before addons; anything created rolls back on failure
+/// helpers commit before addons; anything created rolls back on failure
 public struct InstallTransaction: Sendable {
     public struct CreatedHelper: Equatable, Sendable {
         public var id: String
@@ -22,7 +22,7 @@ public struct InstallTransaction: Sendable {
         self.store = store
     }
 
-    // enablePrimary applies only to primaryId; other new addons commit as enabled: false
+    /// enablePrimary applies only to primaryId; other new addons commit as enabled: false
     public mutating func commitAddons(
         staged: [String: URL],
         order: [String],

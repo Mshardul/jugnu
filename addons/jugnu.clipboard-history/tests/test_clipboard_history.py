@@ -40,7 +40,8 @@ def test_list_reads_sqlite(tmp_path: Path) -> None:
     db = db_dir / "history.db"
     conn = sqlite3.connect(db)
     conn.execute(
-        "CREATE TABLE entries (id INTEGER PRIMARY KEY AUTOINCREMENT, ts REAL NOT NULL, text TEXT NOT NULL, pinned INTEGER NOT NULL DEFAULT 0)"
+        "CREATE TABLE entries (id INTEGER PRIMARY KEY AUTOINCREMENT, ts REAL NOT NULL, "
+        "text TEXT NOT NULL, pinned INTEGER NOT NULL DEFAULT 0)"
     )
     conn.execute("INSERT INTO entries (ts, text, pinned) VALUES (1, 'hello clip', 0)")
     conn.commit()

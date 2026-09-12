@@ -2,7 +2,7 @@ import Foundation
 import ZIPFoundation
 
 public enum ZipExtractor {
-    public static let defaultMaxEntries = 50_000
+    public static let defaultMaxEntries = 50000
     public static let defaultMaxUncompressedBytes: UInt64 = 512_000_000
 
     public static func extract(
@@ -85,7 +85,7 @@ public enum ZipExtractor {
         let destPath = destination.path
         let proposed = destination.appendingPathComponent(normalized).standardizedFileURL.path
         let prefix = destPath.hasSuffix("/") ? destPath : destPath + "/"
-        if proposed != destPath && !proposed.hasPrefix(prefix) {
+        if proposed != destPath, !proposed.hasPrefix(prefix) {
             throw AddonInstallerError.unsafeArchive
         }
     }

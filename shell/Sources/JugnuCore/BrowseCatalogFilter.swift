@@ -48,7 +48,7 @@ public func filterCatalog(
     return result
 }
 
-// ignores the active tag filter so chips show what's still selectable, not the full vocabulary
+/// ignores the active tag filter so chips show what's still selectable, not the full vocabulary
 public func availableTags(
     entries: [RegistryEntry],
     category: String?,

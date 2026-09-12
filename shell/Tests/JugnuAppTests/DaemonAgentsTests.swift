@@ -17,7 +17,10 @@ final class DaemonAgentsTests: XCTestCase {
         defer { try? FileManager.default.removeItem(at: home) }
         let paths = JugnuPaths(home: home)
         let root = home.appendingPathComponent("jugnu.keep-awake")
-        try FileManager.default.createDirectory(at: root.appendingPathComponent("bin"), withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(
+            at: root.appendingPathComponent("bin"),
+            withIntermediateDirectories: true
+        )
         try "#!/bin/sh\n".write(to: root.appendingPathComponent("bin/watch"), atomically: true, encoding: .utf8)
         let launchctl = RecordingLaunchctl()
         let agents = DaemonAgents(launchctl: launchctl, uid: 501)
@@ -109,7 +112,7 @@ final class DisableWhileTrackedTests: XCTestCase {
         XCTAssertTrue(prompted)
         let deadline = Date().addingTimeInterval(3)
         while inv.process.isRunning, Date() < deadline {
-            usleep(20_000)
+            usleep(20000)
         }
         XCTAssertFalse(inv.process.isRunning)
     }

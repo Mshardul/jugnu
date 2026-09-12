@@ -13,7 +13,7 @@ public struct AddonDetailView: View {
     var permissionGrants: [AddonPermission: Bool] = [:]
     var configSchema: [AddonConfigField] = []
     var configValues: [String: JSONValue] = [:]
-    var configError: String? = nil
+    var configError: String?
     let onInstall: () -> Void
     let onUpdate: () -> Void
     let onEnabledChange: (Bool) -> Void
@@ -202,7 +202,7 @@ public struct AddonDetailView: View {
                                 .foregroundStyle(theme.textSecondary)
                         }
                         Spacer()
-                        if isInstalled && isEnabled {
+                        if isInstalled, isEnabled {
                             Button("Run") { onRun(command.id) }
                                 .buttonStyle(.bordered)
                         }
@@ -267,7 +267,9 @@ public struct AddonDetailView: View {
                     "",
                     isOn: Binding(
                         get: {
-                            if case let .bool(b) = draftValues[field.key] ?? field.default { return b }
+                            if case let .bool(b) = draftValues[field.key] ?? field.default {
+                                return b
+                            }
                             return false
                         },
                         set: { newValue in
@@ -283,7 +285,9 @@ public struct AddonDetailView: View {
                     "",
                     selection: Binding(
                         get: {
-                            if case let .string(s) = draftValues[field.key] ?? field.default { return s }
+                            if case let .string(s) = draftValues[field.key] ?? field.default {
+                                return s
+                            }
                             return field.values?.first ?? ""
                         },
                         set: { newValue in
@@ -323,7 +327,9 @@ public struct AddonDetailView: View {
                     "",
                     text: Binding(
                         get: {
-                            if case let .string(s) = draftValues[field.key] ?? field.default { return s }
+                            if case let .string(s) = draftValues[field.key] ?? field.default {
+                                return s
+                            }
                             return ""
                         },
                         set: { text in

@@ -63,5 +63,4 @@ final class CommandIndexTests: XCTestCase {
         index.replaceCommandsForTesting([zoom, mute])
         XCTAssertEqual(index.search("mcmt").first?.title, "Mic Mute")
     }
-
 }

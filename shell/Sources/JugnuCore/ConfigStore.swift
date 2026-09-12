@@ -51,7 +51,9 @@ public enum ConfigFileState: Equatable {
     case syntaxError
 
     public var isSyntaxError: Bool {
-        if case .syntaxError = self { return true }
+        if case .syntaxError = self {
+            return true
+        }
         return false
     }
 }

@@ -20,7 +20,7 @@ public enum NamespaceMigrator {
         paths.stateDir.appendingPathComponent(completionMarkerName)
     }
 
-    // resumable one id at a time; safe to call every launch
+    /// resumable one id at a time; safe to call every launch
     @discardableResult
     public static func migrateInstalledTree(
         paths: JugnuPaths,
@@ -43,7 +43,9 @@ public enum NamespaceMigrator {
             var isDir: ObjCBool = false
             guard fm.fileExists(atPath: dir.path, isDirectory: &isDir), isDir.boolValue else { continue }
             let name = dir.lastPathComponent
-            if name.hasPrefix(".") { continue }
+            if name.hasPrefix(".") {
+                continue
+            }
             if !isNamespaced(name) {
                 unprefixed.append(name)
             }
@@ -128,10 +130,12 @@ public enum NamespaceMigrator {
         }
     }
 
-    // qualified ids are `addonId.commandId`, and addonId itself contains dots after namespacing
+    /// qualified ids are `addonId.commandId`, and addonId itself contains dots after namespacing
     public static func remapQualifiedIds(state: inout JugnuState, fromAddon: String, toAddon: String) {
         func remap(_ id: String) -> String? {
-            if id == fromAddon { return toAddon }
+            if id == fromAddon {
+                return toAddon
+            }
             let prefix = fromAddon + "."
             if id.hasPrefix(prefix) {
                 return toAddon + "." + String(id.dropFirst(prefix.count))

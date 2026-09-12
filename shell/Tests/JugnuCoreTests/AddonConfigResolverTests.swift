@@ -1,11 +1,11 @@
-import XCTest
 import JugnuCore
+import XCTest
 
 final class AddonConfigResolverTests: XCTestCase {
     func testMissingFileUsesDefaults() throws {
         let schema = [
             AddonConfigField(key: "default_interval_minutes", type: .int, default: .number(30)),
-            AddonConfigField(key: "show_nudge_now_in_manage", type: .bool, default: .bool(true)),
+            AddonConfigField(key: "show_nudge_now_in_manage", type: .bool, default: .bool(true))
         ]
         let url = URL(fileURLWithPath: "/tmp/jugnu-config-missing-\(UUID().uuidString).yaml")
         let resolved = try AddonConfigResolver.resolve(schema: schema, fileURL: url)
@@ -69,7 +69,7 @@ final class AddonConfigResolverTests: XCTestCase {
                 type: .enum,
                 values: ["easy", "medium"],
                 default: .string("medium")
-            ),
+            )
         ]
         let yaml = AddonConfigResolver.templateYAML(schema: schema)
         XCTAssertTrue(yaml.contains("show_nudge_now_in_manage: true"))

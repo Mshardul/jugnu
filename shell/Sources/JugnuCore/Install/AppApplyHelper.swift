@@ -9,7 +9,7 @@ public enum AppApplyHelper {
             withJSONObject: [
                 "pid": Int(pid),
                 "source": sourceApp.path,
-                "dest": destApp.path,
+                "dest": destApp.path
             ],
             options: [.sortedKeys]
         ).write(to: planURL)

@@ -1,6 +1,5 @@
 #!/bin/bash
 set -euo pipefail
-# Read and discard JSON request (api 1).
 cat >/dev/null
 
 state=$(osascript <<'APPLESCRIPT'

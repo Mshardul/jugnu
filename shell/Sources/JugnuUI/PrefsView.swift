@@ -143,7 +143,6 @@ public struct PrefsView: View {
         .buttonStyle(.plain)
     }
 
-    @ViewBuilder
     private func content(theme: JugnuThemeColors) -> some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 4) {

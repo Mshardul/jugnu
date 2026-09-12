@@ -26,7 +26,7 @@ final class PermissionsSetTests: XCTestCase {
 
     func testNeedsLine() throws {
         XCTAssertNil(PermissionsSet.needsLine([]))
-        let line = PermissionsSet.needsLine(try PermissionsSet.parse(["clipboard", "accessibility"]))
+        let line = try PermissionsSet.needsLine(PermissionsSet.parse(["clipboard", "accessibility"]))
         XCTAssertEqual(line, "Needs Accessibility, Clipboard")
     }
 
@@ -34,7 +34,7 @@ final class PermissionsSetTests: XCTestCase {
         let rows = PermissionsSet.unionExpand(addons: [
             (name: "Clip Tools", permissions: [.clipboard]),
             (name: "Weather", permissions: [.network]),
-            (name: "History", permissions: [.clipboard, .background]),
+            (name: "History", permissions: [.clipboard, .background])
         ])
         XCTAssertEqual(rows.map(\.permission), [.network, .clipboard, .background])
         XCTAssertEqual(rows.first { $0.permission == .clipboard }?.addonNames, ["Clip Tools", "History"])

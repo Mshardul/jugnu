@@ -2,45 +2,50 @@
 import XCTest
 
 final class InstallHostAllowlistTests: XCTestCase {
-    func testAllowsGitHubHTTPS() {
+    func testAllowsGitHubHTTPS() throws {
         XCTAssertTrue(
-            InstallHostAllowlist.isAllowed(URL(string: "https://github.com/org/repo/releases/download/v1/a.zip")!)
+            try InstallHostAllowlist
+                .isAllowed(XCTUnwrap(URL(string: "https://github.com/org/repo/releases/download/v1/a.zip")))
         )
         XCTAssertTrue(
-            InstallHostAllowlist.isAllowed(
-                URL(string: "https://objects.githubusercontent.com/github-production-release-asset/1")!
+            try InstallHostAllowlist.isAllowed(
+                XCTUnwrap(URL(string: "https://objects.githubusercontent.com/github-production-release-asset/1"))
             )
         )
         XCTAssertTrue(
-            InstallHostAllowlist.isAllowed(
-                URL(string: "https://release-assets.githubusercontent.com/github-production-release-asset/1")!
+            try InstallHostAllowlist.isAllowed(
+                XCTUnwrap(
+                    URL(string: "https://release-assets.githubusercontent.com/github-production-release-asset/1")
+                )
             )
         )
         XCTAssertTrue(
-            InstallHostAllowlist.isAllowed(
-                URL(string: "https://github-releases.githubusercontent.com/github-production-release-asset/1")!
+            try InstallHostAllowlist.isAllowed(
+                XCTUnwrap(
+                    URL(string: "https://github-releases.githubusercontent.com/github-production-release-asset/1")
+                )
             )
         )
     }
 
     func testDownloadRejectsNonSuccessHTTPStatus() throws {
-        let url = URL(string: "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/x.zip")!
-        let redirect = HTTPURLResponse(url: url, statusCode: 302, httpVersion: nil, headerFields: nil)!
+        let url = try XCTUnwrap(URL(string: "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/x.zip"))
+        let redirect = try XCTUnwrap(HTTPURLResponse(url: url, statusCode: 302, httpVersion: nil, headerFields: nil))
         XCTAssertThrowsError(try AllowlistedDownloadSession.requireSuccess(redirect)) {
             XCTAssertEqual($0 as? AddonInstallerError, .downloadFailed)
         }
-        let ok = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
+        let ok = try XCTUnwrap(HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil))
         XCTAssertNoThrow(try AllowlistedDownloadSession.requireSuccess(ok))
     }
 
-    func testRejectsFileAndForeignHosts() {
-        XCTAssertFalse(InstallHostAllowlist.isAllowed(URL(string: "file:///tmp/a.zip")!))
-        XCTAssertFalse(InstallHostAllowlist.isAllowed(URL(string: "http://github.com/a.zip")!))
-        XCTAssertFalse(InstallHostAllowlist.isAllowed(URL(string: "https://evil.example/a.zip")!))
+    func testRejectsFileAndForeignHosts() throws {
+        XCTAssertFalse(try InstallHostAllowlist.isAllowed(XCTUnwrap(URL(string: "file:///tmp/a.zip"))))
+        XCTAssertFalse(try InstallHostAllowlist.isAllowed(XCTUnwrap(URL(string: "http://github.com/a.zip"))))
+        XCTAssertFalse(try InstallHostAllowlist.isAllowed(XCTUnwrap(URL(string: "https://evil.example/a.zip"))))
     }
 
-    func testRedirectPolicyMatchesAllowlist() {
-        XCTAssertTrue(InstallHostAllowlist.isAllowed(URL(string: "https://GITHUB.com/x")!))
+    func testRedirectPolicyMatchesAllowlist() throws {
+        XCTAssertTrue(try InstallHostAllowlist.isAllowed(XCTUnwrap(URL(string: "https://GITHUB.com/x"))))
     }
 }
 
@@ -69,7 +74,7 @@ final class Sha256RequiredTests: XCTestCase {
 
         let emptyZip = home.appendingPathComponent("empty.zip")
         // Minimal invalid zip is fine — hash check runs first.
-        try Data([0x50, 0x4b, 0x05, 0x06] + Data(count: 18)).write(to: emptyZip)
+        try Data([0x50, 0x4B, 0x05, 0x06] + Data(count: 18)).write(to: emptyZip)
 
         let installer = AddonInstaller(paths: JugnuPaths(home: home))
         XCTAssertThrowsError(try installer.installFromLocalZip(url: emptyZip, expectedSHA256: nil, enable: false)) {

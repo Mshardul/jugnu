@@ -1,9 +1,15 @@
 import AppKit
+import JugnuCore
 @testable import JugnuUI
 import SwiftUI
 import XCTest
 
 final class ShellHostFrameTests: XCTestCase {
+    func testGridPresetDefaultsToGridViewType() {
+        XCTAssertEqual(ShellPreset.grid.defaultViewType(compactLauncher: false), .grid)
+        XCTAssertEqual(ShellPreset.grid.defaultViewType(compactLauncher: true), .grid)
+    }
+
     func test_clampedFrame_centersWithinScreen() {
         let screen = NSRect(x: 0, y: 0, width: 1440, height: 900)
         let frame = clampedFrame(size: NSSize(width: 800, height: 560), centeredOn: screen)

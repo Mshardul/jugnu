@@ -51,7 +51,7 @@ final class RecoveryLaunchTests: XCTestCase {
             RecoveryMenuCopy.openConfig,
             RecoveryMenuCopy.disableAddons,
             RecoveryMenuCopy.tryAgain,
-            "Quit Jugnu",
+            "Quit Jugnu"
         ])
         XCTAssertFalse(bar.menuItemTitles.contains("Check for Updates…"))
     }
@@ -67,7 +67,7 @@ final class RecoveryLaunchTests: XCTestCase {
             "Open Palette",
             "Preferences…",
             "Check for Updates…",
-            "Quit Jugnu",
+            "Quit Jugnu"
         ])
     }
 }

@@ -433,45 +433,33 @@
     ]
   },
   {
-    "id": "jugnu.mic-mute",
-    "name": "Mic Mute",
+    "id": "jugnu.audio-toggles",
+    "name": "Audio",
     "version": "1.0.0",
     "api": 1,
-    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.mic-mute-1.0.0.zip",
-    "sha256": "7039aef6b9d7be97cfe3eda054cf505d0d646ae0e508afb3e5ac4b3c9e08a2c4",
-    "summary": "Toggle microphone mute",
+    "url": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
+    "sha256": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
+    "summary": "Mic and mute-all status \u2014 tap to toggle",
     "permissions": [],
     "category": "Focus",
     "tags": [
       "toggle",
       "recommended"
     ],
-    "description": "Mutes or unmutes your input device system-wide with a single command \u2014 faster than fumbling for the mute button in whatever call app you're in.",
+    "description": "Mic and mute-all status in one place \u2014 tap a tile to mute your input, or mute mic and speakers together and restore the volumes you had. Merges the former Mic Mute and Mute All addons.",
     "commands": [
       {
-        "id": "toggle",
+        "id": "audio-toggles",
+        "title": "Audio",
+        "subtitle": "Mic and mute-all status \u2014 tap to toggle"
+      },
+      {
+        "id": "mute-mic",
         "title": "Toggle microphone mute",
         "subtitle": "Mute or unmute input"
-      }
-    ]
-  },
-  {
-    "id": "jugnu.mute-all",
-    "name": "Mute All",
-    "version": "1.0.0",
-    "api": 1,
-    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.mute-all-1.0.0.zip",
-    "sha256": "a3cc9e8fd4eed461ee524ec3be0bc628a8ab542827aa8bfe14f6c2c160dc3eac",
-    "summary": "Mute all",
-    "permissions": [],
-    "category": "Focus",
-    "tags": [
-      "toggle"
-    ],
-    "description": "Mutes the microphone and speakers in one shot, then restores the volumes you had. Built for walking into a meeting or stepping away without hunting two separate toggles.",
-    "commands": [
+      },
       {
-        "id": "toggle",
+        "id": "mute-all",
         "title": "Mute all",
         "subtitle": "Mute mic and speakers, or restore the previous volumes"
       }

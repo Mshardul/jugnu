@@ -1,11 +1,15 @@
 import json
 import os
 import subprocess
+import sys
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-PY = Path(os.environ["JUGNU_HELPER_PYTHON_RUNTIME"]) / "bin" / "python3"
+# production runs via bin/run, which resolves python3 from the installed python-runtime
+# helper; tests exercise the pure-stdlib app directly, so fall back to the ambient interpreter.
+_runtime = os.environ.get("JUGNU_HELPER_PYTHON_RUNTIME")
+PY = Path(_runtime) / "bin" / "python3" if _runtime else Path(sys.executable)
 
 
 def run_cmd(command: str, clipboard: str, args=None):
@@ -36,7 +40,7 @@ class RouterTests(unittest.TestCase):
     def test_json_pretty(self):
         out = run_cmd("json-pretty", '{"a":1}')
         self.assertTrue(out["ok"], out)
-        self.assertIn('\n', out["result"])
+        self.assertIn("\n", out["result"])
         self.assertIn('"a"', out["result"])
 
     def test_invalid_json(self):

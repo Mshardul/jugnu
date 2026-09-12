@@ -131,17 +131,16 @@ Every real addon's `view_types` assignment, decided while auditing the whole app
 | `ui-demo-confirm` | `ask` | Reference confirm pattern |
 | `ui-demo-form` | `fields` | Reference form pattern |
 | `ui-demo-list` | `rows` | Reference list pattern |
-| `mic-mute` | **TBD** | Instant toggle, no content to browse — likely toast-only (no panel), pending a real toast redesign (toast currently has no visual design, only an old AppKit implementation) |
-| `mute-all` | **TBD** | Same as `mic-mute` |
-| `focus-toggle` | **TBD** | Same as `mic-mute` |
+| `audio-toggles` | `grid` | Merged `mic-mute` + `mute-all` per [0074](../tickets.md); live-status tap-to-toggle tiles — first real `grid` consumer, supersedes the earlier toast-only guess for these two addons |
+| `focus-toggle` | **TBD** | Instant toggle, no content to browse — likely toast-only (no panel), pending a real toast redesign (toast currently has no visual design, only an old AppKit implementation) |
 | `open-terminal-here` | **TBD** | Instant action, no content — same toast-only question |
 | `paste-plain` | **TBD** | Instant action, no content — same toast-only question |
 
-**Types with no current real-addon example:** `seek` / `palette` (occupied by the launcher itself, not an addon), `grid` and `spread` (no addon currently needs a gallery or two-pane compare view — left unoccupied, not a gap to fix).
+**Types with no current real-addon example:** `seek` / `palette` (occupied by the launcher itself, not an addon), `spread` (no addon currently needs a two-pane compare view — left unoccupied, not a gap to fix). `grid` now has a real consumer: `audio-toggles` (above).
 
 ## 7.1 Visual design status — most types undesigned, own epic
 
-This section (and §3's ten types) locks **geometry only**. Beyond `seek`/`palette` (viewA) and `canvas` (viewB/detail view/Preferences) — all designed as part of the [launcher + catalog design](./2026-08-25-launcher-catalog-design.md) — no type in this catalog has a real visual mockup. That includes `toast`, whose current AppKit implementation was flagged as visually poor when raised during this audit; five addons (`mic-mute`, `mute-all`, `focus-toggle`, `open-terminal-here`, `paste-plain`) are instant actions with no content to browse and are strong toast-only candidates, but their view-type assignment in §7's table stays **TBD** until toast — and the rest of the undesigned catalog — gets a real design pass.
+This section (and §3's ten types) locks **geometry only**. Beyond `seek`/`palette` (viewA) and `canvas` (viewB/detail view/Preferences) — all designed as part of the [launcher + catalog design](./2026-08-25-launcher-catalog-design.md) — no type in this catalog has a real visual mockup. That includes `toast`, whose current AppKit implementation was flagged as visually poor when raised during this audit; three addons (`focus-toggle`, `open-terminal-here`, `paste-plain`) are instant actions with no content to browse and are strong toast-only candidates, but their view-type assignment in §7's table stays **TBD** until toast — and the rest of the undesigned catalog — gets a real design pass. (`mic-mute`/`mute-all` left this group when they merged into `audio-toggles`, which needed a real panel instead — see §7.)
 
 Tracked as its own epic, not scattered across individual addon/surface docs: [2026-08-26 view types visual design](./2026-08-26-view-types-visual-design.md) (ticket 0052).
 

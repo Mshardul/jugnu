@@ -58,7 +58,9 @@ public struct DependencyPlan: Equatable, Sendable {
         self.installOrder = installOrder
     }
 
-    public var needsDisclosure: Bool { !dependencies.isEmpty }
+    public var needsDisclosure: Bool {
+        !dependencies.isEmpty
+    }
 }
 
 public enum DependencyResolverError: Error, Equatable {
@@ -70,7 +72,7 @@ public enum DependencyResolverError: Error, Equatable {
 }
 
 public enum DependencyResolver {
-    // catalog must include root and every reachable dep id; installed maps id → exact on-disk version
+    /// catalog must include root and every reachable dep id; installed maps id → exact on-disk version
     public static func plan(
         root: DeclaredAddon,
         catalog: [String: DeclaredAddon],
@@ -92,7 +94,9 @@ public enum DependencyResolver {
         var order: [String] = []
 
         func visit(_ id: String) throws {
-            if visited.contains(id) { return }
+            if visited.contains(id) {
+                return
+            }
             if visiting.contains(id) {
                 throw DependencyResolverError.cycle(Array(visiting) + [id])
             }
@@ -132,7 +136,9 @@ public enum DependencyResolver {
 
         // Ensure primary is last among packages we may install.
         var installOrder = order.filter { id in
-            if id == root.id { return true }
+            if id == root.id {
+                return true
+            }
             return installed[id] == nil
         }
         if let idx = installOrder.firstIndex(of: root.id) {
@@ -168,7 +174,7 @@ public enum DependencyResolver {
         )
     }
 
-    // collision key: segment after the last `.`, or the whole id
+    /// collision key: segment after the last `.`, or the whole id
     public static func jobKey(for id: String) -> String {
         if let dot = id.lastIndex(of: ".") {
             return String(id[id.index(after: dot)...])

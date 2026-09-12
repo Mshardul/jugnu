@@ -5,7 +5,7 @@ public enum InstallHostAllowlist {
         "github.com",
         "objects.githubusercontent.com",
         "release-assets.githubusercontent.com",
-        "github-releases.githubusercontent.com",
+        "github-releases.githubusercontent.com"
     ]
 
     public static func isAllowed(_ url: URL) -> Bool {

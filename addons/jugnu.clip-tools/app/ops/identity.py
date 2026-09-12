@@ -19,7 +19,7 @@ def uuid_gen(text: str, args: dict) -> tuple[str, str]:
         # ULID-ish: time-sortable hex without full Crockford alphabet dependency
         # Use uuid7-style timestamp prefix if available (3.12+ has no uuid7 until 3.13)
         # Fallback: timestamp ms + random
-        ms = int(dt.datetime.now(dt.timezone.utc).timestamp() * 1000)
+        ms = int(dt.datetime.now(dt.UTC).timestamp() * 1000)
         return f"{ms:012x}{uuid_mod.uuid4().hex[:20]}", "ULID-like"
     if kind in ("nanoid", "nano"):
         alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-"
@@ -32,7 +32,7 @@ def timestamp(text: str, args: dict) -> tuple[str, str]:
     fmt = args.get("format", "iso")
     if not isinstance(fmt, str):
         raise OpError("format must be a string")
-    now = dt.datetime.now(dt.timezone.utc)
+    now = dt.datetime.now(dt.UTC)
     local = now.astimezone()
     fmt = fmt.lower()
     if fmt in ("unix", "epoch"):

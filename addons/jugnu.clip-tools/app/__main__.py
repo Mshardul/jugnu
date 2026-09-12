@@ -5,7 +5,8 @@ from __future__ import annotations
 import json
 import os
 import sys
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 from clipboard import ClipboardError, read_text, write_text
 from ops import caseops, encode, identity, lines, misc, structured, yamlops

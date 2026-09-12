@@ -1,12 +1,11 @@
-import unittest
-
-from pathlib import Path
 import sys
+import unittest
+from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "app"))
 
-from ops.lines import dedupe_lines, sort_lines  # noqa: E402
 from ops.caseops import case_camel, case_snake  # noqa: E402
+from ops.lines import dedupe_lines, sort_lines  # noqa: E402
 from ops.structured import json_minify, json_path  # noqa: E402
 
 

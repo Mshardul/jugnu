@@ -86,7 +86,9 @@ def test_missing_helper_fails(tmp_path: Path) -> None:
 def test_chime_clears_state(tmp_path: Path) -> None:
     state_dir = tmp_path / "home" / ".local" / "share" / "jugnu" / "state" / "pomodoro"
     state_dir.mkdir(parents=True)
-    (state_dir / "state.json").write_text('{"phase":"work","end_ts":9999999999}\n', encoding="utf-8")
+    (state_dir / "state.json").write_text(
+        '{"phase":"work","end_ts":9999999999}\n', encoding="utf-8"
+    )
     proc, _ = _run(tmp_path, {"api": 1, "op": "run", "command": "chime"})
     assert proc.returncode == 0, proc.stderr
     body = json.loads(proc.stdout)

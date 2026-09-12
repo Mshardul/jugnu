@@ -6,7 +6,7 @@ final class FirstRunSelectionTests: XCTestCase {
         let entries = [
             entry("plain", tags: []),
             entry("star", tags: ["recommended"]),
-            entry("also", tags: ["recommended", "popup-ui"]),
+            entry("also", tags: ["recommended", "popup-ui"])
         ]
         XCTAssertEqual(
             FirstRunSelection.precheckedIDs(entries: entries, fallback: ["plain"]),

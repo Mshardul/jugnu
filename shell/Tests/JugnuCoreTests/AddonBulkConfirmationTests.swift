@@ -16,7 +16,7 @@ final class AddonBulkConfirmationTests: XCTestCase {
             count: 2,
             growthExpand: [
                 (permission: .accessibility, addonNames: ["Window Layouts"]),
-                (permission: .clipboard, addonNames: ["Clip Tools"]),
+                (permission: .clipboard, addonNames: ["Clip Tools"])
             ]
         )
         XCTAssertTrue(ui.message?.contains("2 addons have updates. Update all?") == true)
@@ -36,7 +36,7 @@ final class AddonBulkConfirmationTests: XCTestCase {
                 id: "clip", name: "Clip Tools", version: "2.0.0", api: 1,
                 url: "https://x/c.zip", sha256: "b", summary: "", category: "Tools",
                 permissions: [.clipboard]
-            ),
+            )
         ]
         let expand = AddonBulkPermissions.growthExpand(outdated: outdated) { id in
             id == "layouts" ? [.clipboard] : []

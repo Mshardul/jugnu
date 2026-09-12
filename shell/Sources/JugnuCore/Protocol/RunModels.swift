@@ -6,6 +6,7 @@ public enum UIPattern: String, Codable, Sendable, Equatable {
     case confirm
     case note
     case card
+    case grid
 }
 
 public enum JSONValue: Codable, Sendable, Equatable {
@@ -64,6 +65,31 @@ public struct UIListItem: Codable, Sendable, Equatable {
     }
 }
 
+public struct UIGridItem: Codable, Sendable, Equatable {
+    public var id: String
+    public var title: String
+    public var subtitle: String?
+    public var icon: String
+    public var active: Bool
+    public var actions: [String]?
+
+    public init(
+        id: String,
+        title: String,
+        subtitle: String? = nil,
+        icon: String,
+        active: Bool,
+        actions: [String]? = nil
+    ) {
+        self.id = id
+        self.title = title
+        self.subtitle = subtitle
+        self.icon = icon
+        self.active = active
+        self.actions = actions
+    }
+}
+
 public struct UIFormField: Codable, Sendable, Equatable {
     public var id: String
     public var label: String
@@ -84,6 +110,7 @@ public struct UIDescriptor: Codable, Sendable, Equatable {
     public var placeholder: String?
     public var message: String?
     public var items: [UIListItem]?
+    public var gridItems: [UIGridItem]?
     public var fields: [UIFormField]?
     public var confirmLabel: String?
     public var cancelLabel: String?
@@ -98,6 +125,7 @@ public struct UIDescriptor: Codable, Sendable, Equatable {
         placeholder: String? = nil,
         message: String? = nil,
         items: [UIListItem]? = nil,
+        gridItems: [UIGridItem]? = nil,
         fields: [UIFormField]? = nil,
         confirmLabel: String? = nil,
         cancelLabel: String? = nil,
@@ -111,6 +139,7 @@ public struct UIDescriptor: Codable, Sendable, Equatable {
         self.placeholder = placeholder
         self.message = message
         self.items = items
+        self.gridItems = gridItems
         self.fields = fields
         self.confirmLabel = confirmLabel
         self.cancelLabel = cancelLabel

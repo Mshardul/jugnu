@@ -1,10 +1,10 @@
-import XCTest
 @testable import JugnuCore
+import XCTest
 
 final class NamespaceMigratorTests: XCTestCase {
-    private var home: URL!
-    private var paths: JugnuPaths!
-    private var store: ConfigStore!
+    private var home = FileManager.default.temporaryDirectory
+    private var paths = JugnuPaths(home: FileManager.default.temporaryDirectory)
+    private var store = ConfigStore(paths: JugnuPaths(home: FileManager.default.temporaryDirectory))
 
     override func setUpWithError() throws {
         home = FileManager.default.temporaryDirectory.appendingPathComponent("ns-mig-\(UUID().uuidString)")
@@ -36,7 +36,8 @@ final class NamespaceMigratorTests: XCTestCase {
         // Migrate only first id to simulate mid-pass crash.
         try NamespaceMigrator.migrateOne(job: "mic-mute", paths: paths, store: store, stateStore: stateStore)
         XCTAssertFalse(FileManager.default.fileExists(atPath: paths.addonsDir.appendingPathComponent("mic-mute").path))
-        XCTAssertTrue(FileManager.default.fileExists(atPath: paths.addonsDir.appendingPathComponent("jugnu.mic-mute").path))
+        XCTAssertTrue(FileManager.default
+            .fileExists(atPath: paths.addonsDir.appendingPathComponent("jugnu.mic-mute").path))
         XCTAssertTrue(FileManager.default.fileExists(atPath: paths.addonsDir.appendingPathComponent("ports").path))
 
         let mid = try NamespaceMigrator.migrateInstalledTree(paths: paths, store: store, stateStore: stateStore)

@@ -29,8 +29,12 @@ public enum AppUpdate {
         let parts = minMacOS.split(separator: ".").compactMap { Int($0) }
         let reqMajor = parts.first ?? 0
         let reqMinor = parts.count > 1 ? parts[1] : 0
-        if osMajor < reqMajor { return true }
-        if osMajor > reqMajor { return false }
+        if osMajor < reqMajor {
+            return true
+        }
+        if osMajor > reqMajor {
+            return false
+        }
         return osMinor < reqMinor
     }
 }

@@ -1,0 +1,26 @@
+#!/bin/bash
+set -euo pipefail
+cat >/dev/null
+
+state_dir="${JUGNU_STATE_DIR:-$HOME/.local/share/jugnu/state/audio-toggles}"
+state_file="$state_dir/volumes"
+osa="${OSASCRIPT:-osascript}"
+
+mic_vol=$("$osa" -e 'input volume of (get volume settings)' 2>/dev/null) || {
+  echo '{"ok":false,"error":"Could not read microphone state"}'
+  exit 0
+}
+mic_vol=$(printf '%s' "$mic_vol" | tr -d '[:space:]')
+
+mic_active=false
+[[ "$mic_vol" == "0" ]] && mic_active=true
+
+all_active=false
+[[ -f "$state_file" ]] && all_active=true
+
+cat <<JSON
+{"ok":true,"ui":{"pattern":"grid","title":"Audio","gridItems":[
+{"id":"mic","title":"Microphone","icon":"mic.fill","active":${mic_active},"actions":["mute-mic"]},
+{"id":"all","title":"Mute All","icon":"speaker.slash.fill","active":${all_active},"actions":["mute-all"]}
+]}}
+JSON

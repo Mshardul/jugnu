@@ -72,7 +72,10 @@ public struct RegistryEntry: Codable, Equatable, Sendable {
             permissions = try PermissionsSet.parse(c.decodeIfPresent([String].self, forKey: .permissions) ?? [])
         } catch is PermissionsParseError {
             throw DecodingError.dataCorrupted(
-                DecodingError.Context(codingPath: c.codingPath + [CodingKeys.permissions], debugDescription: "unknown permission")
+                DecodingError.Context(
+                    codingPath: c.codingPath + [CodingKeys.permissions],
+                    debugDescription: "unknown permission"
+                )
             )
         }
     }

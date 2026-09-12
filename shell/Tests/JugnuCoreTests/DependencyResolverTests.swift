@@ -1,5 +1,5 @@
-import XCTest
 @testable import JugnuCore
+import XCTest
 
 final class DependencyResolverTests: XCTestCase {
     func testTopoOrderDepsBeforePrimary() throws {
@@ -47,7 +47,7 @@ final class DependencyResolverTests: XCTestCase {
                 installed: ["dep": "1.1.0"]
             )
         ) {
-            guard case DependencyResolverError.versionMismatch(let id, let req, let have) = $0 else {
+            guard case let DependencyResolverError.versionMismatch(id, req, have) = $0 else {
                 return XCTFail("\(String(describing: $0))")
             }
             XCTAssertEqual(id, "dep")
@@ -64,7 +64,7 @@ final class DependencyResolverTests: XCTestCase {
         XCTAssertThrowsError(
             try DependencyResolver.plan(root: root, catalog: ["root": root], installed: [:])
         ) {
-            guard case DependencyResolverError.unknown(let id) = $0 else {
+            guard case let DependencyResolverError.unknown(id) = $0 else {
                 return XCTFail("\(String(describing: $0))")
             }
             XCTAssertEqual(id, "missing")

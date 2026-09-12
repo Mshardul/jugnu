@@ -77,7 +77,7 @@ final class AddonReaperTests: XCTestCase {
         reaper.reap(mode: .normal)
         let deadline = Date().addingTimeInterval(2)
         while inv.process.isRunning, Date() < deadline {
-            usleep(20_000)
+            usleep(20000)
         }
         XCTAssertFalse(inv.process.isRunning)
         XCTAssertFalse(
@@ -136,7 +136,7 @@ final class AddonReaperTests: XCTestCase {
         reaper.reap(mode: .normal)
         let deadline = Date().addingTimeInterval(2)
         while inv.process.isRunning, Date() < deadline {
-            usleep(20_000)
+            usleep(20000)
         }
         XCTAssertFalse(inv.process.isRunning)
     }
@@ -197,7 +197,7 @@ final class AddonReaperTests: XCTestCase {
         AddonReaper(paths: paths, probe: probe, killGraceMs: 0).reap(mode: .degraded)
         let deadline = Date().addingTimeInterval(2)
         while inv.process.isRunning, Date() < deadline {
-            usleep(20_000)
+            usleep(20000)
         }
         XCTAssertFalse(inv.process.isRunning)
     }

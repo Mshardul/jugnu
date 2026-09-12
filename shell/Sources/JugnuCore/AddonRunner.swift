@@ -27,13 +27,13 @@ public struct AddonRunner: Sendable {
         timeout: TimeInterval? = nil,
         paths: JugnuPaths? = nil
     ) throws -> RunResponse {
-        let request = RunRequest(
+        let request = try RunRequest(
             api: 1,
             op: "run",
             command: commandId,
             args: args,
             context: context,
-            config: try Self.resolveConfig(manifest: manifest, paths: paths)
+            config: Self.resolveConfig(manifest: manifest, paths: paths)
         )
         var extra = try Self.helperEnvironment(manifest: manifest, paths: paths)
         if let paths {
@@ -85,13 +85,13 @@ public struct AddonRunner: Sendable {
         markerDir: URL,
         paths: JugnuPaths? = nil
     ) throws -> RunningInvocation {
-        let request = RunRequest(
+        let request = try RunRequest(
             api: 1,
             op: "run",
             command: commandId,
             args: args,
             context: context,
-            config: try Self.resolveConfig(manifest: manifest, paths: paths)
+            config: Self.resolveConfig(manifest: manifest, paths: paths)
         )
         var extra = try Self.helperEnvironment(manifest: manifest, paths: paths)
         if let paths {

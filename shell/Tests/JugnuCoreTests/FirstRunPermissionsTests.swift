@@ -6,7 +6,7 @@ final class FirstRunPermissionsTests: XCTestCase {
         let entries = [
             entry(id: "a", name: "Clip", permissions: [.clipboard]),
             entry(id: "b", name: "Weather", permissions: [.network]),
-            entry(id: "c", name: "Layouts", permissions: [.accessibility, .clipboard]),
+            entry(id: "c", name: "Layouts", permissions: [.accessibility, .clipboard])
         ]
         let expand = FirstRunPermissions.expand(entries: entries, selectedIDs: ["a", "c"])
         XCTAssertEqual(expand.map(\.permission), [.accessibility, .clipboard])

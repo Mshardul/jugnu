@@ -60,7 +60,7 @@ Companion: [catalog-commands.md](catalog-commands.md). Product rule: every job m
 
 ### Toast-only candidates (view TBD)
 
-No browseable content — product pass on toast visual still open ([0052](tickets.md)).
+No browsable content — product pass on toast visual still open ([0052](tickets.md)).
 
 | Title | Addon | Opens from | View | Status |
 |---|---|---|---|---|

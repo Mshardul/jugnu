@@ -12,7 +12,7 @@ final class PackageGatesTests: XCTestCase {
         XCTAssertNoThrow(try PackageGates.checkMinShellVersion(required: nil, running: "0.1.0"))
         XCTAssertNoThrow(try PackageGates.checkMinShellVersion(required: "0.1.0", running: "0.1.0"))
         XCTAssertThrowsError(try PackageGates.checkMinShellVersion(required: "0.2.0", running: "0.1.0")) {
-            guard case AddonInstallerError.shellTooOld(let required, let running) = $0 else {
+            guard case let AddonInstallerError.shellTooOld(required, running) = $0 else {
                 return XCTFail("got \($0)")
             }
             XCTAssertEqual(required, "0.2.0")

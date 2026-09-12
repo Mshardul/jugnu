@@ -1,7 +1,7 @@
 import Foundation
 
 public enum ShellVersion {
-    // CFBundleShortVersionString, or 0.1.0 in tests/CLI where there's no bundle
+    /// CFBundleShortVersionString, or 0.1.0 in tests/CLI where there's no bundle
     public static var current: String {
         if let v = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String, !v.isEmpty {
             return v
@@ -62,7 +62,9 @@ public enum PackageGates {
 
     public static func validateAddonId(_ id: String) throws {
         let trimmed = id.trimmingCharacters(in: .whitespacesAndNewlines)
-        if trimmed.isEmpty { throw ManifestLoaderError.emptyId }
+        if trimmed.isEmpty {
+            throw ManifestLoaderError.emptyId
+        }
         if trimmed.hasPrefix(".") || trimmed == ".staging" || trimmed == ".trash" {
             throw ManifestLoaderError.reservedId(trimmed)
         }
@@ -71,7 +73,7 @@ public enum PackageGates {
         let bare = #"^[a-z0-9][a-z0-9-]*$"#
         let ok =
             trimmed.range(of: namespaced, options: .regularExpression) != nil
-            || trimmed.range(of: bare, options: .regularExpression) != nil
+                || trimmed.range(of: bare, options: .regularExpression) != nil
         guard ok else {
             throw ManifestLoaderError.invalidId(trimmed)
         }
@@ -79,7 +81,9 @@ public enum PackageGates {
 
     public static func validateNamespacedAddonId(_ id: String) throws {
         let trimmed = id.trimmingCharacters(in: .whitespacesAndNewlines)
-        if trimmed.isEmpty { throw ManifestLoaderError.emptyId }
+        if trimmed.isEmpty {
+            throw ManifestLoaderError.emptyId
+        }
         let namespaced = #"^[a-z0-9]+\.[a-z0-9][a-z0-9-]*$"#
         guard trimmed.range(of: namespaced, options: .regularExpression) != nil else {
             throw ManifestLoaderError.invalidId(trimmed)
@@ -89,9 +93,15 @@ public enum PackageGates {
     public static func compareSemVer(_ lhs: String, _ rhs: String) -> ComparisonResult {
         let a = parseSemVer(lhs)
         let b = parseSemVer(rhs)
-        if a.0 != b.0 { return a.0 < b.0 ? .orderedAscending : .orderedDescending }
-        if a.1 != b.1 { return a.1 < b.1 ? .orderedAscending : .orderedDescending }
-        if a.2 != b.2 { return a.2 < b.2 ? .orderedAscending : .orderedDescending }
+        if a.0 != b.0 {
+            return a.0 < b.0 ? .orderedAscending : .orderedDescending
+        }
+        if a.1 != b.1 {
+            return a.1 < b.1 ? .orderedAscending : .orderedDescending
+        }
+        if a.2 != b.2 {
+            return a.2 < b.2 ? .orderedAscending : .orderedDescending
+        }
         return .orderedSame
     }
 
@@ -101,6 +111,6 @@ public enum PackageGates {
 
     private static func parseSemVer(_ value: String) -> (Int, Int, Int) {
         let parts = value.split(separator: ".").map { Int($0) ?? 0 }
-        return (parts.count > 0 ? parts[0] : 0, parts.count > 1 ? parts[1] : 0, parts.count > 2 ? parts[2] : 0)
+        return (parts.isEmpty ? 0 : parts[0], parts.count > 1 ? parts[1] : 0, parts.count > 2 ? parts[2] : 0)
     }
 }

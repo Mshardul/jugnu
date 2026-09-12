@@ -2,7 +2,7 @@
 set -euo pipefail
 cat >/dev/null
 
-state_dir="${JUGNU_STATE_DIR:-$HOME/.local/share/jugnu/state/mute-all}"
+state_dir="${JUGNU_STATE_DIR:-$HOME/.local/share/jugnu/state/audio-toggles}"
 state_file="$state_dir/volumes"
 
 is_volume() {

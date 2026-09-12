@@ -6,7 +6,7 @@ import csv
 import io
 import json
 import re
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as ET  # nosemgrep
 from typing import Any
 
 from .lines import OpError
@@ -40,7 +40,8 @@ def csv_pretty(text: str, _args: dict) -> tuple[str, str]:
 
 
 def _parse_xml(text: str) -> ET.Element:
-    # Clipboard may be hostile; refuse DTD/ENTITY expansion vectors.
+    # Clipboard may be hostile; refuse DTD/ENTITY expansion vectors. Belt-and-suspenders on top
+    # of expat itself already refusing to resolve external entities (unlike lxml/minidom).
     upper = text[:2000].upper()
     if "<!DOCTYPE" in upper or "<!ENTITY" in upper:
         raise OpError("XML with DOCTYPE/ENTITY is not supported")

@@ -75,6 +75,13 @@ final class ViewTypeTests: XCTestCase {
         XCTAssertNil(try ViewType.resolve(pattern: .note, requested: nil, allowed: ViewType.shellDefaults))
     }
 
+    func testResolveUsesGridDefaultWhenRequestOmitted() throws {
+        XCTAssertEqual(
+            try ViewType.resolve(pattern: .grid, requested: nil, allowed: [.grid]),
+            .grid
+        )
+    }
+
     func testCardResolvesNilViewType() throws {
         XCTAssertNil(try ViewType.resolve(pattern: .card, requested: nil, allowed: ViewType.shellDefaults))
     }

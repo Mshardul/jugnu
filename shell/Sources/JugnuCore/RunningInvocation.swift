@@ -144,7 +144,7 @@ public final class RunningInvocation: @unchecked Sendable {
                 killImmediately()
                 throw AddonRunnerError.jobUnresponsive
             }
-            usleep(20_000)
+            usleep(20000)
         }
     }
 

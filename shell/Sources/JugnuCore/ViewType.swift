@@ -109,6 +109,7 @@ public extension UIPattern {
         case .list: .rows
         case .form: .fields
         case .confirm: .ask
+        case .grid: .grid
         case .note, .card: nil
         }
     }

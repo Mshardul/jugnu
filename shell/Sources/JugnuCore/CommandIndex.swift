@@ -72,7 +72,9 @@ public struct CommandIndex: Sendable {
         }
 
         for (id, root) in rootsById {
-            if id.hasPrefix(".") { continue }
+            if id.hasPrefix(".") {
+                continue
+            }
             guard config.addons[id]?.enabled == true else { continue }
             let manifest = try ManifestLoader.load(from: root)
             guard PackageGates.isRunnable(

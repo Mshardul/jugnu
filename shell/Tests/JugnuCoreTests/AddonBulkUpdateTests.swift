@@ -12,7 +12,7 @@ final class AddonBulkUpdateTests: XCTestCase {
         let catalog = [
             entry("keep", version: "1.0.0"),
             entry("old", version: "1.1.0"),
-            entry("also-old", version: "3.0.0"),
+            entry("also-old", version: "3.0.0")
         ]
         let installed = ["keep": "1.0.0", "old": "1.0.0", "also-old": "2.0.0"]
         XCTAssertEqual(
@@ -24,7 +24,7 @@ final class AddonBulkUpdateTests: XCTestCase {
     func testMixedAndUninstalledAreSkipped() {
         let catalog = [
             entry("fresh", version: "1.0.0"),
-            entry("stale", version: "2.0.0"),
+            entry("stale", version: "2.0.0")
         ]
         let installed = ["stale": "1.0.0"]
         XCTAssertEqual(
@@ -37,12 +37,12 @@ final class AddonBulkUpdateTests: XCTestCase {
         let catalog = [
             entry("bad-installed", version: "1.0.1"),
             entry("bad-registry", version: "not-semver"),
-            entry("ok", version: "1.0.1"),
+            entry("ok", version: "1.0.1")
         ]
         let installed = [
             "bad-installed": "nope",
             "bad-registry": "1.0.0",
-            "ok": "1.0.0",
+            "ok": "1.0.0"
         ]
         XCTAssertEqual(
             AddonBulkUpdate.outdated(installed: installed, catalog: catalog).map(\.id),

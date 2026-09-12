@@ -1,0 +1,12 @@
+#!/bin/bash
+set -euo pipefail
+request=$(cat)
+root="$(cd "$(dirname "$0")" && pwd)"
+command=$(printf '%s' "$request" | grep -o '"command"[[:space:]]*:[[:space:]]*"[^"]*"' | sed -E 's/^"command"[[:space:]]*:[[:space:]]*"([^"]*)"$/\1/')
+
+case "$command" in
+  audio-toggles) printf '%s' "$request" | exec "$root/audio-toggles-status" ;;
+  mute-mic)      printf '%s' "$request" | exec "$root/mute-mic" ;;
+  mute-all)      printf '%s' "$request" | exec "$root/mute-all" ;;
+  *) echo '{"ok":false,"error":"Unknown command"}'; exit 0 ;;
+esac

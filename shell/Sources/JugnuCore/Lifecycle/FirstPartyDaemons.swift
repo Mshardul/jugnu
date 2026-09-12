@@ -1,7 +1,7 @@
 import Foundation
 
 public enum FirstPartyDaemons {
-    // Keep in sync with scripts/validate-addon.sh FIRST_PARTY_DAEMON_IDS.
+    /// Keep in sync with scripts/validate-addon.sh FIRST_PARTY_DAEMON_IDS.
     public static let ids: Set<String> = ["jugnu.keep-awake", "jugnu.clipboard-history"]
 
     public static func launchdLabel(addonID: String, commandID: String) -> String {

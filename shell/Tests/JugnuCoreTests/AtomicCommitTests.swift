@@ -23,7 +23,10 @@ final class AtomicCommitTests: XCTestCase {
         try "v2".write(to: staging2.appendingPathComponent("marker"), atomically: true, encoding: .utf8)
         try AtomicCommit.promote(staging: staging2, live: live, trashParent: trashParent)
         XCTAssertEqual(try String(contentsOf: live.appendingPathComponent("marker")), "v2")
-        let trashChildren = try FileManager.default.contentsOfDirectory(at: trashParent, includingPropertiesForKeys: nil)
+        let trashChildren = try FileManager.default.contentsOfDirectory(
+            at: trashParent,
+            includingPropertiesForKeys: nil
+        )
         XCTAssertTrue(trashChildren.isEmpty, "successful promote should remove trash entry")
     }
 

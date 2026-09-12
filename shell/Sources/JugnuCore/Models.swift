@@ -246,7 +246,7 @@ public struct ShellConfig: Codable, Equatable, Sendable {
     }
 
     public static let recommendedAddonIDs = [
-        "jugnu.mic-mute", "jugnu.focus-toggle", "jugnu.paste-plain", "jugnu.floating-note", "jugnu.ports"
+        "jugnu.audio-toggles", "jugnu.focus-toggle", "jugnu.paste-plain", "jugnu.floating-note", "jugnu.ports"
     ]
 
     public init(
@@ -505,7 +505,8 @@ public struct AddonManifest: Codable, Equatable, Sendable {
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, name, version, api, commands, entrypoint, cleanup, helpers, dependencies, permissions, config, lifecycle
+        case id, name, version, api, commands, entrypoint, cleanup, helpers, dependencies, permissions, config,
+             lifecycle
         case viewTypes = "view_types"
         case minShellVersion
         case minShellVersionSnake = "min_shell_version"
@@ -537,7 +538,7 @@ public struct AddonManifest: Codable, Equatable, Sendable {
         lifecycle = try LifecycleClass.decodeManifestValue(c.decodeIfPresent(String.self, forKey: .lifecycle))
         minShellVersion =
             try c.decodeIfPresent(String.self, forKey: .minShellVersion)
-            ?? c.decodeIfPresent(String.self, forKey: .minShellVersionSnake)
+                ?? c.decodeIfPresent(String.self, forKey: .minShellVersionSnake)
         primary = try c.decodeIfPresent(String.self, forKey: .primary)
         let raw = try c.decodeIfPresent([String].self, forKey: .viewTypes) ?? []
         viewTypes = try raw.map { token in

@@ -50,7 +50,7 @@ public enum AddonConfigResolver {
         }
     }
 
-    // missing file falls back to schema defaults; empty schema yields [:]
+    /// missing file falls back to schema defaults; empty schema yields [:]
     public static func resolve(schema: [AddonConfigField], fileURL: URL) throws -> [String: JSONValue] {
         try validateSchema(schema)
         guard !schema.isEmpty else { return [:] }
@@ -93,18 +93,17 @@ public enum AddonConfigResolver {
     }
 
     public static func fileYAML(schema: [AddonConfigField], values: [String: JSONValue]) -> String {
-        var lines: [String] = ["# Generated defaults — edit values, keep keys."]
+        var lines = ["# Generated defaults — edit values, keep keys."]
         for field in schema {
-            let comment: String
-            switch field.type {
+            let comment = switch field.type {
             case .enum:
-                comment = " # enum: \((field.values ?? []).joined(separator: "|"))"
+                " # enum: \((field.values ?? []).joined(separator: "|"))"
             case .int:
-                comment = " # int"
+                " # int"
             case .bool:
-                comment = " # bool"
+                " # bool"
             case .string:
-                comment = " # string"
+                " # string"
             }
             let value = values[field.key] ?? field.default
             lines.append("\(field.key): \(yamlScalar(value))\(comment)")
@@ -120,14 +119,14 @@ public enum AddonConfigResolver {
 
     public static func reason(for error: AddonConfigError) -> String {
         switch error {
-        case .invalidSchema(let reason):
-            return reason
+        case let .invalidSchema(reason):
+            reason
         case .syntaxError:
-            return "YAML syntax error"
-        case .unknownKey(let key):
-            return "unknown key \(key)"
-        case .invalidValue(let key, let reason):
-            return "\(key): \(reason)"
+            "YAML syntax error"
+        case let .unknownKey(key):
+            "unknown key \(key)"
+        case let .invalidValue(key, reason):
+            "\(key): \(reason)"
         }
     }
 
@@ -160,8 +159,12 @@ public enum AddonConfigResolver {
             }
             return .string(s)
         case .int:
-            if let i = raw as? Int { return .number(Double(i)) }
-            if let i64 = raw as? Int64 { return .number(Double(i64)) }
+            if let i = raw as? Int {
+                return .number(Double(i))
+            }
+            if let i64 = raw as? Int64 {
+                return .number(Double(i64))
+            }
             throw AddonConfigError.invalidValue(key: field.key, reason: "expected int")
         case .bool:
             guard let b = raw as? Bool else {
@@ -184,7 +187,9 @@ public enum AddonConfigResolver {
             }
             return s
         case let .number(n):
-            if n.rounded() == n { return String(Int(n)) }
+            if n.rounded() == n {
+                return String(Int(n))
+            }
             return String(n)
         case let .bool(b):
             return b ? "true" : "false"
