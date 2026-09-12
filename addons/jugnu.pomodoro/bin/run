@@ -74,7 +74,11 @@ start_phase() {
   local now end_ts fire_at file_esc
   now=$(date +%s)
   end_ts=$((now + duration))
-  fire_at=$(date -u -v+"${duration}S" '+%Y-%m-%dT%H:%M:%SZ')
+  if fire_at=$(date -u -r "$end_ts" '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null); then
+    :
+  else
+    fire_at=$(date -u -d "@${end_ts}" '+%Y-%m-%dT%H:%M:%SZ')
+  fi
   cancel_timer
   file_esc=$(json_escape "$CLOCK_FILE")
   if ! clock_run "{\"op\":\"upsert\",\"file\":\"${file_esc}\",\"timer\":{\"id\":\"${TIMER_ID}\",\"kind\":\"one-shot\",\"fire_at\":\"${fire_at}\",\"enabled\":true,\"paused\":false,\"next_fire\":\"${fire_at}\",\"group\":\"pomodoro\",\"target\":{\"addon\":\"pomodoro\",\"command\":\"chime\"}}}"; then
