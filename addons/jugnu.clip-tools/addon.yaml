@@ -1,6 +1,6 @@
 id: jugnu.clip-tools
 name: Clip Tools
-version: 1.0.0
+version: 1.1.0
 api: 1
 permissions:
   - clipboard
@@ -204,6 +204,10 @@ commands:
     title: Clear clipboard
     subtitle: Wipe the general pasteboard
     keywords: [clear, clipboard]
+  - id: paste-plain
+    title: Paste as plain text
+    subtitle: Strip rich text from the clipboard
+    keywords: [paste, plain, clipboard]
 entrypoint:
   kind: exec
   path: bin/run

@@ -36,7 +36,7 @@ Not yet staged as leaves. Candidates after shell MVP:
 5. Claude/agent mission control (lite)
 6. ~~Dev-server / common-ports bar~~ done → `addons/ports`
 7. Screenshot inbox
-8. ~~Paste plain / strip formatting~~ done → `addons/paste-plain`; merges into **clip-tools** per [0074](tickets.md) — not yet built
+8. ~~Paste plain / strip formatting~~ done → merged into **clip-tools** (`paste-plain` command) per [0074](tickets.md)
 9. Kill hung app picker
 10. Disk pressure bar
 
@@ -66,7 +66,7 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | Appearance | **hot-corners** | show / open Hot Corners | Thin Settings surface; possible merge with login-items/settings-jump deferred — see [0074](tickets.md) |
 | Appearance | **finder-toggles** | **hidden-files**, **path-bar**, **status-bar**, **restart-finder** (+ tab bar / other Finder chrome) | Merges with **desktop-toggles** into one Finder/Desktop chrome addon per [0074](tickets.md) — not yet built |
 | Appearance | **resolution-preset** | named resolution / HiDPI presets | Own display job |
-| Clipboard | **clip-tools** (`addons/clip-tools`) | slugify, json/csv/yaml/xml-pretty, base64, url-encode/decode, jwt-decode, timestamp, text-stats, uuid, md-link, clip-clear, **case**, **sort-lines**, **dedupe-lines**, **lorem**, **regex-replace**, **hash**, **tabs-spaces**, **invisible-chars**, **markdown-table**, **reverse-lines**, **extract-emails**, **json-path**, **csv-json** (+ yaml↔json, xml→json), **unicode-name**, **iso-week**, line trim/join/split/number, escape/unescape | Phase 1 **shipped** (palette commands). Transform panel = Phase 2. Declares `python-runtime` helper. **paste-plain** merges in per [0074](tickets.md) — not yet built. See [catalog-commands](catalog-commands.md) / [catalog-ui](catalog-ui.md). |
+| Clipboard | **clip-tools** (`addons/clip-tools`) | slugify, json/csv/yaml/xml-pretty, base64, url-encode/decode, jwt-decode, timestamp, text-stats, uuid, md-link, clip-clear, **case**, **sort-lines**, **dedupe-lines**, **lorem**, **regex-replace**, **hash**, **tabs-spaces**, **invisible-chars**, **markdown-table**, **reverse-lines**, **extract-emails**, **json-path**, **csv-json** (+ yaml↔json, xml→json), **unicode-name**, **iso-week**, line trim/join/split/number, escape/unescape | Phase 1 **shipped** (palette commands). Transform panel = Phase 2. Declares `python-runtime` helper. **paste-plain** merged in per [0074](tickets.md). See [catalog-commands](catalog-commands.md) / [catalog-ui](catalog-ui.md). |
 | Clipboard | **clipboard-guard** | detect likely secrets / warn before history storage / clear or redact clipboard | Privacy utility for clipboard workflows; detection is heuristic |
 | Clipboard | **diff** | diff-clip | Heavier than one-shot transforms — own addon unless kept tiny on clip-tools |
 | Files | **paths** | path-copy, reveal-path, **count-files**, **folder-size** | Path/Finder folder jobs |

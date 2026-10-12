@@ -4,11 +4,11 @@ shell:
   hotkey: "option+space"
 
 addons:
-  mic-mute:
+  audio-toggles:
     enabled: true
   focus-toggle:
     enabled: true
-  paste-plain:
+  clip-tools:
     enabled: false
 
 ui: {}

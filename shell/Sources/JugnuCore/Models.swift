@@ -246,7 +246,7 @@ public struct ShellConfig: Codable, Equatable, Sendable {
     }
 
     public static let recommendedAddonIDs = [
-        "jugnu.audio-toggles", "jugnu.focus-toggle", "jugnu.paste-plain", "jugnu.floating-note", "jugnu.ports"
+        "jugnu.audio-toggles", "jugnu.focus-toggle", "jugnu.clip-tools", "jugnu.floating-note", "jugnu.ports"
     ]
 
     public init(

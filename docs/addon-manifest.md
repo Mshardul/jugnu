@@ -3,12 +3,12 @@
 Every published addon must include `addon.yaml` at the root of its package. The manifest is the shell's trusted description of the addon; it must not contain paths or commands that escape the addon directory.
 
 ```yaml
-id: jugnu.mic-mute
-name: Mic Mute
+id: jugnu.audio-toggles
+name: Audio
 version: 1.0.0
 api: 1
 commands:
-  - id: toggle
+  - id: mute-mic
     title: Toggle microphone mute
     subtitle: Mute or unmute input
     keywords: [mic, mute, audio]
@@ -26,7 +26,7 @@ cleanup:
 - `name`: user-facing addon name.
 - `version`: three-part Semantic Version.
 - `api`: protocol major version; published addons currently use `1`.
-- `commands`: one or more command descriptors with stable ids and user-facing titles.
+- `commands`: one or more command descriptors with stable ids and user-facing titles. Command id naming: name the job (`mute-all`, `audio-toggles`, `dns-flush`), never a bare `open`/`toggle`/`status`/`run` — those are ambiguous once more than one command or addon needs the same word, and block exact-alias addressing ([0077](tickets.md)). Multi-command addons prefix or distinguish by job, not by verb (`jugnu.audio-toggles`'s `mute-mic` / `mute-all`, not `toggle` / `toggle-all`). An id doubling as an alias candidate should stand alone without addon context.
 - `entrypoint.kind`: `exec`, `jxa`, or `osascript`.
 - `entrypoint.path`: relative path to the entrypoint; absolute paths and parent traversal are forbidden.
 - `cleanup`: declared addon-owned paths and launchd labels to remove on disable or uninstall.

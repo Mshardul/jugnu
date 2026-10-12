@@ -161,3 +161,7 @@ def md_link(text: str, args: dict) -> tuple[str, str]:
 
 def clip_clear(_text: str, _args: dict) -> tuple[str, str]:
     return "", "Clipboard cleared"
+
+
+def paste_plain(text: str, _args: dict) -> tuple[str, str]:
+    return text, "Clipboard is plain text"

@@ -64,11 +64,11 @@ No browsable content — product pass on toast visual still open ([0052](tickets
 
 | Title | Addon | Opens from | View | Status |
 |---|---|---|---|---|
-| Mic mute result | `mic-mute` | `toggle` | toast (TBD) | shipped behavior / undesigned chrome |
-| Mute all result | `mute-all` | `toggle` | toast (TBD) | same |
+| Mic mute result | `audio-toggles` | `mute-mic` | toast (TBD) | shipped behavior / undesigned chrome |
+| Mute all result | `audio-toggles` | `mute-all` | toast (TBD) | same |
 | Focus toggle result | `focus-toggle` | `toggle` | toast (TBD) | same |
 | Open terminal | `open-terminal-here` | `open` | toast (TBD) | same |
-| Paste plain result | `paste-plain` | `paste` | toast (TBD) | same |
+| Paste plain result | `clip-tools` | `paste-plain` | toast (TBD) | same |
 
 ---
 
@@ -84,7 +84,7 @@ No browsable content — product pass on toast visual still open ([0052](tickets
 | **View** | `canvas` |
 | **Status** | draft (Phase 2) — Phase 1 ships palette one-shots only (`addons/clip-tools`) |
 | **Scope** | Paste or edit blob → type dropdown **or auto-detect** (JSON / CSV / YAML / XML / plain) → actions: Format, Minify, Convert (to sibling type), Copy, Replace clipboard. Line tools and case can appear as secondary actions or stay palette-only in v0. |
-| **Not in this UI** | PDF, images, QR, calculators, paste-plain (own toast addon) |
+| **Not in this UI** | PDF, images, QR, calculators, paste-plain (own toast command on `clip-tools`) |
 
 ### Diff
 

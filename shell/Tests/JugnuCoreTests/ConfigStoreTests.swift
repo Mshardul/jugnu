@@ -111,8 +111,8 @@ final class ConfigStoreTests: XCTestCase {
         let loaded = try ConfigStore(paths: paths).load()
         XCTAssertEqual(loaded.version, 1)
         XCTAssertEqual(loaded.shell.hotkey, "option+space")
-        XCTAssertEqual(loaded.addons["mic-mute"]?.enabled, true)
-        XCTAssertEqual(loaded.addons["paste-plain"]?.enabled, false)
+        XCTAssertEqual(loaded.addons["audio-toggles"]?.enabled, true)
+        XCTAssertEqual(loaded.addons["clip-tools"]?.enabled, false)
     }
 
     func testInspectSyntaxErrorDoesNotParse() throws {

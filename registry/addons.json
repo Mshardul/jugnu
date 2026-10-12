@@ -52,10 +52,10 @@
   {
     "id": "jugnu.clip-tools",
     "name": "Clip Tools",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "api": 1,
-    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.clip-tools-1.0.0.zip",
-    "sha256": "dbbb9dcd2cbc5469a1507c00e83fbfabc01ddd1016752dd8c17e37b1906a8f99",
+    "url": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
+    "sha256": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
     "summary": "Text stats",
     "permissions": [
       "clipboard"
@@ -65,7 +65,7 @@
       "quick-glance",
       "dev-tool"
     ],
-    "description": "Forty-nine palette commands for clipboard text: pretty-print and convert JSON/CSV/YAML/XML, encode/decode, case and line tools, hashes, slugs, and more. Uses the shared python-runtime helper so nothing requires a system Python install. Phase 1 is commands only; a Transform panel comes later.",
+    "description": "Fifty palette commands for clipboard text: pretty-print and convert JSON/CSV/YAML/XML, encode/decode, case and line tools, hashes, slugs, paste-as-plain, and more. Uses the shared python-runtime helper so nothing requires a system Python install. Phase 1 is commands only; a Transform panel comes later. Absorbs the former Paste Plain addon.",
     "commands": [
       {
         "id": "text-stats",
@@ -311,6 +311,11 @@
         "id": "clip-clear",
         "title": "Clear clipboard",
         "subtitle": "Wipe the general pasteboard"
+      },
+      {
+        "id": "paste-plain",
+        "title": "Paste as plain text",
+        "subtitle": "Strip rich text from the clipboard"
       }
     ]
   },
@@ -539,31 +544,6 @@
         "id": "open",
         "title": "Open Terminal here",
         "subtitle": "Open the last-picked terminal in the front Finder folder"
-      }
-    ]
-  },
-  {
-    "id": "jugnu.paste-plain",
-    "name": "Paste Plain",
-    "version": "1.0.0",
-    "api": 1,
-    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.paste-plain-1.0.0.zip",
-    "sha256": "ff86a9f649d5e317cfcc1ad90f551d54a103eb37a5452b402a24cca4feae2f96",
-    "summary": "Paste as plain text",
-    "permissions": [
-      "clipboard"
-    ],
-    "category": "Clipboard",
-    "tags": [
-      "quick-glance",
-      "recommended"
-    ],
-    "description": "Strips fonts, colors, and formatting from whatever's on your clipboard and pastes it as plain text \u2014 no more fighting a document's styles when you paste from a webpage or PDF.",
-    "commands": [
-      {
-        "id": "paste",
-        "title": "Paste as plain text",
-        "subtitle": "Strip rich text from the clipboard"
       }
     ]
   },

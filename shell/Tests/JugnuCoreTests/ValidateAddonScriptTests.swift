@@ -121,7 +121,7 @@ final class ValidateAddonScriptTests: XCTestCase {
         let addons = entries.filter {
             FileManager.default.fileExists(atPath: $0.appendingPathComponent("addon.yaml").path)
         }
-        XCTAssertGreaterThanOrEqual(addons.count, 19)
+        XCTAssertGreaterThanOrEqual(addons.count, 18)
         for addon in addons {
             let result = try run(addon)
             XCTAssertEqual(result.status, 0, "\(addon.lastPathComponent): \(result.stderr)")

@@ -194,6 +194,7 @@ Do not use SwiftUI `.sheet`, `.alert`, `.confirmationDialog`, or `NavigationStac
 Canonical: [ADR 0001](architecture/decisions/0001-json-addon-boundary.md), [addon-manifest.md](addon-manifest.md).
 
 - Out-of-process JSON on stdin/stdout. Entrypoint kinds: `exec`, `jxa`, `osascript`.
+- Command ids name the job, never a bare `open`/`toggle`/`status`/`run` — see [addon-manifest.md](addon-manifest.md#required-fields).
 - One zip unpacks to `~/.local/share/jugnu/addons/<id>/`. **Never inside `Jugnu.app`.**
 - Published addons must not require user-installed Python or Homebrew.
 - Stdout is **one JSON object**. Logs go to stderr, and stay quiet.

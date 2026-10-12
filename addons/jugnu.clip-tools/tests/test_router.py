@@ -100,6 +100,11 @@ class RouterTests(unittest.TestCase):
         self.assertFalse(out["ok"])
         self.assertIn("DOCTYPE", out["error"])
 
+    def test_paste_plain(self):
+        out = run_cmd("paste-plain", "already plain text")
+        self.assertTrue(out["ok"], out)
+        self.assertEqual(out["result"], "already plain text")
+
 
 if __name__ == "__main__":
     unittest.main()

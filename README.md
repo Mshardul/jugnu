@@ -102,9 +102,9 @@ registry/             # catalog + checksummed download URLs
 
 ## What’s here today
 
-**First-party addons** (`addons/`): clipboard-history, battery-eta, brew-outdated, floating-note, pomodoro, weather-bar, world-clock, ports, window-layouts, open-terminal-here, mute-all, keep-awake, mic-mute, focus-toggle, paste-plain — shell/JXA/`exec` entrypoints (no user Python). Unbuilt jobs live in [backlog](docs/backlog.md).
+**First-party addons** (`addons/`): audio-toggles, battery-eta, brew-outdated, clip-tools, clipboard-history, floating-note, focus-toggle, keep-awake, nudges, open-terminal-here, pomodoro, ports, weather-bar, window-layouts, world-clock — shell/JXA/`exec` entrypoints (no user Python). Unbuilt jobs live in [backlog](docs/backlog.md).
 
-Hotkey shell, YAML addon runtime, and the addon UI host (toast/confirm/list/form/note) are built and tested (`shell/`). Published addons are GitHub Release assets under `addons-v1.0.0`, with `registry/addons.json` pointing at sha256-verified zips — install via the registry, or symlink into the real addons dir for local addon work (see `shell/README.md`). `open-terminal-here` and `mute-all` are in-tree and catalogued; their release zips ship with the next addons release.
+Hotkey shell, YAML addon runtime, and the addon UI host (toast/confirm/list/form/note) are built and tested (`shell/`). Published addons are GitHub Release assets under `addons-v1.0.0`, with `registry/addons.json` pointing at sha256-verified zips — install via the registry, or symlink into the real addons dir for local addon work (see `shell/README.md`). `clip-tools` and `audio-toggles` are in-tree and catalogued; their release zips ship with the next addons release.
 
 ## Out of scope (for now)
 

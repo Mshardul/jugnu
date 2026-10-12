@@ -8,7 +8,7 @@ import sys
 from collections.abc import Callable
 from typing import Any
 
-from clipboard import ClipboardError, read_text, write_text
+from clipboard import ClipboardError, read_as_plain_text, read_text, write_text
 from ops import caseops, encode, identity, lines, misc, structured, yamlops
 from ops.lines import OpError
 
@@ -70,7 +70,12 @@ COMMANDS: dict[str, Handler] = {
     "unicode-name": misc.unicode_name,
     "md-link": misc.md_link,
     "clip-clear": misc.clip_clear,
+    "paste-plain": misc.paste_plain,
 }
+
+# Commands whose input is the raw pasteboard read (RTF/HTML source), not the
+# plain-text flavor every other op assumes — see clipboard.read_as_plain_text.
+RAW_READ_COMMANDS = {"paste-plain"}
 
 
 def _emit(payload: dict[str, Any]) -> None:
@@ -117,7 +122,7 @@ def main() -> None:
             # Do not pass inject-only keys into ops
             op_args = {k: v for k, v in args.items() if k != "_text"}
         else:
-            text = read_text()
+            text = read_as_plain_text() if command in RAW_READ_COMMANDS else read_text()
             op_args = args
         new_text, message = handler(text, op_args)
         if not inject:

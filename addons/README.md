@@ -8,9 +8,9 @@ Nothing here is bundled inside `Jugnu.app`. Users install zips into `~/.local/sh
 
 | Addon | Commands |
 |---|---|
-| `mic-mute` | toggle mic input volume |
+| `audio-toggles` | mic mute, mute-all mic+speakers (grid status view + direct commands) |
 | `focus-toggle` | Focus / DND (Shortcuts or Control Center) |
-| `paste-plain` | clipboard → plain text |
+| `clip-tools` | clipboard text format / convert / line tools / paste-as-plain (requires `python-runtime` helper) |
 | `battery-eta` | battery percent, charging state, ETA |
 | `world-clock` | current time across configured zones |
 | `weather-bar` | current temperature and conditions |
@@ -21,10 +21,8 @@ Nothing here is bundled inside `Jugnu.app`. Users install zips into `~/.local/sh
 | `ports` | list listening ports and kill by pid |
 | `window-layouts` | snaps, snap board, zones (max 6), Space jump; AX helper |
 | `open-terminal-here` | open last-picked terminal at the front Finder folder |
-| `mute-all` | mute mic + speakers and restore previous volumes |
 | `keep-awake` | keep Mac awake (15m / 1h / 2h / until-off) via `caffeinate` |
 | `nudges` | recurring wellness reminders with detached card UI |
-| `clip-tools` | clipboard text format / convert / line tools (requires `python-runtime` helper) |
 
 Package: `scripts/package-addon.sh addons/jugnu.<job> dist/` → `dist/jugnu.<job>-<version>.zip`
 

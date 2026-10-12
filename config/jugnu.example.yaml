@@ -31,11 +31,11 @@ theme:
 addons:
   # Only listed + enabled addons appear in palette search.
   # Install path: ~/.local/share/jugnu/addons/<id>/
-  mic-mute:
+  audio-toggles:
     enabled: true
   focus-toggle:
     enabled: true
-  paste-plain:
+  clip-tools:
     enabled: false
 
 ui: {}

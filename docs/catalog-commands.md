@@ -15,8 +15,8 @@ Companion: [catalog-ui.md](catalog-ui.md) (panels / mini-apps). Packaging rules:
 
 **Locks (2026-09-04)**
 
-- **`paste-plain`** stays its **own** addon — not absorbed into `clip-tools`.
-- **`clip-tools`** = clipboard **text** transforms / formatters only.
+- **`paste-plain`** absorbed into `clip-tools` per [0074](tickets.md) (2026-09-12) — supersedes the 2026-09-04 "stays its own addon" lock below; both are stateless clipboard transforms.
+- **`clip-tools`** = clipboard **text** transforms / formatters, now including pasteboard-format normalization (`paste-plain`).
 - **`python-runtime` helper first**, then `clip-tools` (no in-zip CPython). Specs: [python-runtime](architecture/2026-09-04-python-runtime-helper-design.md) · [clip-tools](architecture/2026-09-04-clip-tools-design.md).
 - **PDF** ops live on **`pdf-tools`**, not the text formatter UI.
 - **Calculators** (EMI, GPA, GST, %, age, …) stay on the list under **Tools / calc**; not part of clip-tools.
@@ -97,14 +97,6 @@ Companion: [catalog-ui.md](catalog-ui.md) (panels / mini-apps). Packaging rules:
 
 ## Clipboard
 
-### paste-plain — shipped
-
-Own zip. Not part of `clip-tools`.
-
-| Command id | Title | Status |
-|---|---|---|
-| `paste` | Paste as plain text | shipped |
-
 ### clipboard-history — shipped
 
 | Command id | Title | Status |
@@ -155,6 +147,7 @@ Clipboard **text** format / convert / line tools. Palette one-shots + shared Tra
 | `unicode-name` | Unicode name / codepoint | shipped |
 | `md-link` | Selection + URL → markdown link | shipped |
 | `clip-clear` | Clear clipboard | shipped |
+| `paste-plain` | Paste as plain text (strip rich text) | shipped |
 | `transform` | Open Transform panel | planned |
 
 ### clipboard-guard — planned
