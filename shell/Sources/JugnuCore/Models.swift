@@ -306,6 +306,21 @@ public struct CommandUISpec: Codable, Equatable, Sendable {
     }
 }
 
+public struct FinderAction: Codable, Equatable, Sendable {
+    public var title: String?
+    public var types: [String]?
+
+    public var fileTypes: [String] {
+        let listed = (types ?? []).map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }
+        return listed.isEmpty ? ["com.adobe.pdf"] : listed
+    }
+
+    public func menuTitle(commandTitle: String) -> String {
+        let trimmed = title?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return trimmed.isEmpty ? commandTitle : trimmed
+    }
+}
+
 public struct CommandDescriptor: Codable, Equatable, Sendable {
     public var id: String
     public var title: String
@@ -317,6 +332,7 @@ public struct CommandDescriptor: Codable, Equatable, Sendable {
     public var onReinvoke: OnReinvoke?
     public var timeout: TimeInterval?
     public var daemon: DaemonBlock?
+    public var finder: FinderAction?
 
     public init(
         id: String,
@@ -328,7 +344,8 @@ public struct CommandDescriptor: Codable, Equatable, Sendable {
         lifecycle: LifecycleClass? = nil,
         onReinvoke: OnReinvoke? = nil,
         timeout: TimeInterval? = nil,
-        daemon: DaemonBlock? = nil
+        daemon: DaemonBlock? = nil,
+        finder: FinderAction? = nil
     ) {
         self.id = id
         self.title = title
@@ -340,6 +357,7 @@ public struct CommandDescriptor: Codable, Equatable, Sendable {
         self.onReinvoke = onReinvoke
         self.timeout = timeout
         self.daemon = daemon
+        self.finder = finder
     }
 
     public var defaultUIPattern: UIPattern? {
@@ -347,7 +365,7 @@ public struct CommandDescriptor: Codable, Equatable, Sendable {
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, title, subtitle, keywords, ui, view, lifecycle, timeout, daemon
+        case id, title, subtitle, keywords, ui, view, lifecycle, timeout, daemon, finder
         case onReinvoke = "on_reinvoke"
     }
 
@@ -370,6 +388,7 @@ public struct CommandDescriptor: Codable, Equatable, Sendable {
         onReinvoke = try c.decodeIfPresent(OnReinvoke.self, forKey: .onReinvoke)
         timeout = try c.decodeIfPresent(TimeInterval.self, forKey: .timeout)
         daemon = try c.decodeIfPresent(DaemonBlock.self, forKey: .daemon)
+        finder = try c.decodeIfPresent(FinderAction.self, forKey: .finder)
     }
 }
 

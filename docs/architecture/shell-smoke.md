@@ -41,7 +41,7 @@ Walk this after the 2026-08-23 palette + addon UI product pass. Leave items unch
 - [ ] Catalog card **gear** (installed) opens detail Settings; card tap opens Overview (0065)
 - [ ] Detail tabs Overview / Commands / Settings; **Run** only when installed+enabled (0065)
 - [ ] Settings shows permissions + config editors when `config:` present; Open/Reset when config file is invalid (0065)
-- [ ] Nudges Settings: `default_interval_minutes` / `show_nudge_now_in_manage` persist under `~/.config/jugnu/addons/jugnu.nudges.yaml` and affect Add form / manage list (0065)
+- [ ] Intervals Settings: `default_interval_minutes` / `show_nudge_now_in_manage` persist under `~/.config/jugnu/addons/jugnu.intervals.yaml` and affect Add form / manage list (0065)
 - [ ] Preferences → **Theme**: Firefly / Terminal Phosphor / Rose Quartz each restyle an already-open palette without restart
 - [ ] A ColorPicker change on one token (light or dark) pushes live to the open palette
 - [ ] Invalid hex in `~/.config/jugnu/jugnu.yaml` falls back per-field instead of crashing

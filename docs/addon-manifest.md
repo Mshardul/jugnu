@@ -118,6 +118,30 @@ config:
 | **Env** | `JUGNU_STATE_DIR` → `~/.local/share/jugnu/state/<id>/`; `JUGNU_CONFIG_DIR` → `~/.config/jugnu/addons/<id>/`. |
 | **Validate** | `validate-addon.sh` rejects malformed / non-scalar `config:` blocks. |
 
+## Finder menu
+
+Optional. A command may declare a Finder right-click item. The shell writes and removes that item. The addon does not.
+
+```yaml
+commands:
+  - id: pdf-unlock
+    title: Remove PDF password
+    finder:
+      title: Remove PDF Password
+      types: [com.adobe.pdf]
+config:
+  - key: show_in_finder_menu
+    type: bool
+    default: false
+```
+
+| Rule | Lock |
+|---|---|
+| **title** | Menu label. Omit to use the command title. |
+| **types** | Uniform type identifiers. Omit to mean PDF (`com.adobe.pdf`). |
+| **Opt-in** | Bool config key `show_in_finder_menu`, default `false`. Install asks once. Settings edits the same key. |
+| **Off** | The menu is absent when the bool is false, the addon is disabled, or the addon is uninstalled. |
+
 ## Helpers
 
 Optional. A **helper** is shared runtime the user would not install alone (vision rule 4). It is **not** a catalog addon and **not** an enable key. Do not copy helper code into each addon zip. An in-zip binary (e.g. window-layouts AX exec) is not a Helper.

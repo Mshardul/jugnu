@@ -35,6 +35,14 @@ public struct JugnuPaths: Sendable {
         home.appendingPathComponent(".local/share/jugnu/state")
     }
 
+    public var finderQueueDir: URL {
+        home.appendingPathComponent(".local/share/jugnu/finder-queue")
+    }
+
+    public var finderServicesDir: URL {
+        home.appendingPathComponent("Library/Services")
+    }
+
     public func addonStateRoot(id: String) -> URL {
         stateDir.appendingPathComponent(id)
     }

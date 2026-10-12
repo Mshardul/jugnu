@@ -2,7 +2,7 @@
 -include .env
 export DEVELOPER_DIR ?= /Applications/Xcode.app/Contents/Developer
 
-.PHONY: sync hooks precommit lint lint-swift format format-swift spell test test-extended tools-swift stop clean-agents run ci window-layouts helper-clock screenshots
+.PHONY: sync hooks precommit lint lint-swift format format-swift spell test test-extended tools-swift stop clean-agents run ci window-layouts pdf-tools helper-clock screenshots
 
 sync:
 	uv sync
@@ -41,6 +41,11 @@ window-layouts:
 	cd addons/jugnu.window-layouts && swift build -c release
 	mkdir -p addons/jugnu.window-layouts/bin
 	cp addons/jugnu.window-layouts/.build/release/window-layouts addons/jugnu.window-layouts/bin/helper
+
+pdf-tools:
+	cd addons/jugnu.pdf-tools && swift build -c release
+	mkdir -p addons/jugnu.pdf-tools/bin
+	cp addons/jugnu.pdf-tools/.build/release/pdf-tools addons/jugnu.pdf-tools/bin/helper
 
 helper-clock:
 	./scripts/package-helper-clock.sh dist

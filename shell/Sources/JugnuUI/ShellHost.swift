@@ -235,6 +235,9 @@ extension ShellHost {
             on: screen,
             viewType: ui.view ?? ui.pattern.defaultViewType
         )
+        // Finder handoff creates the panel without showing it. Palette invokes
+        // are already on screen; ordering front again is harmless.
+        orderFront()
         resolvedTrace.markFirstPaint()
         resolvedTrace.markContent()
     }

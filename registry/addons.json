@@ -471,55 +471,183 @@
     ]
   },
   {
-    "id": "jugnu.nudges",
-    "name": "Nudges",
+    "id": "jugnu.intervals",
+    "name": "Intervals",
     "version": "1.0.0",
     "api": 1,
-    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.nudges-1.0.0.zip",
-    "sha256": "aa8920989f6cc1904f21d55808823e6cbf82fc8ac1b11f9ad1962a2a78306066",
-    "summary": "Nudges",
+    "url": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
+    "sha256": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
+    "summary": "Intervals",
     "permissions": [],
     "category": "System",
     "tags": [
       "background",
       "popup-ui"
     ],
-    "description": "Schedules recurring local reminders for water, eye breaks, stretching, and custom nudges, then shows each one as a lightweight card.",
+    "description": "One timer list for recurring reminders and a pomodoro preset. Eye rest, water, and stretch fire reminder cards on a repeating interval. Pomodoro alternates a focus phase and a break phase on the same row, and stays off until you start a phase.",
     "commands": [
       {
         "id": "manage",
-        "title": "Nudges",
-        "subtitle": "Add, edit, and enable nudge timers"
+        "title": "Intervals",
+        "subtitle": "Add, edit, and enable timers"
       },
       {
         "id": "nudge-now",
-        "title": "Nudge now",
-        "subtitle": "Show a nudge card immediately"
+        "title": "Show interval now",
+        "subtitle": "Show a timer card immediately"
       },
       {
         "id": "pause",
-        "title": "Pause nudges",
+        "title": "Pause intervals",
         "subtitle": ""
       },
       {
         "id": "resume",
-        "title": "Resume nudges",
+        "title": "Resume intervals",
         "subtitle": ""
       },
       {
         "id": "restore-presets",
-        "title": "Restore nudge presets",
+        "title": "Restore interval presets",
         "subtitle": ""
       },
       {
         "id": "advanced",
-        "title": "Nudge advanced",
-        "subtitle": "Edit new-nudge template"
+        "title": "Interval template",
+        "subtitle": "Edit the new-interval template"
       },
       {
         "id": "show-card",
-        "title": "Show nudge card",
+        "title": "Show interval card",
         "subtitle": "Internal \u2014 fired by clock"
+      },
+      {
+        "id": "start-focus",
+        "title": "Start focus session",
+        "subtitle": "Start the pomodoro work phase"
+      },
+      {
+        "id": "start-break",
+        "title": "Start break",
+        "subtitle": "Start the pomodoro break phase"
+      },
+      {
+        "id": "pomodoro-status",
+        "title": "Pomodoro status",
+        "subtitle": "Time remaining in the current phase"
+      },
+      {
+        "id": "reset-pomodoro",
+        "title": "Reset pomodoro",
+        "subtitle": "Stop the pomodoro phase timer"
+      },
+      {
+        "id": "phase-chime",
+        "title": "Phase chime",
+        "subtitle": "Internal \u2014 fired by clock"
+      }
+    ]
+  },
+  {
+    "id": "jugnu.pdf-tools",
+    "name": "PDF Tools",
+    "version": "1.0.0",
+    "api": 1,
+    "url": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
+    "sha256": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
+    "summary": "PDF page tools",
+    "permissions": [],
+    "primary": "pdf-unlock",
+    "category": "System",
+    "tags": [
+      "popup-ui"
+    ],
+    "description": "Saves a new file beside the original. Remove a password, merge, split, extract or reorder pages, rotate, number pages, edit bookmarks, read info or embedded text, compress, flatten forms, grayscale, or convert JPEG and PDF pages. A locked PDF has to be unlocked first. The Finder right-click item stays off until you add it at install or turn it on in Settings.",
+    "commands": [
+      {
+        "id": "pdf-unlock",
+        "title": "Remove PDF password",
+        "subtitle": "Save an unlocked copy beside the PDF"
+      },
+      {
+        "id": "merge",
+        "title": "Merge PDFs",
+        "subtitle": "Save one PDF beside the first file"
+      },
+      {
+        "id": "split",
+        "title": "Split PDF",
+        "subtitle": "Save each page, or the ranges you enter"
+      },
+      {
+        "id": "extract-pages",
+        "title": "Extract pages",
+        "subtitle": "Save the pages you list"
+      },
+      {
+        "id": "organize",
+        "title": "Reorder PDF pages",
+        "subtitle": "Save a PDF in a new page order"
+      },
+      {
+        "id": "rotate",
+        "title": "Rotate PDF pages",
+        "subtitle": "Save a rotated copy"
+      },
+      {
+        "id": "page-count",
+        "title": "Page count",
+        "subtitle": "How many pages are in a PDF"
+      },
+      {
+        "id": "page-numbers",
+        "title": "Add page numbers",
+        "subtitle": "Stamp a number at the bottom of each page"
+      },
+      {
+        "id": "bookmarks",
+        "title": "Add / edit bookmarks",
+        "subtitle": "Save a copy with a new or renamed bookmark"
+      },
+      {
+        "id": "info",
+        "title": "PDF info",
+        "subtitle": "Pages, size, encryption, and version"
+      },
+      {
+        "id": "extract-text",
+        "title": "Extract PDF text",
+        "subtitle": "Read the text embedded in a PDF"
+      },
+      {
+        "id": "compress",
+        "title": "Compress PDF",
+        "subtitle": "Save a smaller copy when the images can shrink"
+      },
+      {
+        "id": "jpg-pdf",
+        "title": "JPG to PDF",
+        "subtitle": "Save a PDF made from JPEG images"
+      },
+      {
+        "id": "pdf-jpg",
+        "title": "PDF to JPG",
+        "subtitle": "Save each page as a JPEG"
+      },
+      {
+        "id": "pdf-png",
+        "title": "PDF to PNG",
+        "subtitle": "Save each page as a PNG"
+      },
+      {
+        "id": "flatten-forms",
+        "title": "Flatten PDF forms",
+        "subtitle": "Bake form fields into the page"
+      },
+      {
+        "id": "grayscale",
+        "title": "Grayscale PDF",
+        "subtitle": "Save a black and white copy"
       }
     ]
   },
@@ -544,49 +672,6 @@
         "id": "open",
         "title": "Open Terminal here",
         "subtitle": "Open the last-picked terminal in the front Finder folder"
-      }
-    ]
-  },
-  {
-    "id": "jugnu.pomodoro",
-    "name": "Pomodoro",
-    "version": "1.0.0",
-    "api": 1,
-    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.pomodoro-1.0.0.zip",
-    "sha256": "c26bf51a71865505f099f2098d549debf22d9c85cc946763780f999829283d13",
-    "summary": "Start focus session",
-    "permissions": [],
-    "category": "Focus",
-    "tags": [
-      "background",
-      "toggle"
-    ],
-    "description": "Runs a standard Pomodoro timer in the background so you can start a focus session and forget about the clock until it's done. Start and stop from the palette, no separate app to babysit.",
-    "commands": [
-      {
-        "id": "work",
-        "title": "Start focus session",
-        "subtitle": "25 minute pomodoro work timer"
-      },
-      {
-        "id": "break",
-        "title": "Start break",
-        "subtitle": "5 minute pomodoro break timer"
-      },
-      {
-        "id": "status",
-        "title": "Pomodoro status",
-        "subtitle": "Time remaining in the current phase"
-      },
-      {
-        "id": "reset",
-        "title": "Reset pomodoro",
-        "subtitle": "Clear the current timer"
-      },
-      {
-        "id": "chime",
-        "title": "Pomodoro chime",
-        "subtitle": "Internal \u2014 fired by clock"
       }
     ]
   },

@@ -15,14 +15,14 @@ Nothing here is bundled inside `Jugnu.app`. Users install zips into `~/.local/sh
 | `world-clock` | current time across configured zones |
 | `weather-bar` | current temperature and conditions |
 | `brew-outdated` | outdated Homebrew formulae and casks |
-| `pomodoro` | work / break timer with notification |
+| `intervals` | recurring reminders and a pomodoro phase preset (one timer list) |
 | `floating-note` | always-on-top scratchpad (`note` UI pattern) |
 | `clipboard-history` | searchable clipboard history (background watcher + sqlite) |
 | `ports` | list listening ports and kill by pid |
 | `window-layouts` | snaps, snap board, zones (max 6), Space jump; AX helper |
+| `pdf-tools` | PDF page tools, including remove password; optional Finder right-click for unlock |
 | `open-terminal-here` | open last-picked terminal at the front Finder folder |
 | `keep-awake` | keep Mac awake (15m / 1h / 2h / until-off) via `caffeinate` |
-| `nudges` | recurring wellness reminders with detached card UI |
 
 Package: `scripts/package-addon.sh addons/jugnu.<job> dist/` → `dist/jugnu.<job>-<version>.zip`
 

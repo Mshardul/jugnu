@@ -3,4 +3,4 @@ set -euo pipefail
 
 REQUEST=$(cat)
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
-exec /usr/bin/osascript -l JavaScript "$SCRIPT_DIR/nudges.js" "$REQUEST"
+exec /usr/bin/osascript -l JavaScript "$SCRIPT_DIR/intervals.js" "$REQUEST"

@@ -1,0 +1,89 @@
+id: jugnu.pdf-tools
+name: PDF Tools
+version: 1.0.0
+api: 1
+primary: pdf-unlock
+view_types: [fields, rows]
+commands:
+  - id: pdf-unlock
+    title: Remove PDF password
+    subtitle: Save an unlocked copy beside the PDF
+    keywords: [pdf, password, unlock, decrypt]
+    finder:
+      title: Remove PDF Password
+      types: [com.adobe.pdf]
+  - id: merge
+    title: Merge PDFs
+    subtitle: Save one PDF beside the first file
+    keywords: [pdf, merge, combine]
+  - id: split
+    title: Split PDF
+    subtitle: Save each page, or the ranges you enter
+    keywords: [pdf, split]
+  - id: extract-pages
+    title: Extract pages
+    subtitle: Save the pages you list
+    keywords: [pdf, extract, pages]
+  - id: organize
+    title: Reorder PDF pages
+    subtitle: Save a PDF in a new page order
+    keywords: [pdf, reorder, organize]
+  - id: rotate
+    title: Rotate PDF pages
+    subtitle: Save a rotated copy
+    keywords: [pdf, rotate]
+  - id: page-count
+    title: Page count
+    subtitle: How many pages are in a PDF
+    keywords: [pdf, pages, count]
+  - id: page-numbers
+    title: Add page numbers
+    subtitle: Stamp a number at the bottom of each page
+    keywords: [pdf, "page numbers"]
+  - id: bookmarks
+    title: Add / edit bookmarks
+    subtitle: Save a copy with a new or renamed bookmark
+    keywords: [pdf, bookmarks, outline]
+  - id: info
+    title: PDF info
+    subtitle: Pages, size, encryption, and version
+    keywords: [pdf, info]
+  - id: extract-text
+    title: Extract PDF text
+    subtitle: Read the text embedded in a PDF
+    keywords: [pdf, text, extract]
+  - id: compress
+    title: Compress PDF
+    subtitle: Save a smaller copy when the images can shrink
+    keywords: [pdf, compress, shrink]
+  - id: jpg-pdf
+    title: JPG to PDF
+    subtitle: Save a PDF made from JPEG images
+    keywords: [jpg, jpeg, pdf]
+  - id: pdf-jpg
+    title: PDF to JPG
+    subtitle: Save each page as a JPEG
+    keywords: [pdf, jpg, jpeg]
+  - id: pdf-png
+    title: PDF to PNG
+    subtitle: Save each page as a PNG
+    keywords: [pdf, png]
+  - id: flatten-forms
+    title: Flatten PDF forms
+    subtitle: Bake form fields into the page
+    keywords: [pdf, form, flatten]
+  - id: grayscale
+    title: Grayscale PDF
+    subtitle: Save a black and white copy
+    keywords: [pdf, grayscale]
+config:
+  - key: show_in_finder_menu
+    type: bool
+    default: false
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths:
+    - "~/.local/share/jugnu/state/pdf-tools"
+  launchd: []

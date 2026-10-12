@@ -47,10 +47,10 @@ Companion: [catalog-commands.md](catalog-commands.md). Product rule: every job m
 | World clock | `world-clock` | `show` | `rows` | shipped | Zones |
 | Battery | `battery-eta` | `status` | `rows` | shipped | Glance |
 | Weather | `weather-bar` | `status` | `rows` | shipped | Glance |
-| Pomodoro setup | `pomodoro` | `work`, `break`, … | `fields` | shipped | Duration / session |
+| Pomodoro phase | `intervals` | `start-focus`, `start-break`, `phase-chime` | `card` (detached) | shipped | Phase preset on the interval list |
 | Keep awake | `keep-awake` | `pick` | `fields` | shipped | Duration picker |
-| Nudges manage | `nudges` | `manage`, `advanced`, … | `rows` / `fields` / `ask` | shipped | List + setup + confirm |
-| Nudge card | `nudges` | `show-card` / timer fire | `card` (detached) | shipped | Not one of the ten in-panel types |
+| Intervals manage | `intervals` | `manage`, `advanced`, … | `rows` / `fields` / `ask` | shipped | List + setup + confirm |
+| Interval card | `intervals` | `show-card` / `phase-chime` | `card` (detached) | shipped | Not one of the ten in-panel types |
 | Floating note | `floating-note` | `open` | `note` (detached) | shipped | Persist scratchpad |
 | Snap board | `window-layouts` | `snap-board` | `board` | shipped | Spatial snaps |
 | Zone picker | `window-layouts` | `zone-apply`, `zone-save`, … | `rows` / `fields` / `ask` | shipped | Max 6 zones |
@@ -126,7 +126,7 @@ No browsable content — product pass on toast visual still open ([0052](tickets
 
 ---
 
-## Planned — PDF (separate from Text Transform)
+## PDF (separate from Text Transform)
 
 ### PDF Tools
 
@@ -134,12 +134,24 @@ No browsable content — product pass on toast visual still open ([0052](tickets
 |---|---|
 | **Title** | PDF Tools |
 | **Addon** | `pdf-tools` |
-| **Opens from** | `studio` / `open` + per-op commands (`merge`, `split`, …) |
-| **View** | `canvas` (page preview) + `rows` (page list / organize) + `fields` (options) |
-| **Status** | draft |
-| **Scope** | Merge, split, extract, organize, rotate, page numbers, bookmarks, compress, rasterize pages, info, extract text. |
-| **Parked** | Word↔PDF, protect, unlock. |
+| **Opens from** | Palette commands (`merge`, `split`, `pdf-unlock`, …) |
+| **View** | `fields` and `rows` for options and bookmarks. `note` for extracted text. Toast for page count and info. |
+| **Status** | Commands shipped. The `canvas` page preview is still unbuilt. |
+| **Scope** | Merge, split, extract, reorder, rotate, page numbers, bookmarks, compress, rasterize pages, info, extract text, unlock. Originals are left in place. |
+| **Parked** | Word↔PDF, protect. `pdf-unlock` stays its own command (password form, optional Finder menu). |
 | **OCR** | PDF OCR may open here or hand off to `ocr` — decide at design time. |
+
+### File conversion
+
+| | |
+|---|---|
+| **Title** | Convert |
+| **Addon** | `pdf-tools` |
+| **Opens from** | `convert`, and from `jpg-pdf` / `pdf-jpg` / `pdf-png` once this view exists |
+| **View** | `fields` |
+| **Status** | planned |
+| **Scope** | One minimal panel for JPG → PDF, PDF → JPG, and PDF → PNG. The clicked or chosen file is filled in, and the conversion that matches its type is selected: a JPEG opens on JPG → PDF; a PDF opens on PDF → JPG, with PDF → PNG as the other choice. The new file is saved beside the original. |
+| **Finder** | Right-click **Convert** on a JPEG or PDF. It opens this panel; it does not convert on click. Same opt-in as **Remove PDF Password** (`show_in_finder_menu`). |
 
 ---
 

@@ -75,7 +75,7 @@ def extract_commands(manifest_text: str) -> list[dict[str, str]]:
                 key, _, value = rest.partition(":")
                 current[key.strip()] = parse_yaml_scalar(value)
             continue
-        if current is not None and ":" in stripped:
+        if current is not None and indent == 4 and ":" in stripped:
             key, _, value = stripped.partition(":")
             current[key.strip()] = parse_yaml_scalar(value)
 
@@ -140,6 +140,13 @@ def _self_test() -> int:
     )
     assert title_after_subtitle[0]["title"] == "Hello"
     assert title_after_subtitle[0]["subtitle"] == "later title is fine"
+
+    nested = extract_commands(
+        "commands:\n  - id: pdf-unlock\n    title: Remove PDF password\n"
+        "    subtitle: Save a copy\n    finder:\n      title: Remove PDF Password\n"
+    )
+    assert nested[0]["title"] == "Remove PDF password", nested
+    assert nested[0]["subtitle"] == "Save a copy", nested
 
     try:
         extract_commands("commands:\n  - id: a\n    keywords: [x]\n")

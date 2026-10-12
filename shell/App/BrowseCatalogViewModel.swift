@@ -99,11 +99,13 @@ final class BrowseCatalogViewModel: ObservableObject, BrowseCatalogViewModelProt
             ) else { return }
         }
 
-        await runInstall(
+        guard await runInstall(
             entry: entry,
             enable: true,
             disclosedDepIDs: disclosedDepIDs
-        )
+        ) else { return }
+        await offerFinderMenuIfNeeded(addonID: entry.id)
+        model.syncFinderMenus()
     }
 
     func update(_ entry: RegistryEntry) async {
@@ -154,11 +156,12 @@ final class BrowseCatalogViewModel: ObservableObject, BrowseCatalogViewModelProt
         }
 
         let preserveEnabled = model.config.addons[entry.id]?.enabled ?? false
-        await runInstall(
+        guard await runInstall(
             entry: entry,
             enable: preserveEnabled,
             disclosedDepIDs: disclosedDepIDs
-        )
+        ) else { return }
+        model.syncFinderMenus()
     }
 
     func setEnabled(_ id: String, enabled: Bool) {
@@ -218,11 +221,25 @@ final class BrowseCatalogViewModel: ObservableObject, BrowseCatalogViewModelProt
         )
     }
 
+    private func offerFinderMenuIfNeeded(addonID: String) async {
+        if ScreenshotMode.isActive { return }
+        let root = model.paths.addonsDir.appendingPathComponent(addonID)
+        guard let manifest = try? ManifestLoader.load(from: root) else { return }
+        let titles = FinderMenu.menuTitles(manifest: manifest)
+        guard !titles.isEmpty else { return }
+        let accepted = await confirmDisclosure(
+            ui: confirmFinderMenuUI(menuTitles: titles),
+            commandId: "shell.finder-menu.\(addonID)"
+        )
+        guard accepted else { return }
+        model.writeAddonConfig(addonID: addonID, key: FinderMenu.configKey, value: .bool(true))
+    }
+
     private func runInstall(
         entry: RegistryEntry,
         enable: Bool,
         disclosedDepIDs: Set<String>
-    ) async {
+    ) async -> Bool {
         do {
             try await model.installer.install(
                 entry: entry,
@@ -253,9 +270,11 @@ final class BrowseCatalogViewModel: ObservableObject, BrowseCatalogViewModelProt
                case .dependencyDisclosureDeclined = installer
             {
                 errorMessage = nil
-                return
+                return false
             }
             errorMessage = UserFacingError.message(for: error)
+            return false
         }
+        return true
     }
 }

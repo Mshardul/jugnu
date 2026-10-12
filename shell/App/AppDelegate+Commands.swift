@@ -53,15 +53,7 @@ extension AppDelegate {
 
     func saveAddonConfigValue(addonID: String, key: String, value: JSONValue) {
         guard let model else { return }
-        let root = model.paths.addonsDir.appendingPathComponent(addonID)
-        guard let manifest = try? ManifestLoader.load(from: root) else { return }
-        let file = model.paths.addonConfigFile(id: addonID)
-        var values = (try? AddonConfigResolver.resolve(schema: manifest.config, fileURL: file)) ?? [:]
-        for field in manifest.config where values[field.key] == nil {
-            values[field.key] = field.default
-        }
-        values[key] = value
-        try? AddonConfigResolver.writeFile(schema: manifest.config, values: values, to: file)
+        model.writeAddonConfig(addonID: addonID, key: key, value: value)
         renderCurrentTop(model: model)
     }
 
@@ -92,6 +84,7 @@ extension AppDelegate {
             values: Dictionary(uniqueKeysWithValues: manifest.config.map { ($0.key, $0.default) }),
             to: model.paths.addonConfigFile(id: addonID)
         )
+        model.syncFinderMenus()
     }
 
     func presentAddonConfigRecovery(addonID: String, name: String, error: AddonConfigError) {
@@ -111,7 +104,7 @@ extension AppDelegate {
         }
     }
 
-    func runCommand(_ cmd: IndexedCommand) {
+    func runCommand(_ cmd: IndexedCommand, args: [String: JSONValue] = [:]) {
         guard let model, let shellHost else { return }
         guard let screen = shellHost.currentScreen ?? NSScreen.main else { return }
         shellHost.onCancelFollowUp = { [weak self] in self?.popOrDismiss() }
@@ -132,7 +125,7 @@ extension AppDelegate {
                 playCommandSound(success: false)
                 return
             }
-            let invocation = try model.runInvocation(for: cmd)
+            let invocation = try model.runInvocation(for: cmd, args: args)
             let gated = Self.tccGated(
                 invocation: invocation,
                 addonName: manifest.name,

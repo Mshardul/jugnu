@@ -60,18 +60,18 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | Appearance | **night-shift** | toggle | Own job |
 | Appearance | **true-tone** | toggle | Own display job |
 | Appearance | **display-brightness** | presets | Brightness job |
-| Appearance | **desktop-toggles** | desktop-icons, dock-autohide, menubar-autohide | Merges with **finder-toggles** into one Finder/Desktop chrome addon per [0074](tickets.md) — not yet built |
+| Appearance | **finder-chrome** | `finder-chrome`, desktop-icons, dock-autohide, menubar-autohide, hidden-files, path-bar, status-bar, restart-finder | Command list locked in [catalog-commands](catalog-commands.md). Not scaffolded. |
 | Appearance | **wallpaper-shuffle** | shuffle from folder | Optional; or under desktop-toggles |
 | Appearance | **screensaver** | start now | Small; desktop-toggles or Security |
 | Appearance | **hot-corners** | show / open Hot Corners | Thin Settings surface; possible merge with login-items/settings-jump deferred — see [0074](tickets.md) |
-| Appearance | **finder-toggles** | **hidden-files**, **path-bar**, **status-bar**, **restart-finder** (+ tab bar / other Finder chrome) | Merges with **desktop-toggles** into one Finder/Desktop chrome addon per [0074](tickets.md) — not yet built |
+| Appearance | **finder-chrome** | see the row above | Same zip as desktop chrome. Not a second addon. |
 | Appearance | **resolution-preset** | named resolution / HiDPI presets | Own display job |
 | Clipboard | **clip-tools** (`addons/clip-tools`) | slugify, json/csv/yaml/xml-pretty, base64, url-encode/decode, jwt-decode, timestamp, text-stats, uuid, md-link, clip-clear, **case**, **sort-lines**, **dedupe-lines**, **lorem**, **regex-replace**, **hash**, **tabs-spaces**, **invisible-chars**, **markdown-table**, **reverse-lines**, **extract-emails**, **json-path**, **csv-json** (+ yaml↔json, xml→json), **unicode-name**, **iso-week**, line trim/join/split/number, escape/unescape | Phase 1 **shipped** (palette commands). Transform panel = Phase 2. Declares `python-runtime` helper. **paste-plain** merged in per [0074](tickets.md). See [catalog-commands](catalog-commands.md) / [catalog-ui](catalog-ui.md). |
 | Clipboard | **clipboard-guard** | detect likely secrets / warn before history storage / clear or redact clipboard | Privacy utility for clipboard workflows; detection is heuristic |
 | Clipboard | **diff** | diff-clip | Heavier than one-shot transforms — own addon unless kept tiny on clip-tools |
 | Files | **paths** | path-copy, reveal-path, **count-files**, **folder-size** | Path/Finder folder jobs |
 | Files | **images** | heic-jpeg, resize-image, **image-rotate**, flip, format convert, compress (+ other `sips`/Image I/O ops) | Image transforms family |
-| Files | **downloads-triage** | reveal-downloads, **downloads-age** (+ type/age triage variants) | Merges with **screenshot-inbox** / **desktop-sweep** / **large-files** into one folder/file-clutter addon per [0074](tickets.md) — not yet built |
+| Files | **folder-clutter** | `folder-clutter`, reveal-downloads, downloads-age, screenshot-inbox, reveal-latest-screenshot, archive-latest-screenshot, archive-older-screenshots, desktop-sweep, large-files | Command list locked in [catalog-commands](catalog-commands.md). Not scaffolded. |
 | Files | **airdrop-folder** | share Finder selection via AirDrop UI | Finder / share QoL |
 | Files | **quarantine-clear** | clear Gatekeeper quarantine xattr (± check) | File / Gatekeeper QoL |
 | Files | **new-file** | create in front Finder folder | Own file job |
@@ -83,14 +83,14 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | Files | **ocr** | image → text (Vision) | Own; permission-heavy |
 | Files | **trash-ui** | trash-selection, empty-trash, **trash-put-back** | Trash jobs on trash-ui |
 | Files | **screenshot-folder** | open screenshots location | Own until screenshot-inbox (gap) absorbs it |
-| Files | **screenshot-inbox** | open inbox / reveal latest / archive latest / archive older | Palette commands first, no background watcher in v0. Merges with **downloads-triage** / **desktop-sweep** / **large-files** into one folder/file-clutter addon per [0074](tickets.md) — not yet built |
-| Files | **pdf-tools** | merge / split / page-count PDFs (+ compress and same-shape PDF ops) | Same-shape PDF jobs — not on images |
-| Files | **large-files** | biggest files under folder (depth-capped) | Merges with **downloads-triage** / **screenshot-inbox** / **desktop-sweep** into one folder/file-clutter addon per [0074](tickets.md) — not yet built |
-| Files | **desktop-sweep** | archive Desktop clutter to dated folder | Merges with **downloads-triage** / **screenshot-inbox** / **large-files** into one folder/file-clutter addon per [0074](tickets.md) — not yet built |
+| Files | **folder-clutter** | screenshot inbox commands | Same zip as downloads triage. Not a second addon. |
+| Files | **pdf-tools** | Page tools on one addon: unlock, merge, split, extract, reorder, rotate, and the rest of the shipped PDF commands. Later, one **Convert** panel for JPG ↔ PDF and PDF → PNG, including Finder **Convert** | Same-shape PDF jobs — not on images |
+| Files | **folder-clutter** | large-files | Same zip. Not a second addon. |
+| Files | **folder-clutter** | desktop-sweep | Same zip. Not a second addon. |
 | Files | **mount-dmg** | mount / unmount selected DMG or volume | Own volume job; possible small-Finder-utility grouping w/ quarantine-clear/airdrop-folder considered and deferred — see [0074](tickets.md) |
 | Files | **media-convert** | **afconvert** (+ other built-in audio convert presets) | Audio via macOS `afconvert` |
-| Files | **favorite-folders** | jump curated folder list | Merges with **recent-files** into one jump-to-location addon per [0074](tickets.md) — not yet built |
-| Files | **recent-files** | recently modified files / filter by folder or extension / reveal or open / copy path | Merges with **favorite-folders** into one jump-to-location addon per [0074](tickets.md) — not yet built |
+| Files | **jump-to-location** | `jump-to-location`, favorite-folders, recent-files | Command list locked in [catalog-commands](catalog-commands.md). Not scaffolded. |
+| Files | **jump-to-location** | recent-files | Same zip as favorite folders. Not a second addon. |
 | Window | **window-layouts** | center, fill-desktop, maximize, hide-others, pin-top, space-jump, stage-toggle, left/right-half, quarters, gather-windows, move-display, app-windows, desktop-name (Jugnu-local label), fullscreen-toggle, minimize-all, show-desktop, **tile-two** (+ swap / other layout ops); **zones** (save/apply, max 6, replace picker). Fold **layout-save**. **No layout-undo.** Snap board + palette commands. Spec: [2026-08-24 window-layouts](architecture/2026-08-24-window-layouts.md) | One window family |
 | Meeting | **screenshare-prep** | hide icons + pause banners; **screenshare-restore** | Orchestrator + one-shot undo |
 | Meeting | **mute-all** (`addons/mute-all`) | mute mic+speakers / restore; **mute-status** later (menu glyph) | Merges with `mic-mute` into one **Audio** addon per [0074](tickets.md) — not yet built |
@@ -100,32 +100,32 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | Meeting | **record-screen** | start/stop screen recording | Own; permission-heavy |
 | Meeting | **flash-attention** | bounce Dock / flash screen | Physical “hey” — own tiny addon |
 | Meeting | **meeting-join** | clipboard URL → join; **meeting-app-pick** | Join + app chooser form |
-| Network | **hosts** | named blocks on/off; **hosts-backup** / restore | Merges with ping/copy-ip/dns-flush/proxy-toggle/vpn-connect/wifi-toggle/http-status into one Network addon per [0074](tickets.md) — not yet built |
-| Network | **ping** | ping host from clipboard/typed | Merges into one Network addon (with hosts, copy-ip, dns-flush, proxy-toggle, vpn-connect, wifi-toggle, http-status) per [0074](tickets.md) — not yet built |
+| Network | **network** | `network`, copy-ip, dns-flush, proxy-toggle, vpn-connect, wifi-toggle, ping, hosts-block, hosts-backup, http-status, http-headers | Command list locked in [catalog-commands](catalog-commands.md). Not scaffolded. Ports stays separate. |
+| Network | **network** | ping | Same zip as hosts. Not a second addon. |
 | Network | **ports** | list listeners, kill by pid/port (folds port-scan-local, port-picker, gap common-ports) | `addons/ports` — one surface. Kept separate from the new Network addon: process/port-killing job, not a network-probe job |
-| Network | **http-status** | HEAD/GET status + timing; **http-headers** (+ copy as markdown / other probe views) | Merges into one Network addon (with hosts, ping, copy-ip, dns-flush, proxy-toggle, vpn-connect, wifi-toggle) per [0074](tickets.md) — not yet built |
+| Network | **network** | http-status, http-headers | Same zip. Not a second addon. |
 | Dev | **git-root** | reveal git root of front path | Possible merge with repo-jumper considered, deferred pending repo-jumper's own scope — see [0074](tickets.md) |
-| Dev | **open-url** | open clipboard URL in chosen browser; **open-url-profile** | Merges with **default-browser** into one "Default Selection" (default-app-picker) addon per [0074](tickets.md) — not yet built |
+| Dev | **default-apps** | `default-apps`, default-browser, open-url, open-url-profile | Command list locked in [catalog-commands](catalog-commands.md). Not scaffolded. Display name: Default Selection. |
 | Dev | **brew-outdated** (`addons/brew-outdated`) | brew-services, **brew-cleanup**, doctor/update and other brew ops | One Homebrew job shelf |
 | Dev | **repo-jumper** | jump known git repos | Own; possible merge with git-root considered, deferred — see [0074](tickets.md) |
 | Dev | **ssh-host-picker** | pick SSH host → connect | Own |
 | Dev | **process-find** | process-list, find-by-name, **process-sort** (CPU/mem) (+ force-quit / copy PID variants) | ≠ quit-heavy, ≠ kill-hung — confirmed separate, [0074](tickets.md) |
 | Dev | **open-terminal-here** (`addons/open-terminal-here`) | last-picked terminal at Finder folder; **term-app-pick** later | Dev QoL |
-| Dev | **app-info** | front app name / bundle id / version / path | Merges with **relaunch-app** into one app-control addon per [0074](tickets.md) — not yet built |
-| Dev | **relaunch-app** | quit + reopen front app | Merges with **app-info** into one app-control addon per [0074](tickets.md) — not yet built |
+| Dev | **app-control** | `app-control`, app-info, relaunch-app | Command list locked in [catalog-commands](catalog-commands.md). Not scaffolded. |
+| Dev | **app-control** | relaunch-app | Same zip as app-info. Not a second addon. |
 | System | **notify-clear** | clear Notification Center | Own; private API risk |
 | System | **login-items** | list / open Login Items | Possible merge with settings-jump/hot-corners as "System Settings shortcuts" considered, deferred pending settings-jump's own scope — see [0074](tickets.md) |
-| System | **sleep** | sleep-now, display-sleep | Merges with **keep-awake** into one Power/Sleep addon per [0074](tickets.md) — not yet built |
-| System | **keep-awake** (`addons/keep-awake`) | 15m / 1h / 2h / until-off; stop; status | Merges with **sleep** into one Power/Sleep addon per [0074](tickets.md) — not yet built |
+| System | **power-sleep** | `power-sleep`, keep-awake, stop-keep-awake, keep-awake-status, keep-awake-watch, sleep-now, display-sleep | Command list locked in [catalog-commands](catalog-commands.md). Not scaffolded. Shipped `keep-awake` stays until this zip exists. |
+| System | **keep-awake** (`addons/jugnu.keep-awake`) | pick, stop, status, watch | Shipped. Target ids live on **power-sleep** when that addon is built. |
 | System | **settings-jump** | palette → System Settings pane | Own; possible merge target for login-items/hot-corners deferred until this addon's own scope is settled — see [0074](tickets.md) |
-| System | **default-browser** | pick default browser | Merges with **open-url**/open-url-profile into one "Default Selection" (default-app-picker) addon per [0074](tickets.md) — not yet built |
+| System | **default-apps** | default-browser | Same zip as open-url. Not a second addon. |
 | System | **memory-pressure** | pressure + top memory apps | Own; pair conceptually w/ disk-pressure gap |
 | System | **speak-clip** | speak clipboard / stop | Own a11y job |
-| System | **nudges** | **eye-rest**, **water-nudge**, **stretch-nudge** (same timer shell; different copy/art/GIF per kind) | One wellness nudge addon. Implementing — [0049](tickets.md) / [spec 2026-08-25](architecture/2026-08-25-nudges-clock-helper-design.md). Absorbs **pomodoro** (as a preset entry, not a parallel mechanism) into one renamed **Intervals** addon per [0074](tickets.md) — not yet built |
+| System | **intervals** (`addons/jugnu.intervals`) | manage, nudge-now, pause, resume, restore-presets, advanced, show-card, start-focus, start-break, pomodoro-status, reset-pomodoro, phase-chime; **pomodoro-skip** later | Shipped. Pomodoro is a phases preset on this list. |
 | System | **time-machine** | status / start backup / open Time Machine | Own |
 | System | **floating-note** (`addons/floating-note`) | `open` (scratchpad, persist on close/quit), **quick-note** (throwaway; close discards), **note-pin** | One note addon: persistent scratchpad vs session scrap; pin is chrome QoL |
 | System | **world-clock** (`addons/world-clock`) | + **world-overlap** | Clocks + meeting overlap |
-| System | **pomodoro** (`addons/pomodoro`) | **pomodoro-skip**, extend, log interruption (+ other session controls) | Focus timer forms. Becomes a preset entry inside **nudges**, renamed **Intervals**, per [0074](tickets.md) — not yet built |
+| System | **intervals** | pomodoro-skip | Same zip. Skip/extend stays planned on this addon. |
 | Security | **password-gen** | random password; **password-options** (passphrase / PIN / exclude-ambiguous / copy-once / …) | Own — not under play |
 | Play | *(each id its own zip)* | dice-roll, coin-flip, pick-one, number-guess, hangman, eight-ball, chess-clock, rps, stopwatch, memory, breathing, reaction-time, tic-tac-toe, fortune | Play is a **category**, not one shelf. Shared RNG/timer code is a **helper** ([0047](tickets.md)) — ship that before any Play zip. **Bundles** later ([0048](tickets.md)); 14 separate catalog rows is fine until then. |
 | Design | **sf-symbols** | pick/copy | Solo for now |
@@ -136,7 +136,7 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | Design | **qr-clip** | encode + **qr-decode** | QR both directions |
 | Tools | **unit-convert** | all units | One converter addon |
 | Meeting | **meeting-bar** | next meeting / join lite | Own; or fold into **next-event** |
-| *(own addons)* | — | camera-check, quit-heavy, scratch-folder, lock-screen, low-power, reminder-add, next-event, kitchen-timer, flash-attention, process-find, pdf-tools, speak-clip, resolution-preset, settings-jump, memory-pressure, nudges, grid-overlay, design-calc, time-machine, emoji-picker, media-convert, mount-dmg, airdrop-folder, quarantine-clear, repo-jumper, ssh-host-picker | Distinct jobs. (Several former entries here now merge elsewhere per [0074](tickets.md): mic-picker/speaker-mute→Audio; copy-ip/dns-flush/proxy-toggle/vpn-connect/wifi-toggle/http-status→Network; large-files/desktop-sweep→folder-clutter addon; finder-toggles→Finder/Desktop chrome; default-browser→Default Selection; app-info/relaunch-app→app-control; favorite-folders→jump-to-location; sleep→Power/Sleep.) |
+| *(own addons)* | — | camera-check, quit-heavy, scratch-folder, lock-screen, low-power, reminder-add, next-event, kitchen-timer, flash-attention, process-find, pdf-tools, speak-clip, resolution-preset, settings-jump, memory-pressure, grid-overlay, design-calc, time-machine, emoji-picker, media-convert, mount-dmg, airdrop-folder, quarantine-clear, repo-jumper, ssh-host-picker | Distinct jobs. (Several former entries here now merge elsewhere per [0074](tickets.md): mic-picker/speaker-mute→Audio; copy-ip/dns-flush/proxy-toggle/vpn-connect/wifi-toggle/http-status→Network; large-files/desktop-sweep→folder-clutter addon; finder-toggles→Finder/Desktop chrome; default-browser→Default Selection; app-info/relaunch-app→app-control; favorite-folders→jump-to-location; sleep→Power/Sleep.) |
 
 ### Meeting / device
 
@@ -161,20 +161,20 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 
 | Id | One-liner | Packaging |
 |---|---|---|
-| copy-ip | Copy LAN (optional public) IP | Merges into one Network addon (with dns-flush, proxy-toggle, vpn-connect, wifi-toggle, hosts, ping, http-status) per [0074](tickets.md) — not yet built |
-| dns-flush | Flush DNS cache | Merges into the same Network addon per [0074](tickets.md) — not yet built |
-| proxy-toggle | System proxy on/off | Merges into the same Network addon per [0074](tickets.md) — not yet built |
+| copy-ip | Copy LAN (optional public) IP | **network** command. List locked in [catalog-commands](catalog-commands.md). Not scaffolded. |
+| dns-flush | Flush DNS cache | **network** command. List locked in [catalog-commands](catalog-commands.md). Not scaffolded. |
+| proxy-toggle | System proxy on/off | **network** command. List locked in [catalog-commands](catalog-commands.md). Not scaffolded. |
 | quit-heavy | Top CPU/mem → quit | Standalone; ≠ kill-hung — confirmed separate from process-find, [0074](tickets.md) |
-| vpn-connect | Named VPN connect/disconnect | Merges into the same Network addon per [0074](tickets.md) — not yet built |
-| hosts | Enable/disable named `/etc/hosts` blocks | Merges into the same Network addon per [0074](tickets.md) — not yet built |
-| hosts-backup | Snapshot `/etc/hosts` before toggle; restore prior snapshot | **hosts** (which merges into Network per [0074](tickets.md)) |
-| ping | Ping host from clipboard or typed input | Merges into the same Network addon per [0074](tickets.md) — not yet built |
+| vpn-connect | Named VPN connect/disconnect | **network** command. List locked in [catalog-commands](catalog-commands.md). Not scaffolded. |
+| hosts | Enable/disable named `/etc/hosts` blocks | **network** command. List locked in [catalog-commands](catalog-commands.md). Not scaffolded. |
+| hosts-backup | Snapshot `/etc/hosts` before toggle; restore prior snapshot | **network** |
+| ping | Ping host from clipboard or typed input | **network** command. List locked in [catalog-commands](catalog-commands.md). Not scaffolded. |
 | port-scan-local | List listening ports on this Mac | Merged into **ports** (`addons/ports`) — stays separate from the new Network addon, [0074](tickets.md) |
 | git-root | Reveal git root of front Finder/Terminal path | Possible merge with repo-jumper considered, deferred — see [0074](tickets.md) |
-| open-url | Open clipboard URL in a chosen browser | Merges with **default-browser** into one "Default Selection" addon per [0074](tickets.md) — not yet built |
-| open-url-profile | Open URL in a chosen browser *profile* (Chrome/Safari/…) | **open-url** (which merges into Default Selection per [0074](tickets.md)) |
-| http-status | HEAD/GET clipboard URL → status + final URL + timing | Merges into the Network addon (with hosts, ping, copy-ip, dns-flush, proxy-toggle, vpn-connect, wifi-toggle) per [0074](tickets.md) — not yet built |
-| http-headers | Copy response headers / timing (e.g. as markdown) | **http-status** (which merges into Network per [0074](tickets.md)) |
+| open-url | Open clipboard URL in a chosen browser | **default-apps** command. List locked in [catalog-commands](catalog-commands.md). Not scaffolded. |
+| open-url-profile | Open URL in a chosen browser *profile* (Chrome/Safari/…) | **default-apps** |
+| http-status | HEAD/GET clipboard URL → status + final URL + timing | **network** command. List locked in [catalog-commands](catalog-commands.md). Not scaffolded. |
+| http-headers | Copy response headers / timing (e.g. as markdown) | **network** |
 | brew-services | List / start / stop / restart Homebrew services | **brew-outdated** |
 | brew-cleanup | `brew cleanup` (± prune) and other brew maintenance ops | **brew-outdated** (w/ doctor/update siblings) |
 | process-list | List processes (filterable) → copy PID / reveal / quit | **process-find** |
@@ -241,7 +241,7 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | trash-put-back | Put back last trashed item(s) | **trash-ui** |
 | screenshot-folder | Open the screenshots save folder | Own until **screenshot-inbox** (gap) |
 | screenshot-inbox | Open inbox, reveal latest, archive latest, or archive older screenshots | Own addon; palette commands first, no background watcher in v0 |
-| pdf-tools | Merge / split / page-count selected PDFs (+ compress and siblings) | Own **pdf-tools** addon (PDFKit) |
+| pdf-tools | Unlock, merge, split, extract, reorder, rotate, and the other shipped PDF commands. Later, one **Convert** panel (JPG → PDF, PDF → JPG, PDF → PNG) opened from the palette or Finder **Convert**. Word ↔ PDF and protect stay parked | Own **pdf-tools** addon (PDFKit) |
 | large-files | Biggest files under home or chosen folder (depth-capped) | Own addon; complements disk-pressure gap |
 | desktop-sweep | Move Desktop clutter into `Desktop/Archive-YYYY-MM-DD` | Own addon; ≠ downloads-triage |
 | favorite-folders | Jump a curated folder list (not full-disk search) | Own addon |
@@ -288,7 +288,7 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | screensaver | Start screensaver now | **desktop-toggles** or lock-adjacent |
 | wallpaper-shuffle | Random wallpaper from folder | Own or **desktop-toggles** |
 | hot-corners | Show or open Hot Corners settings | Own addon |
-| wifi-toggle | Wi‑Fi off/on / reconnect | Merges into the Network addon (with hosts, ping, copy-ip, dns-flush, proxy-toggle, vpn-connect, http-status) per [0074](tickets.md) — not yet built |
+| wifi-toggle | Wi‑Fi off/on / reconnect | **network** command. List locked in [catalog-commands](catalog-commands.md). Not scaffolded. |
 | lock-screen | Lock screen | Standalone |
 | low-power | Toggle Low Power Mode | Standalone |
 | reminder-add | Quick-add Reminder | Standalone |
@@ -306,19 +306,19 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | resolution-preset | Jump to named resolution / HiDPI preset | Own addon |
 | display-sleep | Sleep displays now | **sleep** |
 | sleep-now | Sleep Mac now (confirm) | **sleep** |
-| default-browser | Pick default browser from installed list | Merges with **open-url**/open-url-profile into one "Default Selection" (default-app-picker) addon per [0074](tickets.md) — not yet built |
+| default-browser | Pick default browser from installed list | **default-apps** command. List locked in [catalog-commands](catalog-commands.md). Not scaffolded. |
 | settings-jump | Palette → jump to a System Settings pane | Own addon |
 | memory-pressure | Memory pressure + top memory apps | Own addon; pair conceptually w/ disk-pressure gap |
 | speak-clip | Speak clipboard text (or stop speaking) | Own addon |
-| nudges | Wellness nudge shell: eye-rest / water / stretch (same timer; different copy/GIF) | Own **nudges** addon. Implementing — [0049](tickets.md) / [spec 2026-08-25](architecture/2026-08-25-nudges-clock-helper-design.md) |
-| eye-rest | 20-20-20 look-away nudge | **nudges**; ≠ pomodoro / kitchen-timer. Implementing — [0049](tickets.md) / [spec 2026-08-25](architecture/2026-08-25-nudges-clock-helper-design.md) |
-| water-nudge | Hydrate reminder | **nudges** |
-| stretch-nudge | Stand/stretch reminder | **nudges** |
+| nudges | Wellness reminder rows: eye-rest / water / stretch | **intervals** |
+| eye-rest | 20-20-20 look-away nudge | **intervals** |
+| water-nudge | Hydrate reminder | **intervals** |
+| stretch-nudge | Stand/stretch reminder | **intervals** |
 | time-machine | Status / start backup / open Time Machine | Own addon |
 | note-pin | Pin floating note above other windows | **floating-note** |
 | quick-note | Throwaway floating note: close / Cmd+W discards; nothing survives quit or reopen | **floating-note** — not its own zip; shell `note` pattern `persist: false`. Scratchpad stays `open` (`persist: true`) |
 | world-overlap | Overlap helper for “when is 9–10 across cities?” | **world-clock** |
-| pomodoro-skip | Skip / extend / log interruption (+ other session controls) | **pomodoro** |
+| pomodoro-skip | Skip / extend / log interruption (+ other session controls) | **intervals** |
 
 ### Fun — Play category (one addon per id)
 

@@ -40,6 +40,12 @@ public struct FormPanelView: View {
                 if field.kind == "toggle" {
                     Toggle("", isOn: boolBinding(field))
                         .labelsHidden()
+                } else if field.kind == "password" {
+                    SecureField(field.label, text: textBinding(field))
+                        .textFieldStyle(.plain)
+                        .padding(6)
+                        .background(theme.background)
+                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                 } else {
                     TextField(field.label, text: textBinding(field))
                         .textFieldStyle(.plain)

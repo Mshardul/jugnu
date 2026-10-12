@@ -17,7 +17,7 @@ enum ScreenshotMode {
 
     static let enabledAddons = [
         "jugnu.audio-toggles", "jugnu.focus-toggle", "jugnu.clip-tools", "jugnu.clipboard-history", "jugnu.ports",
-        "jugnu.floating-note", "jugnu.nudges", "jugnu.world-clock", "jugnu.battery-eta", "jugnu.window-layouts",
+        "jugnu.floating-note", "jugnu.intervals", "jugnu.world-clock", "jugnu.battery-eta", "jugnu.window-layouts",
         "jugnu.ui-demo-confirm", "jugnu.ui-demo-form", "jugnu.ui-demo-list",
     ]
 

@@ -31,6 +31,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var launchGuard: LaunchGuard?
     var inRecovery = false
     var keepCurrent: KeepCurrentCoordinator?
+    var pendingFinderURLs: [URL] = []
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         if !ScreenshotMode.isActive, yieldToRunningInstance() { return }
@@ -164,6 +165,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         launchGuard?.markCleanLaunch()
+        drainFinderURLs()
 
         Task { [weak self] in
             await self?.keepCurrent?.checkOnLaunch()
@@ -206,6 +208,42 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             model.statusMessage = message
             shellHost?.showToast(message: message, isError: true)
         }
+    }
+
+    func application(_ application: NSApplication, open urls: [URL]) {
+        pendingFinderURLs.append(contentsOf: urls)
+        drainFinderURLs()
+    }
+
+    func drainFinderURLs() {
+        guard model != nil, shellHost != nil else { return }
+        let urls = pendingFinderURLs
+        pendingFinderURLs = []
+        for url in urls {
+            openFinderURL(url)
+        }
+    }
+
+    func openFinderURL(_ url: URL) {
+        guard let model, let shellHost else { return }
+        guard let parsed = FinderQuickActions.parse(url) else { return }
+        guard let queue = FinderQuickActions.queueFile(
+            home: model.paths.home,
+            addonID: parsed.addonID,
+            commandID: parsed.commandID,
+            id: parsed.id
+        ) else { return }
+        let paths = FinderQuickActions.readQueue(at: queue)
+        try? FileManager.default.removeItem(at: queue)
+        guard let command = model.allCommands.first(where: {
+            $0.addonId == parsed.addonID && $0.commandId == parsed.commandID
+        }) else {
+            shellHost.showToast(message: "That command isn’t available.", isError: true)
+            return
+        }
+        NSApp.activate(ignoringOtherApps: true)
+        ensurePanelIfNeeded(model: model)
+        runCommand(command, args: ["paths": .array(paths.map { .string($0) })])
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {

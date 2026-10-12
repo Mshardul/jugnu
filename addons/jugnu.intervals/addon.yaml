@@ -1,0 +1,68 @@
+id: jugnu.intervals
+name: Intervals
+version: 1.0.0
+api: 1
+primary: manage
+helpers:
+  - id: clock
+    version: 1.0.0
+view_types: [rows, fields, ask]
+commands:
+  - id: manage
+    title: Intervals
+    subtitle: Add, edit, and enable timers
+    keywords: [interval, nudge, wellness, pomodoro, focus, timer]
+    view: rows
+  - id: nudge-now
+    title: Show interval now
+    subtitle: Show a timer card immediately
+    keywords: [nudge, preview, interval]
+    view: rows
+  - id: pause
+    title: Pause intervals
+  - id: resume
+    title: Resume intervals
+  - id: restore-presets
+    title: Restore interval presets
+  - id: advanced
+    title: Interval template
+    subtitle: Edit the new-interval template
+    view: fields
+  - id: show-card
+    title: Show interval card
+    subtitle: Internal — fired by clock
+    keywords: []
+  - id: start-focus
+    title: Start focus session
+    subtitle: Start the pomodoro work phase
+    keywords: [pomodoro, focus, timer, work]
+  - id: start-break
+    title: Start break
+    subtitle: Start the pomodoro break phase
+    keywords: [pomodoro, break, timer, rest]
+  - id: pomodoro-status
+    title: Pomodoro status
+    subtitle: Time remaining in the current phase
+    keywords: [pomodoro, timer]
+  - id: reset-pomodoro
+    title: Reset pomodoro
+    subtitle: Stop the pomodoro phase timer
+    keywords: [pomodoro, reset, stop, cancel]
+  - id: phase-chime
+    title: Phase chime
+    subtitle: Internal — fired by clock
+    keywords: []
+config:
+  - key: default_interval_minutes
+    type: int
+    default: 30
+  - key: show_nudge_now_in_manage
+    type: bool
+    default: true
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths:
+    - "~/.local/share/jugnu/state/intervals"
+  launchd: []

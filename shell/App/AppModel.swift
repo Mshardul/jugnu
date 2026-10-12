@@ -59,6 +59,7 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
         for id in installedAddonIDs() where config.addons[id]?.enabled == true {
             try? bootstrapDaemons(id: id)
         }
+        syncFinderMenus()
     }
 
     func refreshIndex() {
@@ -258,6 +259,7 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
             )
         }
         refreshIndex()
+        syncFinderMenus()
     }
 
     func uninstall(id: String) throws {
@@ -267,6 +269,46 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
         }
         try lifecycle.uninstall(id: id)
         refreshIndex()
+        syncFinderMenus()
+    }
+
+    func writeAddonConfig(addonID: String, key: String, value: JSONValue) {
+        let root = paths.addonsDir.appendingPathComponent(addonID)
+        guard let manifest = try? ManifestLoader.load(from: root) else { return }
+        let file = paths.addonConfigFile(id: addonID)
+        var values = (try? AddonConfigResolver.resolve(schema: manifest.config, fileURL: file)) ?? [:]
+        for field in manifest.config where values[field.key] == nil {
+            values[field.key] = field.default
+        }
+        values[key] = value
+        try? AddonConfigResolver.writeFile(schema: manifest.config, values: values, to: file)
+        syncFinderMenus()
+    }
+
+    func syncFinderMenus() {
+        if ScreenshotMode.isActive { return }
+        var desired: [FinderQuickAction] = []
+        for id in installedAddonIDs() {
+            let root = paths.addonsDir.appendingPathComponent(id)
+            guard let manifest = try? ManifestLoader.load(from: root) else { continue }
+            let file = paths.addonConfigFile(id: id)
+            let values = (try? AddonConfigResolver.resolve(schema: manifest.config, fileURL: file)) ?? [:]
+            desired.append(contentsOf: FinderMenu.actions(
+                manifest: manifest,
+                enabled: config.addons[id]?.enabled == true,
+                config: values
+            ))
+        }
+        let services = paths.finderServicesDir
+        let realServices = FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent("Library/Services")
+            .standardizedFileURL.path
+        let refresh = services.standardizedFileURL.path == realServices
+        try? FinderQuickActions.sync(
+            desired: desired,
+            servicesDirectory: services,
+            refreshServices: refresh
+        )
     }
 
     func bootstrapDaemons(id: String) throws {

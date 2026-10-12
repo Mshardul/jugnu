@@ -43,18 +43,18 @@ teardown_case() {
 }
 
 write_state() {
-  mkdir -p "$HOME/.local/share/jugnu/state/nudges"
-  cat > "$HOME/.local/share/jugnu/state/nudges/nudges.yaml"
+  mkdir -p "$HOME/.local/share/jugnu/state/intervals"
+  cat > "$HOME/.local/share/jugnu/state/intervals/intervals.yaml"
 }
 
 write_current_timers() {
   local include_water=${1:-yes}
   local water=""
   if [[ "$include_water" == "yes" ]]; then
-    water=',{"id":"nudges:water","kind":"interval","interval_seconds":2700,"enabled":true,"paused":false,"next_fire":"2030-01-01T00:45:00Z","group":"nudges","target":{"addon":"nudges","command":"show-card"}}'
+    water=',{"id":"intervals:water","kind":"interval","interval_seconds":2700,"enabled":true,"paused":false,"next_fire":"2030-01-01T00:45:00Z","group":"intervals","target":{"addon":"jugnu.intervals","command":"show-card"}}'
   fi
   cat > "$CLOCK_LIST_FILE" <<EOF
-{"ok":true,"timers":[{"id":"nudges:eye-rest","kind":"interval","interval_seconds":1200,"enabled":true,"paused":false,"next_fire":"2030-01-01T00:20:00Z","group":"nudges","target":{"addon":"nudges","command":"show-card"}}${water},{"id":"nudges:stretch","kind":"interval","interval_seconds":3600,"enabled":true,"paused":false,"next_fire":"2030-01-01T01:00:00Z","group":"nudges","target":{"addon":"nudges","command":"show-card"}}]}
+{"ok":true,"timers":[{"id":"intervals:eye-rest","kind":"interval","interval_seconds":1200,"enabled":true,"paused":false,"next_fire":"2030-01-01T00:20:00Z","group":"intervals","target":{"addon":"jugnu.intervals","command":"show-card"}}${water},{"id":"intervals:stretch","kind":"interval","interval_seconds":3600,"enabled":true,"paused":false,"next_fire":"2030-01-01T01:00:00Z","group":"intervals","target":{"addon":"jugnu.intervals","command":"show-card"}}]}
 EOF
 }
 
@@ -62,7 +62,7 @@ full_state() {
   cat <<'EOF'
 template:
   emoji: "✨"
-  title: "New nudge"
+  title: "New interval"
   message: "A small reminder."
   interval_minutes: 30
   accent: null
@@ -94,12 +94,14 @@ EOF
 test_first_run_writes_yaml_and_schedules_presets() {
   setup_case
   output=$(printf '{"api":1,"op":"run","command":"manage","args":{}}\n' | "$RUN")
-  state=$(cat "$HOME/.local/share/jugnu/state/nudges/nudges.yaml")
+  state=$(cat "$HOME/.local/share/jugnu/state/intervals/intervals.yaml")
   assert_contains "$output" '"ok":true'
   assert_contains "$state" $'template:\n'
   assert_contains "$state" $'rows:\n'
   [[ "$state" != \{* ]] || fail "state must be YAML, not JSON"
   [[ $(rg -c '"op":"upsert"' "$CLOCK_LOG") == 3 ]] || fail "expected three preset upserts"
+  assert_contains "$state" 'id: "pomodoro"'
+  assert_contains "$state" 'enabled: false'
   ! rg -q '/usr/bin/python3' "$RUN" || fail "runtime must not use Python"
   teardown_case
   PASSED=$((PASSED + 1))
@@ -109,7 +111,7 @@ test_show_card_accepts_generic_timer_id() {
   setup_case
   full_state | write_state
   write_current_timers
-  output=$(printf '{"api":1,"op":"run","command":"show-card","args":{"timerId":"nudges:water"}}\n' | "$RUN")
+  output=$(printf '{"api":1,"op":"run","command":"show-card","args":{"timerId":"intervals:water"}}\n' | "$RUN")
   assert_contains "$output" '"title":"Water"'
   assert_contains "$output" '"emoji":"💧"'
   teardown_case
@@ -132,7 +134,7 @@ test_load_reconciles_only_missing_timer() {
   write_current_timers no
   printf '{"api":1,"op":"run","command":"manage","args":{}}\n' | "$RUN" >/dev/null
   [[ $(rg -c '"op":"upsert"' "$CLOCK_LOG") == 1 ]] || fail "expected one missing timer upsert"
-  assert_contains "$(cat "$CLOCK_LOG")" '"id":"nudges:water"'
+  assert_contains "$(cat "$CLOCK_LOG")" '"id":"intervals:water"'
   teardown_case
   PASSED=$((PASSED + 1))
 }
@@ -141,7 +143,7 @@ test_reconcile_preserves_pause_and_next_fire() {
   setup_case
   full_state | write_state
   cat > "$CLOCK_LIST_FILE" <<'EOF'
-{"ok":true,"timers":[{"id":"nudges:eye-rest","kind":"interval","interval_seconds":1200,"enabled":true,"paused":false,"next_fire":"2030-01-01T00:20:00Z","group":"nudges","target":{"addon":"nudges","command":"show-card"}},{"id":"nudges:water","kind":"interval","interval_seconds":60,"enabled":true,"paused":true,"next_fire":"2030-02-03T04:05:06Z","group":"nudges","target":{"addon":"nudges","command":"show-card"}},{"id":"nudges:stretch","kind":"interval","interval_seconds":3600,"enabled":true,"paused":false,"next_fire":"2030-01-01T01:00:00Z","group":"nudges","target":{"addon":"nudges","command":"show-card"}}]}
+{"ok":true,"timers":[{"id":"intervals:eye-rest","kind":"interval","interval_seconds":1200,"enabled":true,"paused":false,"next_fire":"2030-01-01T00:20:00Z","group":"intervals","target":{"addon":"jugnu.intervals","command":"show-card"}},{"id":"intervals:water","kind":"interval","interval_seconds":60,"enabled":true,"paused":true,"next_fire":"2030-02-03T04:05:06Z","group":"intervals","target":{"addon":"jugnu.intervals","command":"show-card"}},{"id":"intervals:stretch","kind":"interval","interval_seconds":3600,"enabled":true,"paused":false,"next_fire":"2030-01-01T01:00:00Z","group":"intervals","target":{"addon":"jugnu.intervals","command":"show-card"}}]}
 EOF
   printf '{"api":1,"op":"run","command":"manage","args":{}}\n' | "$RUN" >/dev/null
   request=$(rg '"op":"upsert"' "$CLOCK_LOG")
@@ -154,11 +156,11 @@ EOF
 test_restore_only_upserts_missing_preset() {
   setup_case
   full_state | write_state
-  perl -0777 -pi -e 's/  - id: "water".*?(?=  - id: "stretch")//s' "$HOME/.local/share/jugnu/state/nudges/nudges.yaml"
+  perl -0777 -pi -e 's/  - id: "water".*?(?=  - id: "stretch")//s' "$HOME/.local/share/jugnu/state/intervals/intervals.yaml"
   write_current_timers no
   printf '{"api":1,"op":"run","command":"restore-presets","args":{}}\n' | "$RUN" >/dev/null
   [[ $(rg -c '"op":"upsert"' "$CLOCK_LOG") == 1 ]] || fail "restore must upsert only the missing preset"
-  assert_contains "$(cat "$CLOCK_LOG")" '"id":"nudges:water"'
+  assert_contains "$(cat "$CLOCK_LOG")" '"id":"intervals:water"'
   teardown_case
   PASSED=$((PASSED + 1))
 }
@@ -166,14 +168,14 @@ test_restore_only_upserts_missing_preset() {
 test_restore_preserves_existing_orphan_timer() {
   setup_case
   full_state | write_state
-  perl -0777 -pi -e 's/  - id: "water".*?(?=  - id: "stretch")//s' "$HOME/.local/share/jugnu/state/nudges/nudges.yaml"
-  ! rg -q 'id: "water"' "$HOME/.local/share/jugnu/state/nudges/nudges.yaml" || fail "water fixture row was not removed"
+  perl -0777 -pi -e 's/  - id: "water".*?(?=  - id: "stretch")//s' "$HOME/.local/share/jugnu/state/intervals/intervals.yaml"
+  ! rg -q 'id: "water"' "$HOME/.local/share/jugnu/state/intervals/intervals.yaml" || fail "water fixture row was not removed"
   cat > "$CLOCK_LIST_FILE" <<'EOF'
-{"ok":true,"timers":[{"id":"nudges:eye-rest","kind":"interval","interval_seconds":1200,"enabled":true,"paused":true,"next_fire":"2030-01-01T00:20:00Z","group":"nudges","target":{"addon":"nudges","command":"show-card"}},{"id":"nudges:water","kind":"interval","interval_seconds":2700,"enabled":true,"paused":true,"next_fire":"2030-02-03T04:05:06Z","group":"nudges","target":{"addon":"nudges","command":"show-card"}},{"id":"nudges:stretch","kind":"interval","interval_seconds":3600,"enabled":true,"paused":true,"next_fire":"2030-01-01T01:00:00Z","group":"nudges","target":{"addon":"nudges","command":"show-card"}}]}
+{"ok":true,"timers":[{"id":"intervals:eye-rest","kind":"interval","interval_seconds":1200,"enabled":true,"paused":true,"next_fire":"2030-01-01T00:20:00Z","group":"intervals","target":{"addon":"jugnu.intervals","command":"show-card"}},{"id":"intervals:water","kind":"interval","interval_seconds":2700,"enabled":true,"paused":true,"next_fire":"2030-02-03T04:05:06Z","group":"intervals","target":{"addon":"jugnu.intervals","command":"show-card"}},{"id":"intervals:stretch","kind":"interval","interval_seconds":3600,"enabled":true,"paused":true,"next_fire":"2030-01-01T01:00:00Z","group":"intervals","target":{"addon":"jugnu.intervals","command":"show-card"}}]}
 EOF
   output=$(printf '{"api":1,"op":"run","command":"restore-presets","args":{}}\n' | "$RUN")
   assert_contains "$output" '"ok":true'
-  assert_contains "$(cat "$HOME/.local/share/jugnu/state/nudges/nudges.yaml")" '  - id: "water"'
+  assert_contains "$(cat "$HOME/.local/share/jugnu/state/intervals/intervals.yaml")" '  - id: "water"'
   ! rg -q '"op":"upsert"' "$CLOCK_LOG" || fail "restore must not replace an existing orphan timer"
   assert_contains "$(cat "$CLOCK_LIST_FILE")" '"paused":true'
   assert_contains "$(cat "$CLOCK_LIST_FILE")" '"next_fire":"2030-02-03T04:05:06Z"'
@@ -181,14 +183,14 @@ EOF
   PASSED=$((PASSED + 1))
 }
 
-test_pause_and_resume_use_nudges_group() {
+test_pause_and_resume_use_intervals_group() {
   setup_case
   full_state | write_state
   write_current_timers
   printf '{"api":1,"op":"run","command":"pause","args":{}}\n' | "$RUN" >/dev/null
   printf '{"api":1,"op":"run","command":"resume","args":{}}\n' | "$RUN" >/dev/null
-  assert_contains "$(cat "$CLOCK_LOG")" '"op":"pause","group":"nudges"'
-  assert_contains "$(cat "$CLOCK_LOG")" '"op":"resume","group":"nudges"'
+  assert_contains "$(cat "$CLOCK_LOG")" '"op":"pause","group":"intervals"'
+  assert_contains "$(cat "$CLOCK_LOG")" '"op":"resume","group":"intervals"'
   teardown_case
   PASSED=$((PASSED + 1))
 }
@@ -199,7 +201,7 @@ test_manage_lists_selectable_rows_and_add() {
   write_current_timers
   output=$(printf '{"api":1,"op":"run","command":"manage","args":{}}\n' | "$RUN")
   assert_contains "$output" '"id":"water","title":"💧 Water","subtitle":"Enabled · Every 45 min","actions":["select"]'
-  assert_contains "$output" '"id":"add","title":"➕ Add nudge","subtitle":"Create a new nudge","actions":["select"]'
+  assert_contains "$output" '"id":"add","title":"➕ Add interval","subtitle":"Create a new interval","actions":["select"]'
   [[ "$output" != *'"actions":["toggle","edit","delete"]'* ]] || fail "manage exposed unreachable multi-action rows"
   actions=$(printf '{"api":1,"op":"run","command":"manage","args":{"itemId":"water","action":"select"}}\n' | "$RUN")
   assert_contains "$actions" '"id":"toggle:water","title":"🔁 Toggle","actions":["select"]'
@@ -218,11 +220,11 @@ test_manage_add_form_uses_template_and_saves_row() {
   assert_contains "$form" '"id":"emoji","label":"Emoji","kind":"text","value":"✨"'
   assert_contains "$form" '"id":"interval_minutes","label":"Interval (minutes)","kind":"text","value":30'
   output=$(printf '{"api":1,"op":"run","command":"manage","args":{"id":"breathe","emoji":"🌬️","title":"Breathe","message":"Slow down.","interval_minutes":"15","accent":"","enabled":true}}\n' | "$RUN")
-  assert_contains "$output" '"message":"Nudge added."'
-  state=$(cat "$HOME/.local/share/jugnu/state/nudges/nudges.yaml")
+  assert_contains "$output" '"message":"Interval added."'
+  state=$(cat "$HOME/.local/share/jugnu/state/intervals/intervals.yaml")
   assert_contains "$state" '  - id: "breathe"'
   assert_contains "$state" '    interval_minutes: 15'
-  assert_contains "$(cat "$CLOCK_LOG")" '"id":"nudges:breathe"'
+  assert_contains "$(cat "$CLOCK_LOG")" '"id":"intervals:breathe"'
   teardown_case
   PASSED=$((PASSED + 1))
 }
@@ -236,10 +238,10 @@ test_manage_edit_keeps_identity_and_syncs_clock() {
   [[ "$form" != *'"id":"id","label":"ID"'* ]] || fail "edit form exposed editable identity"
   assert_contains "$form" '"id":"edit:water:message"'
   output=$(printf '{"api":1,"op":"run","command":"manage","args":{"id":"stretch","emoji":"💧","title":"Hydrate","edit:water:message":"Drink.","interval_minutes":"50","accent":"","enabled":true}}\n' | "$RUN")
-  assert_contains "$output" '"message":"Nudge saved."'
-  state=$(cat "$HOME/.local/share/jugnu/state/nudges/nudges.yaml")
-  assert_contains "$state" $'  - id: "water"\n    emoji: "💧"\n    title: "Hydrate"'
-  assert_contains "$state" $'  - id: "stretch"\n    emoji: "🧘"\n    title: "Stretch"'
+  assert_contains "$output" '"message":"Interval saved."'
+  state=$(cat "$HOME/.local/share/jugnu/state/intervals/intervals.yaml")
+  assert_contains "$state" $'  - id: "water"\n    kind: "interval"\n    emoji: "💧"\n    title: "Hydrate"'
+  assert_contains "$state" $'  - id: "stretch"\n    kind: "interval"\n    emoji: "🧘"\n    title: "Stretch"'
   assert_contains "$(cat "$CLOCK_LOG")" '"interval_seconds":3000'
   teardown_case
   PASSED=$((PASSED + 1))
@@ -250,19 +252,19 @@ test_manage_toggle_and_confirmed_delete_sync_clock() {
   full_state | write_state
   write_current_timers
   output=$(printf '{"api":1,"op":"run","command":"manage","args":{"itemId":"toggle:water","action":"select"}}\n' | "$RUN")
-  assert_contains "$output" '"message":"Nudge disabled."'
-  assert_contains "$(cat "$CLOCK_LOG")" '"op":"cancel","id":"nudges:water"'
-  assert_contains "$(cat "$HOME/.local/share/jugnu/state/nudges/nudges.yaml")" '    enabled: false'
+  assert_contains "$output" '"message":"Interval disabled."'
+  assert_contains "$(cat "$CLOCK_LOG")" '"op":"cancel","id":"intervals:water"'
+  assert_contains "$(cat "$HOME/.local/share/jugnu/state/intervals/intervals.yaml")" '    enabled: false'
 
   : > "$CLOCK_LOG"
   confirm=$(printf '{"api":1,"op":"run","command":"manage","args":{"itemId":"delete:water","action":"select"}}\n' | "$RUN")
   assert_contains "$confirm" '"pattern":"confirm"'
-  assert_contains "$(cat "$HOME/.local/share/jugnu/state/nudges/nudges.yaml")" 'id: "water"'
+  assert_contains "$(cat "$HOME/.local/share/jugnu/state/intervals/intervals.yaml")" 'id: "water"'
   ! rg -q '"op":"cancel"' "$CLOCK_LOG" || fail "delete cancelled clock before confirmation"
   output=$(printf '{"api":1,"op":"run","command":"manage","args":{"confirmed":true}}\n' | "$RUN")
-  assert_contains "$output" '"message":"Nudge deleted."'
-  assert_contains "$(cat "$CLOCK_LOG")" '"op":"cancel","id":"nudges:water"'
-  ! rg -q 'id: "water"' "$HOME/.local/share/jugnu/state/nudges/nudges.yaml" || fail "deleted row remained in state"
+  assert_contains "$output" '"message":"Interval deleted."'
+  assert_contains "$(cat "$CLOCK_LOG")" '"op":"cancel","id":"intervals:water"'
+  ! rg -q 'id: "water"' "$HOME/.local/share/jugnu/state/intervals/intervals.yaml" || fail "deleted row remained in state"
   teardown_case
   PASSED=$((PASSED + 1))
 }
@@ -274,7 +276,7 @@ test_manage_rejects_invalid_form_values() {
   output=$(printf '{"api":1,"op":"run","command":"manage","args":{"id":"bad","emoji":"⚠️","title":"Bad","message":"","interval_minutes":"0","accent":"","enabled":true}}\n' | "$RUN")
   assert_contains "$output" '"ok":false'
   assert_contains "$output" '"error":"Message is required."'
-  ! rg -q 'id: "bad"' "$HOME/.local/share/jugnu/state/nudges/nudges.yaml" || fail "invalid row was saved"
+  ! rg -q 'id: "bad"' "$HOME/.local/share/jugnu/state/intervals/intervals.yaml" || fail "invalid row was saved"
   teardown_case
   PASSED=$((PASSED + 1))
 }
@@ -288,13 +290,13 @@ test_advanced_saves_and_resets_template() {
   assert_contains "$form" '"id":"reset","label":"Reset to factory template","kind":"toggle","value":false'
   output=$(printf '{"api":1,"op":"run","command":"advanced","args":{"emoji":"🌱","title":"Fresh","message":"Begin again.","interval_minutes":"12","accent":"#66CCFF","reset":false}}\n' | "$RUN")
   assert_contains "$output" '"message":"Template saved."'
-  assert_contains "$(cat "$HOME/.local/share/jugnu/state/nudges/nudges.yaml")" '  title: "Fresh"'
+  assert_contains "$(cat "$HOME/.local/share/jugnu/state/intervals/intervals.yaml")" '  title: "Fresh"'
 
   confirm=$(printf '{"api":1,"op":"run","command":"advanced","args":{"emoji":"🌱","title":"Fresh","message":"Begin again.","interval_minutes":"12","accent":"#66CCFF","reset":true}}\n' | "$RUN")
   assert_contains "$confirm" '"pattern":"confirm"'
   output=$(printf '{"api":1,"op":"run","command":"advanced","args":{"confirmed":true}}\n' | "$RUN")
   assert_contains "$output" '"message":"Template reset."'
-  assert_contains "$(cat "$HOME/.local/share/jugnu/state/nudges/nudges.yaml")" '  title: "New nudge"'
+  assert_contains "$(cat "$HOME/.local/share/jugnu/state/intervals/intervals.yaml")" '  title: "New interval"'
   teardown_case
   PASSED=$((PASSED + 1))
 }
@@ -312,10 +314,71 @@ test_nudge_now_selection_returns_card() {
   PASSED=$((PASSED + 1))
 }
 
+test_start_focus_schedules_work_phase() {
+  setup_case
+  printf '{"api":1,"op":"run","command":"manage","args":{}}\n' | "$RUN" >/dev/null
+  : > "$CLOCK_LOG"
+  output=$(printf '{"api":1,"op":"run","command":"start-focus","args":{}}\n' | "$RUN")
+  assert_contains "$output" '"message":"work started (25m)"'
+  assert_contains "$(cat "$CLOCK_LOG")" '"kind":"one-shot"'
+  assert_contains "$(cat "$CLOCK_LOG")" '"id":"intervals:pomodoro:work"'
+  assert_contains "$(cat "$CLOCK_LOG")" '"command":"phase-chime"'
+  assert_contains "$(cat "$HOME/.local/share/jugnu/state/intervals/intervals.yaml")" 'phase: "work"'
+  teardown_case
+  PASSED=$((PASSED + 1))
+}
+
+test_phase_chime_advances_to_break() {
+  setup_case
+  printf '{"api":1,"op":"run","command":"start-focus","args":{}}\n' | "$RUN" >/dev/null
+  : > "$CLOCK_LOG"
+  output=$(printf '{"api":1,"op":"run","command":"phase-chime","args":{"timerId":"intervals:pomodoro:work"}}\n' | "$RUN")
+  assert_contains "$output" '"pattern":"card"'
+  assert_contains "$output" "Focus. The glow can wait."
+  assert_contains "$(cat "$CLOCK_LOG")" '"id":"intervals:pomodoro:break"'
+  assert_contains "$(cat "$HOME/.local/share/jugnu/state/intervals/intervals.yaml")" 'phase: "break"'
+  teardown_case
+  PASSED=$((PASSED + 1))
+}
+
+test_reset_pomodoro_cancels_phase_timer() {
+  setup_case
+  printf '{"api":1,"op":"run","command":"start-focus","args":{}}\n' | "$RUN" >/dev/null
+  : > "$CLOCK_LOG"
+  output=$(printf '{"api":1,"op":"run","command":"reset-pomodoro","args":{}}\n' | "$RUN")
+  assert_contains "$output" '"message":"pomodoro reset"'
+  assert_contains "$(cat "$CLOCK_LOG")" '"op":"cancel","id":"intervals:pomodoro:work"'
+  assert_contains "$(cat "$HOME/.local/share/jugnu/state/intervals/intervals.yaml")" 'enabled: false'
+  teardown_case
+  PASSED=$((PASSED + 1))
+}
+
+test_pomodoro_status_idle_until_started() {
+  setup_case
+  printf '{"api":1,"op":"run","command":"manage","args":{}}\n' | "$RUN" >/dev/null
+  output=$(printf '{"api":1,"op":"run","command":"pomodoro-status","args":{}}\n' | "$RUN")
+  assert_contains "$output" '"message":"idle"'
+  teardown_case
+  PASSED=$((PASSED + 1))
+}
+
+test_pomodoro_status_reads_next_fire() {
+  setup_case
+  printf '{"api":1,"op":"run","command":"start-focus","args":{}}\n' | "$RUN" >/dev/null
+  cat > "$CLOCK_LIST_FILE" <<'EOF'
+{"ok":true,"timers":[{"id":"intervals:pomodoro:work","kind":"one-shot","fire_at":"2099-01-01T00:00:00Z","enabled":true,"paused":false,"next_fire":"2099-01-01T00:00:00Z","group":"intervals","target":{"addon":"jugnu.intervals","command":"phase-chime"}}]}
+EOF
+  output=$(printf '{"api":1,"op":"run","command":"pomodoro-status","args":{}}\n' | "$RUN")
+  assert_contains "$output" "work:"
+  assert_contains "$output" "remaining"
+  teardown_case
+  PASSED=$((PASSED + 1))
+}
+
 test_nudge_now_hides_disabled_rows() {
   setup_case
   full_state | write_state
-  perl -pi -e '$seen ||= /id: "water"/; if ($seen && /enabled: true/) { s/enabled: true/enabled: false/; $seen = 0 }' "$HOME/.local/share/jugnu/state/nudges/nudges.yaml"
+  perl -pi -e '$seen ||= /id: "water"/; if ($seen && /enabled: true/) { s/enabled: true/enabled: false/; $seen = 0 }' "$HOME/.local/share/jugnu/state/intervals/intervals.yaml"
   write_current_timers
   list=$(printf '{"api":1,"op":"run","command":"nudge-now","args":{}}\n' | "$RUN")
   [[ "$list" != *'"id":"water"'* ]] || fail "nudge-now listed a disabled row"
@@ -331,7 +394,7 @@ test_load_reconciles_only_missing_timer
 test_reconcile_preserves_pause_and_next_fire
 test_restore_only_upserts_missing_preset
 test_restore_preserves_existing_orphan_timer
-test_pause_and_resume_use_nudges_group
+test_pause_and_resume_use_intervals_group
 test_manage_lists_selectable_rows_and_add
 test_manage_add_form_uses_template_and_saves_row
 test_manage_edit_keeps_identity_and_syncs_clock
@@ -340,4 +403,9 @@ test_manage_rejects_invalid_form_values
 test_advanced_saves_and_resets_template
 test_nudge_now_selection_returns_card
 test_nudge_now_hides_disabled_rows
-printf '%s nudges tests passed\n' "$PASSED"
+test_start_focus_schedules_work_phase
+test_phase_chime_advances_to_break
+test_reset_pomodoro_cancels_phase_timer
+test_pomodoro_status_idle_until_started
+test_pomodoro_status_reads_next_fire
+printf '%s intervals tests passed\n' "$PASSED"

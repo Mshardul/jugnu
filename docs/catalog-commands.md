@@ -20,7 +20,7 @@ Companion: [catalog-ui.md](catalog-ui.md) (panels / mini-apps). Packaging rules:
 - **`python-runtime` helper first**, then `clip-tools` (no in-zip CPython). Specs: [python-runtime](architecture/2026-09-04-python-runtime-helper-design.md) · [clip-tools](architecture/2026-09-04-clip-tools-design.md).
 - **PDF** ops live on **`pdf-tools`**, not the text formatter UI.
 - **Calculators** (EMI, GPA, GST, %, age, …) stay on the list under **Tools / calc**; not part of clip-tools.
-- Heavy / unclear local path (background remover, upscaler, Word↔PDF, protect/unlock PDF) stay **`parked`**, not deleted.
+- Heavy / unclear local path (background remover, upscaler, Word↔PDF, protect PDF) stay **`parked`**, not deleted.
 
 ---
 
@@ -52,13 +52,20 @@ Companion: [catalog-ui.md](catalog-ui.md) (panels / mini-apps). Packaging rules:
 |---|---|---|
 | `presets` | Brightness presets | planned |
 
-### desktop-toggles — planned
+### finder-chrome — planned
+
+One Finder/Desktop chrome addon. `finder-chrome` is the grid of live toggles. Absorbs desktop-toggles and finder-toggles ([0074](tickets.md)).
 
 | Command id | Title | Status |
 |---|---|---|
-| `desktop-icons` | Show/hide desktop icons | planned |
-| `dock-autohide` | Toggle Dock autohide | planned |
-| `menubar-autohide` | Toggle menu bar autohide | planned |
+| `finder-chrome` | Finder and Desktop | planned |
+| `desktop-icons` | Show or hide desktop icons | planned |
+| `dock-autohide` | Dock autohide | planned |
+| `menubar-autohide` | Menu bar autohide | planned |
+| `hidden-files` | Finder hidden files | planned |
+| `path-bar` | Finder path bar | planned |
+| `status-bar` | Finder status bar | planned |
+| `restart-finder` | Relaunch Finder | planned |
 
 ### wallpaper-shuffle — planned
 
@@ -77,15 +84,6 @@ Companion: [catalog-ui.md](catalog-ui.md) (panels / mini-apps). Packaging rules:
 | Command id | Title | Status |
 |---|---|---|
 | `open` | Open Hot Corners settings | planned |
-
-### finder-toggles — planned
-
-| Command id | Title | Status |
-|---|---|---|
-| `hidden-files` | Toggle hidden files | planned |
-| `path-bar` | Toggle Finder path bar | planned |
-| `status-bar` | Toggle Finder status bar | planned |
-| `restart-finder` | Relaunch Finder | planned |
 
 ### resolution-preset — planned
 
@@ -194,12 +192,21 @@ Heavier two-buffer compare. Own addon unless kept tiny on clip-tools.
 | `background-remove` | Background remover | parked |
 | `upscale` | Image upscaler | parked |
 
-### downloads-triage — planned
+### folder-clutter — planned
+
+One folder/file clutter addon. `folder-clutter` opens the list. Absorbs downloads-triage, screenshot-inbox, desktop-sweep, and large-files ([0074](tickets.md)).
 
 | Command id | Title | Status |
 |---|---|---|
+| `folder-clutter` | Folder clutter | planned |
 | `reveal-downloads` | Open Downloads | planned |
-| `downloads-age` | Triage by age / type | planned |
+| `downloads-age` | Triage Downloads by age | planned |
+| `screenshot-inbox` | Open the screenshot inbox | planned |
+| `reveal-latest-screenshot` | Reveal the latest screenshot | planned |
+| `archive-latest-screenshot` | Archive the latest screenshot | planned |
+| `archive-older-screenshots` | Archive older screenshots | planned |
+| `desktop-sweep` | Archive Desktop clutter | planned |
+| `large-files` | Biggest files under a folder | planned |
 
 ### airdrop-folder — planned
 
@@ -276,52 +283,33 @@ May absorb zip-selection / unarchive later.
 |---|---|---|
 | `open` | Open screenshots folder | planned |
 
-### screenshot-inbox — planned
+### pdf-tools
+
+Separate from clip-tools / text Transform UI. One addon. The commands below are shipped. Word ↔ PDF and protect stay parked. A shared page-preview studio is still unbuilt; these commands use a form, a list, or a toast.
+
+Later, JPG → PDF, PDF → JPG, and PDF → PNG share one **Convert** panel (`fields`). `convert` opens it. Finder’s **Convert** item (JPEG and PDF) opens that panel with the file and its type already chosen, and does not convert on click. `jpg-pdf`, `pdf-jpg`, and `pdf-png` stay the direct jobs and open the same panel with that conversion selected. See [catalog UI](catalog-ui.md).
 
 | Command id | Title | Status |
 |---|---|---|
-| `open` | Open screenshot inbox | planned |
-| `reveal-latest` | Reveal latest screenshot | planned |
-| `archive-latest` | Archive latest | planned |
-| `archive-older` | Archive older | planned |
-
-### pdf-tools — planned
-
-Separate from clip-tools / text Transform UI.
-
-| Command id | Title | Status |
-|---|---|---|
-| `merge` | Merge PDFs | planned |
-| `split` | Split PDF | planned |
-| `extract-pages` | Extract pages | planned |
-| `organize` | Reorder / organize pages | planned |
-| `rotate` | Rotate PDF pages | planned |
-| `page-count` | Page count | planned |
-| `page-numbers` | Add page numbers | planned |
-| `bookmarks` | Add / edit bookmarks | planned |
-| `info` | PDF info (size, encrypted?, version) | planned |
-| `extract-text` | Extract embedded text (non-OCR) | planned |
-| `compress` | Compress PDF | planned |
-| `jpg-pdf` | JPG → PDF | planned |
-| `pdf-jpg` | PDF → JPG | planned |
-| `pdf-png` | PDF → PNG | planned |
-| `flatten-forms` | Flatten form fields | planned |
-| `grayscale` | Grayscale PDF | planned |
+| `pdf-unlock` | Remove PDF password | shipped |
+| `merge` | Merge PDFs | shipped |
+| `split` | Split PDF | shipped |
+| `extract-pages` | Extract pages | shipped |
+| `organize` | Reorder PDF pages | shipped |
+| `rotate` | Rotate PDF pages | shipped |
+| `page-count` | Page count | shipped |
+| `page-numbers` | Add page numbers | shipped |
+| `bookmarks` | Add / edit bookmarks | shipped |
+| `info` | PDF info | shipped |
+| `extract-text` | Extract PDF text | shipped |
+| `compress` | Compress PDF | shipped |
+| `jpg-pdf` | JPG to PDF | shipped |
+| `pdf-jpg` | PDF to JPG | shipped |
+| `pdf-png` | PDF to PNG | shipped |
+| `flatten-forms` | Flatten PDF forms | shipped |
+| `grayscale` | Grayscale PDF | shipped |
 | `word-pdf` | Word ↔ PDF | parked |
 | `protect` | Protect PDF | parked |
-| `unlock` | Unlock PDF | parked |
-
-### large-files — planned
-
-| Command id | Title | Status |
-|---|---|---|
-| `find` | Biggest files under folder | planned |
-
-### desktop-sweep — planned
-
-| Command id | Title | Status |
-|---|---|---|
-| `archive` | Archive Desktop clutter | planned |
 
 ### mount-dmg — planned
 
@@ -336,17 +324,15 @@ Separate from clip-tools / text Transform UI.
 |---|---|---|
 | `afconvert` | Audio convert presets | planned |
 
-### favorite-folders — planned
+### jump-to-location — planned
+
+One jump-to-location addon. `jump-to-location` opens the list. Absorbs favorite-folders and recent-files ([0074](tickets.md)).
 
 | Command id | Title | Status |
 |---|---|---|
-| `jump` | Jump curated folders | planned |
-
-### recent-files — planned
-
-| Command id | Title | Status |
-|---|---|---|
-| `list` | Recently modified files | planned |
+| `jump-to-location` | Jump to a folder or recent file | planned |
+| `favorite-folders` | Jump a curated folder list | planned |
+| `recent-files` | Recently modified files | planned |
 
 ### scratch-folder — planned
 
@@ -488,55 +474,23 @@ Own or on `focus-toggle`.
 |---|---|---|
 | `list` | Listening ports | shipped |
 
-### hosts — planned
+### network — planned
+
+One network addon. `network` opens the list. Absorbs hosts, ping, http-status, copy-ip, dns-flush, proxy-toggle, vpn-connect, and wifi-toggle ([0074](tickets.md)). Ports stays its own addon.
 
 | Command id | Title | Status |
 |---|---|---|
-| `toggle-block` | Enable / disable hosts block | planned |
-| `hosts-backup` | Backup / restore hosts | planned |
-
-### ping — planned
-
-| Command id | Title | Status |
-|---|---|---|
-| `ping` | Ping host | planned |
-
-### http-status — planned
-
-| Command id | Title | Status |
-|---|---|---|
-| `status` | HTTP status + timing | planned |
-| `headers` | Response headers | planned |
-
-### copy-ip — planned
-
-| Command id | Title | Status |
-|---|---|---|
-| `copy` | Copy LAN / public IP | planned |
-
-### dns-flush — planned
-
-| Command id | Title | Status |
-|---|---|---|
-| `flush` | Flush DNS | planned |
-
-### proxy-toggle — planned
-
-| Command id | Title | Status |
-|---|---|---|
-| `toggle` | System proxy on/off | planned |
-
-### vpn-connect — planned
-
-| Command id | Title | Status |
-|---|---|---|
-| `connect` | Named VPN connect / disconnect | planned |
-
-### wifi-toggle — planned
-
-| Command id | Title | Status |
-|---|---|---|
-| `toggle` | Wi‑Fi off / on / reconnect | planned |
+| `network` | Network | planned |
+| `copy-ip` | Copy LAN IP | planned |
+| `dns-flush` | Flush DNS cache | planned |
+| `proxy-toggle` | System proxy on or off | planned |
+| `vpn-connect` | Connect or disconnect a VPN | planned |
+| `wifi-toggle` | Wi-Fi off, on, or reconnect | planned |
+| `ping` | Ping a host | planned |
+| `hosts-block` | Enable or disable a hosts block | planned |
+| `hosts-backup` | Snapshot or restore hosts | planned |
+| `http-status` | HTTP status and timing | planned |
+| `http-headers` | Copy response headers | planned |
 
 ---
 
@@ -564,12 +518,16 @@ Own or on `focus-toggle`.
 |---|---|---|
 | `reveal` | Reveal git root | planned |
 
-### open-url — planned
+### default-apps — planned
+
+One default-app addon (Default Selection). `default-apps` opens the picker. Absorbs default-browser and open-url ([0074](tickets.md)).
 
 | Command id | Title | Status |
 |---|---|---|
-| `open` | Open URL in chosen browser | planned |
-| `open-url-profile` | Open in browser profile | planned |
+| `default-apps` | Default apps | planned |
+| `default-browser` | Pick the default browser | planned |
+| `open-url` | Open a URL in a chosen browser | planned |
+| `open-url-profile` | Open a URL in a chosen browser profile | planned |
 
 ### repo-jumper — planned
 
@@ -591,17 +549,15 @@ Own or on `focus-toggle`.
 | `find` | Find by name | planned |
 | `sort` | Sort by CPU / mem | planned |
 
-### app-info — planned
+### app-control — planned
+
+One app-control addon. `app-control` opens the front-app panel. Absorbs app-info and relaunch-app ([0074](tickets.md)).
 
 | Command id | Title | Status |
 |---|---|---|
-| `front` | Front app info | planned |
-
-### relaunch-app — planned
-
-| Command id | Title | Status |
-|---|---|---|
-| `relaunch` | Quit + reopen front app | planned |
+| `app-control` | Front app | planned |
+| `app-info` | Copy front app name, bundle id, version, and path | planned |
+| `relaunch-app` | Quit and reopen the front app | planned |
 
 ### quit-heavy — planned
 
@@ -622,17 +578,25 @@ Own or on `focus-toggle`.
 | `status` | Keep-awake status | shipped |
 | `watch` | Daemon | shipped |
 
-### nudges — shipped
+### intervals — shipped
+
+One timer list. Recurring reminder rows plus a pomodoro preset (`kind: phases`) that alternates focus and break. Replaces `nudges` and `pomodoro` ([0074](tickets.md)).
 
 | Command id | Title | Status |
 |---|---|---|
-| `manage` | Manage nudges | shipped |
-| `nudge-now` | Nudge now | shipped |
-| `pause` | Pause | shipped |
-| `resume` | Resume | shipped |
-| `restore-presets` | Restore presets | shipped |
-| `advanced` | Advanced | shipped |
-| `show-card` | Show card | shipped |
+| `manage` | Intervals | shipped |
+| `nudge-now` | Show interval now | shipped |
+| `pause` | Pause intervals | shipped |
+| `resume` | Resume intervals | shipped |
+| `restore-presets` | Restore interval presets | shipped |
+| `advanced` | Interval template | shipped |
+| `show-card` | Show interval card | shipped |
+| `start-focus` | Start focus session | shipped |
+| `start-break` | Start break | shipped |
+| `pomodoro-status` | Pomodoro status | shipped |
+| `reset-pomodoro` | Reset pomodoro | shipped |
+| `phase-chime` | Phase chime | shipped |
+| `pomodoro-skip` | Skip / extend / log interruption | planned |
 
 ### floating-note — shipped
 
@@ -649,17 +613,6 @@ Own or on `focus-toggle`.
 | `show` | World clock | shipped |
 | `world-overlap` | Meeting overlap helper | planned |
 
-### pomodoro — shipped
-
-| Command id | Title | Status |
-|---|---|---|
-| `work` | Start work | shipped |
-| `break` | Start break | shipped |
-| `status` | Status | shipped |
-| `reset` | Reset | shipped |
-| `chime` | Chime | shipped |
-| `skip` | Skip / extend / log interruption | planned |
-
 ### battery-eta — shipped
 
 | Command id | Title | Status |
@@ -672,11 +625,18 @@ Own or on `focus-toggle`.
 |---|---|---|
 | `status` | Weather | shipped |
 
-### sleep — planned
+### power-sleep — planned
+
+One power/sleep addon. `power-sleep` opens the list. Absorbs keep-awake and sleep ([0074](tickets.md)). Shipped `keep-awake` keeps its current command ids until this addon is built.
 
 | Command id | Title | Status |
 |---|---|---|
-| `sleep-now` | Sleep Mac | planned |
+| `power-sleep` | Power and sleep | planned |
+| `keep-awake` | Keep awake for a duration | planned |
+| `stop-keep-awake` | Allow idle sleep again | planned |
+| `keep-awake-status` | Whether keep-awake is running | planned |
+| `keep-awake-watch` | Keep-awake watcher | planned |
+| `sleep-now` | Sleep the Mac | planned |
 | `display-sleep` | Sleep displays | planned |
 
 ### settings-jump — planned
@@ -684,12 +644,6 @@ Own or on `focus-toggle`.
 | Command id | Title | Status |
 |---|---|---|
 | `jump` | Jump System Settings pane | planned |
-
-### default-browser — planned
-
-| Command id | Title | Status |
-|---|---|---|
-| `pick` | Default browser | planned |
 
 ### memory-pressure — planned
 

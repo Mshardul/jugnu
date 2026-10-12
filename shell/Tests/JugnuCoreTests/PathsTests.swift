@@ -21,12 +21,12 @@ final class PathsTests: XCTestCase {
             "/tmp/jugnu-home-test/.local/share/jugnu/state/app-update/.staging"
         )
         XCTAssertEqual(
-            paths.addonStateRoot(id: "jugnu.nudges").path,
-            "/tmp/jugnu-home-test/.local/share/jugnu/state/jugnu.nudges"
+            paths.addonStateRoot(id: "jugnu.intervals").path,
+            "/tmp/jugnu-home-test/.local/share/jugnu/state/jugnu.intervals"
         )
         XCTAssertEqual(
-            paths.addonConfigFile(id: "jugnu.nudges").path,
-            "/tmp/jugnu-home-test/.config/jugnu/addons/jugnu.nudges.yaml"
+            paths.addonConfigFile(id: "jugnu.intervals").path,
+            "/tmp/jugnu-home-test/.config/jugnu/addons/jugnu.intervals.yaml"
         )
     }
 }

@@ -17,6 +17,9 @@ The project has not published a release yet. Entries currently describe unreleas
 
 ### Added
 
+- 2026-10-12 — PDF Tools: merge, split, extract, reorder, rotate, page count, page numbers, bookmarks, info, extract text, compress, JPEG/PNG conversion, flatten forms, and grayscale. Each one writes beside the original. A locked PDF has to be unlocked first. The page-preview studio is still unbuilt.
+- 2026-10-12 — PDF Tools: `pdf-unlock` writes an unlocked copy beside a PDF when it opens or you supply the password. Finder’s right-click item is off unless you add it at install or turn on **Show In Finder Menu** in Settings.
+- 2026-10-12 — Intervals (ticket 0074): `jugnu.nudges` and `jugnu.pomodoro` are one addon, `jugnu.intervals`. Pomodoro is a focus/break preset on the same timer list. Command lists for the seven unbuilt merge groups are locked in `docs/catalog-commands.md`.
 - 2026-09-12 — Open via manifest `primary` (ticket 0066): `addon.yaml` `primary:` names a command; catalog card and detail show a leftmost, accent-tinted **Open** for installed+enabled addons with a valid primary; missing/invalid primary shows no button. `jugnu.clipboard-history` is the first consumer (`primary: list`).
 - 2026-09-10 — Addon detail tabs + config (ticket 0065): Overview / Commands / Settings; Run; prefs Installed + gear → Settings; 0827 config pipeline; nudges first `config:` consumer. Visual polish → [0067](docs/tickets.md).
 - 2026-09-10 — Preferences canvas (ticket 0064): rail + panes for Theme / Addons→Updates / General; enable/uninstall / starter install leave prefs (Browse owns them). Hotkeys / Installed / Permissions rows stay [0037](docs/tickets.md) / [0065](docs/tickets.md) / [0054](docs/tickets.md) B.
