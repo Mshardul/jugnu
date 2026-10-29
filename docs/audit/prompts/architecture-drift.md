@@ -134,7 +134,7 @@ The interesting findings are the ones with **no** ticket.
     finding so a spec gets written or the code gets questioned.
 13. **Menu bar (`2026-08-26-menubar-design.md`, ticket 0056).** The spec is
     "findings only, to be reviewed" — but `shell/App/JugnuApp.swift` +
-    `MenuBarController.swift` + `Info.plist` (`LSUIElement`) already ship a menu-bar
+    `MenuBarController.swift` + `Info.plist` (`LSUIElement` false, Dock icon) already ship a menu-bar
     surface. Check what the code does vs what the doc's findings assume; flag any
     behavior the doc explicitly parks that the code built anyway.
 14. **Error / failure states (`2026-08-26-error-failure-states-design.md`,

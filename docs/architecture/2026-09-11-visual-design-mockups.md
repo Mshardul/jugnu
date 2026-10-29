@@ -1,5 +1,9 @@
 # Jugnu — visual design mockup set (epic 0068)
 
+> **Authority:** Existing pre-app-shell mockups are historical where they
+> conflict with the [2026-10-12 app-shell plan](./2026-10-12-app-shell-design.md).
+> Canonical replacements now live under [`docs/mockups/shell/`](../mockups/shell/).
+
 ## 0. Purpose
 
 Jugnu has ~25 design docs, but the visual layer is scattered: some surfaces have a
@@ -54,21 +58,21 @@ whichever screen actually shows them; the tickets that originated their design
 findings ([0054](../tickets.md), [0055](../tickets.md)) keep those findings but
 no longer own a mockup deliverable.
 
-## 2. Shell mockups (`docs/mockups/shell/`) — 7 tickets, 7 screens
+## 2. Shell mockups (`docs/mockups/shell/`)
 
 | Screen | Owning ticket | Status |
 |---|---|---|
-| Launcher — empty (`seek`), with results (`palette`), search-transition | [0052](../tickets.md) | In progress |
+| [Home, Search, Edit Home, widget library/inspector, responsive and widget failure states](../mockups/shell/home.html) | App-shell plan; absorbs the app-level scope of [0052](../tickets.md) | Canonical |
+| [Catalog Guided Explorer, cards, empty/offline/failure states, Addon detail, and uninstall disclosure](../mockups/shell/catalog.html) | App-shell plan; replaces the presentation scope of [0067](../tickets.md) | Canonical |
+| [Preferences — Appearance, Installed, Updates, and General](../mockups/shell/preferences.html) | App-shell plan; replaces the presentation scope of [0069](../tickets.md) | Canonical |
 | Tools launcher — icon grid | [0053](../tickets.md) | In progress |
 | Menu bar icon + dropdown | [0056](../tickets.md) | In progress |
-| Catalog browse (scopes, accordion rail, cards) + addon detail (tabs) — hosts the permission badge/panel body ([0054](../tickets.md) findings) and error/empty states ([0055](../tickets.md) findings) these screens show | [0067](../tickets.md) | Not started |
-| Preferences — rail + panes | [0069](../tickets.md) | Not started |
 | Install / upgrade / keep-current / dependency / integrity-failure | [0070](../tickets.md) | Not started |
 | First-run / onboarding | [0071](../tickets.md) | Not started |
 
-Each ticket's Description in tickets.md is authoritative for exactly what that
-screen's mockup covers — not restated in full here to avoid the two documents
-drifting apart.
+The app-shell files use a shared 1440 × 900 reference display, a 32 pt safe
+margin, and one stable frame. Their state controls sit outside the product
+frame and are review aids, not Jugnu UI.
 
 ## 3. Addon mockups (`docs/mockups/addons/`) — 1 ticket, N files
 
@@ -89,10 +93,9 @@ list in two places is how 0052/0072 drifted apart the first time.
 
 ## 4. Dimension reference
 
-From [view types §3](2026-08-24-view-types.md). A shell-mockup file locks its
-frame to the real point size for whatever view type that screen actually uses
-internally — this table is a lookup, not something a mockup file is organized
-around (see §1).
+From [view types §3](2026-08-24-view-types.md). This table remains a lookup for
+focused Addon UI. Home, Catalog, and Preferences instead use the stable
+near-full-screen frame in the app-shell plan.
 
 | id | Aspect | Representative mockup size (pt) |
 |---|---|---|
@@ -129,8 +132,8 @@ mockups assume a 1440 × 900 reference display.
 
 - Exact point sizes per view type — locked in shell code + tests, not
   re-specified here.
-- Whether an `index.html` contact sheet is worth adding once enough files
-  exist under `shell/`/`addons/`.
+- Whether an `index.html` contact sheet is worth adding once Addon mockups also
+  exist.
 - 0074's outcome reshapes the exact addon file list under 0072 — expect that
   ticket's scope to be revised once 0074 lands.
 
@@ -140,5 +143,5 @@ mockups assume a 1440 × 900 reference display.
 - [view types](2026-08-24-view-types.md)
 - [shell surface presets](2026-08-23-shell-surface-presets.md)
 - [launcher + catalog browse design](2026-08-25-launcher-catalog-design.md) (tokens, `seek` / `palette` / `canvas` mockups)
-- [2026-08-25-launcher-catalog-mockup.html](2026-08-25-launcher-catalog-mockup.html)
+- [Historical 2026-08-25 launcher-catalog mockup](2026-08-25-launcher-catalog-mockup.html)
 - [icon system design](2026-09-11-icon-system-design.md) / [icon-sheet.html](../mockups/icon-sheet.html)

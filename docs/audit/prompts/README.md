@@ -8,7 +8,7 @@ report lands in `report/pending/`, not when it moves to `done/`.
 
 | Prompt | Lens | Cadence | Last run | Last severity |
 |--------|------|---------|----------|---------------|
-| [security](security.md) | Installer / runner / registry-trust / launchd / process spawning / state-dir + config passthrough | Per addons release, min monthly | — | — |
+| [security](security.md) | Installer / runner / registry-trust / launchd / process spawning / state-dir + config passthrough | Per addons release, min monthly | 2026-10-29 | Critical |
 | [architecture-drift](architecture-drift.md) | Code vs `vision.md`, `architecture/*`, ADRs | Monthly | — | — |
 | [catalog-hygiene](catalog-hygiene.md) | Addons vs `AGENTS.md` packaging rules + `backlog.md` map | Per addons release | — | — |
 | [code-quality](code-quality.md) | `conventions.md` adherence, dead code, known-debt not growing | Monthly | — | — |

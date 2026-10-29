@@ -7,6 +7,7 @@ public enum UIPattern: String, Codable, Sendable, Equatable {
     case note
     case card
     case grid
+    case tray
 }
 
 public enum JSONValue: Codable, Sendable, Equatable {

@@ -39,6 +39,12 @@ Not yet staged as leaves. Candidates after shell MVP:
 8. ~~Paste plain / strip formatting~~ done → merged into **clip-tools** (`paste-plain` command) per [0074](tickets.md)
 9. Kill hung app picker
 10. Disk pressure bar
+11. Screenshot stitch
+12. App uninstaller
+13. Local share
+14. Reference snapshot
+15. Presentation pointer
+16. Contact cleaner
 
 ## Accepted addons (not staged yet)
 
@@ -78,7 +84,8 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | Files | **zip-selection** | zip Finder selection | Pair with unarchive; shared archive helpers in zips |
 | Files | **unarchive** | unzip archive beside it | Pair with zip-selection |
 | Files | **archive-utility** | create archives / compression presets / test integrity / reveal archive | Archive workflow; may eventually absorb zip-selection and unarchive |
-| Files | **save-clipboard** | clipboard → Scratch/Downloads | May share path helpers w/ scratch-folder |
+| Files | **temporary-folder** (`addons/jugnu.temporary-folder`) | `temporary-folder` | One stable `~/Temporary` folder. A tray drops from the menu bar for drag and drop. Replaces dated scratch-folder. |
+| Files | **save-clipboard** | clipboard → Downloads or a chosen folder | Own clipboard-to-file job |
 | Files | **quick-capture** | capture clipboard / append to today / open latest / reveal captures | Intentional clipboard-to-file capture; text first, images later |
 | Files | **ocr** | image → text (Vision) | Own; permission-heavy |
 | Files | **trash-ui** | trash-selection, empty-trash, **trash-put-back** | Trash jobs on trash-ui |
@@ -123,7 +130,7 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | System | **speak-clip** | speak clipboard / stop | Own a11y job |
 | System | **intervals** (`addons/jugnu.intervals`) | manage, nudge-now, pause, resume, restore-presets, advanced, show-card, start-focus, start-break, pomodoro-status, reset-pomodoro, phase-chime; **pomodoro-skip** later | Shipped. Pomodoro is a phases preset on this list. |
 | System | **time-machine** | status / start backup / open Time Machine | Own |
-| System | **floating-note** (`addons/floating-note`) | `open` (scratchpad, persist on close/quit), **quick-note** (throwaway; close discards), **note-pin** | One note addon: persistent scratchpad vs session scrap; pin is chrome QoL |
+| System | **floating-note** (`addons/jugnu.floating-note`) | `open` (temporary note: floating sticky, text kept and restored) | Shipped command is the temporary note. Throwaway quick-note and note-pin stay later commands on this addon, not their own zips |
 | System | **world-clock** (`addons/world-clock`) | + **world-overlap** | Clocks + meeting overlap |
 | System | **intervals** | pomodoro-skip | Same zip. Skip/extend stays planned on this addon. |
 | Security | **password-gen** | random password; **password-options** (passphrase / PIN / exclude-ambiguous / copy-once / …) | Own — not under play |
@@ -136,7 +143,7 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | Design | **qr-clip** | encode + **qr-decode** | QR both directions |
 | Tools | **unit-convert** | all units | One converter addon |
 | Meeting | **meeting-bar** | next meeting / join lite | Own; or fold into **next-event** |
-| *(own addons)* | — | camera-check, quit-heavy, scratch-folder, lock-screen, low-power, reminder-add, next-event, kitchen-timer, flash-attention, process-find, pdf-tools, speak-clip, resolution-preset, settings-jump, memory-pressure, grid-overlay, design-calc, time-machine, emoji-picker, media-convert, mount-dmg, airdrop-folder, quarantine-clear, repo-jumper, ssh-host-picker | Distinct jobs. (Several former entries here now merge elsewhere per [0074](tickets.md): mic-picker/speaker-mute→Audio; copy-ip/dns-flush/proxy-toggle/vpn-connect/wifi-toggle/http-status→Network; large-files/desktop-sweep→folder-clutter addon; finder-toggles→Finder/Desktop chrome; default-browser→Default Selection; app-info/relaunch-app→app-control; favorite-folders→jump-to-location; sleep→Power/Sleep.) |
+| *(own addons)* | — | camera-check, quit-heavy, lock-screen, low-power, reminder-add, next-event, kitchen-timer, flash-attention, process-find, pdf-tools, speak-clip, resolution-preset, settings-jump, memory-pressure, grid-overlay, design-calc, time-machine, emoji-picker, media-convert, mount-dmg, airdrop-folder, quarantine-clear, repo-jumper, ssh-host-picker | Distinct jobs. (Several former entries here now merge elsewhere per [0074](tickets.md): mic-picker/speaker-mute→Audio; copy-ip/dns-flush/proxy-toggle/vpn-connect/wifi-toggle/http-status→Network; large-files/desktop-sweep→folder-clutter addon; finder-toggles→Finder/Desktop chrome; default-browser→Default Selection; app-info/relaunch-app→app-control; favorite-folders→jump-to-location; sleep→Power/Sleep.) |
 
 ### Meeting / device
 
@@ -197,7 +204,6 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | resize-image | Resize clipboard image to width presets | **images** |
 | image-rotate | Rotate 90° / flip clipboard or selection (+ other Image I/O ops) | **images** |
 | md-link | Selection + URL → markdown link | **clip-tools** |
-| scratch-folder | Dated `~/Scratch/…` + open | Standalone |
 | clip-clear | Wipe general pasteboard | **clip-tools** |
 | slugify | Clipboard → URL/file slug | **clip-tools** |
 | json-pretty | Pretty/minify clipboard JSON | **clip-tools** |

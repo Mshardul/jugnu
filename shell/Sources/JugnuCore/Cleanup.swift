@@ -26,7 +26,7 @@ public enum Cleanup {
         try performDisable(manifest: manifest, addonRoot: addonRoot, paths: paths)
         let fm = FileManager.default
         for raw in manifest.cleanup.paths {
-            let url = expandHome(raw)
+            let url = expandHome(raw, home: paths.home)
             if fm.fileExists(atPath: url.path) {
                 try fm.removeItem(at: url)
             }
@@ -85,13 +85,13 @@ public enum Cleanup {
         return false
     }
 
-    private static func expandHome(_ path: String) -> URL {
+    private static func expandHome(_ path: String, home: URL) -> URL {
+        // resolve against the shell's home, not the process user's
         if path.hasPrefix("~/") {
-            let home = FileManager.default.homeDirectoryForCurrentUser
             return home.appendingPathComponent(String(path.dropFirst(2)))
         }
         if path == "~" {
-            return FileManager.default.homeDirectoryForCurrentUser
+            return home
         }
         return URL(fileURLWithPath: path)
     }
@@ -146,8 +146,10 @@ public struct AddonLifecycle: Sendable {
         var config = try store.loadOrCreateDefaults()
         let addonRoot = paths.addonsDir.appendingPathComponent(id)
         if !enabled, FileManager.default.fileExists(atPath: addonRoot.appendingPathComponent("addon.yaml").path) {
-            let manifest = try ManifestLoader.load(from: addonRoot)
-            try Cleanup.performDisable(manifest: manifest, addonRoot: addonRoot, paths: paths)
+            // a manifest that fails validation must not trap the user in "enabled"; skip its (untrusted) cleanup
+            if let manifest = try? ManifestLoader.load(from: addonRoot) {
+                try Cleanup.performDisable(manifest: manifest, addonRoot: addonRoot, paths: paths)
+            }
         }
         config.addons[id] = AddonConfig(enabled: enabled)
         try store.save(config)
@@ -155,8 +157,9 @@ public struct AddonLifecycle: Sendable {
 
     public func uninstall(id: String) throws {
         let addonRoot = paths.addonsDir.appendingPathComponent(id)
-        if FileManager.default.fileExists(atPath: addonRoot.appendingPathComponent("addon.yaml").path) {
-            let manifest = try ManifestLoader.load(from: addonRoot)
+        if FileManager.default.fileExists(atPath: addonRoot.appendingPathComponent("addon.yaml").path),
+           let manifest = try? ManifestLoader.load(from: addonRoot)
+        {
             try Cleanup.performUninstall(manifest: manifest, addonRoot: addonRoot, paths: paths)
             try Cleanup.removeOrphanedHelpers(
                 declared: manifest.helpers,
@@ -164,7 +167,9 @@ public struct AddonLifecycle: Sendable {
                 paths: paths
             )
         } else if FileManager.default.fileExists(atPath: addonRoot.path) {
+            // missing or invalid manifest: never act on its cleanup declarations, just remove what the shell owns
             try FileManager.default.removeItem(at: addonRoot)
+            try? FileManager.default.removeItem(at: paths.addonStateRoot(id: id))
         }
         var config = try store.loadOrCreateDefaults()
         config.addons.removeValue(forKey: id)

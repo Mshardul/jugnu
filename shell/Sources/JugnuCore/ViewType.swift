@@ -72,7 +72,7 @@ public enum ViewType: String, Codable, CaseIterable, Sendable, Equatable {
     }
 
     public static func resolve(pattern: UIPattern, requested: ViewType?, allowed: [ViewType]) throws -> ViewType? {
-        if pattern == .note || pattern == .card {
+        if pattern == .note || pattern == .card || pattern == .tray {
             return nil
         }
         let chosen = requested ?? pattern.defaultViewType
@@ -110,7 +110,7 @@ public extension UIPattern {
         case .form: .fields
         case .confirm: .ask
         case .grid: .grid
-        case .note, .card: nil
+        case .note, .card, .tray: nil
         }
     }
 }

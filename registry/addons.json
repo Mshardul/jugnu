@@ -20,7 +20,8 @@
         "title": "Battery status",
         "subtitle": "Percent, charging state, and time remaining"
       }
-    ]
+    ],
+    "trust": "first-party"
   },
   {
     "id": "jugnu.brew-outdated",
@@ -47,7 +48,8 @@
         "title": "Outdated Homebrew packages",
         "subtitle": "Formulae and casks with updates available"
       }
-    ]
+    ],
+    "trust": "first-party"
   },
   {
     "id": "jugnu.clip-tools",
@@ -317,7 +319,8 @@
         "title": "Paste as plain text",
         "subtitle": "Strip rich text from the clipboard"
       }
-    ]
+    ],
+    "trust": "first-party"
   },
   {
     "id": "jugnu.clipboard-history",
@@ -349,7 +352,8 @@
         "title": "Clipboard watcher",
         "subtitle": "Internal \u2014 records pasteboard changes"
       }
-    ]
+    ],
+    "trust": "first-party"
   },
   {
     "id": "jugnu.floating-note",
@@ -369,10 +373,11 @@
     "commands": [
       {
         "id": "open",
-        "title": "Open scratch note",
-        "subtitle": "Always-on-top scratchpad saved to a local file"
+        "title": "Temporary note",
+        "subtitle": "Floating sticky kept on this Mac and restored next time"
       }
-    ]
+    ],
+    "trust": "first-party"
   },
   {
     "id": "jugnu.focus-toggle",
@@ -395,7 +400,8 @@
         "title": "Toggle Focus",
         "subtitle": "Switch Do Not Disturb / Focus on or off"
       }
-    ]
+    ],
+    "trust": "first-party"
   },
   {
     "id": "jugnu.keep-awake",
@@ -435,7 +441,8 @@
         "title": "Keep-awake watcher",
         "subtitle": "Internal \u2014 launchd-owned caffeinate"
       }
-    ]
+    ],
+    "trust": "first-party"
   },
   {
     "id": "jugnu.audio-toggles",
@@ -468,7 +475,8 @@
         "title": "Mute all",
         "subtitle": "Mute mic and speakers, or restore the previous volumes"
       }
-    ]
+    ],
+    "trust": "first-party"
   },
   {
     "id": "jugnu.intervals",
@@ -546,7 +554,8 @@
         "title": "Phase chime",
         "subtitle": "Internal \u2014 fired by clock"
       }
-    ]
+    ],
+    "trust": "first-party"
   },
   {
     "id": "jugnu.pdf-tools",
@@ -649,7 +658,8 @@
         "title": "Grayscale PDF",
         "subtitle": "Save a black and white copy"
       }
-    ]
+    ],
+    "trust": "first-party"
   },
   {
     "id": "jugnu.open-terminal-here",
@@ -673,7 +683,8 @@
         "title": "Open Terminal here",
         "subtitle": "Open the last-picked terminal in the front Finder folder"
       }
-    ]
+    ],
+    "trust": "first-party"
   },
   {
     "id": "jugnu.ports",
@@ -698,7 +709,8 @@
         "title": "Listening ports",
         "subtitle": "List and kill processes on local ports"
       }
-    ]
+    ],
+    "trust": "first-party"
   },
   {
     "id": "jugnu.weather-bar",
@@ -722,7 +734,8 @@
         "title": "Current weather",
         "subtitle": "Temperature and conditions for your location"
       }
-    ]
+    ],
+    "trust": "first-party"
   },
   {
     "id": "jugnu.world-clock",
@@ -745,6 +758,29 @@
         "title": "World clock",
         "subtitle": "Current time across configured zones"
       }
-    ]
+    ],
+    "trust": "first-party"
+  },
+  {
+    "id": "jugnu.temporary-folder",
+    "name": "Temporary Folder",
+    "version": "1.0.0",
+    "api": 1,
+    "url": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
+    "sha256": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
+    "summary": "Temporary folder",
+    "permissions": [],
+    "primary": "temporary-folder",
+    "category": "System",
+    "tags": [],
+    "description": "Opens a menu-bar tray for ~/Temporary. Dropped files and folders are copied in. The folder is created if it is missing, and files already there are left in place.",
+    "commands": [
+      {
+        "id": "temporary-folder",
+        "title": "Temporary folder",
+        "subtitle": "Drop files into ~/Temporary"
+      }
+    ],
+    "trust": "first-party"
   }
 ]

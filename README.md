@@ -37,7 +37,7 @@ That stops any already-running Jugnu, builds this checkout, and launches the new
 
 Or open `shell/Jugnu.xcodeproj` in Xcode and press Run.
 
-Jugnu is a menu-bar agent — **no Dock icon, no window on launch**. `make run` can succeed and still look like “nothing opened.” Look for the firefly on the **right of the menu bar**, then Option+Space (or the menu’s **Open Palette**).
+Jugnu stays in the Dock and the menu bar. Nothing opens until you click the Dock icon, the firefly on the **right of the menu bar**, or press Option+Space.
 
 A Debug build from a new folder may need Accessibility turned on again: System Settings → Privacy & Security → Accessibility.
 
@@ -102,7 +102,7 @@ registry/             # catalog + checksummed download URLs
 
 ## What’s here today
 
-**First-party addons** (`addons/`): audio-toggles, battery-eta, brew-outdated, clip-tools, clipboard-history, floating-note, focus-toggle, intervals, keep-awake, open-terminal-here, pdf-tools, ports, weather-bar, window-layouts, world-clock — shell/JXA/`exec` entrypoints (no user Python). Unbuilt jobs live in [backlog](docs/backlog.md).
+**First-party addons** (`addons/`): audio-toggles, battery-eta, brew-outdated, clip-tools, clipboard-history, floating-note, focus-toggle, intervals, keep-awake, open-terminal-here, pdf-tools, ports, temporary-folder, weather-bar, window-layouts, world-clock — shell/JXA/`exec` entrypoints (no user Python). Unbuilt jobs live in [backlog](docs/backlog.md).
 
 Hotkey shell, YAML addon runtime, and the addon UI host (toast/confirm/list/form/note) are built and tested (`shell/`). Published addons are GitHub Release assets under `addons-v1.0.0`, with `registry/addons.json` pointing at sha256-verified zips — install via the registry, or symlink into the real addons dir for local addon work (see `shell/README.md`). `clip-tools`, `audio-toggles`, `intervals`, and `pdf-tools` are in-tree and catalogued; their release zips ship with the next addons release. `pdf-tools` needs `make pdf-tools` before the command can run.
 

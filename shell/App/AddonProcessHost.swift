@@ -30,7 +30,7 @@ final class AddonProcessHost {
     }
 
     var killJob: (RunningInvocation) -> Void = { $0.killImmediately() }
-    var replaceDeathCeiling: TimeInterval = TimeInterval(LatencyBudgets.replaceDeathCeilingMs) / 1000
+    var replaceDeathCeiling: TimeInterval = .init(LatencyBudgets.replaceDeathCeilingMs) / 1000
 
     private var entries: [CommandKey: [Entry]] = [:]
     private let log: LifecycleLog?
@@ -146,7 +146,9 @@ final class AddonProcessHost {
             let still = (entries[key] ?? []).filter {
                 $0.lifecycleClass == .job && $0.invocation.process.isRunning
             }
-            if still.isEmpty { return .spawn }
+            if still.isEmpty {
+                return .spawn
+            }
             try? await Task.sleep(nanoseconds: 20_000_000)
         }
         let stillAlive = (entries[key] ?? []).contains {

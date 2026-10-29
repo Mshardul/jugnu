@@ -42,28 +42,23 @@ final class MenuBarController {
         if let recoveryProxy {
             menu.addItem(Self.named(RecoveryMenuCopy.resetConfig, #selector(RecoveryProxy.resetConfig), recoveryProxy))
             menu.addItem(Self.named(RecoveryMenuCopy.openConfig, #selector(RecoveryProxy.openConfig), recoveryProxy))
-            menu.addItem(Self.named(RecoveryMenuCopy.disableAddons, #selector(RecoveryProxy.disableAddons), recoveryProxy))
+            menu.addItem(Self.named(
+                RecoveryMenuCopy.disableAddons,
+                #selector(RecoveryProxy.disableAddons),
+                recoveryProxy
+            ))
             menu.addItem(Self.named(RecoveryMenuCopy.tryAgain, #selector(RecoveryProxy.tryAgain), recoveryProxy))
             menu.addItem(.separator())
         } else {
-            let open = NSMenuItem(title: "Open Palette", action: #selector(Proxy.openPalette), keyEquivalent: "")
+            let open = NSMenuItem(title: "Open Jugnu", action: #selector(Proxy.openPalette), keyEquivalent: "")
             open.target = proxy
-            let prefs = NSMenuItem(title: "Preferences…", action: #selector(Proxy.preferences), keyEquivalent: ",")
+            let prefs = NSMenuItem(title: "Open Preferences", action: #selector(Proxy.preferences), keyEquivalent: ",")
             prefs.target = proxy
             menu.addItem(open)
             menu.addItem(prefs)
             menu.addItem(.separator())
-            if onCheckForUpdates != nil {
-                let updates = NSMenuItem(
-                    title: "Check for Updates…",
-                    action: #selector(Proxy.checkForUpdates),
-                    keyEquivalent: ""
-                )
-                updates.target = proxy
-                menu.addItem(updates)
-            }
         }
-        let quit = NSMenuItem(title: "Quit Jugnu", action: #selector(Proxy.quit), keyEquivalent: "q")
+        let quit = NSMenuItem(title: "Quit", action: #selector(Proxy.quit), keyEquivalent: "q")
         quit.target = proxy
         menu.addItem(quit)
         statusItem.menu = menu
@@ -99,10 +94,21 @@ private final class Proxy: NSObject {
         self.onCheckForUpdates = onCheckForUpdates
     }
 
-    @objc func openPalette() { onOpenPalette() }
-    @objc func preferences() { onPreferences() }
-    @objc func quit() { onQuit() }
-    @objc func checkForUpdates() { onCheckForUpdates?() }
+    @objc func openPalette() {
+        onOpenPalette()
+    }
+
+    @objc func preferences() {
+        onPreferences()
+    }
+
+    @objc func quit() {
+        onQuit()
+    }
+
+    @objc func checkForUpdates() {
+        onCheckForUpdates?()
+    }
 }
 
 @MainActor
@@ -113,8 +119,19 @@ private final class RecoveryProxy: NSObject {
         self.actions = actions
     }
 
-    @objc func resetConfig() { actions.onResetConfig() }
-    @objc func openConfig() { actions.onOpenConfig() }
-    @objc func disableAddons() { actions.onDisableAllAddons() }
-    @objc func tryAgain() { actions.onTryAgain() }
+    @objc func resetConfig() {
+        actions.onResetConfig()
+    }
+
+    @objc func openConfig() {
+        actions.onOpenConfig()
+    }
+
+    @objc func disableAddons() {
+        actions.onDisableAllAddons()
+    }
+
+    @objc func tryAgain() {
+        actions.onTryAgain()
+    }
 }

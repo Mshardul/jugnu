@@ -73,6 +73,15 @@ public struct AddonRunner: Sendable {
         return env
     }
 
+    static let inheritedEnvironmentKeys: Set<String> = [
+        "PATH", "HOME", "USER", "LOGNAME", "SHELL", "TMPDIR", "LANG", "__CF_USER_TEXT_ENCODING"
+    ]
+
+    static func childEnvironment(from parent: [String: String]) -> [String: String] {
+        // addons never inherit the shell's own environment (tokens, JUGNU_REPO_ADDONS)
+        parent.filter { inheritedEnvironmentKeys.contains($0.key) || $0.key.hasPrefix("LC_") }
+    }
+
     public func spawn(
         manifest: AddonManifest,
         addonRoot: URL,
@@ -146,7 +155,7 @@ public struct AddonRunner: Sendable {
         process.standardOutput = stdout
         process.standardError = stderr
 
-        var env = ProcessInfo.processInfo.environment
+        var env = Self.childEnvironment(from: ProcessInfo.processInfo.environment)
         for (key, value) in extraEnvironment {
             env[key] = value
         }

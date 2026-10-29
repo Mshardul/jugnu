@@ -1,12 +1,17 @@
 # Jugnu — Preferences canvas (rail + settings panes)
 
 **Date:** 2026-09-10  
-**Status:** Approved  
+**Status:** Approved and shipped — superseded in part by the [2026-10-12 app-shell plan](./2026-10-12-app-shell-design.md)  
 **Plan:** [2026-09-10 prefs canvas](../superpowers/plans/2026-09-10-prefs-canvas.md)  
 **Ticket:** [0064](../tickets.md) (narrowed to this epic)  
 **Product shell lock:** [launcher-catalog §3.4](./2026-08-25-launcher-catalog-design.md) + [mockup](./2026-08-25-launcher-catalog-mockup.html)  
 **Depends on:** [Shell surface](./2026-08-23-shell-surface-presets.md) (`settings` / `canvas`), keep-current toggles ([0063](../tickets.md))  
 **Not this epic:** Hotkeys UI ([0037](../tickets.md)), addon detail tabs / Installed list / gear ([0065](../tickets.md)), Open primary ([0066](../tickets.md)), prefs Permissions inventory (0054 B remainder), icon art ([0051](../tickets.md))
+
+> **Authority:** The app-shell plan supersedes this document's frame geometry,
+> navigation structure, labels, and empty-search first-view preference. The
+> shipped theme, sound, update, installed-Addon link, and persistence behavior
+> remain binding.
 
 ## 0. Purpose
 

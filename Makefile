@@ -2,7 +2,7 @@
 -include .env
 export DEVELOPER_DIR ?= /Applications/Xcode.app/Contents/Developer
 
-.PHONY: sync hooks precommit lint lint-swift format format-swift spell test test-extended tools-swift stop clean-agents run ci window-layouts pdf-tools helper-clock screenshots
+.PHONY: sync hooks precommit lint lint-swift format format-swift spell test test-extended tools-swift stop clean-agents run install ci window-layouts pdf-tools helper-clock screenshots
 
 sync:
 	uv sync
@@ -83,8 +83,21 @@ run: stop
 	  CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO build && \
 	open -n DerivedData/Build/Products/Debug/Jugnu.app
 	@echo ""
-	@echo "Jugnu is a menu-bar app — it does not appear in the Dock or as a window."
-	@echo "Look on the right of the menu bar for a firefly (or the word Jugnu), then Option+Space."
+	@echo "Jugnu is in the Dock. Click that icon to open the palette."
+	@echo "The menu-bar firefly and Option+Space open it too. Nothing opens on launch."
+
+# Release build -> /Applications/Jugnu.app (replaces any previous install), then launch.
+INSTALL_DIR ?= /Applications
+
+install: stop
+	cd shell && \
+	xcodebuild -project Jugnu.xcodeproj -scheme Jugnu -configuration Release \
+	  -derivedDataPath DerivedData \
+	  CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO build
+	rm -rf "$(INSTALL_DIR)/Jugnu.app"
+	ditto shell/DerivedData/Build/Products/Release/Jugnu.app "$(INSTALL_DIR)/Jugnu.app"
+	open "$(INSTALL_DIR)/Jugnu.app"
+	@echo "Installed $(INSTALL_DIR)/Jugnu.app. Option+Space opens the palette."
 
 # Match CI check job (no semgrep locally).
 ci: lint

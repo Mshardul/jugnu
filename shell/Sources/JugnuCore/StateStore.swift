@@ -4,21 +4,29 @@ public struct JugnuState: Codable, Equatable, Sendable {
     public var firstRunCompleted: Bool
     public var recentCommandIDs: [String]
     public var favoriteCommandIDs: [String]
+    public var favoriteAddonIDs: [String]
+    public var favoriteAddonsMigrated: Bool
 
     public init(
         firstRunCompleted: Bool = false,
         recentCommandIDs: [String] = [],
-        favoriteCommandIDs: [String] = []
+        favoriteCommandIDs: [String] = [],
+        favoriteAddonIDs: [String] = [],
+        favoriteAddonsMigrated: Bool = false
     ) {
         self.firstRunCompleted = firstRunCompleted
         self.recentCommandIDs = recentCommandIDs
         self.favoriteCommandIDs = favoriteCommandIDs
+        self.favoriteAddonIDs = favoriteAddonIDs
+        self.favoriteAddonsMigrated = favoriteAddonsMigrated
     }
 
     enum CodingKeys: String, CodingKey {
         case firstRunCompleted
         case recentCommandIDs
         case favoriteCommandIDs
+        case favoriteAddonIDs
+        case favoriteAddonsMigrated
     }
 
     public init(from decoder: Decoder) throws {
@@ -26,6 +34,8 @@ public struct JugnuState: Codable, Equatable, Sendable {
         firstRunCompleted = try container.decodeIfPresent(Bool.self, forKey: .firstRunCompleted) ?? false
         recentCommandIDs = try container.decodeIfPresent([String].self, forKey: .recentCommandIDs) ?? []
         favoriteCommandIDs = try container.decodeIfPresent([String].self, forKey: .favoriteCommandIDs) ?? []
+        favoriteAddonIDs = try container.decodeIfPresent([String].self, forKey: .favoriteAddonIDs) ?? []
+        favoriteAddonsMigrated = try container.decodeIfPresent(Bool.self, forKey: .favoriteAddonsMigrated) ?? false
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -33,6 +43,14 @@ public struct JugnuState: Codable, Equatable, Sendable {
         try container.encode(firstRunCompleted, forKey: .firstRunCompleted)
         try container.encode(recentCommandIDs, forKey: .recentCommandIDs)
         try container.encode(favoriteCommandIDs, forKey: .favoriteCommandIDs)
+        try container.encode(favoriteAddonIDs, forKey: .favoriteAddonIDs)
+        try container.encode(favoriteAddonsMigrated, forKey: .favoriteAddonsMigrated)
+    }
+
+    public mutating func migrateFavoriteAddons(owner: (String) -> String?) {
+        guard !favoriteAddonsMigrated else { return }
+        favoriteAddonIDs = JugnuCore.migrateFavoriteAddons(commandIDs: favoriteCommandIDs, owner: owner)
+        favoriteAddonsMigrated = true
     }
 
     public mutating func recordRecent(qualifiedId: String, limit: Int = 8) {

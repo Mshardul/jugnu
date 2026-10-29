@@ -18,21 +18,45 @@ cd "$SHELL_DIR"
 echo "==> Regenerating Xcode project"
 xcodegen generate >/dev/null
 
+echo "==> Building the app and screenshot tests"
+xcodebuild build-for-testing \
+  -project Jugnu.xcodeproj \
+  -scheme Screenshots \
+  -configuration Debug \
+  -derivedDataPath DerivedData \
+  CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO
+
+# The UI runner resolves the host as Debug/Jugnu. The product is Debug/Jugnu.app.
+PRODUCTS="$SHELL_DIR/DerivedData/Build/Products/Debug"
+if [[ ! -d "$PRODUCTS/Jugnu.app" ]]; then
+  echo "!! Jugnu.app was not built." >&2
+  exit 1
+fi
+ln -sfn Jugnu.app "$PRODUCTS/Jugnu"
+trap 'rm -f "$PRODUCTS/Jugnu"' EXIT
+
+export JUGNU_REPO_ADDONS="$REPO_ROOT/addons"
+export TEST_RUNNER_JUGNU_REPO_ADDONS="$REPO_ROOT/addons"
+
 echo "==> Running the screenshot walk (this opens the app and clicks through it — don't touch the mouse)"
 rm -rf "$RESULT_BUNDLE"
+LOG="$SHELL_DIR/DerivedData/screenshots.log"
 set +e
-xcodebuild test \
+xcodebuild test-without-building \
   -project Jugnu.xcodeproj \
   -scheme Screenshots \
   -configuration Debug \
   -derivedDataPath DerivedData \
   -resultBundlePath "$RESULT_BUNDLE" \
   CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO \
-  JUGNU_REPO_ADDONS="$REPO_ROOT/addons" \
   -test-timeouts-enabled NO \
-  2>&1 | grep -E "SHOT:|Test Case '|passed \(|failed \(|\*\* TEST| error:" || true
-TEST_STATUS=${PIPESTATUS[0]}
+  >"$LOG" 2>&1
+TEST_STATUS=$?
 set -e
+grep -E "SHOT:|Test Case '|passed \\(|failed \\(|\\*\\* TEST|Testing failed|error:" "$LOG" || true
+if [[ "$TEST_STATUS" -ne 0 ]]; then
+  xcrun xcresulttool get test-results summary --path "$RESULT_BUNDLE" || true
+fi
 
 echo "==> Extracting screenshots -> $OUT_DIR"
 rm -rf "$OUT_DIR"
@@ -44,7 +68,6 @@ echo "==> $COUNT screenshot(s) in $OUT_DIR"
 
 if [ "$TEST_STATUS" -ne 0 ] && [ "$COUNT" -eq 0 ]; then
   echo "!! Test run failed and produced no screenshots." >&2
-  echo "!! Most common cause: Accessibility / Screen Recording not granted to the test runner." >&2
-  echo "!! Grant them in System Settings > Privacy & Security, then re-run." >&2
+  echo "!! See $LOG" >&2
   exit 1
 fi

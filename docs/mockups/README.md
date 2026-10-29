@@ -12,8 +12,8 @@ Governed by the epic:
 ```
 docs/mockups/
   icon-sheet.html   — icon system reference (ticket 0051), consumed by both buckets below
-  shell/            — the app itself: menu bar, launcher, catalog, prefs, permissions,
-                      install/upgrade, first-run, errors, tools launcher, generic chrome
+  shell/            — the app itself: Home, Search, Edit Home, Catalog, Addon detail,
+                      Preferences, and later menu/install/onboarding surfaces
   addons/           — one file per addon, every real screen/state that addon has
 ```
 
@@ -39,3 +39,15 @@ how one screen is built, not what a mockup file is about.
 
 Each child ticket under epic 0068 delivers its `.html` files here as it is
 picked up.
+
+## Canonical app-shell mockups
+
+- [Home, Search, and Edit Home](shell/home.html) — includes First run and Context
+- [Catalog and Addon detail](shell/catalog.html) — includes Settings and Run action
+- [Preferences](shell/preferences.html)
+- [Menu bar](shell/menu.html)
+
+The state switchers above each reference frame are mockup review controls, not
+part of Jugnu. The older
+[launcher-catalog living reference](../architecture/2026-08-25-launcher-catalog-mockup.html)
+is historical.

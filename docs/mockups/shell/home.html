@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jugnu — Home, Search, and Edit Home</title>
+<style>
+  :root{
+    color-scheme:dark;
+    --page:#0b0a08;--frame:#16130e;--surface:#1f1b13;--surface-raised:#272117;
+    --surface-soft:#1a1711;--border:#332c1f;--border-strong:#4a3d27;
+    --text:#f3ede0;--muted:#9d9481;--sub:#c7bdab;--accent:#f5a623;
+    --accent-soft:#3b2b12;--green:#72c78b;--red:#df6b67;--blue:#74a7d8;
+    --gap:12px;--row:76px;
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;min-width:960px;background:var(--page);color:var(--text);padding:24px 32px 42px}
+  button,input{font:inherit}
+  button{color:inherit}
+  .artifact-head{max-width:1376px;margin:0 auto 16px;display:flex;align-items:end;justify-content:space-between;gap:20px}
+  .artifact-head h1{font:600 18px/1.2 "SF Pro Display",-apple-system,sans-serif;margin:0 0 4px}
+  .artifact-head p{margin:0;color:var(--muted);font-size:12px}
+  .artifact-controls{display:flex;gap:6px;padding:4px;background:#14120e;border:1px solid #29251d;border-radius:10px}
+  .artifact-controls button{border:0;background:transparent;color:#928b7f;padding:6px 10px;border-radius:7px;font-size:11px;cursor:pointer}
+  .artifact-controls button.active{background:#29231a;color:#f6ead7}
+  .stage{max-width:1376px;margin:auto}
+  .shell{height:836px;max-height:calc(100vh - 118px);min-height:680px;background:var(--frame);border:1px solid var(--border);
+    border-radius:18px;box-shadow:0 28px 90px #000c,0 0 0 1px #ffffff05 inset;overflow:hidden;position:relative}
+  .topbar{height:64px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 18px}
+  .brand{display:flex;align-items:center;gap:10px;font:650 14px/1 "SF Pro Display",-apple-system,sans-serif}
+  .firefly{width:18px;height:18px;border-radius:50%;background:#f5a623;box-shadow:0 0 6px #ffc460,0 0 18px #f5a62366;position:relative}
+  .firefly:after{content:"";position:absolute;width:5px;height:5px;border-radius:50%;background:#fff3cf;top:3px;left:4px}
+  .primary-nav{height:38px;padding:3px;display:flex;gap:2px;background:var(--surface-soft);border:1px solid var(--border);border-radius:11px}
+  .primary-nav button{border:0;background:transparent;padding:0 15px;border-radius:8px;font-size:12px;color:var(--muted);cursor:pointer}
+  .primary-nav button.active{background:var(--surface-raised);color:var(--text);box-shadow:0 1px 4px #0007}
+  .top-actions{justify-self:end;display:flex;gap:6px}
+  .icon-btn{width:34px;height:34px;border:1px solid transparent;border-radius:9px;background:transparent;display:grid;place-items:center;cursor:pointer}
+  .icon-btn:hover,.icon-btn:focus-visible{background:var(--surface);border-color:var(--border);outline:none}
+  .icon-btn.active{background:var(--accent-soft);border-color:#6d4b19;color:var(--accent)}
+  .icon{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;
+    filter:drop-shadow(0 0 3px #f5a62366)}
+  .home-body{height:calc(100% - 64px);overflow:auto;padding:22px 24px 44px;position:relative}
+  .home-intro{display:flex;justify-content:space-between;align-items:end;margin-bottom:18px}
+  .home-intro h2{font:600 24px/1.1 "SF Pro Display",-apple-system,sans-serif;letter-spacing:-.02em;margin:0}
+  .home-intro p{margin:6px 0 0;color:var(--muted);font-size:12px}
+  .freshness{font:500 10px/1 "SF Mono",monospace;color:var(--muted);letter-spacing:.02em}
+  .widget-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));grid-auto-rows:var(--row);gap:var(--gap);position:relative}
+  .widget{grid-column:span var(--w);grid-row:span var(--h);min-width:0;background:var(--surface);border:1px solid var(--border);
+    border-radius:15px;padding:14px;display:flex;flex-direction:column;overflow:hidden;container-type:inline-size;position:relative}
+  .widget:hover{border-color:var(--border-strong)}
+  .widget-head{height:28px;display:flex;align-items:center;gap:8px;flex:0 0 auto}
+  .widget-title{font:600 12px/1 "SF Pro Display",-apple-system,sans-serif}
+  .widget-kicker{margin-left:auto;color:var(--muted);font:500 9px/1 "SF Mono",monospace}
+  .widget-body{margin-top:10px;min-height:0;overflow:hidden}
+  .glyph-tile{width:24px;height:24px;border-radius:7px;background:var(--surface-soft);display:grid;place-items:center;color:var(--sub);flex:0 0 auto}
+  .glyph-tile .icon{width:14px;height:14px}
+  .rows{display:flex;flex-direction:column}
+  .row{min-height:41px;display:flex;align-items:center;gap:10px;border-top:1px solid var(--border)}
+  .row:first-child{border-top:0}
+  .row-copy{min-width:0;flex:1}
+  .row-title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11.5px;color:var(--text)}
+  .row-sub{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:9.5px;color:var(--muted);margin-top:2px}
+  .time{font:500 9.5px/1 "SF Mono",monospace;color:var(--muted)}
+  .favorite-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+  .favorite{min-width:0;background:var(--surface-soft);border:1px solid var(--border);border-radius:10px;padding:9px}
+  .favorite .glyph-tile{margin-bottom:8px}
+  .favorite b{font-size:10.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .favorite span{font-size:9px;color:var(--muted)}
+  .update-summary{display:flex;align-items:end;justify-content:space-between;margin-bottom:10px}
+  .update-summary strong{font:600 27px/1 "SF Pro Display",sans-serif}
+  .update-summary span{font-size:10px;color:var(--muted)}
+  .text-btn{border:1px solid #6b4a1b;background:var(--accent-soft);color:var(--accent);border-radius:8px;padding:7px 10px;font-size:10px;font-weight:650;cursor:pointer}
+  .audio-controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;height:100%}
+  .audio-tile{border:1px solid var(--border);border-radius:12px;background:var(--surface-soft);display:flex;flex-direction:column;align-items:center;
+    justify-content:center;gap:8px;font-size:10px;color:var(--sub);cursor:pointer}
+  .audio-tile.on{background:var(--accent-soft);border-color:#6c4b1d;color:var(--accent)}
+  .audio-tile .icon{width:24px;height:24px}
+  .timer{height:100%;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:14px}
+  .timer-ring{width:70px;height:70px;border-radius:50%;border:5px solid #413723;border-top-color:var(--accent);display:grid;place-items:center;
+    font:600 13px/1 "SF Mono",monospace;transform:rotate(22deg)}
+  .timer-ring span{transform:rotate(-22deg)}
+  .timer-copy b{font-size:12px}.timer-copy p{font-size:10px;color:var(--muted);line-height:1.4;margin:4px 0 10px}
+  .status-line{display:flex;gap:6px;align-items:center;font-size:10px;color:var(--muted)}
+  .status-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px #72c78b88}
+  .empty-state{height:100%;display:grid;place-items:center;text-align:center;border:1px dashed var(--border-strong);border-radius:11px;color:var(--muted);padding:10px}
+  .empty-state b{display:block;color:var(--sub);font-size:11px;margin-bottom:5px}.empty-state span{font-size:9.5px;line-height:1.4}
+
+  .search-layer{position:absolute;inset:64px 0 0;background:#090805a8;backdrop-filter:blur(4px);display:none;align-items:flex-start;justify-content:center;padding-top:72px;z-index:20}
+  .shell[data-state="search"] .search-layer,.shell[data-state="context"] .search-layer{display:flex}
+  .context-group{display:none}
+  .shell[data-state="context"] .context-group{display:block}
+  .intro-card{display:none;margin-bottom:16px;border:1px solid #5a4323;background:#211a10;border-radius:14px;padding:16px 16px 14px}
+  .shell[data-state="intro"] .intro-card{display:block}
+  .shell[data-state="intro"] .personal-grid{display:none}
+  .shell[data-state="intro"] .fresh-grid{display:grid}
+  .intro-card h3{margin:0 0 6px;font:600 14px/1.2 "SF Pro Display",sans-serif}
+  .intro-card>p{margin:0 0 12px;color:var(--muted);font-size:11px}
+  .intro-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--border)}
+  .intro-row b{font-size:12px}.intro-row span{display:block;color:var(--muted);font-size:10px;margin-top:2px}
+  .intro-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+  .search-modal{width:min(680px,70%);max-height:580px;background:#1b1711;border:1px solid var(--border-strong);border-radius:16px;
+    box-shadow:0 30px 90px #000;overflow:hidden}
+  .search-field{height:58px;display:flex;align-items:center;gap:11px;padding:0 16px;border-bottom:1px solid var(--border)}
+  .search-field input{flex:1;background:transparent;border:0;outline:0;color:var(--text);font-size:16px}
+  .search-field input::placeholder{color:#716a5d}
+  .key-hint{font:500 9px/1 "SF Mono",monospace;color:var(--muted);border:1px solid var(--border);border-radius:5px;padding:4px 6px}
+  .result-group{padding:11px 10px 4px}
+  .result-label{font:600 9px/1 "SF Mono",monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;padding:0 10px 7px}
+  .result{height:47px;border-radius:9px;padding:0 10px;display:flex;align-items:center;gap:10px}
+  .result.selected{background:var(--accent-soft)}
+  .result-main{font-size:12px}.result-main span{color:var(--muted)}.result-main b{font-weight:600;color:var(--text)}
+  .result-kind{margin-left:auto;color:var(--muted);font:500 9px/1 "SF Mono",monospace}
+  .search-foot{height:38px;border-top:1px solid var(--border);display:flex;align-items:center;gap:14px;padding:0 14px;color:var(--muted);font-size:9px}
+
+  .grid-guide,.library{display:none}
+  .shell:is([data-state="edit"],[data-state="inspect"]) .grid-guide{display:block;position:absolute;inset:0;border-radius:12px;pointer-events:none;
+    background-image:linear-gradient(to right,#f5a62313 1px,transparent 1px),linear-gradient(to bottom,#f5a62313 1px,transparent 1px);
+    background-size:calc((100% - 72px)/7 + 12px) 88px}
+  .shell:is([data-state="edit"],[data-state="inspect"]) .widget{border-color:#665331}
+  .shell:is([data-state="edit"],[data-state="inspect"]) .widget:after{content:"";position:absolute;width:12px;height:12px;right:5px;bottom:5px;border-right:2px solid var(--accent);border-bottom:2px solid var(--accent);border-radius:2px}
+  .edit-grip{display:none;margin-left:auto;color:var(--muted)}
+  .shell:is([data-state="edit"],[data-state="inspect"]) .edit-grip{display:block}
+  .library{position:absolute;top:64px;right:0;bottom:0;width:360px;background:#18150f;border-left:1px solid var(--border);z-index:12;box-shadow:-20px 0 50px #0006}
+  .shell:is([data-state="edit"],[data-state="inspect"]) .library{display:flex;flex-direction:column}
+  .shell:is([data-state="edit"],[data-state="inspect"]) .home-body{padding-right:384px}
+  .shell[data-state="inspect"] .widget.selected{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+  .library-head{height:58px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--border)}
+  .library-head h3{margin:0;font:600 14px/1 "SF Pro Display",sans-serif}.library-head .icon-btn{margin-left:auto}
+  .library-search{margin:12px 14px 6px;height:34px;border:1px solid var(--border);border-radius:8px;background:var(--surface-soft);display:flex;align-items:center;gap:8px;padding:0 10px;color:var(--muted);font-size:10px}
+  .library-scroll{overflow:auto;padding:8px 14px 24px}
+  .library-section{padding:10px 0 14px;border-bottom:1px solid var(--border)}
+  .library-section:last-child{border:0}
+  .library-addon{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;margin-bottom:9px}
+  .library-addon span{color:var(--muted);font:500 9px/1 "SF Mono",monospace;margin-left:auto}
+  .preview-row{display:flex;gap:8px;overflow:hidden}
+  .preview-card{width:142px;min-width:142px;height:92px;border:1px solid var(--border);background:var(--surface);border-radius:11px;padding:10px;position:relative}
+  .preview-card b{font-size:10px}.preview-card p{font-size:8.5px;color:var(--muted);line-height:1.35;margin:6px 0}
+  .preview-card .add-dot{position:absolute;right:8px;bottom:8px;width:20px;height:20px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center}
+  .inspector{display:none;overflow:auto;padding:14px}
+  .shell[data-state="inspect"] .library-scroll,.shell[data-state="inspect"] .library-search{display:none}
+  .shell[data-state="inspect"] .inspector{display:block}
+  .inspector-preview{height:96px;border:1px solid var(--border);background:var(--surface);border-radius:11px;padding:12px;margin-bottom:14px}
+  .inspector-preview b{font-size:11px}.inspector-preview p{font-size:9px;color:var(--muted);margin:6px 0}
+  .field{padding:12px 0;border-top:1px solid var(--border)}.field:first-of-type{border-top:0}.field label{display:block;font-size:9.5px;color:var(--sub);margin-bottom:7px}
+  .field-control{height:32px;border:1px solid var(--border);background:var(--soft);border-radius:8px;display:flex;align-items:center;justify-content:space-between;padding:0 9px;font-size:9.5px;color:var(--muted)}
+  .danger-btn{width:100%;border:1px solid #62352e;background:#281612;color:#df8178;border-radius:8px;padding:8px;font-size:9.5px;margin-top:12px}
+  .fresh-grid,.states-grid{display:none}
+  .shell[data-state="fresh"] .personal-grid,.shell[data-state="states"] .personal-grid{display:none}
+  .shell[data-state="fresh"] .fresh-grid,.shell[data-state="states"] .states-grid{display:grid}
+  .state-card{justify-content:center}.state-card .widget-body{overflow:visible}.state-message{height:100%;border:1px dashed var(--border-strong);border-radius:10px;display:grid;place-items:center;text-align:center;padding:12px;color:var(--muted)}
+  .state-message b{display:block;color:var(--sub);font-size:10.5px;margin-bottom:5px}.state-message span{font-size:9px;line-height:1.4}.state-message .text-btn{margin-top:9px}
+  .skeleton{display:grid;gap:8px}.skeleton i{display:block;height:9px;border-radius:5px;background:#302a20}.skeleton i:nth-child(2){width:72%}.skeleton i:nth-child(3){width:48%}
+  .stale{color:#d9a85d}.disabled{color:#817a6d}
+
+  .shell[data-density="compact"] .density-low{display:none}
+  .shell[data-density="compact"] .widget-grid{grid-template-columns:repeat(5,minmax(0,1fr));--row:72px}
+  .shell[data-density="compact"] .widget{--w:5!important}
+  .shell[data-density="compact"] .favorite-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .shell[data-density="compact"] .favorite:nth-child(n+4){display:none}
+  @container (max-width:420px){.favorite-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.favorite:nth-child(n+4){display:none}}
+  @media(max-width:1250px){.artifact-head{align-items:flex-start;flex-direction:column}.artifact-controls{max-width:100%;overflow-x:auto}.shell{max-height:none}}
+  @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" aria-hidden="true" style="position:absolute">
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2-4.5-4.4 6.2-.9Z"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-update" viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6.1 9a7 7 0 0 1 11.2-2L20 12M4 12l2.7 5a7 7 0 0 0 11.2-2"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/></symbol>
+  <symbol id="i-volume" viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4Z"/><path d="M15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12"/></symbol>
+  <symbol id="i-timer" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6M12 2v3"/></symbol>
+  <symbol id="i-grip" viewBox="0 0 24 24"><circle cx="8" cy="7" r="1"/><circle cx="16" cy="7" r="1"/><circle cx="8" cy="12" r="1"/><circle cx="16" cy="12" r="1"/><circle cx="8" cy="17" r="1"/><circle cx="16" cy="17" r="1"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="i-note" viewBox="0 0 24 24"><path d="M5 3h14v14l-4 4H5Z"/><path d="M15 21v-4h4M8 8h8M8 12h6"/></symbol>
+</svg>
+
+<header class="artifact-head">
+  <div><h1>Home / Search / Edit Home</h1><p>Canonical app-shell mockup · Firefly dark · near-full-screen frame</p></div>
+  <div class="artifact-controls" aria-label="Mockup states">
+    <button class="active" data-state="home">Home</button>
+    <button data-state="fresh">Fresh Home</button>
+    <button data-state="intro">First run</button>
+    <button data-state="search">Search</button>
+    <button data-state="context">Context</button>
+    <button data-state="edit">Edit Home</button>
+    <button data-state="inspect">Widget inspector</button>
+    <button data-state="states">Widget states</button>
+    <button data-density="compact">Compact width</button>
+  </div>
+</header>
+
+<main class="stage">
+  <div class="shell" id="shell" data-state="home" data-density="wide">
+    <header class="topbar">
+      <div class="brand"><span class="firefly"></span>Jugnu</div>
+      <nav class="primary-nav" aria-label="Primary">
+        <button class="active">Home</button><button>Catalog</button><button>Preferences</button>
+      </nav>
+      <div class="top-actions">
+        <button class="icon-btn" id="searchButton" aria-label="Search" title="Search"><svg class="icon"><use href="#i-search"/></svg></button>
+        <button class="icon-btn" id="editButton" aria-label="Edit Home" title="Edit Home"><svg class="icon"><use href="#i-edit"/></svg></button>
+        <button class="icon-btn" aria-label="Close Jugnu" title="Close"><svg class="icon"><use href="#i-x"/></svg></button>
+      </div>
+    </header>
+
+    <div class="home-body">
+      <section class="intro-card">
+        <h3>A few Addons to start</h3>
+        <p>Add any of these, or skip and keep this Home.</p>
+        <div class="intro-row"><span class="glyph-tile"><svg class="icon"><use href="#i-mic"/></svg></span><div><b>Audio</b><span>Microphone and system output</span></div></div>
+        <div class="intro-row"><span class="glyph-tile"><svg class="icon"><use href="#i-timer"/></svg></span><div><b>Intervals</b><span>Focus cycles and nudges</span></div></div>
+        <div class="intro-row"><span class="glyph-tile"><svg class="icon"><use href="#i-note"/></svg></span><div><b>Floating Note</b><span>A note above your current work</span></div></div>
+        <div class="intro-actions"><button class="text-btn" style="background:transparent;border-color:var(--border);color:var(--sub)">Skip</button></div>
+      </section>
+      <div class="home-intro">
+        <div><h2>Good evening</h2><p>Your Addons, current work, and recent activity at a glance.</p></div>
+        <span class="freshness">updated 18 sec ago</span>
+      </div>
+      <div class="widget-grid personal-grid">
+        <div class="grid-guide"></div>
+
+        <article class="widget" style="--w:4;--h:3">
+          <div class="widget-head"><span class="glyph-tile"><svg class="icon"><use href="#i-star"/></svg></span><span class="widget-title">Favorite Addons</span><span class="widget-kicker">4</span><svg class="icon edit-grip"><use href="#i-grip"/></svg></div>
+          <div class="widget-body favorite-grid">
+            <div class="favorite"><span class="glyph-tile"><svg class="icon"><use href="#i-mic"/></svg></span><b>Audio</b><span>2 Actions</span></div>
+            <div class="favorite"><span class="glyph-tile"><svg class="icon"><use href="#i-timer"/></svg></span><b>Intervals</b><span>Focus running</span></div>
+            <div class="favorite"><span class="glyph-tile"><svg class="icon"><use href="#i-clock"/></svg></span><b>World Clock</b><span>3 cities</span></div>
+            <div class="favorite density-low"><span class="glyph-tile"><svg class="icon"><use href="#i-update"/></svg></span><b>Brew Updates</b><span>5 available</span></div>
+          </div>
+        </article>
+
+        <article class="widget selected" style="--w:3;--h:2">
+          <div class="widget-head"><span class="glyph-tile"><svg class="icon"><use href="#i-mic"/></svg></span><span class="widget-title">Audio</span><span class="widget-kicker">LIVE</span><svg class="icon edit-grip"><use href="#i-grip"/></svg></div>
+          <div class="widget-body audio-controls">
+            <button class="audio-tile on"><svg class="icon"><use href="#i-mic"/></svg>Microphone on</button>
+            <button class="audio-tile"><svg class="icon"><use href="#i-volume"/></svg>System muted</button>
+          </div>
+        </article>
+
+        <article class="widget" style="--w:3;--h:3">
+          <div class="widget-head"><span class="glyph-tile"><svg class="icon"><use href="#i-timer"/></svg></span><span class="widget-title">Intervals</span><span class="widget-kicker">FOCUS</span><svg class="icon edit-grip"><use href="#i-grip"/></svg></div>
+          <div class="widget-body timer">
+            <div class="timer-ring"><span>18:42</span></div>
+            <div class="timer-copy"><b>Deep work</b><p>Break starts when this interval ends.</p><div class="status-line"><i class="status-dot"></i>Running</div></div>
+          </div>
+        </article>
+
+        <article class="widget" style="--w:4;--h:3">
+          <div class="widget-head"><span class="glyph-tile"><svg class="icon"><use href="#i-clock"/></svg></span><span class="widget-title">Recent Activity</span><span class="widget-kicker">TODAY</span><svg class="icon edit-grip"><use href="#i-grip"/></svg></div>
+          <div class="widget-body rows">
+            <div class="row"><span class="glyph-tile"><svg class="icon"><use href="#i-mic"/></svg></span><div class="row-copy"><div class="row-title">Audio › Mute microphone</div><div class="row-sub">Completed</div></div><span class="time">2m</span></div>
+            <div class="row"><span class="glyph-tile"><svg class="icon"><use href="#i-timer"/></svg></span><div class="row-copy"><div class="row-title">Intervals › Start focus</div><div class="row-sub">Running</div></div><span class="time">21m</span></div>
+            <div class="row density-low"><span class="glyph-tile"><svg class="icon"><use href="#i-update"/></svg></span><div class="row-copy"><div class="row-title">Brew Updates › Check</div><div class="row-sub">5 updates found</div></div><span class="time">1h</span></div>
+          </div>
+        </article>
+
+        <article class="widget" style="--w:3;--h:2">
+          <div class="widget-head"><span class="glyph-tile"><svg class="icon"><use href="#i-update"/></svg></span><span class="widget-title">Updates</span><span class="widget-kicker">READY</span><svg class="icon edit-grip"><use href="#i-grip"/></svg></div>
+          <div class="widget-body"><div class="update-summary"><div><strong>3</strong><br><span>Addons can be updated</span></div><button class="text-btn">Review</button></div><div class="status-line"><i class="status-dot"></i>Jugnu is current</div></div>
+        </article>
+      </div>
+
+      <div class="widget-grid fresh-grid">
+        <article class="widget" style="--w:4;--h:3"><div class="widget-head"><span class="glyph-tile"><svg class="icon"><use href="#i-star"/></svg></span><span class="widget-title">Favorite Addons</span></div><div class="widget-body empty-state"><div><b>No favorites yet</b><span>Favorite an Addon in Catalog to keep it here.</span></div></div></article>
+        <article class="widget" style="--w:4;--h:3"><div class="widget-head"><span class="glyph-tile"><svg class="icon"><use href="#i-clock"/></svg></span><span class="widget-title">Recent Activity</span></div><div class="widget-body empty-state"><div><b>Nothing here yet</b><span>Actions you run will appear here.</span></div></div></article>
+        <article class="widget" style="--w:4;--h:2"><div class="widget-head"><span class="glyph-tile"><svg class="icon"><use href="#i-update"/></svg></span><span class="widget-title">Updates</span></div><div class="widget-body"><div class="update-summary"><div><strong>0</strong><br><span>Everything is current</span></div><button class="text-btn">Browse Catalog</button></div><div class="status-line"><i class="status-dot"></i>Checked just now</div></div></article>
+      </div>
+
+      <div class="widget-grid states-grid">
+        <article class="widget state-card" style="--w:2;--h:2"><div class="widget-head"><span class="widget-title">Loading</span></div><div class="widget-body skeleton"><i></i><i></i><i></i></div></article>
+        <article class="widget state-card" style="--w:3;--h:2"><div class="widget-head"><span class="widget-title">Weather</span><span class="widget-kicker stale">STALE · 32m</span></div><div class="widget-body state-message"><div><b>18° · Cloudy</b><span>Last valid snapshot stays visible while refresh retries.</span></div></div></article>
+        <article class="widget state-card" style="--w:2;--h:2"><div class="widget-head"><span class="widget-title">Ports</span></div><div class="widget-body state-message"><div><b>Refresh timed out</b><span>Nothing else on Home is blocked.</span><br><button class="text-btn">Retry</button></div></div></article>
+        <article class="widget state-card" style="--w:3;--h:2"><div class="widget-head"><span class="widget-title">World Clock</span></div><div class="widget-body state-message"><div><b>Couldn’t read this widget</b><span>The Addon returned malformed data.</span><br><button class="text-btn">Try again</button></div></div></article>
+        <article class="widget state-card" style="--w:2;--h:2;opacity:.68"><div class="widget-head"><span class="widget-title disabled">Audio</span></div><div class="widget-body state-message"><div><b>Addon disabled</b><span>Your placement is preserved.</span><br><button class="text-btn">Enable</button></div></div></article>
+      </div>
+    </div>
+
+    <div class="search-layer" id="searchLayer">
+      <section class="search-modal" role="dialog" aria-label="Search">
+        <div class="search-field"><svg class="icon"><use href="#i-search"/></svg><input id="searchInput" value="mute" aria-label="Search Jugnu"><span class="key-hint">esc</span></div>
+        <div class="result-group context-group">
+          <div class="result-label">Frontmost app</div>
+          <div class="result selected"><span class="glyph-tile"><svg class="icon"><use href="#i-mic"/></svg></span><div class="result-main"><span>Audio</span> › <b>Mute microphone</b></div><span class="result-kind">Matches this app</span></div>
+        </div>
+        <div class="result-group">
+          <div class="result-label">Actions</div>
+          <div class="result selected"><span class="glyph-tile"><svg class="icon"><use href="#i-mic"/></svg></span><div class="result-main"><span>Audio</span> › <b>Mute microphone</b></div><span class="result-kind">Action</span></div>
+          <div class="result"><span class="glyph-tile"><svg class="icon"><use href="#i-volume"/></svg></span><div class="result-main"><span>Audio</span> › <b>Mute everything</b></div><span class="result-kind">Action</span></div>
+        </div>
+        <div class="result-group">
+          <div class="result-label">Addons and settings</div>
+          <div class="result"><span class="glyph-tile"><svg class="icon"><use href="#i-mic"/></svg></span><div class="result-main"><b>Audio</b></div><span class="result-kind">Addon</span></div>
+          <div class="result"><span class="glyph-tile"><svg class="icon"><use href="#i-chevron"/></svg></span><div class="result-main"><span>Preferences</span> › <b>Sound</b></div><span class="result-kind">Setting</span></div>
+        </div>
+        <footer class="search-foot"><span>↑↓ Select</span><span>↵ Open</span><span>esc Close</span></footer>
+      </section>
+    </div>
+
+    <aside class="library" aria-label="Widget library">
+      <header class="library-head"><h3 id="libraryTitle">Add Widgets</h3><button class="icon-btn" id="doneButton" aria-label="Done editing" title="Done"><svg class="icon"><use href="#i-x"/></svg></button></header>
+      <div class="library-search"><svg class="icon"><use href="#i-search"/></svg>Search installed Addons</div>
+      <div class="library-scroll">
+        <section class="library-section"><div class="library-addon"><span class="firefly"></span>Jugnu <span>4 widgets</span></div><div class="preview-row">
+          <div class="preview-card"><b>Favorite Addons</b><p>Your shared list of favorite Addons.</p><span class="add-dot"><svg class="icon"><use href="#i-plus"/></svg></span></div>
+          <div class="preview-card"><b>Recent Activity</b><p>Recent Actions and results.</p><span class="add-dot"><svg class="icon"><use href="#i-plus"/></svg></span></div>
+          <div class="preview-card"><b>Running Work</b><p>Legal background work only.</p><span class="add-dot"><svg class="icon"><use href="#i-plus"/></svg></span></div>
+        </div></section>
+        <section class="library-section"><div class="library-addon"><span class="glyph-tile"><svg class="icon"><use href="#i-mic"/></svg></span>Audio <span>2 widgets</span></div><div class="preview-row">
+          <div class="preview-card"><b>Audio controls</b><p>Microphone and system output.</p><span class="add-dot"><svg class="icon"><use href="#i-plus"/></svg></span></div>
+          <div class="preview-card"><b>Audio status</b><p>A compact live status view.</p><span class="add-dot"><svg class="icon"><use href="#i-plus"/></svg></span></div>
+        </div></section>
+        <section class="library-section"><div class="library-addon"><span class="glyph-tile"><svg class="icon"><use href="#i-timer"/></svg></span>Intervals <span>2 widgets</span></div><div class="preview-row">
+          <div class="preview-card"><b>Current interval</b><p>Progress and quick controls.</p><span class="add-dot"><svg class="icon"><use href="#i-plus"/></svg></span></div>
+          <div class="preview-card"><b>Upcoming</b><p>Next intervals in the active set.</p><span class="add-dot"><svg class="icon"><use href="#i-plus"/></svg></span></div>
+        </div></section>
+      </div>
+      <div class="inspector">
+        <div class="inspector-preview"><b>Audio controls</b><p>3 × 2 cells · Interactive</p><div class="status-line"><i class="status-dot"></i>Live preview</div></div>
+        <div class="field"><label>Title</label><div class="field-control"><span>Audio</span><span>Default</span></div></div>
+        <div class="field"><label>Show device names</label><div class="field-control"><span>Visible when space allows</span><span>On</span></div></div>
+        <div class="field"><label>Compact control order</label><div class="field-control"><span>Microphone first</span><svg class="icon"><use href="#i-chevron"/></svg></div></div>
+        <button class="danger-btn">Remove Widget</button>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<script>
+  const shell=document.getElementById("shell");
+  const stateButtons=[...document.querySelectorAll("[data-state]")].filter(button=>button.tagName==="BUTTON");
+  const densityButton=document.querySelector("[data-density]");
+  function setState(state){
+    shell.dataset.state=state;
+    stateButtons.forEach(button=>button.classList.toggle("active",button.dataset.state===state));
+    document.getElementById("searchButton").classList.toggle("active",state==="search"||state==="context");
+    document.getElementById("editButton").classList.toggle("active",state==="edit"||state==="inspect");
+    document.getElementById("libraryTitle").textContent=state==="inspect"?"Widget Settings":"Add Widgets";
+    const searchInput=document.getElementById("searchInput");
+    if(state==="context") searchInput.value="";
+    if(state==="search") searchInput.value="mute";
+    if(state==="search"||state==="context") setTimeout(()=>searchInput.focus(),0);
+  }
+  stateButtons.forEach(button=>button.addEventListener("click",()=>setState(button.dataset.state)));
+  document.getElementById("searchButton").addEventListener("click",()=>setState("search"));
+  document.getElementById("editButton").addEventListener("click",()=>setState("edit"));
+  document.querySelector(".widget.selected").addEventListener("click",()=>{if(shell.dataset.state==="edit")setState("inspect")});
+  document.getElementById("doneButton").addEventListener("click",()=>setState("home"));
+  document.getElementById("searchLayer").addEventListener("click",event=>{if(event.target.id==="searchLayer") setState("home")});
+  document.addEventListener("keydown",event=>{if(event.key==="Escape") setState("home")});
+  densityButton.addEventListener("click",()=>{
+    const compact=shell.dataset.density!=="compact";
+    shell.dataset.density=compact?"compact":"wide";
+    densityButton.classList.toggle("active",compact);
+  });
+</script>
+</body>
+</html>

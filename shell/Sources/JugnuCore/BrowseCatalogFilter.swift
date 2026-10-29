@@ -48,6 +48,30 @@ public func filterCatalog(
     return result
 }
 
+public func catalogWithSymlinkedAddons(_ fetched: [RegistryEntry], symlinked: [RegistryEntry]) -> [RegistryEntry] {
+    let known = Set(fetched.map(\.id))
+    return fetched + symlinked.filter { !known.contains($0.id) }
+}
+
+public func registryEntryForLocalAddon(_ manifest: AddonManifest) -> RegistryEntry {
+    RegistryEntry(
+        id: manifest.id,
+        name: manifest.name,
+        version: manifest.version,
+        api: manifest.api,
+        url: "local:\(manifest.id)",
+        sha256: "local",
+        summary: manifest.commands.first?.title ?? manifest.name,
+        category: "System",
+        description: manifest.commands.first?.subtitle,
+        commands: manifest.commands.map {
+            RegistryCommand(id: $0.id, title: $0.title, subtitle: $0.subtitle)
+        },
+        permissions: manifest.permissions,
+        primary: manifest.primary
+    )
+}
+
 /// ignores the active tag filter so chips show what's still selectable, not the full vocabulary
 public func availableTags(
     entries: [RegistryEntry],

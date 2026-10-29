@@ -29,44 +29,51 @@ final class HotkeyController {
     static func parse(_ raw: String) -> KeyCombo? {
         guard let spec = HotkeySpec.parse(raw) else { return nil }
         var modifiers: NSEvent.ModifierFlags = []
-        if spec.modifiers.contains("command") { modifiers.insert(.command) }
-        if spec.modifiers.contains("option") { modifiers.insert(.option) }
-        if spec.modifiers.contains("control") { modifiers.insert(.control) }
-        if spec.modifiers.contains("shift") { modifiers.insert(.shift) }
+        if spec.modifiers.contains("command") {
+            modifiers.insert(.command)
+        }
+        if spec.modifiers.contains("option") {
+            modifiers.insert(.option)
+        }
+        if spec.modifiers.contains("control") {
+            modifiers.insert(.control)
+        }
+        if spec.modifiers.contains("shift") {
+            modifiers.insert(.shift)
+        }
 
-        let key: Key?
-        switch spec.key {
-        case "space": key = .space
-        case "return": key = .return
-        case "tab": key = .tab
-        case "escape": key = .escape
-        case "a": key = .a
-        case "b": key = .b
-        case "c": key = .c
-        case "d": key = .d
-        case "e": key = .e
-        case "f": key = .f
-        case "g": key = .g
-        case "h": key = .h
-        case "i": key = .i
-        case "j": key = .j
-        case "k": key = .k
-        case "l": key = .l
-        case "m": key = .m
-        case "n": key = .n
-        case "o": key = .o
-        case "p": key = .p
-        case "q": key = .q
-        case "r": key = .r
-        case "s": key = .s
-        case "t": key = .t
-        case "u": key = .u
-        case "v": key = .v
-        case "w": key = .w
-        case "x": key = .x
-        case "y": key = .y
-        case "z": key = .z
-        default: key = nil
+        let key: Key? = switch spec.key {
+        case "space": .space
+        case "return": .return
+        case "tab": .tab
+        case "escape": .escape
+        case "a": .a
+        case "b": .b
+        case "c": .c
+        case "d": .d
+        case "e": .e
+        case "f": .f
+        case "g": .g
+        case "h": .h
+        case "i": .i
+        case "j": .j
+        case "k": .k
+        case "l": .l
+        case "m": .m
+        case "n": .n
+        case "o": .o
+        case "p": .p
+        case "q": .q
+        case "r": .r
+        case "s": .s
+        case "t": .t
+        case "u": .u
+        case "v": .v
+        case "w": .w
+        case "x": .x
+        case "y": .y
+        case "z": .z
+        default: nil
         }
         guard let key else { return nil }
         return KeyCombo(key: key, modifiers: modifiers)

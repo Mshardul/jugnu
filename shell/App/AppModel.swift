@@ -42,8 +42,14 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
         publishTheme()
     }
 
-    var allCommands: [IndexedCommand] { index.all }
-    var hiddenShellCommands: Set<String> { config.shell.hiddenShellCommands }
+    var allCommands: [IndexedCommand] {
+        index.all
+    }
+
+    var hiddenShellCommands: Set<String> {
+        config.shell.hiddenShellCommands
+    }
+
     var shellNativeCommands: [ShellNativeCommand] {
         ShellNativeCommand.visible(hidden: config.shell.hiddenShellCommands)
     }
@@ -85,11 +91,11 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
     func commandsForFirstView() -> [IndexedCommand] {
         switch config.palette.firstView {
         case .blank:
-            return []
+            []
         case .recent:
-            return state.recentCommandIDs.compactMap { id in index.all.first { $0.qualifiedId == id } }
+            state.recentCommandIDs.compactMap { id in index.all.first { $0.qualifiedId == id } }
         case .favorites:
-            return state.favoriteCommandIDs.compactMap { id in index.all.first { $0.qualifiedId == id } }
+            state.favoriteCommandIDs.compactMap { id in index.all.first { $0.qualifiedId == id } }
         }
     }
 
@@ -101,6 +107,32 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
 
     func isFavorite(qualifiedId: String) -> Bool {
         state.favoriteCommandIDs.contains(qualifiedId)
+    }
+
+    func isFavoriteAddon(_ id: String) -> Bool {
+        state.favoriteAddonIDs.contains(id)
+    }
+
+    func toggleFavoriteAddon(_ id: String) {
+        if let index = state.favoriteAddonIDs.firstIndex(of: id) {
+            state.favoriteAddonIDs.remove(at: index)
+        } else {
+            state.favoriteAddonIDs.append(id)
+        }
+        try? stateStore.save(state)
+        objectWillChange.send()
+    }
+
+    func recentAddonIDs() -> [String] {
+        var seen: [String] = []
+        for qualified in state.recentCommandIDs {
+            guard let dot = qualified.lastIndex(of: ".") else { continue }
+            let addonID = String(qualified[..<dot])
+            if !seen.contains(addonID) {
+                seen.append(addonID)
+            }
+        }
+        return seen
     }
 
     func moveFavorite(from source: Int, to destination: Int) {
@@ -174,11 +206,10 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
                 paths: paths
             )
             Self.track(inv, key: key, invokeUUID: invokeUUID, lifecycleClass: klass, host: processHost)
-            let response: RunResponse
-            if klass == .job {
-                response = try await inv.waitForJobResponse()
+            let response: RunResponse = if klass == .job {
+                try await inv.waitForJobResponse()
             } else {
-                response = try await inv.waitForResponse(timeout: oneshotTimeout)
+                try await inv.waitForResponse(timeout: oneshotTimeout)
             }
             return try response.resolvingView(
                 commandView: command.defaultViewType,
@@ -201,11 +232,10 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
                 markerDir: markerDir
             )
             Self.track(inv, key: key, invokeUUID: invokeUUID, lifecycleClass: klass, host: processHost)
-            let response: RunResponse
-            if klass == .job {
-                response = try await inv.waitForJobResponse()
+            let response: RunResponse = if klass == .job {
+                try await inv.waitForJobResponse()
             } else {
-                response = try await inv.waitForResponse(timeout: oneshotTimeout)
+                try await inv.waitForResponse(timeout: oneshotTimeout)
             }
             return try response.resolvingView(
                 commandView: command.defaultViewType,
@@ -286,7 +316,9 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
     }
 
     func syncFinderMenus() {
-        if ScreenshotMode.isActive { return }
+        if ScreenshotMode.isActive {
+            return
+        }
         var desired: [FinderQuickAction] = []
         for id in installedAddonIDs() {
             let root = paths.addonsDir.appendingPathComponent(id)
@@ -360,7 +392,9 @@ final class AppModel: ObservableObject, PaletteModelProtocol {
             do {
                 try await installFromRegistry(ids: selectedAddonIDs)
             } catch {
-                if localAddonRoots.isEmpty { throw error }
+                if localAddonRoots.isEmpty {
+                    throw error
+                }
                 for root in localAddonRoots {
                     let manifest = try ManifestLoader.load(from: root)
                     guard ReplaceWhileTracked.proceed(

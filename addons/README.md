@@ -16,7 +16,8 @@ Nothing here is bundled inside `Jugnu.app`. Users install zips into `~/.local/sh
 | `weather-bar` | current temperature and conditions |
 | `brew-outdated` | outdated Homebrew formulae and casks |
 | `intervals` | recurring reminders and a pomodoro phase preset (one timer list) |
-| `floating-note` | always-on-top scratchpad (`note` UI pattern) |
+| `floating-note` | temporary note: floating sticky restored from a local file (`note` UI pattern) |
+| `temporary-folder` | menu-bar tray for dropping files into `~/Temporary` |
 | `clipboard-history` | searchable clipboard history (background watcher + sqlite) |
 | `ports` | list listening ports and kill by pid |
 | `window-layouts` | snaps, snap board, zones (max 6), Space jump; AX helper |

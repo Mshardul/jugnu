@@ -83,6 +83,14 @@ public struct JugnuPaths: Sendable {
         home.appendingPathComponent(".config/jugnu/state.json")
     }
 
+    public var homeLayoutFile: URL {
+        home.appendingPathComponent(".config/jugnu/home-layout.json")
+    }
+
+    public var widgetSnapshotCacheFile: URL {
+        stateDir.appendingPathComponent("widget-snapshots.json")
+    }
+
     public var registryCacheFile: URL {
         home.appendingPathComponent(".local/share/jugnu/state/registry-cache.json")
     }

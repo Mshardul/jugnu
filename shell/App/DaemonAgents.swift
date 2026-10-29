@@ -23,7 +23,9 @@ struct ProcessLaunchctl: DaemonLaunchctl {
 }
 
 struct DaemonAgents {
-    static var firstPartyDaemonIDs: Set<String> { FirstPartyDaemons.ids }
+    static var firstPartyDaemonIDs: Set<String> {
+        FirstPartyDaemons.ids
+    }
 
     var launchctl: DaemonLaunchctl
     var uid: uid_t
@@ -65,7 +67,12 @@ struct DaemonAgents {
         try? FileManager.default.removeItem(at: plist)
     }
 
-    func syncEnabled(manifest: AddonManifest, addonRoot: URL, paths: JugnuPaths, shellIdentity: AddonRunner.ShellIdentity) throws {
+    func syncEnabled(
+        manifest: AddonManifest,
+        addonRoot: URL,
+        paths: JugnuPaths,
+        shellIdentity: AddonRunner.ShellIdentity
+    ) throws {
         for command in manifest.commands
             where manifest.effectiveLifecycle(commandId: command.id) == .daemon
         {
@@ -128,8 +135,8 @@ struct DaemonAgents {
             "StandardErrorPath": stateDir.appendingPathComponent("daemon.err.log").path,
             "EnvironmentVariables": [
                 "JUGNU_ORIGIN": "\(addonID):\(commandID)",
-                "JUGNU_SHELL_START_TS": String(shellIdentity.startTS),
-            ],
+                "JUGNU_SHELL_START_TS": String(shellIdentity.startTS)
+            ]
         ]
         let data = try PropertyListSerialization.data(fromPropertyList: dict, format: .xml, options: 0)
         let url = paths.launchAgentsDir.appendingPathComponent("\(label).plist")
@@ -189,4 +196,3 @@ enum ReplaceWhileTracked {
         return alert.runModal() == .alertFirstButtonReturn
     }
 }
-

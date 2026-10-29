@@ -1,10 +1,16 @@
 # Jugnu — shell surface: one panel, presets, stack
 
 **Date:** 2026-08-23  
-**Status:** Approved  
+**Status:** Approved and implemented — superseded in part by the [2026-10-12 app-shell plan](./2026-10-12-app-shell-design.md)  
 **Ticket:** [0008](../tickets.md)  
 **Depends on:** [Addon UI host + speed](./2026-08-22-addon-ui-speed-design.md) (patterns, shell-owned chrome), [Palette + addon UI product pass](./2026-08-23-palette-ui-product-pass.md) (tokens, theming), [Addon catalog browse](./2026-08-23-addon-catalog-browse-design.md) (taxonomy, registry, install — **not** the titled `BrowseCatalogWindow`)  
 **Out of scope here:** Liquid Glass / Tahoe material chrome (parked in [ideas.md](../ideas.md)); first-run rewrite ([ticket 0004](../tickets.md) — this spec only leaves a door); per-addon pixel sizes (superseded by [view types](./2026-08-24-view-types.md)); addons creating their own `NSWindow`; background `progress` queue (later); Quick note **command** (backlog on `floating-note`; this spec only adds the host `persist` flag)
+
+> **Authority:** The app-shell plan supersedes this document's launcher/Home,
+> Catalog, Preferences, and app-route invocation geometry. This document remains
+> binding for the main-panel stack, focused Addon UI, detached chrome, process
+> cancellation, and state restoration where the app-shell plan does not
+> override it.
 
 ## 1. Why now
 
@@ -168,6 +174,7 @@ Shell table: `default_ui_pattern` / response `ui.pattern` → preset, HUD, or de
 | list | `list` |
 | form | `form` |
 | note | detached window (`persist` true/false) |
+| tray | detached shelf under the menu bar |
 | Browse Addons (shell command) | push `catalog` (replace if current is `settings`) |
 | Preferences (shell command) | push `settings` (replace if current is `catalog`) |
 

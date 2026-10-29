@@ -1,3 +1,4 @@
+import JugnuCore
 @testable import JugnuUI
 import XCTest
 
@@ -137,9 +138,33 @@ final class ShellStackTests: XCTestCase {
         XCTAssertEqual(decideInvokeOutcome(stack: stack, isVisible: false), .showHome)
     }
 
+    func test_dockReopen_hiddenPalette_showsIt() {
+        XCTAssertEqual(decideDockReopen(paletteVisible: false), .showPalette)
+    }
+
+    func test_dockReopen_visiblePalette_staysOpen() {
+        XCTAssertEqual(decideDockReopen(paletteVisible: true), .orderFront)
+    }
+
     func test_invokeOutcome_visibleOnLauncher_closes() {
         let stack = ShellStack()
         XCTAssertEqual(decideInvokeOutcome(stack: stack, isVisible: true), .close)
+    }
+
+    func test_hideLauncherAfterInvoke_skippedWhenNoteClearedTheStack() {
+        var stack = ShellStack()
+        stack.clear()
+        XCTAssertFalse(shouldHideLauncherAfterInvoke(stack))
+    }
+
+    func test_hideLauncherAfterInvoke_whenStillOnLauncher() {
+        XCTAssertTrue(shouldHideLauncherAfterInvoke(ShellStack()))
+    }
+
+    func test_hideLauncherAfterInvoke_skippedWhenFollowUpIsShowing() {
+        var stack = ShellStack()
+        stack.push(ShellStackEntry(.list(query: "", highlightedID: nil, scroll: 0)))
+        XCTAssertFalse(shouldHideLauncherAfterInvoke(stack))
     }
 
     func test_invokeOutcome_visibleOnCatalog_showsHome() {
@@ -153,5 +178,21 @@ final class ShellStackTests: XCTestCase {
             selectedCardID: nil
         )))
         XCTAssertEqual(decideInvokeOutcome(stack: stack, isVisible: true), .showHome)
+    }
+
+    func test_appShell_isTheSingleRoot() {
+        var stack = ShellStack()
+        stack.home(initial: .appShell(.freshHome()))
+        XCTAssertEqual(stack.top.preset, .appShell)
+        XCTAssertTrue(stack.isAtRoot)
+
+        var catalog = AppNavigation.freshHome()
+        catalog.page = .catalog
+        stack.push(ShellStackEntry(.appShell(catalog)))
+        XCTAssertEqual(stack.entries.count, 1)
+        XCTAssertEqual(stack.top.preset, .appShell)
+
+        stack.push(ShellStackEntry(.list(query: "", highlightedID: nil, scroll: 0)))
+        XCTAssertEqual(stack.entries.map(\.preset), [.appShell, .list])
     }
 }

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0C269B59DB0AD928393F514F /* JugnuApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFC6769799C763B68AB9458E /* JugnuApp.swift */; };
+		19D1C73DC3FAF52F7132997C /* AppDelegate+AppShell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A5C181DBCC96846C2F3C2B9 /* AppDelegate+AppShell.swift */; };
 		3A4D0C19C22EC9C67CBCFB55 /* AddonProcessHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68333462923074742BE70CAB /* AddonProcessHost.swift */; };
 		3AF25473E76FCC6758730646 /* ScreenshotFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91CC5912906B1489BE2F8456 /* ScreenshotFlow.swift */; };
 		43396A1778B20138131DD6AA /* TCCExplainerGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51F3263964CB3654B1B56075 /* TCCExplainerGate.swift */; };
@@ -47,6 +48,7 @@
 		250A8E808389C83FDDFEF2A5 /* DaemonAgents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DaemonAgents.swift; sourceTree = "<group>"; };
 		270E0874AB20E0EB3A96CB16 /* ScreenshotTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScreenshotTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		278F0380D93A6EEE31AD2C2F /* HotkeyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyController.swift; sourceTree = "<group>"; };
+		2A5C181DBCC96846C2F3C2B9 /* AppDelegate+AppShell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+AppShell.swift"; sourceTree = "<group>"; };
 		4E828A6B867A511A83ECEBC3 /* BrowseCatalogViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowseCatalogViewModel.swift; sourceTree = "<group>"; };
 		51F3263964CB3654B1B56075 /* TCCExplainerGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCCExplainerGate.swift; sourceTree = "<group>"; };
 		5E983F2778775352830C719C /* FirstRunWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstRunWindow.swift; sourceTree = "<group>"; };
@@ -115,6 +117,7 @@
 				68333462923074742BE70CAB /* AddonProcessHost.swift */,
 				B75FD8B95BC991E13A258885 /* AddonReaper.swift */,
 				A7827A8A356F9392C623B554 /* AddonUninstallPresenter.swift */,
+				2A5C181DBCC96846C2F3C2B9 /* AppDelegate+AppShell.swift */,
 				C54EFD50AF390947D5BB2593 /* AppDelegate+Commands.swift */,
 				618555F88ACF791DF48B6696 /* AppDelegate+Navigation.swift */,
 				D3D00E1FEF0969F288E08FF6 /* AppModel.swift */,
@@ -254,6 +257,7 @@
 				3A4D0C19C22EC9C67CBCFB55 /* AddonProcessHost.swift in Sources */,
 				F6D1A03B6F3606EAC5C6A914 /* AddonReaper.swift in Sources */,
 				D075254A62556C0A795B0DAB /* AddonUninstallPresenter.swift in Sources */,
+				19D1C73DC3FAF52F7132997C /* AppDelegate+AppShell.swift in Sources */,
 				FA96539C714240EFF02151ED /* AppDelegate+Commands.swift in Sources */,
 				E6406652E415093E43EE79ED /* AppDelegate+Navigation.swift in Sources */,
 				AD78C530AE4729B3D27FE654 /* AppModel.swift in Sources */,

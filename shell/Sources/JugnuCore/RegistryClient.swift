@@ -12,6 +12,20 @@ public struct RegistryCommand: Codable, Equatable, Sendable {
     }
 }
 
+public enum RegistryTrust: String, Codable, Equatable, Sendable {
+    case community
+    case verified
+    case firstParty = "first-party"
+
+    public var label: String {
+        switch self {
+        case .community: "Community"
+        case .verified: "Verified"
+        case .firstParty: "First-party"
+        }
+    }
+}
+
 public struct RegistryEntry: Codable, Equatable, Sendable {
     public var id: String
     public var name: String
@@ -29,6 +43,7 @@ public struct RegistryEntry: Codable, Equatable, Sendable {
     public var dependencies: [AddonDependency]
     public var permissions: [AddonPermission]
     public var primary: String?
+    public var trust: RegistryTrust
 
     public init(
         id: String, name: String, version: String, api: Int, url: String, sha256: String, summary: String,
@@ -36,7 +51,8 @@ public struct RegistryEntry: Codable, Equatable, Sendable {
         description: String? = nil, commands: [RegistryCommand] = [],
         dependencies: [AddonDependency] = [],
         permissions: [AddonPermission] = [],
-        primary: String? = nil
+        primary: String? = nil,
+        trust: RegistryTrust = .community
     ) {
         self.id = id; self.name = name; self.version = version; self.api = api
         self.url = url; self.sha256 = sha256; self.summary = summary
@@ -45,11 +61,12 @@ public struct RegistryEntry: Codable, Equatable, Sendable {
         self.dependencies = dependencies
         self.permissions = permissions
         self.primary = primary
+        self.trust = trust
     }
 
     enum CodingKeys: String, CodingKey {
         case id, name, version, api, url, sha256, summary, category, subcategory, tags, description, commands
-        case dependencies, permissions, primary
+        case dependencies, permissions, primary, trust
     }
 
     public init(from decoder: Decoder) throws {
@@ -68,6 +85,9 @@ public struct RegistryEntry: Codable, Equatable, Sendable {
         commands = try c.decodeIfPresent([RegistryCommand].self, forKey: .commands) ?? []
         dependencies = try c.decodeIfPresent([AddonDependency].self, forKey: .dependencies) ?? []
         primary = try c.decodeIfPresent(String.self, forKey: .primary)
+        // missing or unknown tiers must never read as more trusted than they are
+        let rawTrust = (try? c.decodeIfPresent(String.self, forKey: .trust)) ?? nil
+        trust = rawTrust.flatMap(RegistryTrust.init(rawValue:)) ?? .community
         do {
             permissions = try PermissionsSet.parse(c.decodeIfPresent([String].self, forKey: .permissions) ?? [])
         } catch is PermissionsParseError {
@@ -101,6 +121,7 @@ public struct RegistryEntry: Codable, Equatable, Sendable {
             try c.encode(permissions.map(\.rawValue), forKey: .permissions)
         }
         try c.encodeIfPresent(primary, forKey: .primary)
+        try c.encode(trust, forKey: .trust)
     }
 }
 
@@ -110,7 +131,7 @@ public struct RegistryClient: Sendable {
     public init() {}
 
     public func fetch(from url: URL) async throws -> [RegistryEntry] {
-        let (data, response) = try await URLSession.shared.data(from: url)
+        let (data, response) = try await RegistryTransport.shared.data(from: url)
         if let http = response as? HTTPURLResponse, !(200 ... 299).contains(http.statusCode) {
             throw RegistryClientError.httpStatus(http.statusCode)
         }
@@ -122,7 +143,7 @@ public struct RegistryClient: Sendable {
     }
 
     public func fetchHelpers(from url: URL) async throws -> [HelperRegistryEntry] {
-        let (data, response) = try await URLSession.shared.data(from: url)
+        let (data, response) = try await RegistryTransport.shared.data(from: url)
         if let http = response as? HTTPURLResponse, !(200 ... 299).contains(http.statusCode) {
             throw RegistryClientError.httpStatus(http.statusCode)
         }
@@ -151,4 +172,6 @@ public struct HelperRegistryEntry: Codable, Equatable, Sendable {
 public enum RegistryClientError: Error, Equatable {
     case httpStatus(Int)
     case invalidCatalog
+    case insecureURL
+    case tooLarge
 }

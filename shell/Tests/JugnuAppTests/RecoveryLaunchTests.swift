@@ -51,12 +51,12 @@ final class RecoveryLaunchTests: XCTestCase {
             RecoveryMenuCopy.openConfig,
             RecoveryMenuCopy.disableAddons,
             RecoveryMenuCopy.tryAgain,
-            "Quit Jugnu"
+            "Quit"
         ])
         XCTAssertFalse(bar.menuItemTitles.contains("Check for Updates…"))
     }
 
-    func test_normalMenu_includesCheckForUpdates() {
+    func test_normalMenu_matchesMenuBarSpec() {
         let bar = MenuBarController(
             onOpenPalette: {},
             onPreferences: {},
@@ -64,10 +64,9 @@ final class RecoveryLaunchTests: XCTestCase {
             onCheckForUpdates: {}
         )
         XCTAssertEqual(bar.menuItemTitles, [
-            "Open Palette",
-            "Preferences…",
-            "Check for Updates…",
-            "Quit Jugnu"
+            "Open Jugnu",
+            "Open Preferences",
+            "Quit"
         ])
     }
 }

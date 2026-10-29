@@ -86,6 +86,10 @@ final class ViewTypeTests: XCTestCase {
         XCTAssertNil(try ViewType.resolve(pattern: .card, requested: nil, allowed: ViewType.shellDefaults))
     }
 
+    func testTrayResolvesNilViewType() throws {
+        XCTAssertNil(try ViewType.resolve(pattern: .tray, requested: nil, allowed: ViewType.shellDefaults))
+    }
+
     func testResolveAcceptsOverrideWhenAllowed() throws {
         XCTAssertEqual(
             try ViewType.resolve(pattern: .list, requested: .board, allowed: [.board, .rows]),

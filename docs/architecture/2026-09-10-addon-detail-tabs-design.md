@@ -1,12 +1,17 @@
 # Jugnu — Addon detail tabs + Installed + config passthrough (0065)
 
 **Date:** 2026-09-10  
-**Status:** Approved — shipped (product locks from prefs thread + batched §3–§5)  
+**Status:** Approved and shipped — superseded in part by the [2026-10-12 app-shell plan](./2026-10-12-app-shell-design.md)  
 **Ticket:** [0065](../tickets.md)  
 **Plan:** [2026-09-10-addon-detail-tabs](../superpowers/plans/2026-09-10-addon-detail-tabs.md)  
 **Depends on:** Prefs canvas [0064](../tickets.md), permissions vocabulary [0038](../tickets.md) / [0054](../tickets.md) A, [0827 state+config](./2026-08-27-addon-state-and-config-design.md)  
 **Absorbs:** Detail **Settings** tab half of 0054 B; 0827 Epic A (shell pipeline) + nudges as first `config:` consumer  
 **Not this epic:** Gallery / genie / card visual redesign ([0067](../tickets.md)); Open/`primary` ([0066](../tickets.md)); Hotkeys ([0037](../tickets.md)); prefs cross-addon Permissions inventory (0054 B remainder)
+
+> **Authority:** The app-shell plan supersedes this document's detail geometry,
+> app navigation, and the user-facing **Commands** tab label. Config/state
+> passthrough, installed/enabled gating, deep-link capability, and current
+> Addon Settings behavior remain binding.
 
 ## 0. Purpose
 

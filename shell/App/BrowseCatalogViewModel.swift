@@ -1,7 +1,7 @@
+import Combine
 import Foundation
 import JugnuCore
 import JugnuUI
-import Combine
 
 @MainActor
 final class BrowseCatalogViewModel: ObservableObject, BrowseCatalogViewModelProtocol {
@@ -12,7 +12,7 @@ final class BrowseCatalogViewModel: ObservableObject, BrowseCatalogViewModelProt
     @Published var staleMessage: String?
     @Published var errorMessage: String?
     @Published var installingIDs: Set<String> = []
-    // isInstalled/isEnabled read live from model, not @Published — bump this to force their redraw
+    /// isInstalled/isEnabled read live from model, not @Published — bump this to force their redraw
     @Published private(set) var refreshTick = 0
 
     let categories = CatalogTaxonomy.categories
@@ -48,6 +48,20 @@ final class BrowseCatalogViewModel: ObservableObject, BrowseCatalogViewModelProt
         return AddonUpdate.isAvailable(installed: installed, registry: entry.version)
     }
 
+    func isFavoriteAddon(_ id: String) -> Bool {
+        _ = refreshTick
+        return model.isFavoriteAddon(id)
+    }
+
+    func toggleFavoriteAddon(_ id: String) {
+        model.toggleFavoriteAddon(id)
+        refreshTick += 1
+    }
+
+    var recentAddonIDs: [String] {
+        model.recentAddonIDs()
+    }
+
     func load() async {
         guard let url = URL(string: model.config.shell.registryURL) else {
             errorMessage = "The catalog URL isn't valid."
@@ -55,15 +69,15 @@ final class BrowseCatalogViewModel: ObservableObject, BrowseCatalogViewModelProt
         }
         let result = await RegistryClient().fetchWithCache(from: url, cacheFile: model.paths.registryCacheFile)
         switch result {
-        case .fresh(let fetched):
-            entries = fetched
+        case let .fresh(fetched):
+            entries = catalogWithSymlinkedAddons(fetched, symlinked: symlinkedCatalogEntries())
             staleMessage = nil
             errorMessage = nil
-        case .cached(let cached, let failure):
-            entries = cached
+        case let .cached(cached, failure):
+            entries = catalogWithSymlinkedAddons(cached, symlinked: symlinkedCatalogEntries())
             staleMessage = UserFacingError.cachedCatalogMessage(for: failure)
             errorMessage = nil
-        case .unavailable(let failure):
+        case let .unavailable(failure):
             errorMessage = UserFacingError.message(for: failure)
         }
     }
@@ -189,6 +203,17 @@ final class BrowseCatalogViewModel: ObservableObject, BrowseCatalogViewModelProt
         await InstallDisclosurePresenter.confirm(ui: ui, shellHost: shellHost, commandId: commandId)
     }
 
+    private func symlinkedCatalogEntries() -> [RegistryEntry] {
+        model.installedAddonIDs().compactMap { id in
+            let root = model.paths.addonsDir.appendingPathComponent(id)
+            guard (try? FileManager.default.destinationOfSymbolicLink(atPath: root.path)) != nil else {
+                return nil
+            }
+            guard let manifest = try? ManifestLoader.load(from: root) else { return nil }
+            return registryEntryForLocalAddon(manifest)
+        }
+    }
+
     private func installedPermissions(id: String) -> [AddonPermission] {
         let root = model.paths.addonsDir.appendingPathComponent(id)
         guard let manifest = try? ManifestLoader.load(from: root) else { return [] }
@@ -222,7 +247,9 @@ final class BrowseCatalogViewModel: ObservableObject, BrowseCatalogViewModelProt
     }
 
     private func offerFinderMenuIfNeeded(addonID: String) async {
-        if ScreenshotMode.isActive { return }
+        if ScreenshotMode.isActive {
+            return
+        }
         let root = model.paths.addonsDir.appendingPathComponent(addonID)
         guard let manifest = try? ManifestLoader.load(from: root) else { return }
         let titles = FinderMenu.menuTitles(manifest: manifest)

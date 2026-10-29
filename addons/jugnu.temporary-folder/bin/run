@@ -1,0 +1,162 @@
+#!/bin/bash
+# Copies dropped paths into ~/Temporary. Trashes a direct child only when asked.
+set -euo pipefail
+
+folder="$HOME/Temporary"
+mkdir -p "$folder"
+
+req=$(cat)
+parsed=$(osascript -l JavaScript - "$req" <<'JS' || true
+function run(argv) {
+  var obj;
+  try { obj = JSON.parse(argv[0]); } catch (e) { return ""; }
+  var action = "";
+  if (obj && obj.args && typeof obj.args.action === "string") action = obj.args.action;
+  var list = obj && obj.args && obj.args.paths;
+  var out = [action];
+  if (list && list.length) {
+    for (var i = 0; i < list.length; i++) {
+      if (typeof list[i] === "string" && list[i].length) out.push(list[i]);
+    }
+  }
+  return out.join("\u001e");
+}
+JS
+)
+
+action=""
+dropped=()
+if [[ -n "${parsed:-}" ]]; then
+  IFS=$'\036' read -r -a fields <<< "$parsed"
+  action="${fields[0]}"
+  if ((${#fields[@]} > 1)); then
+    dropped=("${fields[@]:1}")
+  fi
+fi
+
+json_escape() {
+  local s=$1
+  s=${s//\\/\\\\}
+  s=${s//\"/\\\"}
+  s=${s//$'\n'/\\n}
+  s=${s//$'\r'/}
+  s=${s//$'\t'/\\t}
+  printf '%s' "$s"
+}
+
+canonical() {
+  local p=$1
+  if [[ -d "$p" ]]; then
+    (cd "$p" && pwd)
+  else
+    local dir base
+    dir=$(dirname "$p")
+    base=$(basename "$p")
+    printf '%s/%s\n' "$(cd "$dir" && pwd)" "$base"
+  fi
+}
+
+unique_dest() {
+  local base=$1
+  if [[ ! -e "$folder/$base" ]]; then
+    printf '%s\n' "$folder/$base"
+    return
+  fi
+  local stem ext n
+  if [[ "$base" == *.* && "$base" != .* ]]; then
+    ext=".${base##*.}"
+    stem="${base%.*}"
+  else
+    ext=""
+    stem="$base"
+  fi
+  n=2
+  while [[ -e "$folder/$stem $n$ext" ]]; do
+    n=$((n + 1))
+  done
+  printf '%s\n' "$folder/$stem $n$ext"
+}
+
+copy_in() {
+  local src=$1
+  [[ -e "$src" ]] || return 0
+  local abs folder_abs dest
+  abs=$(canonical "$src") || return 0
+  folder_abs=$(canonical "$folder") || return 0
+  case "$abs" in
+    "$folder_abs"|"$folder_abs"/*) return 0 ;;
+  esac
+  dest=$(unique_dest "$(basename "$abs")")
+  cp -R "$abs" "$dest"
+}
+
+is_direct_child() {
+  local src=$1
+  [[ -e "$src" ]] || return 1
+  local abs folder_abs parent
+  abs=$(canonical "$src") || return 1
+  folder_abs=$(canonical "$folder") || return 1
+  parent=$(dirname "$abs")
+  [[ "$parent" == "$folder_abs" ]]
+}
+
+trash_item() {
+  local target=$1
+  local result
+  result=$(osascript -l JavaScript - "$target" <<'JS' || true
+ObjC.import("Foundation");
+function run(argv) {
+  var url = $.NSURL.fileURLWithPath(argv[0]);
+  var error = $();
+  var ok = $.NSFileManager.defaultManager.trashItemAtURLResultingItemURLError(url, null, error);
+  return ok ? "ok" : "fail";
+}
+JS
+)
+  [[ "$result" == "ok" ]]
+}
+
+failed=0
+if [[ "$action" == "delete" ]]; then
+  for src in "${dropped[@]}"; do
+    [[ -n "$src" ]] || continue
+    if ! is_direct_child "$src"; then
+      failed=1
+      continue
+    fi
+    if ! trash_item "$src"; then
+      failed=1
+    fi
+  done
+elif ((${#dropped[@]} > 0)); then
+  for src in "${dropped[@]}"; do
+    [[ -n "$src" ]] || continue
+    copy_in "$src" || true
+  done
+fi
+
+folder_abs=$(canonical "$folder")
+if [[ $failed -eq 1 ]]; then
+  printf '{"ok":false,"error":"Couldn'"'"'t remove that from ~/Temporary","ui":'
+else
+  printf '{"ok":true,"ui":'
+fi
+printf '{"pattern":"tray","title":"Temporary","message":"Drop files or folders","items":['
+first=1
+shopt -s nullglob
+names=()
+for path in "$folder_abs"/*; do
+  names+=("$(basename "$path")")
+done
+if ((${#names[@]} > 0)); then
+  while IFS= read -r name; do
+    [[ -n "$name" ]] || continue
+    if [[ $first -eq 0 ]]; then printf ','; fi
+    first=0
+    printf '{"id":"%s","title":"%s"}' \
+      "$(json_escape "$folder_abs/$name")" \
+      "$(json_escape "$name")"
+  done < <(printf '%s\n' "${names[@]}" | LC_ALL=C sort)
+fi
+printf ']}}'
+printf '\n'

@@ -20,7 +20,7 @@ def xcresulttool(*args):
 
 
 def get_json(bundle, ref=None):
-    args = ["get", "--format", "json", "--path", bundle]
+    args = ["get", "object", "--legacy", "--format", "json", "--path", bundle]
     if ref:
         args += ["--id", ref]
     return json.loads(xcresulttool(*args))
@@ -105,7 +105,7 @@ def main():
         safe = name if name.endswith(".png") else name + ".png"
         dest = out_dir / safe
         data = subprocess.run(
-            ["xcrun", "xcresulttool", "export", "--type", "file",
+            ["xcrun", "xcresulttool", "export", "object", "--legacy", "--type", "file",
              "--path", bundle, "--id", ref, "--output-path", str(dest)],
             capture_output=True, check=False,
         )

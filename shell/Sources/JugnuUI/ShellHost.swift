@@ -15,6 +15,7 @@ public func clampedFrame(size requested: NSSize, centeredOn screenFrame: NSRect)
 public final class ShellHost: ObservableObject {
     @Published public private(set) var stack: ShellStack
     private var panel: KeyablePanel?
+    public private(set) var showsAppShellContent = false
     private let reduceMotion: () -> Bool
     private var outsideClickMonitor: Any?
     private var followUpDescriptor: UIDescriptor?
@@ -26,6 +27,8 @@ public final class ShellHost: ObservableObject {
     )?
     private let toast = ToastPresenter()
     private var cards: [String: WeakCardPanel] = [:]
+    private var notes: [String: NotePanel] = [:]
+    private var tray: TrayPanel?
     public var onCancelFollowUp: (() -> Void)?
 
     public init(reduceMotion: @escaping () -> Bool = { NSWorkspace.shared.accessibilityDisplayShouldReduceMotion }) {
@@ -49,7 +52,58 @@ public final class ShellHost: ObservableObject {
     public private(set) var currentViewType: ViewType = .seek
 
     public var dismissesOnOutsideClick: Bool {
-        currentViewType.dismissesOnOutsideClick
+        if stack.entries.last?.preset == .appShell {
+            return false
+        }
+        return currentViewType.dismissesOnOutsideClick
+    }
+
+    public var panelFrame: NSRect? {
+        panel?.frame
+    }
+
+    public var appShellNavigation: AppNavigation? {
+        for entry in stack.entries.reversed() {
+            if case let .appShell(navigation) = entry.state {
+                return navigation
+            }
+        }
+        return nil
+    }
+
+    public func showAppShell(_ navigation: AppNavigation) {
+        stack.home(initial: .appShell(navigation))
+    }
+
+    public func updateAppShell(_ navigation: AppNavigation) {
+        guard !stack.entries.isEmpty, stack.top.preset == .appShell else { return }
+        stack.replace(ShellStackEntry(.appShell(navigation)))
+    }
+
+    public func placeAppShellFrame(in visibleFrame: NSRect) {
+        guard let panel else { return }
+        panel.setFrame(appShellFrame(in: visibleFrame), display: true)
+    }
+
+    public func setOnCommandW(_ handler: (() -> Void)?) {
+        panel?.commandWHandler = handler
+    }
+
+    public func performCommandW() -> Bool {
+        guard let panel else { return false }
+        guard let event = NSEvent.keyEvent(
+            with: .keyDown,
+            location: .zero,
+            modifierFlags: .command,
+            timestamp: ProcessInfo.processInfo.systemUptime,
+            windowNumber: panel.windowNumber,
+            context: nil,
+            characters: "w",
+            charactersIgnoringModifiers: "w",
+            isARepeat: false,
+            keyCode: 13
+        ) else { return false }
+        return panel.performKeyEquivalent(with: event)
     }
 
     public func setOnCancel(_ handler: (() -> Void)?) {
@@ -88,12 +142,25 @@ public final class ShellHost: ObservableObject {
         on screen: NSScreen,
         viewType: ViewType? = nil
     ) {
+        morphFrame(to: preset, compactLauncher: compactLauncher, in: screen.visibleFrame, viewType: viewType)
+    }
+
+    public func morphFrame(
+        to preset: ShellPreset,
+        compactLauncher: Bool,
+        in visibleFrame: NSRect,
+        viewType: ViewType? = nil
+    ) {
         guard let panel else { return }
+        if preset == .appShell, viewType == nil {
+            placeAppShellFrame(in: visibleFrame)
+            return
+        }
         let type = viewType ?? preset.defaultViewType(compactLauncher: compactLauncher)
         currentViewType = type
-        let box = type.size(in: screen.visibleFrame)
+        let box = type.size(in: visibleFrame)
         let size = NSSize(width: box.width, height: box.height)
-        let target = clampedFrame(size: size, centeredOn: screen.visibleFrame)
+        let target = clampedFrame(size: size, centeredOn: visibleFrame)
         if reduceMotion() {
             panel.setFrame(target, display: true)
         } else {
@@ -123,6 +190,14 @@ public final class ShellHost: ObservableObject {
     }
 
     public func setContent(_ view: some View) {
+        showsAppShellContent = false
+        panel?.contentView = NSHostingView(rootView: view)
+    }
+
+    public func installAppShellContent(_ view: some View) {
+        guard panel != nil else { return }
+        guard !showsAppShellContent else { return }
+        showsAppShellContent = true
         panel?.contentView = NSHostingView(rootView: view)
     }
 
@@ -153,6 +228,7 @@ public extension ShellHost {
         stopOutsideClickMonitor()
         panel?.orderOut(nil)
         stack.clear()
+        showsAppShellContent = false
         followUpDescriptor = nil
         followUpError.message = nil
         activeFollowUp = nil
@@ -171,6 +247,8 @@ public extension ShellHost {
             reference.value?.orderOut(nil)
         }
         cards.removeAll()
+        tray?.close()
+        tray = nil
     }
 }
 
@@ -182,18 +260,17 @@ extension ShellHost {
         onScreen screen: NSScreen,
         followUp: @escaping (RunRequest) async throws -> RunResponse
     ) {
-        if let ui = response.ui, ui.pattern != .note, ui.pattern != .card {
-            pushFollowUp(ui: ui, commandId: commandId, trace: trace, onScreen: screen, followUp: followUp)
-            return
-        }
-        if let ui = response.ui, ui.pattern == .note {
-            openNote(ui: ui, followUp: followUp)
-            trace.markFirstPaint()
-            trace.markContent()
-            return
-        }
-        if let ui = response.ui, ui.pattern == .card {
-            openCard(ui: ui)
+        if let ui = response.ui {
+            switch ui.pattern {
+            case .note:
+                openNote(ui: ui, followUp: followUp)
+            case .card:
+                openCard(ui: ui)
+            case .tray:
+                openTray(ui: ui, commandId: commandId, onScreen: screen, followUp: followUp)
+            case .list, .form, .confirm, .grid:
+                pushFollowUp(ui: ui, commandId: commandId, trace: trace, onScreen: screen, followUp: followUp)
+            }
             trace.markFirstPaint()
             trace.markContent()
             return
@@ -222,6 +299,7 @@ extension ShellHost {
         case .grid: state = .grid(highlightedID: nil)
         case .note: return // note is detached, not a stack push
         case .card: return
+        case .tray: return
         }
         let resolvedTrace = trace ?? InvokeTrace(commandId: commandId)
         followUpDescriptor = ui
@@ -307,17 +385,107 @@ extension ShellHost {
         followUpError.message = nil
     }
 
+    /// hide() first so the tray doesn't leave the palette panel sitting behind it.
+    /// Stays up across app switches so a drag from Finder can land on it.
+    private func openTray(
+        ui: UIDescriptor,
+        commandId: String,
+        onScreen screen: NSScreen,
+        followUp: @escaping (RunRequest) async throws -> RunResponse
+    ) {
+        hide()
+        let animated = reduceMotion() == false
+        if let tray {
+            bindTray(tray, commandId: commandId, followUp: followUp)
+            tray.replace(ui: ui)
+            tray.reveal(on: screen, animated: false)
+            NSApp.activate(ignoringOtherApps: true)
+            return
+        }
+        let panel = TrayPanel(
+            ui: ui,
+            onClose: { [weak self] in
+                self?.tray = nil
+            }
+        )
+        bindTray(panel, commandId: commandId, followUp: followUp)
+        tray = panel
+        panel.reveal(on: screen, animated: animated)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    private func bindTray(
+        _ tray: TrayPanel,
+        commandId: String,
+        followUp: @escaping (RunRequest) async throws -> RunResponse
+    ) {
+        tray.onPaths = { [weak self] paths in
+            self?.sendTray(
+                commandId: commandId,
+                followUp: followUp,
+                args: ["paths": .array(paths.map { .string($0) })]
+            )
+        }
+        tray.onOpen = { [weak self] paths in
+            let urls = paths.map { URL(fileURLWithPath: $0) }
+            let opened = urls.contains { NSWorkspace.shared.open($0) }
+            guard opened else {
+                self?.toast.show(message: "Couldn't open that.", isError: true)
+                return
+            }
+        }
+        tray.onReveal = { paths in
+            NSWorkspace.shared.activateFileViewerSelecting(paths.map { URL(fileURLWithPath: $0) })
+        }
+        tray.onTrash = { [weak self] paths in
+            self?.sendTray(
+                commandId: commandId,
+                followUp: followUp,
+                args: [
+                    "action": .string("delete"),
+                    "paths": .array(paths.map { .string($0) })
+                ]
+            )
+        }
+    }
+
+    private func sendTray(
+        commandId: String,
+        followUp: @escaping (RunRequest) async throws -> RunResponse,
+        args: [String: JSONValue]
+    ) {
+        Task { @MainActor in
+            do {
+                let request = RunJSON.followUpRequest(command: commandId, args: args)
+                let response = try await followUp(request)
+                if let next = response.ui, next.pattern == .tray {
+                    self.tray?.replace(ui: next)
+                }
+                if response.ok == false {
+                    self.toast.show(message: response.error ?? "Couldn't update ~/Temporary.", isError: true)
+                }
+            } catch {
+                self.toast.show(message: UserFacingError.message(for: error), isError: true)
+            }
+        }
+    }
+
     /// hide() first so the note doesn't leave the palette panel sitting behind it
     private func openNote(ui: UIDescriptor, followUp: @escaping (RunRequest) async throws -> RunResponse) {
         hide()
-        let commandId = ui.title ?? "note"
+        let key = ui.title ?? "note"
+        if let existing = notes[key], existing.isVisible {
+            existing.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+            return
+        }
         let note = NotePanel(
             ui: ui,
             persist: true,
             onSave: { [weak self] text in
                 Task { @MainActor in
                     do {
-                        let request = RunJSON.followUpRequest(command: commandId, args: ["content": .string(text)])
+                        let request = RunJSON.followUpRequest(command: key, args: ["content": .string(text)])
                         let response = try await followUp(request)
                         if response.ok == false {
                             self?.toast.show(message: response.error ?? "Couldn't save note.", isError: true)
@@ -329,6 +497,7 @@ extension ShellHost {
             },
             onClose: {}
         )
+        notes[key] = note
         note.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
     }

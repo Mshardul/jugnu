@@ -52,8 +52,12 @@ enum LaunchStart: Equatable {
     case recovery(RecoveryReason)
 
     static func decide(safeMode: Bool, configSyntaxError: Bool) -> LaunchStart {
-        if configSyntaxError { return .recovery(.malformedConfig) }
-        if safeMode { return .recovery(.crashLoop) }
+        if configSyntaxError {
+            return .recovery(.malformedConfig)
+        }
+        if safeMode {
+            return .recovery(.crashLoop)
+        }
         return .normal
     }
 }

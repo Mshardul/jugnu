@@ -334,11 +334,13 @@ One jump-to-location addon. `jump-to-location` opens the list. Absorbs favorite-
 | `favorite-folders` | Jump a curated folder list | planned |
 | `recent-files` | Recently modified files | planned |
 
-### scratch-folder — planned
+### temporary-folder — shipped
+
+One stable folder at `~/Temporary`. The command creates it if it is missing and opens a tray under the menu bar. Dropped files and folders are copied in. Files already there are left in place.
 
 | Command id | Title | Status |
 |---|---|---|
-| `open` | Open dated Scratch folder | planned |
+| `temporary-folder` | Temporary folder | shipped |
 
 ---
 
@@ -602,7 +604,7 @@ One timer list. Recurring reminder rows plus a pomodoro preset (`kind: phases`) 
 
 | Command id | Title | Status |
 |---|---|---|
-| `open` | Floating scratchpad | shipped |
+| `open` | Temporary note | shipped |
 | `quick-note` | Throwaway note | planned |
 | `note-pin` | Pin note | planned |
 

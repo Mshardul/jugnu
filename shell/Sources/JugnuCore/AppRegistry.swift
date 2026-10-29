@@ -75,7 +75,7 @@ public enum AppUpdateError: Error, Equatable {
 
 public extension RegistryClient {
     func fetchAppRegistry(from url: URL) async throws -> AppRegistryEntry {
-        let (data, response) = try await URLSession.shared.data(from: url)
+        let (data, response) = try await RegistryTransport.shared.data(from: url)
         if let http = response as? HTTPURLResponse, !(200 ... 299).contains(http.statusCode) {
             throw RegistryClientError.httpStatus(http.statusCode)
         }

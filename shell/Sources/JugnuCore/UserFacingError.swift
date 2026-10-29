@@ -58,6 +58,8 @@ public enum UserFacingError {
             return "This addon’s settings description couldn’t be read. Try reinstalling it."
         case .unknownPrimary:
             return "This addon’s description couldn’t be read. Try reinstalling it."
+        case .unsafeManifestField:
+            return "This addon asks for access it isn’t allowed to have, so Jugnu won’t load it."
         }
     }
 
@@ -196,7 +198,7 @@ public enum UserFacingError {
     private static func registryClientMessage(for error: Error) -> String? {
         guard let registry = error as? RegistryClientError else { return nil }
         switch registry {
-        case .httpStatus:
+        case .httpStatus, .insecureURL, .tooLarge:
             return catalogUnreachable
         case .invalidCatalog:
             return catalogInvalid

@@ -6,69 +6,32 @@ import SwiftUI
 @MainActor
 extension AppDelegate {
     func pushSettings() {
-        guard let model, let shellHost else { return }
-        let screen = NSScreen.main ?? NSScreen.screens.first
-        guard let screen else { return }
-        syncCatalogSnapshot()
-        ensurePanelIfNeeded(model: model)
-        let entry = ShellStackEntry(.settings(scroll: 0, focusedControlID: nil))
-        if shellHost.stack.top.preset == .catalog {
-            shellHost.replace(entry)
-        } else {
-            shellHost.push(entry)
-        }
-        renderCurrentTop(model: model)
-        shellHost.morphFrame(to: .settings, compactLauncher: false, on: screen)
-        shellHost.orderFront()
-        shellHost.armClickOutsideDismiss { [weak self] in self?.dismissFromClickOutside() }
+        openAppShellPage(.preferences)
     }
 
     func pushCatalog() {
-        guard let model, let shellHost else { return }
-        let screen = NSScreen.main ?? NSScreen.screens.first
-        guard let screen else { return }
-        ensurePanelIfNeeded(model: model)
-        let entry = ShellStackEntry(.catalog(
-            category: nil, subcategory: nil, tags: [], query: "", scroll: 0, selectedCardID: nil
-        ))
-        if shellHost.stack.top.preset == .settings {
-            shellHost.replace(entry)
-        } else {
-            shellHost.push(entry)
-        }
-        renderCurrentTop(model: model)
-        shellHost.morphFrame(to: .catalog, compactLauncher: false, on: screen)
-        shellHost.orderFront()
-        shellHost.armClickOutsideDismiss { [weak self] in self?.dismissFromClickOutside() }
+        openAppShellPage(.catalog)
     }
 
     func pushDetail(addonID: String, tab: AddonDetailTab = .overview) {
         guard let model, let shellHost else { return }
-        let screen = NSScreen.main ?? NSScreen.screens.first
-        guard let screen else { return }
-        syncCatalogSnapshot()
-        shellHost.push(ShellStackEntry(.detail(addonID: addonID, tab: tab)))
-        renderCurrentTop(model: model)
-        shellHost.morphFrame(to: .detail, compactLauncher: false, on: screen)
-        shellHost.orderFront()
-        shellHost.armClickOutsideDismiss { [weak self] in self?.dismissFromClickOutside() }
+        var navigation = shellHost.appShellNavigation ?? .freshHome()
+        navigation.page = .catalog
+        navigation.catalog.detail = AddonDetailRoute(addonID: addonID, section: addonDetailSection(tab))
+        if shellHost.isVisible, shellHost.stack.top.preset == .appShell {
+            shellHost.updateAppShell(navigation)
+            renderCurrentTop(model: model)
+            return
+        }
+        guard let screen = screenUnderPointer() else { return }
+        openAppShell(navigation, on: screen, model: model)
     }
 
-    func ensurePanelIfNeeded(model: AppModel) {
+    func ensurePanelIfNeeded(model _: AppModel) {
         guard let shellHost else { return }
         shellHost.ensurePanel(
-            initialContent: PaletteView(
-                model: model,
-                favorites: model.topFavorites(limit: 5),
-                onRun: { [weak self] cmd in self?.runCommand(cmd) },
-                onClose: { [weak shellHost] in shellHost?.hide() },
-                onOpenBrowseCatalog: { [weak self] in self?.pushCatalog() },
-                onOpenPreferences: { [weak self] in self?.pushSettings() },
-                onRunShellNative: { [weak self] cmd in self?.runShellNative(cmd) },
-                onReorderFavorite: { [weak self] from, to in self?.model?.moveFavorite(from: from, to: to) },
-                onRemoveFavorite: { [weak self] cmd in self?.model?.removeFavorite(qualifiedId: cmd.qualifiedId) }
-            ),
-            size: ShellPreset.launcher.size(compactLauncher: false)
+            initialContent: EmptyView(),
+            size: NSSize(width: 960, height: 640)
         )
     }
 
@@ -81,10 +44,11 @@ extension AppDelegate {
 
     func renderCurrentTop(model: AppModel) {
         guard let shellHost else { return }
-        shellHost.setOnCancel { [weak self] in self?.popOrDismiss() }
+        shellHost.setOnCancel { [weak self] in self?.handlePanelEscape() }
+        shellHost.setOnCommandW { [weak self] in self?.handlePanelCommandW() }
         switch shellHost.stack.top.preset {
         case .launcher:
-            guard case .launcher(let query, _, _) = shellHost.stack.top.state else { return }
+            guard case let .launcher(query, _, _) = shellHost.stack.top.state else { return }
             shellHost.setContent(PaletteView(
                 model: model,
                 favorites: model.topFavorites(limit: 5),
@@ -113,14 +77,6 @@ extension AppDelegate {
                     set: { value in
                         var config = model.config
                         config.sound = value
-                        try? model.saveConfig(config)
-                    }
-                ),
-                firstView: Binding(
-                    get: { model.config.palette.firstView },
-                    set: { value in
-                        var config = model.config
-                        config.palette.firstView = value
                         try? model.saveConfig(config)
                     }
                 ),
@@ -174,66 +130,34 @@ extension AppDelegate {
                 onOpen: { [weak self] addonID in self?.runPrimary(addonID: addonID) }
             ))
         case .detail:
-            guard case .detail(let addonID, let tab) = shellHost.stack.top.state else { return }
-            let vm = catalogViewModel(model: model)
-            if let entry = vm.entries.first(where: { $0.id == addonID }) {
-                var grants: [AddonPermission: Bool] = [:]
-                for permission in entry.permissions where permission.isTCC {
-                    grants[permission] = TCCGrantStatus.isGranted(permission)
-                }
-                let configState = self.addonConfigState(for: addonID)
-                shellHost.setContent(AddonDetailView(
-                    entry: entry,
-                    isInstalled: vm.isInstalled(entry.id),
-                    isEnabled: vm.isEnabled(entry.id),
-                    isInstalling: vm.installingIDs.contains(entry.id),
-                    updateAvailable: vm.updateAvailable(entry.id),
-                    errorMessage: vm.errorMessage,
-                    initialTab: tab,
-                    permissionGrants: grants,
-                    configSchema: configState.schema,
-                    configValues: configState.values,
-                    configError: configState.error,
-                    onInstall: { Task { await vm.install(entry) } },
-                    onUpdate: { Task { await vm.update(entry) } },
-                    onEnabledChange: { vm.setEnabled(entry.id, enabled: $0) },
-                    onUninstall: { vm.uninstall(id: entry.id, name: entry.name) },
-                    onRun: { [weak self] commandId in
-                        self?.runDetailCommand(addonID: addonID, commandId: commandId)
-                    },
-                    onConfigChange: { [weak self] key, value in
-                        self?.saveAddonConfigValue(addonID: addonID, key: key, value: value)
-                    },
-                    onOpenConfig: { [weak self] in
-                        self?.openAddonConfigFile(addonID: addonID)
-                    },
-                    onResetConfig: { [weak self] in
-                        self?.resetAddonConfigFile(addonID: addonID)
-                        if let model = self?.model {
-                            self?.renderCurrentTop(model: model)
-                        }
-                    },
-                    onClose: { [weak self] in self?.popOrDismiss() },
-                    onOpen: { [weak self] in self?.runPrimary(addonID: addonID) }
-                ))
-            }
+            guard case let .detail(addonID, tab) = shellHost.stack.top.state else { return }
+            shellHost.setContent(hostedAddonDetail(
+                model: model,
+                addonID: addonID,
+                tab: tab,
+                onClose: { [weak self] in self?.popOrDismiss() }
+            ))
         case .confirm, .list, .form, .grid:
             shellHost.renderFollowUpContent()
+        case .appShell:
+            renderAppShell(model: model)
         }
     }
 
-    // built once and reused so entries/filters survive push/pop
+    /// built once and reused so entries/filters survive push/pop
     func catalogViewModel(model: AppModel) -> BrowseCatalogViewModel {
-        if let catalogViewModel { return catalogViewModel }
+        if let catalogViewModel {
+            return catalogViewModel
+        }
         guard let shellHost else { preconditionFailure("catalogViewModel(model:) requires shellHost to be set") }
         let vm = BrowseCatalogViewModel(model: model, shellHost: shellHost)
         catalogViewModel = vm
         return vm
     }
 
-    // call before leaving catalog: the view model's @Published state survives push/pop, but the stack
-    // snapshot needs updating for anything that reads the stack directly. scroll/selectedCardID aren't
-    // tracked by the view model yet, so they keep their last-pushed value.
+    /// call before leaving catalog: the view model's @Published state survives push/pop, but the stack
+    /// snapshot needs updating for anything that reads the stack directly. scroll/selectedCardID aren't
+    /// tracked by the view model yet, so they keep their last-pushed value.
     func syncCatalogSnapshot() {
         guard let shellHost, let catalogViewModel, shellHost.stack.top.preset == .catalog else { return }
         shellHost.updateTopState(.catalog(

@@ -6,6 +6,11 @@
 **Depends on:** [Shell surface presets](./2026-08-23-shell-surface-presets.md), [Addon UI host + speed](./2026-08-22-addon-ui-speed-design.md)  
 **Not this spec:** Liquid Glass; addons creating `NSWindow`; per-addon pixel or percent fields; rotating the physical display
 
+> **Authority:** This catalog remains binding for focused Addon UI. The
+> app-level Home, Catalog, and Preferences frame is now governed by the
+> [2026-10-12 app-shell plan](./2026-10-12-app-shell-design.md), not by a view
+> type.
+
 ## 1. Intent
 
 The shell owns a **fixed catalog of view types**. A view type is a **viewport**: size band + panel aspect + chrome + dismiss rules. It is not an addon id and not a raw width/height.
@@ -25,7 +30,7 @@ The **app** defines the types. Each **addon** lists the type **id(s)** it may us
 | Clamp | Apply **min and max points** after the fraction so 70% of a 49″ ultrawide is not a wall and 40% of a 13″ is not a stamp. |
 | Morph | Same `KeyablePanel`, same stack. Frame morphs to the type’s rect; Reduce Motion snaps. |
 | Interaction patterns | `toast` / `list` / `form` / `confirm` / … stay the **content** contract. View type is **geometry**. Defaults map patterns → types; `board` / `spread` / `canvas` / `grid` are explicit. |
-| Not in the ten | `toast` (HUD), `status` (menu bar), `note` (detached), `veil` (full-screen overlay on one display). |
+| Not in the ten | `toast` (HUD), `status` (menu bar), `note` (detached), `tray` (menu-bar shelf), `veil` (full-screen overlay on one display). |
 
 ### Rejected
 

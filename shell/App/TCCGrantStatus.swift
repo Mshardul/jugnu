@@ -6,14 +6,14 @@ enum TCCGrantStatus {
     static func isGranted(_ permission: AddonPermission) -> Bool {
         switch permission {
         case .accessibility:
-            return AXIsProcessTrusted()
+            AXIsProcessTrusted()
         case .inputMonitoring:
             // Prefer not-granted until an addon needs CGPreflight (none declare it yet).
-            return false
+            false
         case .camera, .microphone, .screenRecording:
-            return false
+            false
         case .network, .clipboard, .background:
-            return true
+            true
         }
     }
 }

@@ -90,6 +90,46 @@ public enum PackageGates {
         }
     }
 
+    public static func validateHelperRef(_ ref: HelperRef) throws {
+        let idOK = ref.id.range(of: #"^[a-z0-9][a-z0-9-]*$"#, options: .regularExpression) != nil
+        guard idOK else { throw ManifestLoaderError.unsafeManifestField("helpers.id") }
+        guard isValidSemVer(ref.version) else { throw ManifestLoaderError.unsafeManifestField("helpers.version") }
+    }
+
+    public static func validateEntrypointPath(_ path: String) throws {
+        guard isContainedRelativePath(path) else { throw ManifestLoaderError.unsafeManifestField("entrypoint.path") }
+    }
+
+    public static func validateCleanupPath(_ raw: String, addonId: String) throws {
+        // anything outside the addon's own state/config dir would be a delete primitive on uninstall
+        let job = addonId.split(separator: ".", maxSplits: 1).last.map(String.init) ?? addonId
+        let roots = ["~/.local/share/jugnu/state/", "~/.config/jugnu/addons/"]
+        for root in roots where raw.hasPrefix(root) {
+            let rest = String(raw.dropFirst(root.count))
+            guard isContainedRelativePath(rest) else { break }
+            let first = rest.split(separator: "/", omittingEmptySubsequences: false).first.map(String.init)
+            if first == addonId || first == job {
+                return
+            }
+        }
+        throw ManifestLoaderError.unsafeManifestField("cleanup.paths")
+    }
+
+    public static func validateCleanupLaunchdLabel(_ label: String, addonId: String) throws {
+        let prefix = "com.\(addonId)."
+        let tail = label.dropFirst(prefix.count)
+        guard label.hasPrefix(prefix),
+              tail.range(of: #"^[A-Za-z0-9][A-Za-z0-9._-]*$"#, options: .regularExpression) != nil,
+              !tail.contains("..")
+        else { throw ManifestLoaderError.unsafeManifestField("cleanup.launchd") }
+    }
+
+    private static func isContainedRelativePath(_ path: String) -> Bool {
+        guard !path.isEmpty, !path.hasPrefix("/"), !path.contains("\\") else { return false }
+        let parts = path.split(separator: "/", omittingEmptySubsequences: false)
+        return !parts.contains { $0.isEmpty || $0 == "." || $0 == ".." }
+    }
+
     public static func compareSemVer(_ lhs: String, _ rhs: String) -> ComparisonResult {
         let a = parseSemVer(lhs)
         let b = parseSemVer(rhs)

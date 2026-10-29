@@ -1,10 +1,15 @@
 import Foundation
 import JugnuCore
 
-// builds a throwaway $HOME so screenshot runs never touch the real ~/.config/jugnu
+/// builds a throwaway $HOME so screenshot runs never touch the real ~/.config/jugnu
 enum ScreenshotMode {
     static var isActive: Bool {
-        ProcessInfo.processInfo.environment["JUGNU_SCREENSHOT_MODE"] == "1"
+        // Release must ignore the env var: this mode installs unverified addon copies into a fake $HOME
+        #if DEBUG
+            ProcessInfo.processInfo.environment["JUGNU_SCREENSHOT_MODE"] == "1"
+        #else
+            false
+        #endif
     }
 
     static let seededFavorites = [
@@ -12,16 +17,16 @@ enum ScreenshotMode {
         "jugnu.focus-toggle.toggle",
         "jugnu.clip-tools.paste-plain",
         "jugnu.clipboard-history.open",
-        "jugnu.ports.list",
+        "jugnu.ports.list"
     ]
 
     static let enabledAddons = [
         "jugnu.audio-toggles", "jugnu.focus-toggle", "jugnu.clip-tools", "jugnu.clipboard-history", "jugnu.ports",
         "jugnu.floating-note", "jugnu.intervals", "jugnu.world-clock", "jugnu.battery-eta", "jugnu.window-layouts",
-        "jugnu.ui-demo-confirm", "jugnu.ui-demo-form", "jugnu.ui-demo-list",
+        "jugnu.ui-demo-confirm", "jugnu.ui-demo-form", "jugnu.ui-demo-list"
     ]
 
-    // nil on any failure; caller falls back to the normal paths
+    /// nil on any failure; caller falls back to the normal paths
     static func makePaths() -> JugnuPaths? {
         let fm = FileManager.default
         let env = ProcessInfo.processInfo.environment

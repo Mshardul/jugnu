@@ -182,4 +182,14 @@ final class AddonRunnerTests: XCTestCase {
             }
         }
     }
+
+    func testChildEnvironmentDropsEverythingButTheAllowlist() {
+        let parent = [
+            "PATH": "/usr/bin", "HOME": "/Users/x", "LC_ALL": "en_US.UTF-8", "LANG": "en_US.UTF-8",
+            "GITHUB_TOKEN": "secret", "AWS_SECRET_ACCESS_KEY": "secret", "JUGNU_REPO_ADDONS": "/repo",
+            "SSH_AUTH_SOCK": "/tmp/agent"
+        ]
+        let child = AddonRunner.childEnvironment(from: parent)
+        XCTAssertEqual(Set(child.keys), ["PATH", "HOME", "LC_ALL", "LANG"])
+    }
 }

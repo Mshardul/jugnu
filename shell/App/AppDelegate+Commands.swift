@@ -109,7 +109,8 @@ extension AppDelegate {
         guard let screen = shellHost.currentScreen ?? NSScreen.main else { return }
         shellHost.onCancelFollowUp = { [weak self] in self?.popOrDismiss() }
         let key = CommandKey(addonID: cmd.addonId, commandID: cmd.commandId)
-        let klass = (try? ManifestLoader.load(from: cmd.addonRoot))?.effectiveLifecycle(commandId: cmd.commandId) ?? .oneshot
+        let klass = (try? ManifestLoader.load(from: cmd.addonRoot))?
+            .effectiveLifecycle(commandId: cmd.commandId) ?? .oneshot
         if klass == .job {
             shellHost.showJobProgress(startedAt: Date(), onScreen: screen) { [weak self] in
                 self?.processHost?.killTracked(key: key)
@@ -144,9 +145,14 @@ extension AppDelegate {
                 if self?.inFlightInvoke?.key == key {
                     self?.inFlightInvoke = nil
                 }
-                // still on launcher = toast-only result, no follow-up pushed; close
-                if shellHost.stack.top.preset == .launcher {
-                    shellHost.hide()
+                guard let host = self?.shellHost, let top = host.stack.entries.last else { return }
+                if top.preset == .appShell, let model = self?.model {
+                    self?.renderCurrentTop(model: model)
+                    if let screen = host.currentScreen ?? NSScreen.main {
+                        host.placeAppShellFrame(in: screen.visibleFrame)
+                    }
+                } else if shouldHideLauncherAfterInvoke(host.stack) {
+                    host.hide()
                 }
             }
             inFlightInvoke = (key: key, task: task)

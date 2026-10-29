@@ -1,10 +1,16 @@
 # Jugnu — launcher + catalog browse design
 
 **Date:** 2026-08-25
-**Status:** Planning complete — §0–§5 locked, no open blocking items. Remaining icon-related items parked to [ticket 0051](../tickets.md)'s epic; not blockers here.
+**Status:** Historical product lock — superseded in part by the [2026-10-12 app-shell plan](./2026-10-12-app-shell-design.md). Remaining icon-related items are parked in [ticket 0051](../tickets.md)'s epic.
 **Depends on:** [Shell design](./2026-08-22-shell-design.md), [Palette + addon UI product pass](./2026-08-23-palette-ui-product-pass.md), [View types](./2026-08-24-view-types.md), [Shell surface presets](./2026-08-23-shell-surface-presets.md)
 **Living mockup:** [2026-08-25-launcher-catalog-mockup.html](./2026-08-25-launcher-catalog-mockup.html) — visual reference kept in sync with each locked section, Firefly dark theme only
 **Related open ticket:** [0002](../tickets.md) — addon management / Preferences redesign + catalog browse (this doc is that design)
+
+> **Authority:** The app-shell plan supersedes this document's launcher/Home,
+> command-favorites, Catalog presentation, detail geometry, Preferences
+> navigation, and user-facing terminology. Registry taxonomy, install/update
+> behavior, and lifecycle contracts remain binding unless that plan explicitly
+> changes them.
 
 ## 0. Purpose
 

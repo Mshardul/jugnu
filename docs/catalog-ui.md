@@ -11,7 +11,7 @@ Companion: [catalog-commands.md](catalog-commands.md). Product rule: every job m
 | **Title** | User-facing panel name |
 | **Addon** | Owning zip |
 | **Opens from** | Command id(s) — one command or a group that shares this surface |
-| **View** | Shell view type id (`rows`, `canvas`, `board`, …) or detached (`note` / `toast` / `status`) |
+| **View** | Shell view type id (`rows`, `canvas`, `board`, …) or detached (`note` / `tray` / `toast` / `status`) |
 | **Status** | `shipped` / `planned` / `parked` / `draft` |
 
 **Locks (2026-09-04)**
@@ -51,7 +51,8 @@ Companion: [catalog-commands.md](catalog-commands.md). Product rule: every job m
 | Keep awake | `keep-awake` | `pick` | `fields` | shipped | Duration picker |
 | Intervals manage | `intervals` | `manage`, `advanced`, … | `rows` / `fields` / `ask` | shipped | List + setup + confirm |
 | Interval card | `intervals` | `show-card` / `phase-chime` | `card` (detached) | shipped | Not one of the ten in-panel types |
-| Floating note | `floating-note` | `open` | `note` (detached) | shipped | Persist scratchpad |
+| Temporary note | `floating-note` | `open` | `note` (detached) | shipped | Floating sticky; text kept and restored |
+| Temporary folder | `temporary-folder` | `temporary-folder` | `tray` (detached) | shipped | Menu-bar shelf for `~/Temporary`. Click opens, Ctrl-click selects, right-click or Clear moves items to the Trash |
 | Snap board | `window-layouts` | `snap-board` | `board` | shipped | Spatial snaps |
 | Zone picker | `window-layouts` | `zone-apply`, `zone-save`, … | `rows` / `fields` / `ask` | shipped | Max 6 zones |
 | Confirm demo | `ui-demo-confirm` | `demo` | `ask` | demo | |

@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jugnu — Preferences</title>
+<style>
+  :root{color-scheme:dark;--page:#0b0a08;--frame:#16130e;--surface:#1f1b13;--raised:#272117;--soft:#1a1711;
+    --border:#332c1f;--strong:#4a3d27;--text:#f3ede0;--muted:#9d9481;--sub:#c7bdab;--accent:#f5a623;
+    --accent-soft:#3b2b12;--green:#72c78b;--red:#df6b67;
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif}
+  *{box-sizing:border-box}body{margin:0;min-width:960px;background:var(--page);color:var(--text);padding:24px 32px 42px}
+  button,input{font:inherit}button{color:inherit}
+  .artifact-head{max-width:1376px;margin:0 auto 16px;display:flex;align-items:end;justify-content:space-between;gap:20px}
+  .artifact-head h1{font:600 18px/1.2 "SF Pro Display",-apple-system,sans-serif;margin:0 0 4px}
+  .artifact-head p{margin:0;color:var(--muted);font-size:12px}
+  .artifact-controls{display:flex;gap:6px;padding:4px;background:#14120e;border:1px solid #29251d;border-radius:10px}
+  .artifact-controls button{border:0;background:transparent;color:#928b7f;padding:6px 10px;border-radius:7px;font-size:11px;cursor:pointer}
+  .artifact-controls button.active{background:#29231a;color:#f6ead7}
+  .stage{max-width:1376px;margin:auto}
+  .shell{height:836px;max-height:calc(100vh - 118px);min-height:680px;background:var(--frame);border:1px solid var(--border);
+    border-radius:18px;box-shadow:0 28px 90px #000c,0 0 0 1px #ffffff05 inset;overflow:hidden;position:relative}
+  .topbar{height:64px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 18px}
+  .brand{display:flex;align-items:center;gap:10px;font:650 14px/1 "SF Pro Display",-apple-system,sans-serif}
+  .firefly{width:18px;height:18px;border-radius:50%;background:#f5a623;box-shadow:0 0 6px #ffc460,0 0 18px #f5a62366;position:relative}
+  .firefly:after{content:"";position:absolute;width:5px;height:5px;border-radius:50%;background:#fff3cf;top:3px;left:4px}
+  .primary-nav{height:38px;padding:3px;display:flex;gap:2px;background:var(--soft);border:1px solid var(--border);border-radius:11px}
+  .primary-nav button{border:0;background:transparent;padding:0 15px;border-radius:8px;font-size:12px;color:var(--muted);cursor:pointer}
+  .primary-nav button.active{background:var(--raised);color:var(--text);box-shadow:0 1px 4px #0007}
+  .top-actions{justify-self:end;display:flex;gap:6px}
+  .icon-btn{width:34px;height:34px;border:1px solid transparent;border-radius:9px;background:transparent;display:grid;place-items:center;cursor:pointer}
+  .icon-btn:hover,.icon-btn:focus-visible{background:var(--surface);border-color:var(--border);outline:none}
+  .icon{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 3px #f5a62366)}
+  .prefs-layout{height:calc(100% - 64px);display:grid;grid-template-columns:230px 1fr}
+  .sidebar{background:#13110d;border-right:1px solid var(--border);padding:16px 12px;overflow:auto}
+  .prefs-search{height:34px;border:1px solid var(--border);background:var(--soft);border-radius:8px;display:flex;align-items:center;gap:8px;padding:0 10px;color:var(--muted);font-size:10px;margin-bottom:18px}
+  .prefs-search .icon{width:14px;height:14px}
+  .side-label{font:600 9px/1 "SF Mono",monospace;color:#766f62;text-transform:uppercase;letter-spacing:.1em;margin:8px 10px}
+  .side-label:not(:first-of-type){margin-top:23px}
+  .side-item{height:36px;width:100%;border:0;background:transparent;border-radius:8px;display:flex;align-items:center;gap:9px;padding:0 10px;color:var(--sub);font-size:11.5px;text-align:left;cursor:pointer;position:relative}
+  .side-item:hover{background:var(--surface)}.side-item.active{background:var(--accent-soft);color:var(--accent);font-weight:600}
+  .side-item.active:before{content:"";position:absolute;left:-12px;width:3px;height:20px;background:var(--accent);border-radius:0 3px 3px 0;box-shadow:0 0 9px #f5a62388}
+  .side-item .icon{width:15px;height:15px}.badge{margin-left:auto;min-width:17px;height:17px;border-radius:8px;background:#452f13;color:var(--accent);display:grid;place-items:center;font:600 8px/1 "SF Mono",monospace}
+  .content{overflow:auto;padding:24px 28px 50px}.pane{display:none;max-width:860px}.pane.active{display:block}
+  .pane-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:22px}.pane-head h2{font:600 24px/1.1 "SF Pro Display",sans-serif;letter-spacing:-.02em;margin:0}.pane-head p{font-size:11px;color:var(--muted);margin:6px 0 0}
+  .save-state{font:500 9px/1 "SF Mono",monospace;color:var(--muted);display:flex;gap:6px;align-items:center}.save-state:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px #72c78b88}
+  .section{margin-bottom:22px}.section h3{font:600 11px/1 "SF Pro Display",sans-serif;margin:0 0 9px;color:var(--sub)}
+  .card{border:1px solid var(--border);background:var(--surface);border-radius:14px;overflow:hidden}
+  .setting{min-height:62px;display:flex;align-items:center;gap:18px;padding:12px 15px;border-top:1px solid var(--border)}
+  .setting:first-child{border-top:0}.setting-copy{min-width:0;flex:1}.setting-copy b{font-size:11px;font-weight:550}.setting-copy p{font-size:9.5px;line-height:1.4;color:var(--muted);margin:4px 0 0}
+  .control{flex:0 0 auto}.toggle{width:36px;height:21px;border-radius:12px;border:0;background:#494237;position:relative;cursor:pointer}.toggle:after{content:"";position:absolute;width:17px;height:17px;top:2px;left:2px;border-radius:50%;background:var(--sub);box-shadow:0 1px 3px #0008}.toggle.on{background:#8d5b18}.toggle.on:after{left:17px;background:#ffe0a5}
+  .select{height:30px;border:1px solid var(--border);background:var(--soft);border-radius:7px;padding:0 25px 0 9px;color:var(--sub);font-size:9.5px;display:flex;align-items:center}
+  .text-btn{border:1px solid var(--border);background:var(--soft);color:var(--sub);border-radius:8px;padding:7px 10px;font-size:9.5px;cursor:pointer}.text-btn.accent{border-color:#6b4a1b;background:var(--accent-soft);color:var(--accent);font-weight:650}
+  .themes{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.theme-card{height:116px;border:1px solid var(--border);background:var(--surface);border-radius:13px;padding:10px;cursor:pointer}.theme-card.active{border-color:#845b1f;box-shadow:0 0 0 1px #845b1f inset}
+  .theme-preview{height:70px;border-radius:8px;border:1px solid #332c1f;background:#16130e;padding:8px}.theme-preview.light{background:#f7f4ee;border-color:#e4ddcf}.theme-preview.green{background:#0c130d;border-color:#223826}
+  .mini-bar{height:10px;display:flex;gap:4px;margin-bottom:7px}.mini-dot{width:10px;border-radius:3px;background:#f5a623}.mini-line{height:5px;border-radius:3px;background:#4a4235}.mini-line.long{width:70%}.mini-line.short{width:42%;margin-top:6px}.theme-name{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:9.5px}.theme-name span{color:var(--muted)}
+  .editor-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.color-editor{border:1px solid var(--border);background:var(--surface);border-radius:13px;padding:14px}.color-editor h4{font-size:10px;margin:0 0 11px}.swatch-row{height:34px;display:flex;align-items:center;gap:9px;border-top:1px solid var(--border);font-size:9.5px}.swatch-row:first-of-type{border:0}.swatch{width:18px;height:18px;border-radius:5px;border:1px solid #ffffff24}.hex{margin-left:auto;color:var(--muted);font:500 8.5px/1 "SF Mono",monospace}
+  .addon-row{min-height:70px;display:flex;align-items:center;gap:11px;padding:12px 14px;border-top:1px solid var(--border)}.addon-row:first-child{border:0}
+  .addon-icon{width:34px;height:34px;border-radius:9px;background:var(--soft);border:1px solid var(--border);display:grid;place-items:center;color:var(--sub);flex:0 0 auto}.addon-icon .icon{width:19px;height:19px}
+  .addon-copy{min-width:0;flex:1}.addon-copy b{font-size:11px}.addon-copy p{font-size:9px;color:var(--muted);margin:3px 0 0}.link-button{border:0;background:transparent;color:var(--accent);font-size:9.5px;display:flex;align-items:center;gap:5px;cursor:pointer}.link-button .icon{width:13px;height:13px}
+  .version{font:500 9px/1 "SF Mono",monospace;color:var(--muted)}
+  .update-status{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}.status-card{border:1px solid var(--border);background:var(--surface);border-radius:13px;padding:14px;display:flex;align-items:center;gap:11px}.status-icon{width:34px;height:34px;border-radius:50%;background:#18241a;color:var(--green);display:grid;place-items:center}.status-card b{font-size:10.5px}.status-card p{font-size:9px;color:var(--muted);margin:3px 0 0}
+  .registry-url{font:500 8.5px/1.4 "SF Mono",monospace;color:#756e62;word-break:break-all}
+  .notice{border:1px solid #594324;background:#211a10;border-radius:11px;padding:11px 13px;color:var(--sub);font-size:9.5px;line-height:1.5;margin-bottom:12px}
+  @media(max-width:1080px){.prefs-layout{grid-template-columns:200px 1fr}.editor-grid,.update-status{grid-template-columns:1fr}.themes{grid-template-columns:1fr 1fr}.theme-card:last-child{display:none}}
+  @media(max-width:1250px){.artifact-head{align-items:flex-start;flex-direction:column}.artifact-controls{max-width:100%;overflow-x:auto}.shell{max-height:none}}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" aria-hidden="true" style="position:absolute">
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+  <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0 0 18h1.5a2 2 0 0 0 0-4H12a2 2 0 0 1 0-4h5a4 4 0 0 0 4-4 6 6 0 0 0-2-4A9 9 0 0 0 12 3Z"/><circle cx="7.5" cy="10.5" r=".5"/><circle cx="9.5" cy="7.5" r=".5"/><circle cx="13" cy="6.5" r=".5"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="m4 7 8-4 8 4-8 4Z"/><path d="M4 7v10l8 4 8-4V7M12 11v10"/></symbol>
+  <symbol id="i-update" viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6.1 9a7 7 0 0 1 11.2-2L20 12M4 12l2.7 5a7 7 0 0 0 11.2-2"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/></symbol>
+  <symbol id="i-timer" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6M12 2v3"/></symbol>
+  <symbol id="i-note" viewBox="0 0 24 24"><path d="M5 3h14v14l-4 4H5Z"/><path d="M15 21v-4h4M8 8h8M8 12h6"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="i-volume" viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4Z"/><path d="M15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12"/></symbol>
+</svg>
+
+<header class="artifact-head">
+  <div><h1>Preferences</h1><p>Only populated destinations: Appearance, Installed, Updates, and General</p></div>
+  <div class="artifact-controls" aria-label="Preference panes"><button class="active" data-pane="appearance">Appearance</button><button data-pane="installed">Installed</button><button data-pane="updates">Updates</button><button data-pane="general">General</button></div>
+</header>
+
+<main class="stage">
+  <div class="shell">
+    <header class="topbar"><div class="brand"><span class="firefly"></span>Jugnu</div><nav class="primary-nav" aria-label="Primary"><button>Home</button><button>Catalog</button><button class="active">Preferences</button></nav><div class="top-actions"><button class="icon-btn" aria-label="Close Jugnu" title="Close"><svg class="icon"><use href="#i-x"/></svg></button></div></header>
+    <div class="prefs-layout">
+      <aside class="sidebar">
+        <div class="prefs-search"><svg class="icon"><use href="#i-search"/></svg>Search settings</div>
+        <div class="side-label">Personal</div><button class="side-item active" data-side="appearance"><svg class="icon"><use href="#i-palette"/></svg>Appearance</button>
+        <div class="side-label">Addons</div><button class="side-item" data-side="installed"><svg class="icon"><use href="#i-box"/></svg>Installed</button><button class="side-item" data-side="updates"><svg class="icon"><use href="#i-update"/></svg>Updates <span class="badge">3</span></button>
+        <div class="side-label">System</div><button class="side-item" data-side="general"><svg class="icon"><use href="#i-sliders"/></svg>General</button>
+      </aside>
+
+      <section class="content">
+        <div class="pane active" id="appearance">
+          <header class="pane-head"><div><h2>Appearance</h2><p>Choose a theme, then tune its light and dark colors.</p></div><span class="save-state">Saved</span></header>
+          <section class="section"><h3>Theme</h3><div class="themes">
+            <button class="theme-card active"><div class="theme-preview"><div class="mini-bar"><i class="mini-dot"></i><i class="mini-line long"></i></div><div class="mini-line long"></div><div class="mini-line short"></div></div><div class="theme-name"><b>Firefly</b><span>Selected</span></div></button>
+            <button class="theme-card"><div class="theme-preview green"><div class="mini-bar"><i class="mini-dot" style="background:#80d98b"></i><i class="mini-line long"></i></div><div class="mini-line long"></div><div class="mini-line short"></div></div><div class="theme-name"><b>Phosphor</b><span>Dark</span></div></button>
+            <button class="theme-card"><div class="theme-preview light"><div class="mini-bar"><i class="mini-dot" style="background:#b36777"></i><i class="mini-line long" style="background:#d7c9c6"></i></div><div class="mini-line long" style="background:#d7c9c6"></div><div class="mini-line short" style="background:#d7c9c6"></div></div><div class="theme-name"><b>Rose Quartz</b><span>Light</span></div></button>
+          </div></section>
+          <section class="section"><h3>Firefly colors</h3><div class="editor-grid">
+            <div class="color-editor"><h4>Dark appearance</h4><div class="swatch-row"><i class="swatch" style="background:#16130e"></i>Background <span class="hex">#16130E</span></div><div class="swatch-row"><i class="swatch" style="background:#1f1b13"></i>Surface <span class="hex">#1F1B13</span></div><div class="swatch-row"><i class="swatch" style="background:#f5a623"></i>Accent <span class="hex">#F5A623</span></div></div>
+            <div class="color-editor"><h4>Light appearance</h4><div class="swatch-row"><i class="swatch" style="background:#f7f4ee"></i>Background <span class="hex">#F7F4EE</span></div><div class="swatch-row"><i class="swatch" style="background:#ffffff"></i>Surface <span class="hex">#FFFFFF</span></div><div class="swatch-row"><i class="swatch" style="background:#c97a12"></i>Accent <span class="hex">#C97A12</span></div></div>
+          </div></section>
+        </div>
+
+        <div class="pane" id="installed">
+          <header class="pane-head"><div><h2>Installed Addons</h2><p>Open an Addon’s Settings. Installation and lifecycle controls stay in Catalog.</p></div><span class="save-state">8 installed</span></header>
+          <div class="notice">Enable, disable, update, and uninstall Addons in Catalog. This page links only to settings that already exist.</div>
+          <div class="card">
+            <div class="addon-row"><span class="addon-icon"><svg class="icon"><use href="#i-mic"/></svg></span><div class="addon-copy"><b>Audio</b><p>2 Actions · 2 widgets · Enabled</p></div><button class="link-button">Open Settings <svg class="icon"><use href="#i-chevron"/></svg></button></div>
+            <div class="addon-row"><span class="addon-icon"><svg class="icon"><use href="#i-timer"/></svg></span><div class="addon-copy"><b>Intervals</b><p>3 Actions · 2 widgets · Enabled</p></div><button class="link-button">Open Settings <svg class="icon"><use href="#i-chevron"/></svg></button></div>
+            <div class="addon-row"><span class="addon-icon"><svg class="icon"><use href="#i-note"/></svg></span><div class="addon-copy"><b>Floating Note</b><p>1 Action · 1 widget · Enabled</p></div><button class="link-button">Open Settings <svg class="icon"><use href="#i-chevron"/></svg></button></div>
+          </div>
+        </div>
+
+        <div class="pane" id="updates">
+          <header class="pane-head"><div><h2>Updates</h2><p>Keep Jugnu and installed Addons current.</p></div><span class="version">JUGNU 0.8.0</span></header>
+          <div class="update-status"><div class="status-card"><span class="status-icon"><svg class="icon"><use href="#i-check"/></svg></span><div><b>Jugnu is current</b><p>Last checked 8 minutes ago</p></div></div><div class="status-card"><span class="status-icon" style="background:#352613;color:var(--accent)"><svg class="icon"><use href="#i-update"/></svg></span><div><b>3 Addon updates</b><p>Ready to review in Catalog</p></div></div></div>
+          <section class="section"><h3>Automatic updates</h3><div class="card"><div class="setting"><div class="setting-copy"><b>Keep Jugnu current</b><p>Download verified Jugnu updates automatically.</p></div><button class="toggle on" aria-label="Keep Jugnu current"></button></div><div class="setting"><div class="setting-copy"><b>Keep Addons current</b><p>Update installed Addons when permissions do not grow.</p></div><button class="toggle on" aria-label="Keep Addons current"></button></div></div></section>
+          <section class="section"><h3>Manual check</h3><div class="card"><div class="setting"><div class="setting-copy"><b>Check for Updates</b><p>Check Jugnu and the Addon registry now.</p></div><button class="text-btn accent">Check now</button></div><div class="setting"><div class="setting-copy"><b>Registry</b><p class="registry-url">https://github.com/jugnu-app/registry/releases/latest/download/addons.json</p></div></div></div></section>
+        </div>
+
+        <div class="pane" id="general">
+          <header class="pane-head"><div><h2>General</h2><p>App-wide behavior that does not belong to an Addon.</p></div><span class="save-state">Saved</span></header>
+          <section class="section"><h3>Sound</h3><div class="card"><div class="setting"><span class="addon-icon"><svg class="icon"><use href="#i-volume"/></svg></span><div class="setting-copy"><b>Interface sounds</b><p>Play subtle feedback for completed actions and errors.</p></div><button class="toggle on" aria-label="Interface sounds"></button></div></div></section>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<script>
+  function setPane(id){
+    document.querySelectorAll(".pane").forEach(pane=>pane.classList.toggle("active",pane.id===id));
+    document.querySelectorAll("[data-side]").forEach(button=>button.classList.toggle("active",button.dataset.side===id));
+    document.querySelectorAll("[data-pane]").forEach(button=>button.classList.toggle("active",button.dataset.pane===id));
+  }
+  document.querySelectorAll("[data-pane],[data-side]").forEach(button=>button.addEventListener("click",()=>setPane(button.dataset.pane||button.dataset.side)));
+  document.querySelectorAll(".toggle").forEach(button=>button.addEventListener("click",()=>button.classList.toggle("on")));
+  document.querySelectorAll(".theme-card").forEach(button=>button.addEventListener("click",()=>{document.querySelectorAll(".theme-card").forEach(card=>card.classList.toggle("active",card===button))}));
+</script>
+</body>
+</html>

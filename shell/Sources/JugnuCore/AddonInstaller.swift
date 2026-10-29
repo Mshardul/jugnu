@@ -445,15 +445,13 @@ public struct AddonInstaller: Sendable {
         let extractRoot = FileManager.default.temporaryDirectory
             .appendingPathComponent("jugnu-extract-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: extractRoot, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: extractRoot) }
         try ZipExtractor.extract(zipURL: zipURL, to: extractRoot)
         let packageRoot = try ZipExtractor.findPackageRoot(in: extractRoot, manifestName: "addon.yaml")
-        // Copy out of extract root so defer cleanup of zip is fine; keep extractRoot until caller done.
-        // Caller owns lifetime via staging copy — return packageRoot under extractRoot that must survive.
-        // Move extract root aside without defer delete: re-copy to a durable temp.
+        // the caller outlives extractRoot, so hand back a durable copy
         let durable = FileManager.default.temporaryDirectory
             .appendingPathComponent("jugnu-pkg-\(entry.id)-\(UUID().uuidString)")
         try FileManager.default.copyItem(at: packageRoot, to: durable)
-        try? FileManager.default.removeItem(at: extractRoot)
         return durable
     }
 

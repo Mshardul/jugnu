@@ -121,7 +121,8 @@ for addon_dir in "$repo_root"/addons/*/; do
     "sha256": "${sha256}",
     "summary": "${summary}",
     "permissions": ${permissions_json},
-    "primary": ${primary_json}
+    "primary": ${primary_json},
+    "trust": "first-party"
   }
 JSON
 )

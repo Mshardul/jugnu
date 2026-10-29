@@ -65,8 +65,10 @@ final class FirstRunWindowController: NSObject, NSWindowDelegate {
         self.window = window
     }
 
-    func windowShouldClose(_ sender: NSWindow) -> Bool {
-        if finishing { return true }
+    func windowShouldClose(_: NSWindow) -> Bool {
+        if finishing {
+            return true
+        }
         let outcome = session.closeOutcome()
         finish(
             keepAppCurrent: outcome.keepApp,
@@ -113,7 +115,7 @@ final class FirstRunWindowController: NSObject, NSWindowDelegate {
                 .deletingLastPathComponent()
                 .deletingLastPathComponent()
                 .deletingLastPathComponent()
-                .appendingPathComponent("addons"),
+                .appendingPathComponent("addons")
         ]
         var roots: [URL] = []
         for id in ids {
@@ -257,13 +259,13 @@ struct FirstRunView: View {
         }
         let result = await RegistryClient().fetchWithCache(from: url, cacheFile: model.paths.registryCacheFile)
         switch result {
-        case .fresh(let fetched):
+        case let .fresh(fetched):
             session.entries = fetched
             session.catalogMessage = nil
-        case .cached(let cached, let failure):
+        case let .cached(cached, failure):
             session.entries = cached
             session.catalogMessage = UserFacingError.cachedCatalogMessage(for: failure)
-        case .unavailable(let failure):
+        case let .unavailable(failure):
             session.catalogMessage = UserFacingError.message(for: failure)
         }
         let prechecked = FirstRunSelection.precheckedIDs(

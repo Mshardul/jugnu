@@ -23,11 +23,11 @@ Xcode’s developer dir is `DEVELOPER_DIR` in the repo `.env` / `.env.example` (
 
 Or open `Jugnu.xcodeproj` and press Run. If you changed `project.yml`, run `xcodegen generate` first.
 
-There is no Dock icon and no window on launch (`LSUIElement`). Use the menu-bar firefly or Option+Space. If it “did nothing,” look at the right of the menu bar — that is the app.
+The Dock icon and the menu-bar firefly both open the palette. Nothing opens on launch. Option+Space does the same.
 
 `swift run Jugnu` skips `Assets.xcassets` (see `Package.swift`) — fine for logic checks, not for chrome.
 
-The Xcode project is generated from `project.yml` ([XcodeGen](https://github.com/yonaskolb/XcodeGen)). `App/Info.plist` sets `LSUIElement` (agent app). HotKey is linked from the app target.
+The Xcode project is generated from `project.yml` ([XcodeGen](https://github.com/yonaskolb/XcodeGen)). `App/Info.plist` keeps `LSUIElement` off so the Dock icon shows. HotKey is linked from the app target.
 
 Published-site install steps will go in the [root README](../README.md) when a download exists.
 

@@ -8,6 +8,8 @@ The project has not published a release yet. Entries currently describe unreleas
 
 ### Fixed
 
+- 2026-10-12 — Temporary folder tray: click a file to open it, Ctrl-click (or Command-click) to select more than one, and right-click to move the selection to the Trash. Clear, in the tray header, moves every item to the Trash.
+- 2026-10-12 — Jugnu shows a Dock icon. Clicking it opens the palette. The menu-bar firefly and Option+Space still open it. Nothing opens on launch.
 - 2026-09-06 — Catalog zip downloads follow GitHub's current release CDN (`release-assets.githubusercontent.com` / `github-releases.githubusercontent.com`); a cancelled redirect no longer hashes an empty file as a sha256 mismatch.
 - 2026-08-29 — Shell panel survives dismiss: `hide()` orders the `KeyablePanel` out instead of destroying it, so a reopen reuses the existing view and skips the cold-paint cost (ticket 0016).
 
@@ -17,6 +19,8 @@ The project has not published a release yet. Entries currently describe unreleas
 
 ### Added
 
+- 2026-10-12 — Temporary note is the existing Floating Note command `open`: a floating sticky whose text is kept and restored. Search title is Temporary note.
+- 2026-10-12 — Temporary Folder (`jugnu.temporary-folder`): a tray drops from the menu bar onto `~/Temporary`. Dropped files and folders are copied in. The folder is created if missing, and files already there are left in place. Replaces the planned dated scratch folder.
 - 2026-10-12 — PDF Tools: merge, split, extract, reorder, rotate, page count, page numbers, bookmarks, info, extract text, compress, JPEG/PNG conversion, flatten forms, and grayscale. Each one writes beside the original. A locked PDF has to be unlocked first. The page-preview studio is still unbuilt.
 - 2026-10-12 — PDF Tools: `pdf-unlock` writes an unlocked copy beside a PDF when it opens or you supply the password. Finder’s right-click item is off unless you add it at install or turn on **Show In Finder Menu** in Settings.
 - 2026-10-12 — Intervals (ticket 0074): `jugnu.nudges` and `jugnu.pomodoro` are one addon, `jugnu.intervals`. Pomodoro is a focus/break preset on the same timer list. Command lists for the seven unbuilt merge groups are locked in `docs/catalog-commands.md`.

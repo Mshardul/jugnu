@@ -38,4 +38,4 @@ else
 fi
 escaped=$(json_escape "$current")
 
-echo "{\"ok\":true,\"ui\":{\"pattern\":\"note\",\"title\":\"Scratch\",\"content\":\"${escaped}\"}}"
+echo "{\"ok\":true,\"ui\":{\"pattern\":\"note\",\"title\":\"Temporary note\",\"content\":\"${escaped}\"}}"

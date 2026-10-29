@@ -107,6 +107,41 @@ if grep -q '^helpers:' "$manifest"; then
   ' "$manifest"
 fi
 
+# Mirrors PackageGates.validateCleanupPath / validateCleanupLaunchdLabel (Swift): cleanup may only touch the
+# addon's own state/config dir and its own com.<id>.* launchd labels.
+job=${id#*.}
+awk -v id="$id" -v job="$job" '
+  function strip(v) { gsub(/["'\'']/, "", v); sub(/[[:space:]]*#.*$/, "", v); gsub(/^[[:space:]]+|[[:space:]]+$/, "", v); return v }
+  function check(kind, v,    root, rest, first, n, parts, i) {
+    if (v == "") return
+    if (kind == "paths") {
+      if (index(v, "~/.local/share/jugnu/state/") == 1) root = "~/.local/share/jugnu/state/"
+      else if (index(v, "~/.config/jugnu/addons/") == 1) root = "~/.config/jugnu/addons/"
+      else { bad("cleanup path outside addon state/config: " v) }
+      rest = substr(v, length(root) + 1)
+      n = split(rest, parts, "/")
+      for (i = 1; i <= n; i++) if (parts[i] == "" || parts[i] == "." || parts[i] == "..") bad("unsafe cleanup path: " v)
+      if (parts[1] != id && parts[1] != job) bad("cleanup path must be under this addon: " v)
+    } else {
+      if (index(v, "com." id ".") != 1 || v ~ /\.\./ || v ~ /\//) bad("cleanup launchd label must be com." id ".*: " v)
+    }
+  }
+  function bad(msg) { print msg > "/dev/stderr"; failed = 1; exit 1 }
+  /^cleanup:/ { in_c = 1; next }
+  in_c && /^[^[:space:]#]/ { in_c = 0 }
+  !in_c { next }
+  /^[[:space:]]+paths:/ || /^[[:space:]]+launchd:/ {
+    kind = ($0 ~ /paths:/) ? "paths" : "launchd"
+    line = $0; sub(/^[[:space:]]+[a-z]+:[[:space:]]*/, "", line)
+    if (line ~ /^\[/) {
+      gsub(/[][]/, "", line); n = split(line, items, ",")
+      for (i = 1; i <= n; i++) check(kind, strip(items[i]))
+    }
+    next
+  }
+  /^[[:space:]]+-[[:space:]]*/ { v = $0; sub(/^[[:space:]]+-[[:space:]]*/, "", v); check(kind, strip(v)) }
+' "$manifest"
+
 if grep -q '^config:' "$manifest"; then
   python3 - "$manifest" <<'PY' || exit 1
 import re, sys

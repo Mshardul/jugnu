@@ -100,4 +100,17 @@ final class BrowseCatalogFilterTests: XCTestCase {
         XCTAssertEqual(drilled.category, "System")
         XCTAssertEqual(drilled.subcategory, "Dev Tools")
     }
+
+    func testSymlinkedAddonAppearsWhenMissingFromThePublishedCatalog() {
+        let published = [entry("jugnu.floating-note", category: "Notes", tags: [], name: "Floating Note")]
+        let local = [entry("jugnu.temporary-folder", category: "System", tags: [], name: "Temporary Folder")]
+        let merged = catalogWithSymlinkedAddons(published, symlinked: local)
+        XCTAssertEqual(merged.map(\.id), ["jugnu.floating-note", "jugnu.temporary-folder"])
+    }
+
+    func testSymlinkedAddonAlreadyPublishedIsNotDuplicated() {
+        let published = [entry("jugnu.temporary-folder", category: "System", tags: [], name: "Temporary Folder")]
+        let merged = catalogWithSymlinkedAddons(published, symlinked: published)
+        XCTAssertEqual(merged.map(\.id), ["jugnu.temporary-folder"])
+    }
 }

@@ -29,6 +29,19 @@ public enum ManifestLoader {
                 throw ManifestLoaderError.invalidDependencyVersion(dep.id, dep.version)
             }
         }
+        for dep in manifest.dependencies {
+            try PackageGates.validateAddonId(dep.id)
+        }
+        for ref in manifest.helpers {
+            try PackageGates.validateHelperRef(ref)
+        }
+        try PackageGates.validateEntrypointPath(manifest.entrypoint.path)
+        for path in manifest.cleanup.paths {
+            try PackageGates.validateCleanupPath(path, addonId: manifest.id)
+        }
+        for label in manifest.cleanup.launchd {
+            try PackageGates.validateCleanupLaunchdLabel(label, addonId: manifest.id)
+        }
         try manifest.validateViewTypes()
         if let primary = manifest.primary, manifest.primaryCommand == nil {
             throw ManifestLoaderError.unknownPrimary(primary)
@@ -89,4 +102,5 @@ public enum ManifestLoaderError: Error, Equatable {
     case unknownPermission(String)
     case invalidConfigSchema(String)
     case unknownPrimary(String)
+    case unsafeManifestField(String)
 }

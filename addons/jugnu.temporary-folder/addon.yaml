@@ -1,0 +1,18 @@
+id: jugnu.temporary-folder
+name: Temporary Folder
+version: 1.0.0
+api: 1
+primary: temporary-folder
+commands:
+  - id: temporary-folder
+    title: Temporary folder
+    subtitle: Drop files into ~/Temporary
+    keywords: [temporary, folder, scratch, holding, drop, tray, files]
+    ui:
+      pattern: tray
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths: []
+  launchd: []

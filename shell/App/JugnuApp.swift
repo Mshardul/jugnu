@@ -7,7 +7,7 @@ import SwiftUI
 struct JugnuMain {
     static func main() {
         let app = NSApplication.shared
-        app.setActivationPolicy(.accessory)
+        app.setActivationPolicy(.regular)
         let delegate = AppDelegate()
         app.delegate = delegate
         app.run()
@@ -32,15 +32,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var inRecovery = false
     var keepCurrent: KeepCurrentCoordinator?
     var pendingFinderURLs: [URL] = []
+    let appShellChrome = AppShellChromeModel()
 
-    func applicationDidFinishLaunching(_ notification: Notification) {
-        if !ScreenshotMode.isActive, yieldToRunningInstance() { return }
+    func applicationDidFinishLaunching(_: Notification) {
+        if !ScreenshotMode.isActive, yieldToRunningInstance() {
+            return
+        }
+        installApplicationMenu()
 
-        let paths: JugnuPaths
-        if ScreenshotMode.isActive, let shot = ScreenshotMode.makePaths() {
-            paths = shot
+        let paths: JugnuPaths = if ScreenshotMode.isActive, let shot = ScreenshotMode.makePaths() {
+            shot
         } else {
-            paths = JugnuPaths()
+            JugnuPaths()
         }
         AddonInstaller(paths: paths).recoverInstallOrphans()
         do {
@@ -78,7 +81,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         self.reaper = reaper
 
         switch decision {
-        case .recovery(let reason):
+        case let .recovery(reason):
             enterRecovery(
                 reason: reason,
                 model: model,
@@ -210,7 +213,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    func application(_ application: NSApplication, open urls: [URL]) {
+    func application(_: NSApplication, open urls: [URL]) {
         pendingFinderURLs.append(contentsOf: urls)
         drainFinderURLs()
     }
@@ -246,7 +249,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         runCommand(command, args: ["paths": .array(paths.map { .string($0) })])
     }
 
-    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+    func applicationShouldHandleReopen(_: NSApplication, hasVisibleWindows _: Bool) -> Bool {
+        // A visible tray counts as a window. The Dock click still opens the palette.
+        guard let shellHost else { return true }
+        switch decideDockReopen(paletteVisible: shellHost.isVisible) {
+        case .orderFront:
+            shellHost.orderFront()
+        case .showPalette:
+            invokeShell()
+        }
+        return true
+    }
+
+    func applicationShouldTerminate(_: NSApplication) -> NSApplication.TerminateReply {
         guard processHost?.hasLiveJob() == true else { return .terminateNow }
         let alert = NSAlert()
         alert.messageText = "Quit Jugnu?"
@@ -260,7 +275,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return .terminateNow
     }
 
-    func applicationWillTerminate(_ notification: Notification) {
+    func applicationWillTerminate(_: Notification) {
         clockHost?.stop()
         processHost?.killAll()
         reaper?.reap(mode: inRecovery ? .degraded : .normal)
@@ -311,7 +326,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func recoveryOpenConfig() {
         guard let model else { return }
         let file = model.paths.configFile
-        try? FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try? FileManager.default.createDirectory(
+            at: file.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
         if !FileManager.default.fileExists(atPath: file.path) {
             try? model.store.save(JugnuConfig())
         }
@@ -330,14 +348,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func recoveryTryAgain() {
         launchGuard?.markCleanLaunch()
-        NSWorkspace.shared.openApplication(at: Bundle.main.bundleURL, configuration: NSWorkspace.OpenConfiguration()) { _, _ in
-            DispatchQueue.main.async {
-                NSApp.terminate(nil)
+        NSWorkspace.shared
+            .openApplication(at: Bundle.main.bundleURL, configuration: NSWorkspace.OpenConfiguration()) { _, _ in
+                DispatchQueue.main.async {
+                    NSApp.terminate(nil)
+                }
             }
-        }
     }
 
-    // Another Jugnu is already up: ask it to open the palette, then quit before touching the hotkey or menu bar.
+    /// Another Jugnu is already up: ask it to open the palette, then quit before touching the hotkey or menu bar.
     private func yieldToRunningInstance() -> Bool {
         guard let bundleID = Bundle.main.bundleIdentifier else { return false }
         let selfPID = Int(ProcessInfo.processInfo.processIdentifier)
@@ -355,37 +374,89 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return true
     }
 
+    private func installApplicationMenu() {
+        let appMenu = NSMenu(title: "Jugnu")
+        let about = NSMenuItem(
+            title: "About Jugnu",
+            action: #selector(NSApplication.orderFrontStandardAboutPanel(_:)),
+            keyEquivalent: ""
+        )
+        about.target = NSApp
+        appMenu.addItem(about)
+        appMenu.addItem(.separator())
+        let hide = NSMenuItem(title: "Hide Jugnu", action: #selector(NSApplication.hide(_:)), keyEquivalent: "h")
+        hide.target = NSApp
+        appMenu.addItem(hide)
+        let hideOthers = NSMenuItem(
+            title: "Hide Others",
+            action: #selector(NSApplication.hideOtherApplications(_:)),
+            keyEquivalent: "h"
+        )
+        hideOthers.keyEquivalentModifierMask = [.command, .option]
+        hideOthers.target = NSApp
+        appMenu.addItem(hideOthers)
+        let showAll = NSMenuItem(
+            title: "Show All",
+            action: #selector(NSApplication.unhideAllApplications(_:)),
+            keyEquivalent: ""
+        )
+        showAll.target = NSApp
+        appMenu.addItem(showAll)
+        appMenu.addItem(.separator())
+        let quit = NSMenuItem(title: "Quit Jugnu", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        quit.target = NSApp
+        appMenu.addItem(quit)
+
+        let main = NSMenu(title: "MainMenu")
+        let appItem = NSMenuItem()
+        appItem.submenu = appMenu
+        main.addItem(appItem)
+        NSApp.mainMenu = main
+    }
+
     private func invokeShell() {
         guard let model, let shellHost else { return }
         model.refreshIndex()
-        let mouse = NSEvent.mouseLocation
-        let frames = NSScreen.screens.map(\.frame)
-        let screen: NSScreen
-        if let idx = PalettePlacement.screenIndex(frames: frames, mouse: mouse),
-           NSScreen.screens.indices.contains(idx) {
-            screen = NSScreen.screens[idx]
-        } else {
-            screen = NSScreen.main ?? NSScreen.screens[0]
+        guard let screen = screenUnderPointer() else { return }
+        if shellHost.isVisible, shellHost.stack.top.preset == .appShell {
+            handleAppShellControl(.invokeHotkey)
+            return
         }
-        switch decideInvokeOutcome(stack: shellHost.stack, isVisible: shellHost.isVisible) {
-        case .close:
+        if shellHost.isVisible, var navigation = shellHost.appShellNavigation {
             tearDownInFlight()
-            shellHost.hide()
-        case .showHome:
-            syncCatalogSnapshot()
-            ensurePanelIfNeeded(model: model)
-            shellHost.goHome()
-            renderCurrentTop(model: model)
-            shellHost.morphFrame(to: .launcher, compactLauncher: true, on: screen)
-            shellHost.orderFront()
-            shellHost.armClickOutsideDismiss { [weak self] in self?.dismissFromClickOutside() }
+            navigation.page = .home
+            navigation.searchQuery = ""
+            navigation.isEditingHome = false
+            navigation.editPanel = .library
+            navigation.focusedOrigin = nil
+            openAppShell(navigation, on: screen, model: model)
+            return
         }
+        if shellHost.isVisible {
+            switch decideInvokeOutcome(stack: shellHost.stack, isVisible: true) {
+            case .close:
+                tearDownInFlight()
+                shellHost.hide()
+                return
+            case .showHome:
+                break
+            }
+        }
+        openAppShell(.freshHome(), on: screen, model: model)
     }
 
     func popOrDismiss() {
         guard let model, let shellHost else { return }
         tearDownInFlight()
+        guard !shellHost.stack.entries.isEmpty else { return }
         if shellHost.stack.isAtRoot {
+            if shellHost.stack.top.preset == .appShell {
+                renderCurrentTop(model: model)
+                if let screen = shellHost.currentScreen ?? NSScreen.main {
+                    shellHost.placeAppShellFrame(in: screen.visibleFrame)
+                }
+                return
+            }
             shellHost.hide()
             return
         }
@@ -394,6 +465,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         renderCurrentTop(model: model)
         let screen = shellHost.currentScreen ?? NSScreen.main ?? NSScreen.screens.first
         guard let screen else { return }
+        if shellHost.stack.top.preset == .appShell {
+            shellHost.placeAppShellFrame(in: screen.visibleFrame)
+            return
+        }
         let compact = shellHost.stack.top.preset == .launcher
         shellHost.morphFrame(to: shellHost.stack.top.preset, compactLauncher: compact, on: screen)
     }
@@ -404,12 +479,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         shellHost.hide()
     }
 
-    // Fire-and-forget so a dismiss never waits on process teardown.
-    private func tearDownInFlight() {
+    /// Fire-and-forget so a dismiss never waits on process teardown.
+    func tearDownInFlight() {
         guard let inFlight = inFlightInvoke else { return }
         inFlight.task.cancel()
         processHost?.killTracked(key: inFlight.key)
         inFlightInvoke = nil
     }
 }
-

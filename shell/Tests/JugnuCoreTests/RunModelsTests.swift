@@ -61,6 +61,16 @@ final class RunModelsTests: XCTestCase {
         XCTAssertEqual(decoded.ui?.gridItems?.last?.active, true)
     }
 
+    func testTrayResponseRoundTrip() throws {
+        let json = Data("""
+        {"ok":true,"ui":{"pattern":"tray","title":"Temporary","message":"Drop files or folders",
+         "items":[{"id":"/Users/me/Temporary/note.txt","title":"note.txt"}]}}
+        """.utf8)
+        let decoded = try JSONDecoder().decode(RunResponse.self, from: json)
+        XCTAssertEqual(decoded.ui?.pattern, .tray)
+        XCTAssertEqual(decoded.ui?.items?.first?.id, "/Users/me/Temporary/note.txt")
+    }
+
     func testRequestEncodesEmptyContext() throws {
         let req = RunRequest(api: 1, op: "run", command: "toggle", args: [:], context: [:])
         let data = try JSONEncoder().encode(req)

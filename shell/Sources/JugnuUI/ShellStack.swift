@@ -1,8 +1,10 @@
 import Foundation
+import JugnuCore
 
 public enum AddonDetailTab: String, Equatable, Sendable {
     case overview
     case commands
+    case widgets
     case settings
 }
 
@@ -22,6 +24,7 @@ public enum ShellViewState: Equatable, Sendable {
     case list(query: String, highlightedID: String?, scroll: CGFloat)
     case form(values: [String: String], focusedFieldID: String?)
     case grid(highlightedID: String?)
+    case appShell(AppNavigation)
 
     public var preset: ShellPreset {
         switch self {
@@ -33,6 +36,7 @@ public enum ShellViewState: Equatable, Sendable {
         case .list: .list
         case .form: .form
         case .grid: .grid
+        case .appShell: .appShell
         }
     }
 }
@@ -104,7 +108,21 @@ public enum InvokeOutcome: Equatable, Sendable {
     case close
 }
 
+public enum DockReopen: Equatable, Sendable {
+    case orderFront
+    case showPalette
+}
+
 public func decideInvokeOutcome(stack: ShellStack, isVisible: Bool) -> InvokeOutcome {
     guard isVisible else { return .showHome }
     return stack.top.preset == .launcher ? .close : .showHome
+}
+
+public func decideDockReopen(paletteVisible: Bool) -> DockReopen {
+    paletteVisible ? .orderFront : .showPalette
+}
+
+public func shouldHideLauncherAfterInvoke(_ stack: ShellStack) -> Bool {
+    // note/card already called hide(), which empties the stack; top would trap
+    stack.entries.last?.preset == .launcher
 }

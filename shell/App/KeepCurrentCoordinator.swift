@@ -78,9 +78,9 @@ final class KeepCurrentCoordinator {
     private func checkApp(silent: Bool) async -> AppCheckOutcome {
         if silent {
             #if DEBUG
-            let isDebug = true
+                let isDebug = true
             #else
-            let isDebug = false
+                let isDebug = false
             #endif
             if AppUpdateSkip.shouldSkipAppCheck(
                 firstRunCompleted: model.state.firstRunCompleted,
@@ -121,12 +121,12 @@ final class KeepCurrentCoordinator {
         ) {
         case .upToDate:
             return .upToDate
-        case .blockedMacOS(let required):
+        case let .blockedMacOS(required):
             if !silent {
                 report(AppUpdateError.macOSTooOld(required: required))
             }
             return .other
-        case .available(let available):
+        case let .available(available):
             let dest = Bundle.main.bundleURL
             if !Self.destIsWritable(dest) {
                 if !silent {
