@@ -1,0 +1,28 @@
+id: jugnu.converters-valid
+name: Converters Valid
+version: 1.0.0
+api: 1
+commands:
+  - id: json-csv
+    title: JSON to CSV
+  - id: heic-jpeg
+    title: HEIC to JPEG
+converters:
+  - command: json-csv
+    from: json
+    to: csv
+    modes: [text]
+  - command: heic-jpeg
+    from: heic
+    to: jpeg
+    modes: [file]
+formats:
+  - id: ndjson
+    label: Newline-delimited JSON
+    extensions: [ndjson, jsonl]
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths: []
+  launchd: []

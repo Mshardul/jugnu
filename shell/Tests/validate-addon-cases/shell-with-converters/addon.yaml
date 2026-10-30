@@ -1,0 +1,17 @@
+id: jugnu.convert
+name: Convert
+version: 1.0.0
+api: 1
+commands:
+  - id: convert-file
+    title: Convert a file
+converters:
+  - command: convert-file
+    from: json
+    to: csv
+    modes: [text]
+entrypoint:
+  kind: shell
+cleanup:
+  paths: []
+  launchd: []

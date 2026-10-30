@@ -1,0 +1,18 @@
+id: jugnu.converters-unknown-command
+name: Converters Unknown Command
+version: 1.0.0
+api: 1
+commands:
+  - id: json-csv
+    title: JSON to CSV
+converters:
+  - command: nope
+    from: json
+    to: csv
+    modes: [text]
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths: []
+  launchd: []

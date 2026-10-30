@@ -52,6 +52,47 @@ final class ValidateAddonScriptTests: XCTestCase {
         XCTAssertTrue(result.stdout.contains("valid addon: jugnu.valid-oneshot"))
     }
 
+    func test_validateAddon_convertersValid_passes() throws {
+        let result = try run(fixture("converters-valid"))
+        XCTAssertEqual(result.status, 0, result.stderr)
+    }
+
+    func test_validateAddon_converterUnknownCommand_rejected() throws {
+        let result = try run(fixture("converters-unknown-command"))
+        XCTAssertNotEqual(result.status, 0)
+        XCTAssertTrue(result.stderr.contains("converter references unknown command: nope"), result.stderr)
+    }
+
+    func test_validateAddon_converterSameFormat_rejected() throws {
+        let result = try run(fixture("converters-same-format"))
+        XCTAssertNotEqual(result.status, 0)
+        XCTAssertTrue(result.stderr.contains("converter from and to must differ"), result.stderr)
+    }
+
+    func test_validateAddon_converterBadMode_rejected() throws {
+        let result = try run(fixture("converters-bad-mode"))
+        XCTAssertNotEqual(result.status, 0)
+        XCTAssertTrue(result.stderr.contains("converter modes must be text or file"), result.stderr)
+    }
+
+    func test_validateAddon_shellEntrypointFirstParty_passes() throws {
+        let result = try run(fixture("shell-valid"))
+        XCTAssertEqual(result.status, 0, result.stderr)
+        XCTAssertTrue(result.stdout.contains("valid addon: jugnu.convert"))
+    }
+
+    func test_validateAddon_shellEntrypointNotFirstParty_rejected() throws {
+        let result = try run(fixture("shell-not-allowlisted"))
+        XCTAssertNotEqual(result.status, 0)
+        XCTAssertTrue(result.stderr.contains("shell entrypoint is first-party only"), result.stderr)
+    }
+
+    func test_validateAddon_shellEntrypointWithConverters_rejected() throws {
+        let result = try run(fixture("shell-with-converters"))
+        XCTAssertNotEqual(result.status, 0)
+        XCTAssertTrue(result.stderr.contains("shell entrypoint cannot declare converters"), result.stderr)
+    }
+
     func test_validateAddon_sessionLifecycle_rejected() throws {
         let result = try run(fixture("session-rejected"))
         XCTAssertNotEqual(result.status, 0)

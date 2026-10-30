@@ -83,7 +83,7 @@ No browsable content — product pass on toast visual still open ([0052](tickets
 | **Addon** | `clip-tools` |
 | **Opens from** | `transform` (primary); also deep-links from one-shot commands that offer “Open in Transform” later |
 | **View** | `canvas` |
-| **Status** | draft (Phase 2) — Phase 1 ships palette one-shots only (`addons/clip-tools`) |
+| **Status** | **superseded 2026-10-30** by the `convert-text` block (single app frame) in [Convert](architecture/2026-10-30-convert-design.md) ([0079](tickets.md)). Phase 1 palette one-shots stay (`addons/clip-tools`). |
 | **Scope** | Paste or edit blob → type dropdown **or auto-detect** (JSON / CSV / YAML / XML / plain) → actions: Format, Minify, Convert (to sibling type), Copy, Replace clipboard. Line tools and case can appear as secondary actions or stay palette-only in v0. |
 | **Not in this UI** | PDF, images, QR, calculators, paste-plain (own toast command on `clip-tools`) |
 
@@ -150,7 +150,7 @@ No browsable content — product pass on toast visual still open ([0052](tickets
 | **Addon** | `pdf-tools` |
 | **Opens from** | `convert`, and from `jpg-pdf` / `pdf-jpg` / `pdf-png` once this view exists |
 | **View** | `fields` |
-| **Status** | planned |
+| **Status** | **superseded 2026-10-30** by the `convert-file` block (single app frame) in [Convert](architecture/2026-10-30-convert-design.md) ([0079](tickets.md)); `pdf-tools` will declare its edges as `converters:` instead of owning a panel. Finder **Convert** opens `convert-file`. |
 | **Scope** | One minimal panel for JPG → PDF, PDF → JPG, and PDF → PNG. The clicked or chosen file is filled in, and the conversion that matches its type is selected: a JPEG opens on JPG → PDF; a PDF opens on PDF → JPG, with PDF → PNG as the other choice. The new file is saved beside the original. |
 | **Finder** | Right-click **Convert** on a JPEG or PDF. It opens this panel; it does not convert on click. Same opt-in as **Remove PDF Password** (`show_in_finder_menu`). |
 

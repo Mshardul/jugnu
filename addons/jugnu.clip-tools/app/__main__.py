@@ -73,6 +73,17 @@ COMMANDS: dict[str, Handler] = {
     "paste-plain": misc.paste_plain,
 }
 
+# Commands the shell Convert view may call (`op: convert`): command id → (from, to).
+# Mirrors addon.yaml `converters:`. Text in, text out, no clipboard; the handlers are
+# the same ones the palette commands use.
+CONVERT_EDGES: dict[str, tuple[str, str]] = {
+    "json-csv": ("json", "csv"),
+    "csv-json": ("csv", "json"),
+    "xml-json": ("xml", "json"),
+    "yaml-json": ("yaml", "json"),
+    "json-yaml": ("json", "yaml"),
+}
+
 # Commands whose input is the raw pasteboard read (RTF/HTML source), not the
 # plain-text flavor every other op assumes — see clipboard.read_as_plain_text.
 RAW_READ_COMMANDS = {"paste-plain"}
@@ -81,6 +92,28 @@ RAW_READ_COMMANDS = {"paste-plain"}
 def _emit(payload: dict[str, Any]) -> None:
     sys.stdout.write(json.dumps(payload, ensure_ascii=False))
     sys.stdout.write("\n")
+
+
+def _convert(req: dict) -> None:
+    command = req.get("command")
+    edge = CONVERT_EDGES.get(command) if isinstance(command, str) else None
+    if edge is None:
+        _emit({"ok": False, "error": f"unknown converter: {command}"})
+        return
+    if (req.get("from"), req.get("to")) != edge:
+        _emit({"ok": False, "error": f"{command} converts {edge[0]} to {edge[1]}"})
+        return
+    text = req.get("text")
+    if not isinstance(text, str):
+        _emit({"ok": False, "error": "text must be a string"})
+        return
+    try:
+        new_text, _message = COMMANDS[command](text, {})
+        _emit({"ok": True, "text": new_text})
+    except OpError as exc:
+        _emit({"ok": False, "error": str(exc)})
+    except Exception:
+        _emit({"ok": False, "error": "conversion failed"})
 
 
 def main() -> None:
@@ -93,6 +126,9 @@ def main() -> None:
 
     if req.get("api") != 1:
         _emit({"ok": False, "error": "unsupported api"})
+        return
+    if req.get("op") == "convert":
+        _convert(req)
         return
     if req.get("op") != "run":
         _emit({"ok": False, "error": "unsupported op"})

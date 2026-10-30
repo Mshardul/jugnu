@@ -35,7 +35,9 @@ public enum ManifestLoader {
         for ref in manifest.helpers {
             try PackageGates.validateHelperRef(ref)
         }
-        try PackageGates.validateEntrypointPath(manifest.entrypoint.path)
+        if !manifest.entrypoint.isShell {
+            try PackageGates.validateEntrypointPath(manifest.entrypoint.path)
+        }
         for path in manifest.cleanup.paths {
             try PackageGates.validateCleanupPath(path, addonId: manifest.id)
         }
@@ -43,6 +45,7 @@ public enum ManifestLoader {
             try PackageGates.validateCleanupLaunchdLabel(label, addonId: manifest.id)
         }
         try manifest.validateViewTypes()
+        try manifest.validateConverters()
         if let primary = manifest.primary, manifest.primaryCommand == nil {
             throw ManifestLoaderError.unknownPrimary(primary)
         }
@@ -103,4 +106,8 @@ public enum ManifestLoaderError: Error, Equatable {
     case invalidConfigSchema(String)
     case unknownPrimary(String)
     case unsafeManifestField(String)
+    case invalidConverter(String)
+    case unknownConverterCommand(String)
+    case invalidFormat(String)
+    case shellEntrypointNotFirstParty(String)
 }

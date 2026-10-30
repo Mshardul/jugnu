@@ -1,6 +1,6 @@
 id: jugnu.clip-tools
 name: Clip Tools
-version: 1.1.0
+version: 1.2.0
 api: 1
 permissions:
   - clipboard
@@ -208,6 +208,27 @@ commands:
     title: Paste as plain text
     subtitle: Strip rich text from the clipboard
     keywords: [paste, plain, clipboard]
+converters:
+  - command: json-csv
+    from: json
+    to: csv
+    modes: [text]
+  - command: csv-json
+    from: csv
+    to: json
+    modes: [text]
+  - command: xml-json
+    from: xml
+    to: json
+    modes: [text]
+  - command: yaml-json
+    from: yaml
+    to: json
+    modes: [text]
+  - command: json-yaml
+    from: json
+    to: yaml
+    modes: [text]
 entrypoint:
   kind: exec
   path: bin/run

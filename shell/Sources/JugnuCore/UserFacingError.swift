@@ -56,7 +56,7 @@ public enum UserFacingError {
             return "This addon’s description couldn’t be read. Try reinstalling it."
         case .invalidConfigSchema:
             return "This addon’s settings description couldn’t be read. Try reinstalling it."
-        case .unknownPrimary:
+        case .unknownPrimary, .invalidConverter, .unknownConverterCommand, .invalidFormat, .shellEntrypointNotFirstParty:
             return "This addon’s description couldn’t be read. Try reinstalling it."
         case .unsafeManifestField:
             return "This addon asks for access it isn’t allowed to have, so Jugnu won’t load it."

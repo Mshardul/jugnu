@@ -3,6 +3,8 @@ set -euo pipefail
 
 # Kept in sync with DaemonAgents.firstPartyDaemonIDs (Swift). See plan §3.2 consistency notes.
 FIRST_PARTY_DAEMON_IDS=(jugnu.keep-awake jugnu.clipboard-history)
+# Kept in sync with FirstPartyShellAddons.ids (Swift).
+FIRST_PARTY_SHELL_IDS=(jugnu.convert)
 
 if [[ $# -ne 1 ]]; then
   echo "usage: $0 <addon-dir>" >&2
@@ -45,15 +47,28 @@ if [[ -n "$min_shell" ]]; then
   }
 fi
 [[ "$api" == "1" ]] || { echo "unsupported addon api: $api" >&2; exit 1; }
-[[ "$entrypoint_kind" == "exec" || "$entrypoint_kind" == "jxa" || "$entrypoint_kind" == "osascript" ]] || {
+[[ "$entrypoint_kind" == "exec" || "$entrypoint_kind" == "jxa" || "$entrypoint_kind" == "osascript" || "$entrypoint_kind" == "shell" ]] || {
   echo "invalid entrypoint kind: $entrypoint_kind" >&2
   exit 1
 }
-[[ -n "$entrypoint_path" && "$entrypoint_path" != /* && "$entrypoint_path" != *../* && "$entrypoint_path" != ../* ]] || {
-  echo "entrypoint path must be relative and cannot traverse parents" >&2
-  exit 1
-}
-[[ -f "$addon_dir/$entrypoint_path" ]] || { echo "missing entrypoint: $entrypoint_path" >&2; exit 1; }
+if [[ "$entrypoint_kind" == "shell" ]]; then
+  # shell-hosted commands run no addon process, so there is no entrypoint file
+  allowed=no
+  for allow in "${FIRST_PARTY_SHELL_IDS[@]}"; do
+    [[ "$id" == "$allow" ]] && allowed=yes
+  done
+  [[ "$allowed" == "yes" ]] || { echo "shell entrypoint is first-party only" >&2; exit 1; }
+  if grep -q "^converters:" "$manifest"; then
+    echo "shell entrypoint cannot declare converters" >&2
+    exit 1
+  fi
+else
+  [[ -n "$entrypoint_path" && "$entrypoint_path" != /* && "$entrypoint_path" != *../* && "$entrypoint_path" != ../* ]] || {
+    echo "entrypoint path must be relative and cannot traverse parents" >&2
+    exit 1
+  }
+  [[ -f "$addon_dir/$entrypoint_path" ]] || { echo "missing entrypoint: $entrypoint_path" >&2; exit 1; }
+fi
 
 if [[ "$entrypoint_kind" == "exec" ]]; then
   entrypoint_file="$addon_dir/$entrypoint_path"
@@ -384,9 +399,60 @@ timeout_bad=$(grep -nE '^[[:space:]]*timeout:[[:space:]]*' "$manifest" 2>/dev/nu
   | awk '$1 + 0 > 10 { print; exit }' || true)
 [[ -z "$timeout_bad" ]] || { echo "timeout must be ≤ oneshotHardCeiling (10s)" >&2; exit 1; }
 
-entrypoint_file="$addon_dir/$entrypoint_path"
-if grep -qE '(^|[[:space:]])(disown|nohup)([[:space:]]|$)|&[[:space:]]*$' "$entrypoint_file"; then
+if [[ "$entrypoint_kind" != "shell" ]]; then
+  entrypoint_file="$addon_dir/$entrypoint_path"
+  if grep -qE '(^|[[:space:]])(disown|nohup)([[:space:]]|$)|&[[:space:]]*$' "$entrypoint_file"; then
   echo "warning: $id entrypoint uses disown/nohup/trailing &; background work belongs in a daemon or the clock helper" >&2
+  fi
+fi
+
+# converters: each edge must name a real command, valid format ids, differing ends, and valid modes
+if grep -q "^converters:" "$manifest"; then
+  command_ids=$(awk '
+    /^commands:/ { in_c = 1; next }
+    in_c && /^[^[:space:]-]/ { in_c = 0 }
+    in_c && /^[[:space:]]+-[[:space:]]+id:[[:space:]]*/ {
+      line = $0
+      sub(/^[[:space:]]+-[[:space:]]+id:[[:space:]]*/, "", line)
+      gsub(/["'\'']/, "", line)
+      sub(/[[:space:]]*#.*$/, "", line)
+      print line
+    }
+  ' "$manifest" | paste -sd, -)
+  converter_errors=$(awk -v cmds="$command_ids" '
+    function strip(s) { gsub(/["'\'']/, "", s); sub(/[[:space:]]*#.*$/, "", s); gsub(/^[[:space:]]+|[[:space:]]+$/, "", s); return s }
+    function flush(    n, i, parts, tok, ok) {
+      if (!have) return
+      if (!(cmd in known)) { print "converter references unknown command: " cmd; failed = 1; exit 1 }
+      if (from !~ /^[a-z0-9][a-z0-9-]*$/ || to !~ /^[a-z0-9][a-z0-9-]*$/) { print "converter format ids must be lowercase tokens: " cmd; failed = 1; exit 1 }
+      if (from == to) { print "converter from and to must differ: " cmd; failed = 1; exit 1 }
+      if (modes == "") { print "converter modes must be text or file: " cmd; failed = 1; exit 1 }
+      gsub(/[\[\]]/, "", modes)
+      n = split(modes, parts, ",")
+      ok = 0
+      for (i = 1; i <= n; i++) {
+        tok = strip(parts[i])
+        if (tok != "text" && tok != "file") { print "converter modes must be text or file: " cmd; failed = 1; exit 1 }
+        ok = 1
+      }
+      if (!ok) { print "converter modes must be text or file: " cmd; failed = 1; exit 1 }
+      edge = from ">" to
+      if (edge in seen) { print "duplicate converter edge: " edge; failed = 1; exit 1 }
+      seen[edge] = 1
+    }
+    BEGIN { n = split(cmds, c, ","); for (i = 1; i <= n; i++) known[c[i]] = 1 }
+    /^converters:/ { in_v = 1; next }
+    in_v && /^[^[:space:]-]/ { flush(); have = 0; in_v = 0 }
+    in_v && /^[[:space:]]+-[[:space:]]+command:/ {
+      flush(); have = 1; from = ""; to = ""; modes = ""
+      line = $0; sub(/^[[:space:]]+-[[:space:]]+command:[[:space:]]*/, "", line); cmd = strip(line)
+      next
+    }
+    in_v && /^[[:space:]]+from:/ { line = $0; sub(/^[[:space:]]+from:[[:space:]]*/, "", line); from = strip(line) }
+    in_v && /^[[:space:]]+to:/ { line = $0; sub(/^[[:space:]]+to:[[:space:]]*/, "", line); to = strip(line) }
+    in_v && /^[[:space:]]+modes:/ { line = $0; sub(/^[[:space:]]+modes:[[:space:]]*/, "", line); modes = strip(line); if (modes == "[]") modes = "" }
+    END { if (!failed) flush() }
+  ' "$manifest" 2>&1) || { echo "$converter_errors" >&2; exit 1; }
 fi
 
 printf 'valid addon: %s %s (api %s)\n' "$id" "$version" "$api"

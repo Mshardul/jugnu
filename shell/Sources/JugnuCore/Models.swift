@@ -396,9 +396,34 @@ public struct Entrypoint: Codable, Equatable, Sendable {
     public var kind: String
     public var path: String
 
-    public init(kind: String, path: String) {
+    /// `shell`: the command opens shell-hosted UI and runs no addon process, so there is no path.
+    public var isShell: Bool {
+        kind == "shell"
+    }
+
+    public init(kind: String, path: String = "") {
         self.kind = kind
         self.path = path
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case kind, path
+    }
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        kind = try c.decode(String.self, forKey: .kind)
+        path = kind == "shell"
+            ? try c.decodeIfPresent(String.self, forKey: .path) ?? ""
+            : try c.decode(String.self, forKey: .path)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(kind, forKey: .kind)
+        if !path.isEmpty {
+            try c.encode(path, forKey: .path)
+        }
     }
 }
 
@@ -462,6 +487,8 @@ public struct AddonManifest: Codable, Equatable, Sendable {
     public var lifecycle: LifecycleClass?
     public var minShellVersion: String?
     public var primary: String?
+    public var converters: [ConverterEdge]
+    public var formats: [FormatDecl]
 
     public var allowedViewTypes: [ViewType] {
         viewTypes.isEmpty ? ViewType.shellDefaults : viewTypes
@@ -504,7 +531,9 @@ public struct AddonManifest: Codable, Equatable, Sendable {
         config: [AddonConfigField] = [],
         lifecycle: LifecycleClass? = nil,
         minShellVersion: String? = nil,
-        primary: String? = nil
+        primary: String? = nil,
+        converters: [ConverterEdge] = [],
+        formats: [FormatDecl] = []
     ) {
         self.id = id
         self.name = name
@@ -521,6 +550,8 @@ public struct AddonManifest: Codable, Equatable, Sendable {
         self.lifecycle = lifecycle
         self.minShellVersion = minShellVersion
         self.primary = primary
+        self.converters = converters
+        self.formats = formats
     }
 
     enum CodingKeys: String, CodingKey {
@@ -529,7 +560,7 @@ public struct AddonManifest: Codable, Equatable, Sendable {
         case viewTypes = "view_types"
         case minShellVersion
         case minShellVersionSnake = "min_shell_version"
-        case primary
+        case primary, converters, formats
     }
 
     public init(from decoder: Decoder) throws {
@@ -559,6 +590,8 @@ public struct AddonManifest: Codable, Equatable, Sendable {
             try c.decodeIfPresent(String.self, forKey: .minShellVersion)
                 ?? c.decodeIfPresent(String.self, forKey: .minShellVersionSnake)
         primary = try c.decodeIfPresent(String.self, forKey: .primary)
+        converters = try c.decodeIfPresent([ConverterEdge].self, forKey: .converters) ?? []
+        formats = try c.decodeIfPresent([FormatDecl].self, forKey: .formats) ?? []
         let raw = try c.decodeIfPresent([String].self, forKey: .viewTypes) ?? []
         viewTypes = try raw.map { token in
             guard let parsed = ViewType(rawValue: token) else {
@@ -591,6 +624,12 @@ public struct AddonManifest: Codable, Equatable, Sendable {
         try c.encodeIfPresent(minShellVersion, forKey: .minShellVersion)
         if !viewTypes.isEmpty {
             try c.encode(viewTypes.map(\.rawValue), forKey: .viewTypes)
+        }
+        if !converters.isEmpty {
+            try c.encode(converters, forKey: .converters)
+        }
+        if !formats.isEmpty {
+            try c.encode(formats, forKey: .formats)
         }
     }
 

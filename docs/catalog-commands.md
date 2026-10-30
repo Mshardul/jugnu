@@ -146,7 +146,7 @@ Clipboard **text** format / convert / line tools. Palette one-shots + shared Tra
 | `md-link` | Selection + URL → markdown link | shipped |
 | `clip-clear` | Clear clipboard | shipped |
 | `paste-plain` | Paste as plain text (strip rich text) | shipped |
-| `transform` | Open Transform panel | planned |
+| `transform` | Open Transform panel | dropped 2026-10-30 — replaced by `convert-text` on the `convert` addon ([0079](tickets.md)) |
 
 ### clipboard-guard — planned
 
@@ -287,7 +287,7 @@ May absorb zip-selection / unarchive later.
 
 Separate from clip-tools / text Transform UI. One addon. The commands below are shipped. Word ↔ PDF and protect stay parked. A shared page-preview studio is still unbuilt; these commands use a form, a list, or a toast.
 
-Later, JPG → PDF, PDF → JPG, and PDF → PNG share one **Convert** panel (`fields`). `convert` opens it. Finder’s **Convert** item (JPEG and PDF) opens that panel with the file and its type already chosen, and does not convert on click. `jpg-pdf`, `pdf-jpg`, and `pdf-png` stay the direct jobs and open the same panel with that conversion selected. See [catalog UI](catalog-ui.md).
+Later, JPG → PDF, PDF → JPG, and PDF → PNG are declared as `converters:` edges and surface in the shared `convert-file` view of the `convert` addon ([spec](architecture/2026-10-30-convert-design.md), [0079](tickets.md)). This addon no longer owns a Convert panel; the paragraph below describes the earlier plan. Finder’s **Convert** item (JPEG and PDF) opens that panel with the file and its type already chosen, and does not convert on click. `jpg-pdf`, `pdf-jpg`, and `pdf-png` stay the direct jobs and open the same panel with that conversion selected. See [catalog UI](catalog-ui.md).
 
 | Command id | Title | Status |
 |---|---|---|

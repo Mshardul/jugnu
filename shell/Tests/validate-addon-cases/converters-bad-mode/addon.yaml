@@ -1,0 +1,18 @@
+id: jugnu.converters-bad-mode
+name: Converters Bad Mode
+version: 1.0.0
+api: 1
+commands:
+  - id: json-csv
+    title: JSON to CSV
+converters:
+  - command: json-csv
+    from: json
+    to: csv
+    modes: [stream]
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths: []
+  launchd: []

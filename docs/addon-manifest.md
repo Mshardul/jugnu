@@ -27,8 +27,8 @@ cleanup:
 - `version`: three-part Semantic Version.
 - `api`: protocol major version; published addons currently use `1`.
 - `commands`: one or more command descriptors with stable ids and user-facing titles. Command id naming: name the job (`mute-all`, `audio-toggles`, `dns-flush`), never a bare `open`/`toggle`/`status`/`run` — those are ambiguous once more than one command or addon needs the same word, and block exact-alias addressing ([0077](tickets.md)). Multi-command addons prefix or distinguish by job, not by verb (`jugnu.audio-toggles`'s `mute-mic` / `mute-all`, not `toggle` / `toggle-all`). An id doubling as an alias candidate should stand alone without addon context.
-- `entrypoint.kind`: `exec`, `jxa`, or `osascript`.
-- `entrypoint.path`: relative path to the entrypoint; absolute paths and parent traversal are forbidden.
+- `entrypoint.kind`: `exec`, `jxa`, or `osascript`. First-party addons that only open shell-hosted UI (today `jugnu.convert`) use `shell`: no path, no process, and `converters:` is not allowed.
+- `entrypoint.path`: relative path to the entrypoint; absolute paths and parent traversal are forbidden. Required for every kind except `shell`.
 - `cleanup`: declared addon-owned paths and launchd labels to remove on disable or uninstall.
 
 ## Optional install gates
@@ -168,6 +168,28 @@ Omit `helpers` when the addon needs none. Distinct from catalog-addon `dependenc
 Helper zip: `helper.yaml` at the root (`id`, `version` — no `commands`, no enable). Unpack into the version directory above.
 
 Play addons wait on this plumbing ([ticket 0047](tickets.md)). Bundles are [0048](tickets.md).
+
+## Converters
+
+An addon that can turn one format into another declares it, and the shell's Convert view builds its dropdowns from the declarations ([design](architecture/2026-10-30-convert-design.md)).
+
+```yaml
+converters:
+  - command: json-csv      # an existing command id on this addon
+    from: json             # format ids; see below
+    to: csv
+    modes: [text]          # any of: text, file (at least one)
+formats:                   # optional: formats the shell does not already know
+  - id: ndjson
+    label: Newline-delimited JSON
+    extensions: [ndjson, jsonl]   # lowercase, no dot
+    mime: application/x-ndjson    # optional
+```
+
+- One entry is one directed edge (one hop, no chaining). `from` and `to` must differ; the same `from → to` cannot appear twice in one addon.
+- Format ids are lowercase tokens (`json`, `markdown-table`). The shell owns the core catalog (`FormatCatalog.core`); `formats:` cannot redefine a core id or repeat one.
+- A `text` edge is called with `{"api":1,"op":"convert","command","from","to","text"}` and answers `{"ok":true,"text":"..."}`. A `file` edge gets `path` and `out` (the shell picks `out`, never overwriting) and answers `{"ok":true,"path":"..."}`.
+- Validated by `ManifestLoader` and `scripts/validate-addon.sh`.
 
 ## View types
 

@@ -22,6 +22,7 @@ Unbuilt jobs live in the packaging map and gap list below. Shipped first-party s
 | 12 | `session` lifecycle class + addon IPC (epic) | [Ticket 0059](tickets.md) — stub, no design yet. Live process bound to an open panel + bidirectional IPC (`api: 2`). Cut from 0057 (§11); gated on the first `session`-shaped addon (most of Play). |
 | 13 | ~~Addon install & upgrade integrity (epic)~~ | **Done 2026-09-06** — [Ticket 0058](tickets.md) · [2026-09-05 spec](architecture/2026-09-05-addon-install-upgrade-integrity-design.md). Phases 1–6 shipped. Walk [shell-smoke.md](architecture/shell-smoke.md) 0058. |
 | 14 | Keep current (app + addons + first launch) | [Ticket 0063](tickets.md) · [2026-09-07 spec](architecture/2026-09-07-keep-current-design.md) · [plan](superpowers/plans/2026-09-07-keep-current.md). Unified shell-zip pipeline; keep-app / keep-addons confirms; two-step first-run. Absorbs [0017](tickets.md) [0062](tickets.md) [0004](tickets.md). |
+| 15 | **Convert** (file + text views) | [Ticket 0079](tickets.md) · [2026-10-30 spec](architecture/2026-10-30-convert-design.md). One `convert` addon; addons declare converter edges, shell owns the two views. Supersedes clip-tools *Text Transform* and the pdf-tools *Convert* panel. |
 
 **Canonical product surfaces:** [`docs/vision.md`](vision.md) — commands + popup UI + speed; context-aware surfacing later.
 
@@ -141,6 +142,7 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | Design | **grid-overlay** | column/baseline overlay | Own design-QA overlay |
 | Design | **emoji-picker** | search emoji → copy | Own; keep tiny |
 | Design | **qr-clip** | encode + **qr-decode** | QR both directions |
+| Tools | **convert** | `convert-file`, `convert-text` | Format conversion views over converters other addons declare — owns no converter code. [Spec](architecture/2026-10-30-convert-design.md) · [0079](tickets.md) |
 | Tools | **unit-convert** | all units | One converter addon |
 | Meeting | **meeting-bar** | next meeting / join lite | Own; or fold into **next-event** |
 | *(own addons)* | — | camera-check, quit-heavy, lock-screen, low-power, reminder-add, next-event, kitchen-timer, flash-attention, process-find, pdf-tools, speak-clip, resolution-preset, settings-jump, memory-pressure, grid-overlay, design-calc, time-machine, emoji-picker, media-convert, mount-dmg, airdrop-folder, quarantine-clear, repo-jumper, ssh-host-picker | Distinct jobs. (Several former entries here now merge elsewhere per [0074](tickets.md): mic-picker/speaker-mute→Audio; copy-ip/dns-flush/proxy-toggle/vpn-connect/wifi-toggle/http-status→Network; large-files/desktop-sweep→folder-clutter addon; finder-toggles→Finder/Desktop chrome; default-browser→Default Selection; app-info/relaunch-app→app-control; favorite-folders→jump-to-location; sleep→Power/Sleep.) |

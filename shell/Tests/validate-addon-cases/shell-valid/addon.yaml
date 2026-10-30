@@ -1,0 +1,12 @@
+id: jugnu.convert
+name: Convert
+version: 1.0.0
+api: 1
+commands:
+  - id: convert-file
+    title: Convert a file
+entrypoint:
+  kind: shell
+cleanup:
+  paths: []
+  launchd: []
