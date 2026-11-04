@@ -1,10 +1,11 @@
 id: jugnu.floating-note
 name: Temporary Note
-version: 1.0.0
+version: 1.0.1
 api: 1
 commands:
   - id: open
     title: Temporary note
+    alias: note
     subtitle: Floating sticky kept on this Mac and restored next time
     keywords: [temporary, note, sticky, scratch, memo, floating]
     ui:

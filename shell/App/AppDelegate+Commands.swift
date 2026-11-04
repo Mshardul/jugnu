@@ -109,7 +109,7 @@ extension AppDelegate {
         if let block = HostedBlock.resolve(addonID: cmd.addonId, commandID: cmd.commandId) {
             model.state.recordRecent(qualifiedId: cmd.qualifiedId)
             try? model.stateStore.save(model.state)
-            openHostedBlock(block)
+            openHostedBlock(block, paths: Self.fileURLs(from: args))
             return
         }
         guard let screen = shellHost.currentScreen ?? NSScreen.main else { return }

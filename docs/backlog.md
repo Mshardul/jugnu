@@ -23,6 +23,7 @@ Unbuilt jobs live in the packaging map and gap list below. Shipped first-party s
 | 13 | ~~Addon install & upgrade integrity (epic)~~ | **Done 2026-09-06** — [Ticket 0058](tickets.md) · [2026-09-05 spec](architecture/2026-09-05-addon-install-upgrade-integrity-design.md). Phases 1–6 shipped. Walk [shell-smoke.md](architecture/shell-smoke.md) 0058. |
 | 14 | Keep current (app + addons + first launch) | [Ticket 0063](tickets.md) · [2026-09-07 spec](architecture/2026-09-07-keep-current-design.md) · [plan](superpowers/plans/2026-09-07-keep-current.md). Unified shell-zip pipeline; keep-app / keep-addons confirms; two-step first-run. Absorbs [0017](tickets.md) [0062](tickets.md) [0004](tickets.md). |
 | 15 | **Convert** (file + text views) | [Ticket 0079](tickets.md) · [2026-10-30 spec](architecture/2026-10-30-convert-design.md). One `convert` addon; addons declare converter edges, shell owns the two views. Supersedes clip-tools *Text Transform* and the pdf-tools *Convert* panel. |
+| 16 | Load & performance testing (epic) | [Ticket 0080](tickets.md) — stub, no design yet. Repeatable latency harness through the real spawn path, scale (hundreds of addons), soak/stress, CI budget gate. Seeded by the [0079](tickets.md) speed gate. |
 
 **Canonical product surfaces:** [`docs/vision.md`](vision.md) — commands + popup UI + speed; context-aware surfacing later.
 

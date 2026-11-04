@@ -6,6 +6,7 @@ public struct IndexedCommand: Equatable, Sendable {
     public var title: String
     public var subtitle: String
     public var keywords: [String]
+    public var alias: String?
     public var addonRoot: URL
     public var defaultUIPattern: UIPattern?
     public var defaultViewType: ViewType?
@@ -17,6 +18,7 @@ public struct IndexedCommand: Equatable, Sendable {
         title: String,
         subtitle: String,
         keywords: [String],
+        alias: String? = nil,
         addonRoot: URL,
         defaultUIPattern: UIPattern? = nil,
         defaultViewType: ViewType? = nil,
@@ -27,6 +29,7 @@ public struct IndexedCommand: Equatable, Sendable {
         self.title = title
         self.subtitle = subtitle
         self.keywords = keywords
+        self.alias = alias
         self.addonRoot = addonRoot
         self.defaultUIPattern = defaultUIPattern
         self.defaultViewType = defaultViewType
@@ -89,6 +92,7 @@ public struct CommandIndex: Sendable {
                         title: cmd.title,
                         subtitle: cmd.subtitle,
                         keywords: cmd.keywords,
+                        alias: cmd.alias,
                         addonRoot: root,
                         defaultUIPattern: cmd.defaultUIPattern,
                         defaultViewType: cmd.view,
@@ -98,11 +102,39 @@ public struct CommandIndex: Sendable {
             }
         }
 
-        commands = found.sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
+        commands = Self.resolvingAliases(found)
+            .sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
     }
 
     public mutating func replaceCommandsForTesting(_ commands: [IndexedCommand]) {
-        self.commands = commands
+        self.commands = Self.resolvingAliases(commands)
+    }
+
+    /// An alias is an address, so it must name one command. Duplicate claims: a single first-party
+    /// (`jugnu.*`) claimant keeps it; any other tie drops the alias for every claimant.
+    static func resolvingAliases(_ commands: [IndexedCommand]) -> [IndexedCommand] {
+        var claimants: [String: [Int]] = [:]
+        for (i, command) in commands.enumerated() {
+            if let key = aliasKey(command.alias) {
+                claimants[key, default: []].append(i)
+            }
+        }
+        var result = commands
+        for indexes in claimants.values {
+            if indexes.count == 1 { continue }
+            let firstParty = indexes.filter { commands[$0].addonId.hasPrefix("jugnu.") }
+            let winner = firstParty.count == 1 ? firstParty.first : nil
+            for i in indexes where i != winner {
+                result[i].alias = nil
+            }
+        }
+        return result
+    }
+
+    private static func aliasKey(_ alias: String?) -> String? {
+        guard let alias else { return nil }
+        let key = alias.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        return key.isEmpty ? nil : key
     }
 
     public func search(_ query: String) -> [IndexedCommand] {
@@ -115,8 +147,9 @@ public struct CommandIndex: Sendable {
             return all.map { SearchHit(command: $0, tier: .title, score: 0, isSuggestion: false) }
         }
 
+        let aliasMatch = commands.first { Self.aliasKey($0.alias) == trimmed.lowercased() }
         var hits: [SearchHit] = []
-        for command in commands {
+        for command in commands where command != aliasMatch {
             if let ranked = rank(command, query: trimmed) {
                 hits.append(ranked)
             }
@@ -129,6 +162,9 @@ public struct CommandIndex: Sendable {
                 return lhs.score > rhs.score
             }
             return lhs.command.title.localizedCaseInsensitiveCompare(rhs.command.title) == .orderedAscending
+        }
+        if let aliasMatch {
+            hits.insert(SearchHit(command: aliasMatch, tier: .title, score: Int.max, isSuggestion: false), at: 0)
         }
         if hits.isEmpty, let suggestion = closest(query: trimmed) {
             return [suggestion]

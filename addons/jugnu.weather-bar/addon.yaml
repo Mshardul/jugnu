@@ -1,12 +1,13 @@
 id: jugnu.weather-bar
 name: Weather
-version: 1.0.0
+version: 1.0.1
 api: 1
 permissions:
   - network
 commands:
   - id: status
     title: Current weather
+    alias: weather
     subtitle: Temperature and conditions for your location
     keywords: [weather, temperature, forecast]
 entrypoint:

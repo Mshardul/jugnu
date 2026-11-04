@@ -1,16 +1,24 @@
 id: jugnu.convert
 name: Convert
-version: 1.0.0
+version: 1.1.1
 api: 1
 commands:
   - id: convert-file
     title: Convert a file
+    alias: convert
     subtitle: Save a data file in another format, beside the original
     keywords: [convert, file, format, export, json, csv, yaml, xml]
+    finder:
+      title: Convert…
+      types: [public.data]
   - id: convert-text
     title: Convert text
     subtitle: Convert text side by side, JSON to CSV and more
     keywords: [convert, text, json, csv, yaml, xml, format]
+config:
+  - key: show_in_finder_menu
+    type: bool
+    default: false
 entrypoint:
   kind: shell
 cleanup:

@@ -1,6 +1,6 @@
 id: jugnu.clipboard-history
 name: Clipboard History
-version: 1.0.0
+version: 1.0.1
 api: 1
 primary: list
 permissions:
@@ -9,6 +9,7 @@ permissions:
 commands:
   - id: list
     title: Clipboard history
+    alias: clip
     subtitle: Browse and copy recent clipboard entries
     keywords: [clipboard, history, paste, copy]
     ui:

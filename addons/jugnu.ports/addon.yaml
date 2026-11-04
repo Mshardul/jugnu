@@ -1,10 +1,11 @@
 id: jugnu.ports
 name: Ports
-version: 1.0.0
+version: 1.0.1
 api: 1
 commands:
   - id: list
     title: Listening ports
+    alias: ports
     subtitle: List and kill processes on local ports
     keywords: [port, ports, listen, kill, lsof, dev, server, network]
     ui:

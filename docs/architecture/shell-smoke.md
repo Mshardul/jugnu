@@ -184,6 +184,7 @@ Walk on a Mac after the namespaced `jugnu.*` zips are on `addons-v1.0.0` and `re
 - [ ] Output pane is read-only; the lock icon toggles editing; edit the output, then change the input: footer asks **Replace** / **Keep my edits**.
 - [ ] **Copy** puts the output on the clipboard; **Download** writes `converted.<ext>` to Downloads, reveals it, and a second Download makes `converted 2.<ext>`.
 - [ ] Paste a very large JSON (over ~200 KB): live conversion stops, footer offers **Convert**, pressing it converts.
+- [ ] Enable `show_in_finder_menu` for Convert, right-click a `.json` file in Finder → **Convert…**: Jugnu opens **Convert a file** with that file listed and the format picker filled. Turn the key off: the menu item disappears.
 - [ ] Palette → **Convert file**: drop a `.json`; output dropdown lists csv, yaml, and the other offered formats only; **Convert** writes the file beside the original; a second run makes `name 2.ext`; Reveal and Copy path work.
 - [ ] Copy a `.heic` in Finder, open **Convert file**: it is pre-filled; HEIC → JPEG writes beside the original.
 - [ ] Copy an image (screenshot to clipboard), open **Convert file**: shows a PNG; converting writes to Downloads and leaves no `jugnu-convert-clipboard` temp folder behind.

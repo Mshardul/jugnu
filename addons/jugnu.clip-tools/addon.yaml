@@ -1,6 +1,6 @@
 id: jugnu.clip-tools
 name: Clip Tools
-version: 1.2.0
+version: 1.2.1
 api: 1
 permissions:
   - clipboard
@@ -14,6 +14,7 @@ commands:
     keywords: [stats, words, count]
   - id: sort-lines
     title: Sort lines
+    alias: sort
     subtitle: Sort clipboard lines
     keywords: [sort, lines]
   - id: reverse-lines
@@ -22,6 +23,7 @@ commands:
     keywords: [reverse, lines]
   - id: dedupe-lines
     title: Dedupe lines
+    alias: dedupe
     subtitle: Remove duplicate lines
     keywords: [dedupe, unique]
   - id: trim-lines
@@ -50,6 +52,7 @@ commands:
     keywords: [cut, field, column]
   - id: case
     title: Change case
+    alias: case
     subtitle: lower / UPPER / Title / camel / snake / kebab (args.style)
     keywords: [case]
   - id: case-lower
@@ -78,6 +81,7 @@ commands:
     keywords: [kebab]
   - id: json-pretty
     title: JSON pretty
+    alias: json
     subtitle: Pretty-print clipboard JSON
     keywords: [json, pretty, format]
   - id: json-minify
@@ -122,6 +126,7 @@ commands:
     keywords: [json, yaml]
   - id: base64-encode
     title: Base64 encode
+    alias: b64
     subtitle: Encode clipboard as Base64
     keywords: [base64, encode]
   - id: base64-decode
@@ -146,22 +151,27 @@ commands:
     keywords: [html, unescape]
   - id: jwt-decode
     title: JWT decode
+    alias: jwt
     subtitle: Decode JWT header/payload (no verify)
     keywords: [jwt]
   - id: hash
     title: Hash
+    alias: hash
     subtitle: SHA-256 (or args.algo) of text or file path
     keywords: [hash, sha256]
   - id: slugify
     title: Slugify
+    alias: slug
     subtitle: URL/file slug from clipboard
     keywords: [slug]
   - id: uuid
     title: UUID
+    alias: uuid
     subtitle: Generate UUID / ULID-like / nanoid
     keywords: [uuid, ulid, nanoid]
   - id: timestamp
     title: Timestamp
+    alias: ts
     subtitle: Now as unix / ISO / RFC3339 / local
     keywords: [timestamp, time, iso]
   - id: iso-week
@@ -186,10 +196,12 @@ commands:
     keywords: [email]
   - id: lorem
     title: Lorem
+    alias: lorem
     subtitle: Placeholder words
     keywords: [lorem, ipsum]
   - id: regex-replace
     title: Regex replace
+    alias: regex
     subtitle: Replace with a regex pattern
     keywords: [regex, replace]
   - id: unicode-name
@@ -202,10 +214,12 @@ commands:
     keywords: [markdown, link]
   - id: clip-clear
     title: Clear clipboard
+    alias: clear-clip
     subtitle: Wipe the general pasteboard
     keywords: [clear, clipboard]
   - id: paste-plain
     title: Paste as plain text
+    alias: plain
     subtitle: Strip rich text from the clipboard
     keywords: [paste, plain, clipboard]
   - id: json-tsv

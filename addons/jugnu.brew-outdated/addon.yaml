@@ -1,12 +1,13 @@
 id: jugnu.brew-outdated
 name: Brew Outdated
-version: 1.0.0
+version: 1.0.1
 api: 1
 permissions:
   - network
 commands:
   - id: list
     title: Outdated Homebrew packages
+    alias: brew
     subtitle: Formulae and casks with updates available
     keywords: [brew, homebrew, outdated, update, upgrade]
     ui:

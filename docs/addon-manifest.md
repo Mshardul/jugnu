@@ -118,6 +118,23 @@ config:
 | **Env** | `JUGNU_STATE_DIR` → `~/.local/share/jugnu/state/<id>/`; `JUGNU_CONFIG_DIR` → `~/.config/jugnu/addons/<id>/`. |
 | **Validate** | `validate-addon.sh` rejects malformed / non-scalar `config:` blocks. |
 
+## Command alias
+
+Optional. A command may declare a short `alias` ([ticket 0077](tickets.md)). Typing exactly the alias in the palette (case-insensitive, whole string) puts that command first, so Return runs it. Any other query keeps fuzzy ranking.
+
+```yaml
+commands:
+  - id: mute-all
+    title: Mute microphone and speakers
+    alias: mute-all
+```
+
+| Rule | Lock |
+|---|---|
+| **Format** | 2–24 characters: lowercase letters, digits, hyphen; starts with a letter. `validate-addon.sh` enforces it and rejects duplicates inside one addon. |
+| **Catalog-unique** | The shell resolves clashes between addons: a single first-party (`jugnu.*`) claimant keeps the alias; any other tie drops it for every claimant. Pick aliases a user would recognise, not near-synonyms of another addon's. |
+| **Not a search term** | Aliases are not fuzzy-matched; use `keywords` for discovery. |
+
 ## Finder menu
 
 Optional. A command may declare a Finder right-click item. The shell writes and removes that item. The addon does not.

@@ -5,13 +5,24 @@ import SwiftUI
 
 @MainActor
 extension AppDelegate {
-    func openHostedBlock(_ block: HostedBlock) {
+    static func fileURLs(from args: [String: JSONValue]) -> [URL] {
+        guard case let .array(items)? = args["paths"] else { return [] }
+        return items.compactMap { item in
+            guard case let .string(path) = item, !path.isEmpty else { return nil }
+            return URL(fileURLWithPath: path)
+        }
+    }
+
+    func openHostedBlock(_ block: HostedBlock, paths: [URL] = []) {
         guard let model, let shellHost else { return }
         if block == .convertText, convertTextModel == nil || shellHost.appShellNavigation?.block != .convertText {
             convertTextModel = makeConvertTextModel(model: model)
         }
         if block == .convertFile, convertFileModel == nil || shellHost.appShellNavigation?.block != .convertFile {
             convertFileModel = makeConvertFileModel(model: model)
+        }
+        if block == .convertFile, !paths.isEmpty {
+            convertFileModel?.setFiles(paths)
         }
         if shellHost.isVisible, shellHost.stack.top.preset == .appShell {
             let navigation = (shellHost.appShellNavigation ?? .freshHome()).openingBlock(block)

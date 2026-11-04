@@ -63,4 +63,46 @@ final class CommandIndexTests: XCTestCase {
         index.replaceCommandsForTesting([zoom, mute])
         XCTAssertEqual(index.search("mcmt").first?.title, "Mic Mute")
     }
+
+    private func command(_ addon: String, _ id: String, _ title: String, alias: String? = nil) -> IndexedCommand {
+        IndexedCommand(
+            addonId: addon, commandId: id, title: title, subtitle: "", keywords: [],
+            alias: alias, addonRoot: URL(fileURLWithPath: "/tmp")
+        )
+    }
+
+    func testExactAliasRanksFirstEvenWhenFuzzyPrefersAnother() {
+        var index = CommandIndex(paths: JugnuPaths(home: URL(fileURLWithPath: "/tmp")), config: JugnuConfig())
+        index.replaceCommandsForTesting([
+            command("jugnu.a", "mute-mic", "Mute microphone input"),
+            command("jugnu.b", "mute-all", "Quiet everything", alias: "Mute"),
+        ])
+        XCTAssertEqual(index.searchHits("mute").first?.command.commandId, "mute-all")
+        XCTAssertEqual(index.searchHits("  MUTE ").first?.command.commandId, "mute-all")
+        XCTAssertEqual(index.searchHits("mute").count, 2)
+    }
+
+    func testNonMatchingQueryFallsBackToFuzzyOrder() {
+        var index = CommandIndex(paths: JugnuPaths(home: URL(fileURLWithPath: "/tmp")), config: JugnuConfig())
+        index.replaceCommandsForTesting([
+            command("jugnu.a", "mute-mic", "Mute microphone", alias: "mm"),
+            command("jugnu.b", "mute-all", "Mute all", alias: "mute-all"),
+        ])
+        XCTAssertEqual(index.searchHits("mut").first?.command.commandId, "mute-all")
+    }
+
+    func testDuplicateAliasKeepsSingleFirstPartyAndDropsAmbiguousTies() {
+        var index = CommandIndex(paths: JugnuPaths(home: URL(fileURLWithPath: "/tmp")), config: JugnuConfig())
+        index.replaceCommandsForTesting([
+            command("acme.x", "one", "One", alias: "go"),
+            command("jugnu.y", "two", "Two", alias: "go"),
+            command("acme.p", "three", "Three", alias: "tie"),
+            command("beta.q", "four", "Four", alias: "tie"),
+        ])
+        let byId = Dictionary(uniqueKeysWithValues: index.all.map { ($0.commandId, $0.alias) })
+        XCTAssertNil(byId["one"] ?? nil)
+        XCTAssertEqual(byId["two"] ?? nil, "go")
+        XCTAssertNil(byId["three"] ?? nil)
+        XCTAssertNil(byId["four"] ?? nil)
+    }
 }

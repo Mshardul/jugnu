@@ -1,12 +1,13 @@
 id: jugnu.keep-awake
 name: Keep Awake
-version: 1.0.0
+version: 1.0.1
 api: 1
 permissions:
   - background
 commands:
   - id: pick
     title: Keep awake
+    alias: awake
     subtitle: Stop the Mac from idle-sleeping for a while
     keywords: [awake, caffeine, sleep, display, caffeinate, stay awake]
     ui:

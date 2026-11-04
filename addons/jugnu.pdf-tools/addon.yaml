@@ -1,12 +1,13 @@
 id: jugnu.pdf-tools
 name: PDF Tools
-version: 1.1.0
+version: 1.1.1
 api: 1
 primary: pdf-unlock
 view_types: [fields, rows]
 commands:
   - id: pdf-unlock
     title: Remove PDF password
+    alias: pdf-unlock
     subtitle: Save an unlocked copy beside the PDF
     keywords: [pdf, password, unlock, decrypt]
     finder:
@@ -14,10 +15,12 @@ commands:
       types: [com.adobe.pdf]
   - id: merge
     title: Merge PDFs
+    alias: pdf-merge
     subtitle: Save one PDF beside the first file
     keywords: [pdf, merge, combine]
   - id: split
     title: Split PDF
+    alias: pdf-split
     subtitle: Save each page, or the ranges you enter
     keywords: [pdf, split]
   - id: extract-pages
@@ -54,6 +57,7 @@ commands:
     keywords: [pdf, text, extract]
   - id: compress
     title: Compress PDF
+    alias: pdf-compress
     subtitle: Save a smaller copy when the images can shrink
     keywords: [pdf, compress, shrink]
   - id: jpg-pdf

@@ -326,6 +326,7 @@ public struct CommandDescriptor: Codable, Equatable, Sendable {
     public var title: String
     public var subtitle: String
     public var keywords: [String]
+    public var alias: String?
     public var ui: CommandUISpec?
     public var view: ViewType?
     public var lifecycle: LifecycleClass?
@@ -339,6 +340,7 @@ public struct CommandDescriptor: Codable, Equatable, Sendable {
         title: String,
         subtitle: String,
         keywords: [String] = [],
+        alias: String? = nil,
         ui: CommandUISpec? = nil,
         view: ViewType? = nil,
         lifecycle: LifecycleClass? = nil,
@@ -351,6 +353,7 @@ public struct CommandDescriptor: Codable, Equatable, Sendable {
         self.title = title
         self.subtitle = subtitle
         self.keywords = keywords
+        self.alias = alias
         self.ui = ui
         self.view = view
         self.lifecycle = lifecycle
@@ -365,7 +368,7 @@ public struct CommandDescriptor: Codable, Equatable, Sendable {
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, title, subtitle, keywords, ui, view, lifecycle, timeout, daemon, finder
+        case id, title, subtitle, keywords, alias, ui, view, lifecycle, timeout, daemon, finder
         case onReinvoke = "on_reinvoke"
     }
 
@@ -375,6 +378,7 @@ public struct CommandDescriptor: Codable, Equatable, Sendable {
         title = try c.decode(String.self, forKey: .title)
         subtitle = try c.decodeIfPresent(String.self, forKey: .subtitle) ?? ""
         keywords = try c.decodeIfPresent([String].self, forKey: .keywords) ?? []
+        alias = try c.decodeIfPresent(String.self, forKey: .alias)
         ui = try c.decodeIfPresent(CommandUISpec.self, forKey: .ui)
         if let raw = try c.decodeIfPresent(String.self, forKey: .view) {
             guard let parsed = ViewType(rawValue: raw) else {

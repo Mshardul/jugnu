@@ -36,6 +36,13 @@ def parse_yaml_scalar(raw: str) -> str:
 
 
 def extract_commands(manifest_text: str) -> list[dict[str, str]]:
+    return [
+        {"id": c["id"], "title": c["title"], "subtitle": c.get("subtitle", "")}
+        for c in parse_commands(manifest_text)
+    ]
+
+
+def parse_commands(manifest_text: str) -> list[dict[str, str]]:
     lines = manifest_text.splitlines()
     in_commands = False
     items: list[dict[str, str]] = []
@@ -47,13 +54,7 @@ def extract_commands(manifest_text: str) -> list[dict[str, str]]:
             return
         if "id" not in current or "title" not in current:
             raise ManifestParseError(f"command missing id or title: {current}")
-        items.append(
-            {
-                "id": current["id"],
-                "title": current["title"],
-                "subtitle": current.get("subtitle", ""),
-            }
-        )
+        items.append(current)
         current = None
 
     for line in lines:
@@ -85,10 +86,34 @@ def extract_commands(manifest_text: str) -> list[dict[str, str]]:
     return items
 
 
+def check_aliases(repo_root: Path) -> list[str]:
+    """Command aliases must address one command catalog-wide (ticket 0077).
+
+    The shell resolves clashes at load time; here a clash is an authoring error, so it fails
+    before release. Scans every in-tree addon, including ones not yet in the registry.
+    """
+    claims: dict[str, list[str]] = {}
+    for manifest in sorted((repo_root / "addons").glob("*/addon.yaml")):
+        try:
+            commands = parse_commands(manifest.read_text())
+        except ManifestParseError:
+            continue
+        addon_id = manifest.parent.name
+        for command in commands:
+            alias = command.get("alias", "").strip().lower()
+            if alias:
+                claims.setdefault(alias, []).append(f"{addon_id}:{command['id']}")
+    return [
+        f"alias '{alias}' is claimed by more than one command: {', '.join(who)}"
+        for alias, who in sorted(claims.items())
+        if len(who) > 1
+    ]
+
+
 def sync_registry(registry_file: Path, repo_root: Path, check_mode: bool) -> int:
     original_text = registry_file.read_text()
     entries = json.loads(original_text)
-    errors: list[str] = []
+    errors: list[str] = check_aliases(repo_root)
 
     for entry in entries:
         addon_id = entry["id"]
@@ -147,6 +172,24 @@ def _self_test() -> int:
     )
     assert nested[0]["title"] == "Remove PDF password", nested
     assert nested[0]["subtitle"] == "Save a copy", nested
+
+    with_alias = extract_commands(
+        "commands:\n  - id: a\n    title: A\n    alias: aa\n    subtitle: s\n"
+    )
+    assert with_alias == [{"id": "a", "title": "A", "subtitle": "s"}], with_alias
+
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        for addon, alias in (("jugnu.one", "go"), ("jugnu.two", "GO"), ("jugnu.three", "stop")):
+            (root / "addons" / addon).mkdir(parents=True)
+            (root / "addons" / addon / "addon.yaml").write_text(
+                f"commands:\n  - id: c\n    title: C\n    alias: {alias}\n"
+            )
+        found = check_aliases(root)
+        assert len(found) == 1 and "'go'" in found[0], found
+        assert "jugnu.one:c" in found[0] and "jugnu.two:c" in found[0], found
 
     try:
         extract_commands("commands:\n  - id: a\n    keywords: [x]\n")

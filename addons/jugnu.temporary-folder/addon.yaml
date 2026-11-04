@@ -1,11 +1,12 @@
 id: jugnu.temporary-folder
 name: Temporary Folder
-version: 1.0.0
+version: 1.0.1
 api: 1
 primary: temporary-folder
 commands:
   - id: temporary-folder
     title: Temporary folder
+    alias: tmp
     subtitle: Drop files into ~/Temporary
     keywords: [temporary, folder, scratch, holding, drop, tray, files]
     ui:

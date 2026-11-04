@@ -157,6 +157,25 @@ awk -v id="$id" -v job="$job" '
   /^[[:space:]]+-[[:space:]]*/ { v = $0; sub(/^[[:space:]]+-[[:space:]]*/, "", v); check(kind, strip(v)) }
 ' "$manifest"
 
+aliases="$( { grep -E '^[[:space:]]+alias:' "$manifest" || true; } | sed -E 's/^[[:space:]]+alias:[[:space:]]*//; s/[[:space:]]+#.*$//; s/^["'"'"']//; s/["'"'"']$//')"
+if [ -n "$aliases" ]; then
+  seen_aliases=""
+  while IFS= read -r alias; do
+    if ! printf '%s' "$alias" | grep -Eq '^[a-z][a-z0-9-]{1,23}$'; then
+      echo "invalid alias '$alias': use 2-24 chars, lowercase letters, digits, hyphen, starting with a letter" >&2
+      exit 1
+    fi
+    if printf '%s\n' "$seen_aliases" | grep -Fxq "$alias"; then
+      echo "duplicate alias '$alias' within addon" >&2
+      exit 1
+    fi
+    seen_aliases="$seen_aliases
+$alias"
+  done <<EOF_ALIASES
+$aliases
+EOF_ALIASES
+fi
+
 if grep -q '^config:' "$manifest"; then
   python3 - "$manifest" <<'PY' || exit 1
 import re, sys

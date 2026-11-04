@@ -2,88 +2,89 @@
 
 from __future__ import annotations
 
+import importlib
 import json
 import os
 import sys
 from collections.abc import Callable
 from typing import Any
 
-from clipboard import ClipboardError, read_as_plain_text, read_text, write_text
-from ops import caseops, convertops, encode, identity, lines, misc, structured, yamlops
 from ops.lines import OpError
 
 Handler = Callable[[str, dict], tuple[str, str]]
 
-COMMANDS: dict[str, Handler] = {
+# "module.function" strings, resolved on demand so one invocation imports only the op module
+# it needs (startup latency is on the Convert speed budget).
+COMMANDS: dict[str, str] = {
     # stats / lines
-    "text-stats": lines.text_stats,
-    "sort-lines": lines.sort_lines,
-    "reverse-lines": lines.reverse_lines,
-    "dedupe-lines": lines.dedupe_lines,
-    "trim-lines": lines.trim_lines,
-    "number-lines": lines.number_lines,
-    "join-lines": lines.join_lines,
-    "split-lines": lines.split_lines,
-    "prefix-suffix": lines.prefix_suffix,
-    "cut-field": lines.cut_field,
+    "text-stats": "lines.text_stats",
+    "sort-lines": "lines.sort_lines",
+    "reverse-lines": "lines.reverse_lines",
+    "dedupe-lines": "lines.dedupe_lines",
+    "trim-lines": "lines.trim_lines",
+    "number-lines": "lines.number_lines",
+    "join-lines": "lines.join_lines",
+    "split-lines": "lines.split_lines",
+    "prefix-suffix": "lines.prefix_suffix",
+    "cut-field": "lines.cut_field",
     # case
-    "case": caseops.case,
-    "case-lower": caseops.case_lower,
-    "case-upper": caseops.case_upper,
-    "case-title": caseops.case_title,
-    "case-camel": caseops.case_camel,
-    "case-snake": caseops.case_snake,
-    "case-kebab": caseops.case_kebab,
+    "case": "caseops.case",
+    "case-lower": "caseops.case_lower",
+    "case-upper": "caseops.case_upper",
+    "case-title": "caseops.case_title",
+    "case-camel": "caseops.case_camel",
+    "case-snake": "caseops.case_snake",
+    "case-kebab": "caseops.case_kebab",
     # structured
-    "json-pretty": structured.json_pretty,
-    "json-minify": structured.json_minify,
-    "csv-pretty": structured.csv_pretty,
-    "xml-pretty": structured.xml_pretty,
-    "csv-json": structured.csv_json,
-    "json-csv": structured.json_csv,
-    "xml-json": structured.xml_json,
-    "json-path": structured.json_path,
-    "yaml-pretty": yamlops.yaml_pretty,
-    "yaml-json": yamlops.yaml_json,
-    "json-yaml": yamlops.json_yaml,
+    "json-pretty": "structured.json_pretty",
+    "json-minify": "structured.json_minify",
+    "csv-pretty": "structured.csv_pretty",
+    "xml-pretty": "structured.xml_pretty",
+    "csv-json": "structured.csv_json",
+    "json-csv": "structured.json_csv",
+    "xml-json": "structured.xml_json",
+    "json-path": "structured.json_path",
+    "yaml-pretty": "yamlops.yaml_pretty",
+    "yaml-json": "yamlops.yaml_json",
+    "json-yaml": "yamlops.json_yaml",
     # convert-only (Convert addon)
-    "json-tsv": convertops.json_tsv,
-    "tsv-json": convertops.tsv_json,
-    "csv-tsv": convertops.csv_tsv,
-    "tsv-csv": convertops.tsv_csv,
-    "json-xml": convertops.json_xml,
-    "csv-markdown-table": convertops.csv_markdown_table,
-    "json-markdown-table": convertops.json_markdown_table,
-    "markdown-table-csv": convertops.markdown_table_csv,
-    "markdown-table-json": convertops.markdown_table_json,
-    "markdown-html": convertops.markdown_html,
-    "html-markdown": convertops.html_markdown,
-    "html-plain": convertops.html_plain,
+    "json-tsv": "convertops.json_tsv",
+    "tsv-json": "convertops.tsv_json",
+    "csv-tsv": "convertops.csv_tsv",
+    "tsv-csv": "convertops.tsv_csv",
+    "json-xml": "convertops.json_xml",
+    "csv-markdown-table": "convertops.csv_markdown_table",
+    "json-markdown-table": "convertops.json_markdown_table",
+    "markdown-table-csv": "convertops.markdown_table_csv",
+    "markdown-table-json": "convertops.markdown_table_json",
+    "markdown-html": "convertops.markdown_html",
+    "html-markdown": "convertops.html_markdown",
+    "html-plain": "convertops.html_plain",
     # encode
-    "base64-encode": encode.base64_encode,
-    "base64-decode": encode.base64_decode,
-    "url-encode": encode.url_encode,
-    "url-decode": encode.url_decode,
-    "html-escape": encode.html_escape,
-    "html-unescape": encode.html_unescape,
-    "jwt-decode": encode.jwt_decode,
-    "hash": encode.hash_text,
-    "slugify": encode.slugify,
+    "base64-encode": "encode.base64_encode",
+    "base64-decode": "encode.base64_decode",
+    "url-encode": "encode.url_encode",
+    "url-decode": "encode.url_decode",
+    "html-escape": "encode.html_escape",
+    "html-unescape": "encode.html_unescape",
+    "jwt-decode": "encode.jwt_decode",
+    "hash": "encode.hash_text",
+    "slugify": "encode.slugify",
     # identity
-    "uuid": identity.uuid_gen,
-    "timestamp": identity.timestamp,
-    "iso-week": identity.iso_week,
+    "uuid": "identity.uuid_gen",
+    "timestamp": "identity.timestamp",
+    "iso-week": "identity.iso_week",
     # misc
-    "tabs-spaces": misc.tabs_spaces,
-    "invisible-chars": misc.invisible_chars,
-    "markdown-table": misc.markdown_table,
-    "extract-emails": misc.extract_emails,
-    "lorem": misc.lorem,
-    "regex-replace": misc.regex_replace,
-    "unicode-name": misc.unicode_name,
-    "md-link": misc.md_link,
-    "clip-clear": misc.clip_clear,
-    "paste-plain": misc.paste_plain,
+    "tabs-spaces": "misc.tabs_spaces",
+    "invisible-chars": "misc.invisible_chars",
+    "markdown-table": "misc.markdown_table",
+    "extract-emails": "misc.extract_emails",
+    "lorem": "misc.lorem",
+    "regex-replace": "misc.regex_replace",
+    "unicode-name": "misc.unicode_name",
+    "md-link": "misc.md_link",
+    "clip-clear": "misc.clip_clear",
+    "paste-plain": "misc.paste_plain",
 }
 
 # Commands the shell Convert view may call (`op: convert`): command id → (from, to).
@@ -117,6 +118,14 @@ RAW_READ_COMMANDS = {"paste-plain"}
 MAX_CONVERT_FILE_BYTES = 10 * 1024 * 1024
 
 
+def _handler(command: str) -> Handler | None:
+    target = COMMANDS.get(command)
+    if target is None:
+        return None
+    module, _, name = target.partition(".")
+    return getattr(importlib.import_module(f"ops.{module}"), name)
+
+
 def _emit(payload: dict[str, Any]) -> None:
     sys.stdout.write(json.dumps(payload, ensure_ascii=False))
     sys.stdout.write("\n")
@@ -139,7 +148,7 @@ def _convert(req: dict) -> None:
         _emit({"ok": False, "error": "text must be a string"})
         return
     try:
-        new_text, _message = COMMANDS[command](text, {})
+        new_text, _message = _handler(command)(text, {})
         _emit({"ok": True, "text": new_text})
     except OpError as exc:
         _emit({"ok": False, "error": str(exc)})
@@ -165,7 +174,7 @@ def _convert_file(command: str, req: dict) -> None:
         _emit({"ok": False, "error": "could not read the file"})
         return
     try:
-        new_text, _message = COMMANDS[command](text, {})
+        new_text, _message = _handler(command)(text, {})
     except OpError as exc:
         _emit({"ok": False, "error": str(exc)})
         return
@@ -210,10 +219,12 @@ def main() -> None:
         return
 
     inject = os.environ.get("JUGNU_CLIP_TOOLS_INJECT") == "1"
-    handler = COMMANDS.get(command)
+    handler = _handler(command)
     if handler is None:
         _emit({"ok": False, "error": f"unknown command: {command}"})
         return
+
+    import clipboard  # lazy: pulls in subprocess, unused on the convert path
 
     try:
         if inject and "_text" in args:
@@ -223,18 +234,18 @@ def main() -> None:
             # Do not pass inject-only keys into ops
             op_args = {k: v for k, v in args.items() if k != "_text"}
         else:
-            text = read_as_plain_text() if command in RAW_READ_COMMANDS else read_text()
+            text = clipboard.read_as_plain_text() if command in RAW_READ_COMMANDS else clipboard.read_text()
             op_args = args
         new_text, message = handler(text, op_args)
         if not inject:
-            write_text(new_text)
+            clipboard.write_text(new_text)
         out: dict[str, Any] = {"ok": True, "message": message}
         if inject:
             out["result"] = new_text
         _emit(out)
     except OpError as exc:
         _emit({"ok": False, "error": str(exc)})
-    except ClipboardError as exc:
+    except clipboard.ClipboardError as exc:
         _emit({"ok": False, "error": str(exc)})
     except Exception:
         # Never dump stacks to the shell user surface

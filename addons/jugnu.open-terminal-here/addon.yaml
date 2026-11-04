@@ -1,10 +1,11 @@
 id: jugnu.open-terminal-here
 name: Open Terminal Here
-version: 1.0.0
+version: 1.0.1
 api: 1
 commands:
   - id: open
     title: Open Terminal here
+    alias: term
     subtitle: Open the last-picked terminal in the front Finder folder
     keywords: [terminal, iterm, warp, finder, here, cd]
 entrypoint:

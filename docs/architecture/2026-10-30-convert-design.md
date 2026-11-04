@@ -1,7 +1,7 @@
 # Jugnu — Convert (file + text)
 
 **Date:** 2026-10-30  
-**Status:** Implemented 2026-11-04, not yet accepted. Both blocks, `jugnu.convert` and the converter addons are built and unit-tested. Open: Finder-selection prefill, the §6 speed gate (measured failing, see ticket 0079), the manual walk in [shell-smoke](./shell-smoke.md), and the release cut  
+**Status:** Implemented 2026-11-04, not yet accepted. Both blocks, `jugnu.convert` and the converter addons are built and unit-tested. Open: the §6 speed gate (measured failing, see ticket 0079), the manual walk in [shell-smoke](./shell-smoke.md), and the release cut  
 **Ticket:** [0079](../tickets.md)  
 **Depends on:** [App shell plan](./2026-10-12-app-shell-design.md) (§2 frame, §11.1 single view; delivery phase 3), [Addon UI + speed](./2026-08-22-addon-ui-speed-design.md), [Addon manifest](../addon-manifest.md), [Process lifecycle](./2026-08-30-addon-process-lifecycle-design.md) (`oneshot`)  
 **Supersedes:** the *Text Transform* panel sketched in [clip-tools design §5](./2026-09-04-clip-tools-design.md) and the *File conversion* panel planned under `pdf-tools` in [catalog-ui](../catalog-ui.md). Both fold into this design.  
@@ -134,7 +134,7 @@ Not offered, deliberately: webp (macOS tools cannot write it), video (needs a bu
 
 - [catalog-ui](../catalog-ui.md): *Text Transform* and *File conversion (pdf-tools)* are superseded by *Convert*.
 - [catalog-commands](../catalog-commands.md): `transform` (clip-tools) is dropped; `convert` (pdf-tools) becomes the `convert` addon's two commands. `unit-convert` keeps its own `convert` id — rename to a job-named id when that addon is built (naming rule in [addon-manifest](../addon-manifest.md#required-fields)).
-- Finder right-click **Convert** (pdf-tools plan) opens `convert-file` with the file filled in.
+- Finder right-click **Convert…** (opt-in `show_in_finder_menu`, `public.data`) opens `convert-file` with the file filled in. No Automation permission: the shell never asks Finder for its selection; the other entry points are *Choose file…* and the clipboard file.
 - The *View* rows for these panels in catalog-ui are replaced by "content block in the frame" (§ Hosting).
 
 ## 10. Success criteria

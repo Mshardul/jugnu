@@ -1,6 +1,6 @@
 id: jugnu.intervals
 name: Intervals
-version: 1.0.0
+version: 1.0.1
 api: 1
 primary: manage
 helpers:
@@ -10,6 +10,7 @@ view_types: [rows, fields, ask]
 commands:
   - id: manage
     title: Intervals
+    alias: intervals
     subtitle: Add, edit, and enable timers
     keywords: [interval, nudge, wellness, pomodoro, focus, timer]
     view: rows
@@ -34,6 +35,7 @@ commands:
     keywords: []
   - id: start-focus
     title: Start focus session
+    alias: pomodoro
     subtitle: Start the pomodoro work phase
     keywords: [pomodoro, focus, timer, work]
   - id: start-break
