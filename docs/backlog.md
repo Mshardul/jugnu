@@ -77,7 +77,7 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | Clipboard | **clipboard-guard** | detect likely secrets / warn before history storage / clear or redact clipboard | Privacy utility for clipboard workflows; detection is heuristic |
 | Clipboard | **diff** | diff-clip | Heavier than one-shot transforms — own addon unless kept tiny on clip-tools |
 | Files | **paths** | path-copy, reveal-path, **count-files**, **folder-size** | Path/Finder folder jobs |
-| Files | **images** | heic-jpeg, resize-image, **image-rotate**, flip, format convert, compress (+ other `sips`/Image I/O ops) | Image transforms family |
+| Files | **images** | *(format convert shipped 2026-11-04: heic/jpeg/png/tiff/gif)* heic-jpeg, resize-image, **image-rotate**, flip, format convert, compress (+ other `sips`/Image I/O ops) | Image transforms family |
 | Files | **folder-clutter** | `folder-clutter`, reveal-downloads, downloads-age, screenshot-inbox, reveal-latest-screenshot, archive-latest-screenshot, archive-older-screenshots, desktop-sweep, large-files | Command list locked in [catalog-commands](catalog-commands.md). Not scaffolded. |
 | Files | **airdrop-folder** | share Finder selection via AirDrop UI | Finder / share QoL |
 | Files | **quarantine-clear** | clear Gatekeeper quarantine xattr (± check) | File / Gatekeeper QoL |
@@ -96,7 +96,8 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | Files | **folder-clutter** | large-files | Same zip. Not a second addon. |
 | Files | **folder-clutter** | desktop-sweep | Same zip. Not a second addon. |
 | Files | **mount-dmg** | mount / unmount selected DMG or volume | Own volume job; possible small-Finder-utility grouping w/ quarantine-clear/airdrop-folder considered and deferred — see [0074](tickets.md) |
-| Files | **media-convert** | **afconvert** (+ other built-in audio convert presets) | Audio via macOS `afconvert` |
+| Files | **media-convert** | **afconvert** (shipped 2026-11-04: wav/aiff/m4a/caf, mp3 source; other presets later) | Audio via macOS `afconvert` |
+| Files | **doc-convert** | docx, rtf, odt, html, plain via macOS `textutil` (shipped 2026-11-04) | Document formats; every edge also feeds **convert** |
 | Files | **jump-to-location** | `jump-to-location`, favorite-folders, recent-files | Command list locked in [catalog-commands](catalog-commands.md). Not scaffolded. |
 | Files | **jump-to-location** | recent-files | Same zip as favorite folders. Not a second addon. |
 | Window | **window-layouts** | center, fill-desktop, maximize, hide-others, pin-top, space-jump, stage-toggle, left/right-half, quarters, gather-windows, move-display, app-windows, desktop-name (Jugnu-local label), fullscreen-toggle, minimize-all, show-desktop, **tile-two** (+ swap / other layout ops); **zones** (save/apply, max 6, replace picker). Fold **layout-save**. **No layout-undo.** Snap board + palette commands. Spec: [2026-08-24 window-layouts](architecture/2026-08-24-window-layouts.md) | One window family |
@@ -142,8 +143,8 @@ Draft boundaries — refine by user mental model (not “all toggles in one zip�
 | Design | **grid-overlay** | column/baseline overlay | Own design-QA overlay |
 | Design | **emoji-picker** | search emoji → copy | Own; keep tiny |
 | Design | **qr-clip** | encode + **qr-decode** | QR both directions |
-| Tools | **convert** | `convert-file`, `convert-text` | Format conversion views over converters other addons declare — owns no converter code. [Spec](architecture/2026-10-30-convert-design.md) · [0079](tickets.md) |
-| Tools | **unit-convert** | all units | One converter addon |
+| Converters | **convert** | `convert-file`, `convert-text` | Format conversion views over converters other addons declare — owns no converter code. [Spec](architecture/2026-10-30-convert-design.md) · [0079](tickets.md) |
+| Converters | **unit-convert** | all units | One converter addon |
 | Meeting | **meeting-bar** | next meeting / join lite | Own; or fold into **next-event** |
 | *(own addons)* | — | camera-check, quit-heavy, lock-screen, low-power, reminder-add, next-event, kitchen-timer, flash-attention, process-find, pdf-tools, speak-clip, resolution-preset, settings-jump, memory-pressure, grid-overlay, design-calc, time-machine, emoji-picker, media-convert, mount-dmg, airdrop-folder, quarantine-clear, repo-jumper, ssh-host-picker | Distinct jobs. (Several former entries here now merge elsewhere per [0074](tickets.md): mic-picker/speaker-mute→Audio; copy-ip/dns-flush/proxy-toggle/vpn-connect/wifi-toggle/http-status→Network; large-files/desktop-sweep→folder-clutter addon; finder-toggles→Finder/Desktop chrome; default-browser→Default Selection; app-info/relaunch-app→app-control; favorite-folders→jump-to-location; sleep→Power/Sleep.) |
 

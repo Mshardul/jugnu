@@ -9,7 +9,7 @@ from collections.abc import Callable
 from typing import Any
 
 from clipboard import ClipboardError, read_as_plain_text, read_text, write_text
-from ops import caseops, encode, identity, lines, misc, structured, yamlops
+from ops import caseops, convertops, encode, identity, lines, misc, structured, yamlops
 from ops.lines import OpError
 
 Handler = Callable[[str, dict], tuple[str, str]]
@@ -46,6 +46,19 @@ COMMANDS: dict[str, Handler] = {
     "yaml-pretty": yamlops.yaml_pretty,
     "yaml-json": yamlops.yaml_json,
     "json-yaml": yamlops.json_yaml,
+    # convert-only (Convert addon)
+    "json-tsv": convertops.json_tsv,
+    "tsv-json": convertops.tsv_json,
+    "csv-tsv": convertops.csv_tsv,
+    "tsv-csv": convertops.tsv_csv,
+    "json-xml": convertops.json_xml,
+    "csv-markdown-table": convertops.csv_markdown_table,
+    "json-markdown-table": convertops.json_markdown_table,
+    "markdown-table-csv": convertops.markdown_table_csv,
+    "markdown-table-json": convertops.markdown_table_json,
+    "markdown-html": convertops.markdown_html,
+    "html-markdown": convertops.html_markdown,
+    "html-plain": convertops.html_plain,
     # encode
     "base64-encode": encode.base64_encode,
     "base64-decode": encode.base64_decode,
@@ -82,11 +95,26 @@ CONVERT_EDGES: dict[str, tuple[str, str]] = {
     "xml-json": ("xml", "json"),
     "yaml-json": ("yaml", "json"),
     "json-yaml": ("json", "yaml"),
+    "json-tsv": ("json", "tsv"),
+    "tsv-json": ("tsv", "json"),
+    "csv-tsv": ("csv", "tsv"),
+    "tsv-csv": ("tsv", "csv"),
+    "json-xml": ("json", "xml"),
+    "csv-markdown-table": ("csv", "markdown-table"),
+    "json-markdown-table": ("json", "markdown-table"),
+    "markdown-table-csv": ("markdown-table", "csv"),
+    "markdown-table-json": ("markdown-table", "json"),
+    "markdown-html": ("markdown", "html"),
+    "html-markdown": ("html", "markdown"),
+    "html-plain": ("html", "plain"),
 }
 
 # Commands whose input is the raw pasteboard read (RTF/HTML source), not the
 # plain-text flavor every other op assumes — see clipboard.read_as_plain_text.
 RAW_READ_COMMANDS = {"paste-plain"}
+
+# File-mode conversions read the whole file; keep them to a size a live UI can wait for.
+MAX_CONVERT_FILE_BYTES = 10 * 1024 * 1024
 
 
 def _emit(payload: dict[str, Any]) -> None:
@@ -103,6 +131,9 @@ def _convert(req: dict) -> None:
     if (req.get("from"), req.get("to")) != edge:
         _emit({"ok": False, "error": f"{command} converts {edge[0]} to {edge[1]}"})
         return
+    if "path" in req:
+        _convert_file(command, req)
+        return
     text = req.get("text")
     if not isinstance(text, str):
         _emit({"ok": False, "error": "text must be a string"})
@@ -114,6 +145,40 @@ def _convert(req: dict) -> None:
         _emit({"ok": False, "error": str(exc)})
     except Exception:
         _emit({"ok": False, "error": "conversion failed"})
+
+
+def _convert_file(command: str, req: dict) -> None:
+    src, dst = req.get("path"), req.get("out")
+    if not isinstance(src, str) or not isinstance(dst, str) or not src or not dst:
+        _emit({"ok": False, "error": "path and out must be strings"})
+        return
+    try:
+        if os.path.getsize(src) > MAX_CONVERT_FILE_BYTES:
+            _emit({"ok": False, "error": "file is too large to convert"})
+            return
+        with open(src, encoding="utf-8") as handle:
+            text = handle.read()
+    except UnicodeDecodeError:
+        _emit({"ok": False, "error": "file is not UTF-8 text"})
+        return
+    except OSError:
+        _emit({"ok": False, "error": "could not read the file"})
+        return
+    try:
+        new_text, _message = COMMANDS[command](text, {})
+    except OpError as exc:
+        _emit({"ok": False, "error": str(exc)})
+        return
+    except Exception:
+        _emit({"ok": False, "error": "conversion failed"})
+        return
+    try:
+        with open(dst, "w", encoding="utf-8") as handle:
+            handle.write(new_text)
+    except OSError:
+        _emit({"ok": False, "error": "could not write the converted file"})
+        return
+    _emit({"ok": True, "path": dst})
 
 
 def main() -> None:

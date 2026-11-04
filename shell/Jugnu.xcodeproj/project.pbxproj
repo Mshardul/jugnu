@@ -15,6 +15,7 @@
 		53E92CA35345AB32F40039EA /* ShellIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0098016C87FA73A4C628AA /* ShellIdentity.swift */; };
 		548EE8613579A3EE86FFEA1F /* BrowseCatalogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E828A6B867A511A83ECEBC3 /* BrowseCatalogViewModel.swift */; };
 		6C2C4BB30FB65D2A8D28781D /* InstallDisclosurePresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5A6C2A7623F2DF17C81C0B /* InstallDisclosurePresenter.swift */; };
+		77C2BE8D65DC83EFF219D6EF /* AppDelegate+Convert.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9413D0CA27DA36E32752543 /* AppDelegate+Convert.swift */; };
 		8F9CF22782218EABE56A4DE4 /* KeepCurrentCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD356C4237C6A159868568E5 /* KeepCurrentCoordinator.swift */; };
 		A1EBD9F94A85D7D3946C0860 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EF23787A5713452BFF2A17F8 /* Assets.xcassets */; };
 		AC65EF4AD2F34CBB13F2E6F9 /* HotKey in Frameworks */ = {isa = PBXBuildFile; productRef = 7EEF6C210640E38020837ACD /* HotKey */; };
@@ -65,6 +66,7 @@
 		C5935023FD7BC462A1C14B9A /* shell */ = {isa = PBXFileReference; lastKnownFileType = folder; name = shell; path = .; sourceTree = SOURCE_ROOT; };
 		C92B9A72BEBE9AA2C83556D4 /* Jugnu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Jugnu.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D3D00E1FEF0969F288E08FF6 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		D9413D0CA27DA36E32752543 /* AppDelegate+Convert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Convert.swift"; sourceTree = "<group>"; };
 		DA5A6C2A7623F2DF17C81C0B /* InstallDisclosurePresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstallDisclosurePresenter.swift; sourceTree = "<group>"; };
 		EF23787A5713452BFF2A17F8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		EF6D006D6FF269845E0A291B /* TCCGrantStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCCGrantStatus.swift; sourceTree = "<group>"; };
@@ -119,6 +121,7 @@
 				A7827A8A356F9392C623B554 /* AddonUninstallPresenter.swift */,
 				2A5C181DBCC96846C2F3C2B9 /* AppDelegate+AppShell.swift */,
 				C54EFD50AF390947D5BB2593 /* AppDelegate+Commands.swift */,
+				D9413D0CA27DA36E32752543 /* AppDelegate+Convert.swift */,
 				618555F88ACF791DF48B6696 /* AppDelegate+Navigation.swift */,
 				D3D00E1FEF0969F288E08FF6 /* AppModel.swift */,
 				EF23787A5713452BFF2A17F8 /* Assets.xcassets */,
@@ -259,6 +262,7 @@
 				D075254A62556C0A795B0DAB /* AddonUninstallPresenter.swift in Sources */,
 				19D1C73DC3FAF52F7132997C /* AppDelegate+AppShell.swift in Sources */,
 				FA96539C714240EFF02151ED /* AppDelegate+Commands.swift in Sources */,
+				77C2BE8D65DC83EFF219D6EF /* AppDelegate+Convert.swift in Sources */,
 				E6406652E415093E43EE79ED /* AppDelegate+Navigation.swift in Sources */,
 				AD78C530AE4729B3D27FE654 /* AppModel.swift in Sources */,
 				548EE8613579A3EE86FFEA1F /* BrowseCatalogViewModel.swift in Sources */,

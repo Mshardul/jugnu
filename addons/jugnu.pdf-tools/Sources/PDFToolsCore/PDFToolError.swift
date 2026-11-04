@@ -18,4 +18,5 @@ enum PDFToolError: Error, Equatable {
     case notSmaller
     case badBookmark
     case emptyTitle
+    case noText
 }

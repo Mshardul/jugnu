@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+root="$(cd "$(dirname "$0")/.." && pwd)"
+py="${JUGNU_HELPER_PYTHON_RUNTIME:?python-runtime helper missing}/bin/python3"
+exec "$py" -I "$root/app" "$@"

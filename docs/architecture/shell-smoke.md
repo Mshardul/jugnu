@@ -175,3 +175,19 @@ Walk on a Mac after the namespaced `jugnu.*` zips are on `addons-v1.0.0` and `re
 - [ ] With Accessibility **already on**: snap runs with no explainer.
 - [ ] Invoke `jugnu.floating-note` / clip-tools: no pre-TCC explainer (non-TCC / none).
 
+
+## Manual — Convert (0079)
+
+- [ ] Palette → **Convert text** opens in the app frame (not a panel); Esc returns to the section you left.
+- [ ] Copy JSON in another app, open **Convert text**: input is pre-filled, detected format shows `Auto (JSON)`, output appears within a blink.
+- [ ] Type invalid JSON after valid: inline red message, last output stays but dimmed; fix it, output undims.
+- [ ] Output pane is read-only; the lock icon toggles editing; edit the output, then change the input: footer asks **Replace** / **Keep my edits**.
+- [ ] **Copy** puts the output on the clipboard; **Download** writes `converted.<ext>` to Downloads, reveals it, and a second Download makes `converted 2.<ext>`.
+- [ ] Paste a very large JSON (over ~200 KB): live conversion stops, footer offers **Convert**, pressing it converts.
+- [ ] Palette → **Convert file**: drop a `.json`; output dropdown lists csv, yaml, and the other offered formats only; **Convert** writes the file beside the original; a second run makes `name 2.ext`; Reveal and Copy path work.
+- [ ] Copy a `.heic` in Finder, open **Convert file**: it is pre-filled; HEIC → JPEG writes beside the original.
+- [ ] Copy an image (screenshot to clipboard), open **Convert file**: shows a PNG; converting writes to Downloads and leaves no `jugnu-convert-clipboard` temp folder behind.
+- [ ] Drop a `.json` and a `.csv` together: plain-language mixed-format message, Convert disabled.
+- [ ] Drop a `.docx`: plain text / RTF / HTML offered; converting works; a corrupt `.docx` shows a per-file error and leaves no empty output.
+- [ ] Disable `jugnu.images`: HEIC no longer offers any output; re-enable restores it.
+- [ ] Install only `jugnu.convert` (no converter addons): both blocks open and say nothing converts.

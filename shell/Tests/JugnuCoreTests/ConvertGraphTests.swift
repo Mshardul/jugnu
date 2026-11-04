@@ -107,10 +107,72 @@ final class ConvertGraphTests: XCTestCase {
             .deletingLastPathComponent().deletingLastPathComponent()
         let clip = try ManifestLoader.load(from: repoRoot.appendingPathComponent("addons/jugnu.clip-tools"))
         let graph = ConvertGraph(manifests: [clip])
-        XCTAssertEqual(graph.targets(from: "json", mode: .text).map(\.id), ["csv", "yaml"])
-        XCTAssertEqual(graph.targets(from: "csv", mode: .text).map(\.id), ["json"])
-        XCTAssertEqual(graph.targets(from: "xml", mode: .text).map(\.id), ["json"])
-        XCTAssertEqual(graph.targets(from: "yaml", mode: .text).map(\.id), ["json"])
-        XCTAssertEqual(graph.targets(from: "json", mode: .file), [])
+        func targets(_ from: String, _ mode: ConvertMode) -> Set<String> {
+            Set(graph.targets(from: from, mode: mode).map(\.id))
+        }
+        XCTAssertTrue(targets("json", .text).isSuperset(of: ["csv", "yaml", "tsv", "xml", "markdown-table"]))
+        XCTAssertTrue(targets("csv", .text).isSuperset(of: ["json", "tsv", "markdown-table"]))
+        XCTAssertTrue(targets("xml", .text).contains("json"))
+        XCTAssertTrue(targets("yaml", .text).contains("json"))
+        XCTAssertEqual(targets("json", .text), targets("json", .file))
+        XCTAssertEqual(graph.targets(from: "heic", mode: .file), [])
+    }
+}
+
+final class ShippedConverterCatalogTests: XCTestCase {
+    private func shippedManifests() throws -> [AddonManifest] {
+        let repoRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let addons = repoRoot.appendingPathComponent("addons")
+        let names = try FileManager.default.contentsOfDirectory(atPath: addons.path).sorted()
+        return try names.filter { $0.hasPrefix("jugnu.") }.map {
+            try ManifestLoader.load(from: addons.appendingPathComponent($0))
+        }
+    }
+
+    func testEveryShippedManifestLoadsAndFeedsOneGraph() throws {
+        let manifests = try shippedManifests()
+        let graph = ConvertGraph(manifests: manifests.filter { !$0.entrypoint.isShell })
+        // every declared edge resolves to formats the graph knows (core or addon-declared)
+        for route in graph.routes {
+            XCTAssertNotNil(graph.format(id: route.from), "\(route.addonID):\(route.command) from \(route.from)")
+            XCTAssertNotNil(graph.format(id: route.to), "\(route.addonID):\(route.command) to \(route.to)")
+        }
+    }
+
+    func testTheImportantConversionsAreOffered() throws {
+        let graph = try ConvertGraph(manifests: shippedManifests().filter { !$0.entrypoint.isShell })
+        func has(_ from: String, _ to: String, _ mode: ConvertMode) -> Bool {
+            graph.route(from: from, to: to, mode: mode) != nil
+        }
+        // data
+        for pair in [("json", "csv"), ("csv", "json"), ("json", "yaml"), ("yaml", "json"), ("xml", "json"),
+                     ("json", "xml"), ("json", "tsv"), ("csv", "tsv"), ("csv", "markdown-table"),
+                     ("markdown-table", "json"), ("markdown", "html"), ("html", "markdown"), ("html", "plain")]
+        {
+            XCTAssertTrue(has(pair.0, pair.1, .text), "text \(pair)")
+            XCTAssertTrue(has(pair.0, pair.1, .file), "file \(pair)")
+        }
+        // images, audio, documents, pdf: file only
+        for pair in [("heic", "jpeg"), ("png", "jpeg"), ("jpeg", "png"), ("tiff", "png"), ("png", "heic"),
+                     ("wav", "m4a"), ("m4a", "wav"), ("aiff", "wav"), ("mp3", "wav"), ("wav", "caf"),
+                     ("docx", "plain"), ("rtf", "docx"), ("html", "docx"), ("odt", "docx"), ("plain", "rtf"),
+                     ("jpeg", "pdf"), ("png", "pdf"), ("pdf", "plain")]
+        {
+            XCTAssertTrue(has(pair.0, pair.1, .file), "file \(pair)")
+            XCTAssertFalse(has(pair.0, pair.1, .text) && !["html", "plain"].contains(pair.1), "no text \(pair)")
+        }
+        XCTAssertEqual(graph.format(id: "docx")?.label, "Word (DOCX)")
+    }
+
+    func testDroppedFilesOfEachFamilyGetOutputChoices() throws {
+        let graph = try ConvertGraph(manifests: shippedManifests().filter { !$0.entrypoint.isShell })
+        XCTAssertEqual(
+            Set(graph.targets(from: "heic", mode: .file).map(\.id)), ["jpeg", "png"]
+        )
+        XCTAssertTrue(graph.targets(from: "docx", mode: .file).map(\.id).contains("plain"))
+        XCTAssertTrue(graph.targets(from: "wav", mode: .file).map(\.id).contains("m4a"))
+        XCTAssertEqual(graph.targets(from: "pdf", mode: .file).map(\.id), ["plain"])
     }
 }

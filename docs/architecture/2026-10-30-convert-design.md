@@ -1,7 +1,7 @@
 # Jugnu — Convert (file + text)
 
 **Date:** 2026-10-30  
-**Status:** Draft — product locked 2026-10-30. Frame-independent Core + clip-tools slice implemented; UI blocks and the `jugnu.convert` addon wait on the app frame  
+**Status:** Implemented 2026-11-04, not yet accepted. Both blocks, `jugnu.convert` and the converter addons are built and unit-tested. Open: Finder-selection prefill, the §6 speed gate (measured failing, see ticket 0079), the manual walk in [shell-smoke](./shell-smoke.md), and the release cut  
 **Ticket:** [0079](../tickets.md)  
 **Depends on:** [App shell plan](./2026-10-12-app-shell-design.md) (§2 frame, §11.1 single view; delivery phase 3), [Addon UI + speed](./2026-08-22-addon-ui-speed-design.md), [Addon manifest](../addon-manifest.md), [Process lifecycle](./2026-08-30-addon-process-lifecycle-design.md) (`oneshot`)  
 **Supersedes:** the *Text Transform* panel sketched in [clip-tools design §5](./2026-09-04-clip-tools-design.md) and the *File conversion* panel planned under `pdf-tools` in [catalog-ui](../catalog-ui.md). Both fold into this design.  
@@ -121,9 +121,14 @@ The shell chooses `out` (collision-free) so the addon never decides where files 
 
 | Addon | Converters declared |
 |---|---|
-| `clip-tools` | json↔csv, json↔yaml, xml→json, csv↔markdown-table, and the other same-shape text converters already shipped (add `converters:` plus the `convert` op; no new logic). |
-| `images` / `pdf-tools` / `media-convert` | Declare edges as each ships (heic→jpeg, jpeg↔pdf, pdf→png, audio presets). Not a blocker for v1. |
+| `clip-tools` | Text and file: json↔csv, json↔tsv, csv↔tsv, json↔yaml, xml→json, json→xml, csv/json→markdown-table, markdown-table→csv/json, markdown→html, html→markdown, html→plain. Same handlers as the palette commands (`CONVERT_EDGES` + `op: convert`). |
+| `images` | File: heic→jpeg/png, jpeg↔png, tiff→jpeg/png, gif→jpeg/png, png/jpeg→tiff, png/jpeg→heic. macOS `sips`, argv list, no shell. Palette commands convert the images copied in Finder. |
+| `media-convert` | File: wav↔aiff, wav↔caf, wav/aiff→m4a, m4a→wav/aiff, mp3→wav/m4a (MP3 is read-only: macOS has no encoder). macOS `afconvert`. |
+| `doc-convert` | File, 15 edges across docx, rtf, odt, html, plain. Declares the `docx`, `rtf`, `odt` formats. macOS `textutil` with `-noload`, so documents never fetch remote resources. |
+| `pdf-tools` | File: jpeg→pdf, png→pdf, pdf→plain (text). `op: convert` added to the compiled helper. pdf→image stays palette-only: it writes one file per page, which a single `out` path cannot express. |
 | `convert` | New. Two commands, `kind: shell` entrypoint. |
+
+Not offered, deliberately: webp (macOS tools cannot write it), video (needs a bundled encoder), and any chained route. Each would be one new edge on the addon that owns the engine.
 
 ## 9. Catalog and doc changes this implies
 

@@ -33,6 +33,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var keepCurrent: KeepCurrentCoordinator?
     var pendingFinderURLs: [URL] = []
     let appShellChrome = AppShellChromeModel()
+    var convertTextModel: ConvertTextBlockModel?
+    var convertFileModel: ConvertFileBlockModel?
 
     func applicationDidFinishLaunching(_: Notification) {
         if !ScreenshotMode.isActive, yieldToRunningInstance() {

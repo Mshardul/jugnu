@@ -1,6 +1,5 @@
 import Foundation
 
-/// One enabled addon's way to get from a format to another.
 public struct ConvertRoute: Equatable, Sendable {
     public var addonID: String
     public var command: String
@@ -9,14 +8,10 @@ public struct ConvertRoute: Equatable, Sendable {
     public var modes: [ConvertMode]
 }
 
-/// The conversion graph the Convert blocks read. Built from enabled addon manifests; rebuild when addons are
-/// enabled, disabled, installed or removed. One edge is one hop: there is no chaining.
 public struct ConvertGraph: Sendable {
     public let routes: [ConvertRoute]
     private let formatsByID: [String: FormatDecl]
 
-    /// `manifests` are in the user's addon order. That order breaks ties when two addons declare the same edge or
-    /// the same extra format; the earlier addon wins.
     public init(manifests: [AddonManifest]) {
         var formats: [String: FormatDecl] = [:]
         for format in FormatCatalog.core {
@@ -49,7 +44,6 @@ public struct ConvertGraph: Sendable {
         formatsByID[id]
     }
 
-    /// Output formats reachable from `source` in one hop for `mode`, ordered by label.
     public func targets(from source: String, mode: ConvertMode) -> [FormatDecl] {
         var seen = Set<String>()
         return routes
@@ -58,17 +52,14 @@ public struct ConvertGraph: Sendable {
             .sorted { $0.label.localizedCaseInsensitiveCompare($1.label) == .orderedAscending }
     }
 
-    /// Every addon that can do `source → target` for `mode`, in addon order.
     public func routes(from source: String, to target: String, mode: ConvertMode) -> [ConvertRoute] {
         routes.filter { $0.from == source && $0.to == target && $0.modes.contains(mode) }
     }
 
-    /// The route used when the user has not been asked to choose between providers.
     public func route(from source: String, to target: String, mode: ConvertMode) -> ConvertRoute? {
         routes(from: source, to: target, mode: mode).first
     }
 
-    /// Formats that can be converted from at all, for `mode` (the input override dropdown).
     public func sources(mode: ConvertMode) -> [FormatDecl] {
         var seen = Set<String>()
         return routes

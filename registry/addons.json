@@ -54,7 +54,7 @@
   {
     "id": "jugnu.clip-tools",
     "name": "Clip Tools",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "api": 1,
     "url": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
     "sha256": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
@@ -67,7 +67,7 @@
       "quick-glance",
       "dev-tool"
     ],
-    "description": "Fifty palette commands for clipboard text: pretty-print and convert JSON/CSV/YAML/XML, encode/decode, case and line tools, hashes, slugs, paste-as-plain, and more. Uses the shared python-runtime helper so nothing requires a system Python install. Phase 1 is commands only; a Transform panel comes later. Absorbs the former Paste Plain addon.",
+    "description": "Fifty palette commands for clipboard text: pretty-print and convert JSON/CSV/YAML/XML, encode/decode, case and line tools, hashes, slugs, paste-as-plain, and more. Uses the shared python-runtime helper so nothing requires a system Python install. Its data conversions (JSON, CSV, TSV, XML, YAML, Markdown tables, Markdown and HTML) also feed the Convert addon, as text and as files. Absorbs the former Paste Plain addon.",
     "commands": [
       {
         "id": "text-stats",
@@ -318,6 +318,66 @@
         "id": "paste-plain",
         "title": "Paste as plain text",
         "subtitle": "Strip rich text from the clipboard"
+      },
+      {
+        "id": "json-tsv",
+        "title": "JSON to TSV",
+        "subtitle": "Clipboard JSON array to TSV"
+      },
+      {
+        "id": "tsv-json",
+        "title": "TSV to JSON",
+        "subtitle": "Clipboard TSV to JSON"
+      },
+      {
+        "id": "csv-tsv",
+        "title": "CSV to TSV",
+        "subtitle": "Clipboard CSV to TSV"
+      },
+      {
+        "id": "tsv-csv",
+        "title": "TSV to CSV",
+        "subtitle": "Clipboard TSV to CSV"
+      },
+      {
+        "id": "json-xml",
+        "title": "JSON to XML",
+        "subtitle": "Clipboard JSON to XML"
+      },
+      {
+        "id": "csv-markdown-table",
+        "title": "CSV to Markdown table",
+        "subtitle": "Clipboard CSV to a Markdown table"
+      },
+      {
+        "id": "json-markdown-table",
+        "title": "JSON to Markdown table",
+        "subtitle": "Clipboard JSON array to a Markdown table"
+      },
+      {
+        "id": "markdown-table-csv",
+        "title": "Markdown table to CSV",
+        "subtitle": "Clipboard Markdown table to CSV"
+      },
+      {
+        "id": "markdown-table-json",
+        "title": "Markdown table to JSON",
+        "subtitle": "Clipboard Markdown table to JSON"
+      },
+      {
+        "id": "markdown-html",
+        "title": "Markdown to HTML",
+        "subtitle": "Clipboard Markdown to HTML"
+      },
+      {
+        "id": "html-markdown",
+        "title": "HTML to Markdown",
+        "subtitle": "Clipboard HTML to Markdown"
+      },
+      {
+        "id": "html-plain",
+        "title": "HTML to plain text",
+        "subtitle": "Clipboard HTML to plain text"
       }
     ],
     "trust": "first-party"
@@ -560,7 +620,7 @@
   {
     "id": "jugnu.pdf-tools",
     "name": "PDF Tools",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "api": 1,
     "url": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
     "sha256": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
@@ -571,7 +631,7 @@
     "tags": [
       "popup-ui"
     ],
-    "description": "Saves a new file beside the original. Remove a password, merge, split, extract or reorder pages, rotate, number pages, edit bookmarks, read info or embedded text, compress, flatten forms, grayscale, or convert JPEG and PDF pages. A locked PDF has to be unlocked first. The Finder right-click item stays off until you add it at install or turn it on in Settings.",
+    "description": "Saves a new file beside the original. Remove a password, merge, split, extract or reorder pages, rotate, number pages, edit bookmarks, read info or embedded text, compress, flatten forms, grayscale, or convert JPEG and PDF pages. A locked PDF has to be unlocked first. The Finder right-click item stays off until you add it at install or turn it on in Settings. JPEG and PNG to PDF, and PDF to text, also show up in the Convert addon.",
     "commands": [
       {
         "id": "pdf-unlock",
@@ -637,6 +697,11 @@
         "id": "jpg-pdf",
         "title": "JPG to PDF",
         "subtitle": "Save a PDF made from JPEG images"
+      },
+      {
+        "id": "png-pdf",
+        "title": "PNG to PDF",
+        "subtitle": "Save a PDF made from PNG images"
       },
       {
         "id": "pdf-jpg",
@@ -779,6 +844,273 @@
         "id": "temporary-folder",
         "title": "Temporary folder",
         "subtitle": "Drop files into ~/Temporary"
+      }
+    ],
+    "trust": "first-party"
+  },
+  {
+    "id": "jugnu.convert",
+    "name": "Convert",
+    "version": "1.0.0",
+    "api": 1,
+    "url": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
+    "sha256": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
+    "summary": "Convert a file",
+    "permissions": [],
+    "category": "Converters",
+    "tags": [
+      "popup-ui"
+    ],
+    "description": "Convert files and text between formats in one view. Pick or drop a file and get a new one beside it, or paste text and see the result side by side. Conversions come from your other installed addons (Clip Tools covers JSON, CSV, XML and YAML), so Convert adds options as you install more.",
+    "commands": [
+      {
+        "id": "convert-file",
+        "title": "Convert a file",
+        "subtitle": "Save a data file in another format, beside the original"
+      },
+      {
+        "id": "convert-text",
+        "title": "Convert text",
+        "subtitle": "Convert text side by side, JSON to CSV and more"
+      }
+    ],
+    "trust": "first-party"
+  },
+  {
+    "id": "jugnu.images",
+    "name": "Images",
+    "version": "1.0.0",
+    "api": 1,
+    "url": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
+    "sha256": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
+    "summary": "HEIC to JPEG",
+    "permissions": [],
+    "category": "Converters",
+    "tags": [
+      "popup-ui"
+    ],
+    "description": "Convert HEIC, JPEG, PNG, TIFF and GIF images with the built-in macOS tools. Pick a file in Convert, or copy images in Finder and run a command from the palette. Each result is saved beside the original and never overwrites it.",
+    "commands": [
+      {
+        "id": "heic-jpeg",
+        "title": "HEIC to JPEG",
+        "subtitle": "Save the copied HEIC file as JPEG, beside the original"
+      },
+      {
+        "id": "heic-png",
+        "title": "HEIC to PNG",
+        "subtitle": "Save the copied HEIC file as PNG, beside the original"
+      },
+      {
+        "id": "jpeg-png",
+        "title": "JPEG to PNG",
+        "subtitle": "Save the copied JPEG file as PNG, beside the original"
+      },
+      {
+        "id": "png-jpeg",
+        "title": "PNG to JPEG",
+        "subtitle": "Save the copied PNG file as JPEG, beside the original"
+      },
+      {
+        "id": "tiff-jpeg",
+        "title": "TIFF to JPEG",
+        "subtitle": "Save the copied TIFF file as JPEG, beside the original"
+      },
+      {
+        "id": "tiff-png",
+        "title": "TIFF to PNG",
+        "subtitle": "Save the copied TIFF file as PNG, beside the original"
+      },
+      {
+        "id": "gif-png",
+        "title": "GIF to PNG",
+        "subtitle": "Save the copied GIF file as PNG, beside the original"
+      },
+      {
+        "id": "gif-jpeg",
+        "title": "GIF to JPEG",
+        "subtitle": "Save the copied GIF file as JPEG, beside the original"
+      },
+      {
+        "id": "png-tiff",
+        "title": "PNG to TIFF",
+        "subtitle": "Save the copied PNG file as TIFF, beside the original"
+      },
+      {
+        "id": "jpeg-tiff",
+        "title": "JPEG to TIFF",
+        "subtitle": "Save the copied JPEG file as TIFF, beside the original"
+      },
+      {
+        "id": "png-heic",
+        "title": "PNG to HEIC",
+        "subtitle": "Save the copied PNG file as HEIC, beside the original"
+      },
+      {
+        "id": "jpeg-heic",
+        "title": "JPEG to HEIC",
+        "subtitle": "Save the copied JPEG file as HEIC, beside the original"
+      }
+    ],
+    "trust": "first-party"
+  },
+  {
+    "id": "jugnu.media-convert",
+    "name": "Audio Convert",
+    "version": "1.0.0",
+    "api": 1,
+    "url": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
+    "sha256": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
+    "summary": "WAV to AIFF",
+    "permissions": [],
+    "category": "Converters",
+    "tags": [
+      "popup-ui"
+    ],
+    "description": "Convert audio between WAV, AIFF, M4A (AAC) and CAF, and read MP3, with the built-in macOS afconvert. Pick a file in Convert, or copy audio files in Finder and run a command from the palette. Results are saved beside the original.",
+    "commands": [
+      {
+        "id": "wav-aiff",
+        "title": "WAV to AIFF",
+        "subtitle": "Save the copied WAV file as AIFF, beside the original"
+      },
+      {
+        "id": "aiff-wav",
+        "title": "AIFF to WAV",
+        "subtitle": "Save the copied AIFF file as WAV, beside the original"
+      },
+      {
+        "id": "wav-m4a",
+        "title": "WAV to M4A",
+        "subtitle": "Save the copied WAV file as M4A, beside the original"
+      },
+      {
+        "id": "aiff-m4a",
+        "title": "AIFF to M4A",
+        "subtitle": "Save the copied AIFF file as M4A, beside the original"
+      },
+      {
+        "id": "m4a-wav",
+        "title": "M4A to WAV",
+        "subtitle": "Save the copied M4A file as WAV, beside the original"
+      },
+      {
+        "id": "m4a-aiff",
+        "title": "M4A to AIFF",
+        "subtitle": "Save the copied M4A file as AIFF, beside the original"
+      },
+      {
+        "id": "mp3-wav",
+        "title": "MP3 to WAV",
+        "subtitle": "Save the copied MP3 file as WAV, beside the original"
+      },
+      {
+        "id": "mp3-m4a",
+        "title": "MP3 to M4A",
+        "subtitle": "Save the copied MP3 file as M4A, beside the original"
+      },
+      {
+        "id": "wav-caf",
+        "title": "WAV to CAF",
+        "subtitle": "Save the copied WAV file as CAF, beside the original"
+      },
+      {
+        "id": "caf-wav",
+        "title": "CAF to WAV",
+        "subtitle": "Save the copied CAF file as WAV, beside the original"
+      }
+    ],
+    "trust": "first-party"
+  },
+  {
+    "id": "jugnu.doc-convert",
+    "name": "Document Convert",
+    "version": "1.0.0",
+    "api": 1,
+    "url": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
+    "sha256": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
+    "summary": "DOCX to TXT",
+    "permissions": [],
+    "category": "Converters",
+    "tags": [
+      "popup-ui"
+    ],
+    "description": "Convert documents between Word (DOCX), RTF, OpenDocument (ODT), HTML and plain text with the built-in macOS textutil. Pick a file in Convert, or copy documents in Finder and run a command from the palette. Remote images in a document are never fetched.",
+    "commands": [
+      {
+        "id": "docx-plain",
+        "title": "DOCX to TXT",
+        "subtitle": "Save the copied Word (DOCX) file as plain text, beside the original"
+      },
+      {
+        "id": "docx-html",
+        "title": "DOCX to HTML",
+        "subtitle": "Save the copied Word (DOCX) file as HTML, beside the original"
+      },
+      {
+        "id": "docx-rtf",
+        "title": "DOCX to RTF",
+        "subtitle": "Save the copied Word (DOCX) file as RTF, beside the original"
+      },
+      {
+        "id": "docx-odt",
+        "title": "DOCX to ODT",
+        "subtitle": "Save the copied Word (DOCX) file as OpenDocument (ODT), beside the original"
+      },
+      {
+        "id": "rtf-docx",
+        "title": "RTF to DOCX",
+        "subtitle": "Save the copied RTF file as Word (DOCX), beside the original"
+      },
+      {
+        "id": "rtf-plain",
+        "title": "RTF to TXT",
+        "subtitle": "Save the copied RTF file as plain text, beside the original"
+      },
+      {
+        "id": "rtf-html",
+        "title": "RTF to HTML",
+        "subtitle": "Save the copied RTF file as HTML, beside the original"
+      },
+      {
+        "id": "odt-docx",
+        "title": "ODT to DOCX",
+        "subtitle": "Save the copied OpenDocument (ODT) file as Word (DOCX), beside the original"
+      },
+      {
+        "id": "odt-plain",
+        "title": "ODT to TXT",
+        "subtitle": "Save the copied OpenDocument (ODT) file as plain text, beside the original"
+      },
+      {
+        "id": "html-docx",
+        "title": "HTML to DOCX",
+        "subtitle": "Save the copied HTML file as Word (DOCX), beside the original"
+      },
+      {
+        "id": "html-rtf",
+        "title": "HTML to RTF",
+        "subtitle": "Save the copied HTML file as RTF, beside the original"
+      },
+      {
+        "id": "html-plain",
+        "title": "HTML to TXT",
+        "subtitle": "Save the copied HTML file as plain text, beside the original"
+      },
+      {
+        "id": "plain-docx",
+        "title": "TXT to DOCX",
+        "subtitle": "Save the copied plain text file as Word (DOCX), beside the original"
+      },
+      {
+        "id": "plain-rtf",
+        "title": "TXT to RTF",
+        "subtitle": "Save the copied plain text file as RTF, beside the original"
+      },
+      {
+        "id": "plain-html",
+        "title": "TXT to HTML",
+        "subtitle": "Save the copied plain text file as HTML, beside the original"
       }
     ],
     "trust": "first-party"

@@ -159,6 +159,8 @@ extension AppDelegate {
                 tab: addonDetailTab(detail.section),
                 onClose: { [weak self] in self?.handleAppShellControl(.escape) }
             )
+        } else if navigation.page == .focusedAddon, let block = navigation.block {
+            hostedBlockPage(model: model, block: block)
         } else if navigation.page == .catalog {
             catalogPage(model: model, navigation: navigation)
         }

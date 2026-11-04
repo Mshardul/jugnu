@@ -1,0 +1,111 @@
+id: jugnu.images
+name: Images
+version: 1.0.0
+api: 1
+helpers:
+  - id: python-runtime
+    version: 1.0.0
+commands:
+  - id: heic-jpeg
+    title: HEIC to JPEG
+    subtitle: Save the copied HEIC file as JPEG, beside the original
+    keywords: [heic, jpeg, image, convert]
+  - id: heic-png
+    title: HEIC to PNG
+    subtitle: Save the copied HEIC file as PNG, beside the original
+    keywords: [heic, png, image, convert]
+  - id: jpeg-png
+    title: JPEG to PNG
+    subtitle: Save the copied JPEG file as PNG, beside the original
+    keywords: [jpeg, png, image, convert]
+  - id: png-jpeg
+    title: PNG to JPEG
+    subtitle: Save the copied PNG file as JPEG, beside the original
+    keywords: [png, jpeg, image, convert]
+  - id: tiff-jpeg
+    title: TIFF to JPEG
+    subtitle: Save the copied TIFF file as JPEG, beside the original
+    keywords: [tiff, jpeg, image, convert]
+  - id: tiff-png
+    title: TIFF to PNG
+    subtitle: Save the copied TIFF file as PNG, beside the original
+    keywords: [tiff, png, image, convert]
+  - id: gif-png
+    title: GIF to PNG
+    subtitle: Save the copied GIF file as PNG, beside the original
+    keywords: [gif, png, image, convert]
+  - id: gif-jpeg
+    title: GIF to JPEG
+    subtitle: Save the copied GIF file as JPEG, beside the original
+    keywords: [gif, jpeg, image, convert]
+  - id: png-tiff
+    title: PNG to TIFF
+    subtitle: Save the copied PNG file as TIFF, beside the original
+    keywords: [png, tiff, image, convert]
+  - id: jpeg-tiff
+    title: JPEG to TIFF
+    subtitle: Save the copied JPEG file as TIFF, beside the original
+    keywords: [jpeg, tiff, image, convert]
+  - id: png-heic
+    title: PNG to HEIC
+    subtitle: Save the copied PNG file as HEIC, beside the original
+    keywords: [png, heic, image, convert]
+  - id: jpeg-heic
+    title: JPEG to HEIC
+    subtitle: Save the copied JPEG file as HEIC, beside the original
+    keywords: [jpeg, heic, image, convert]
+converters:
+  - command: heic-jpeg
+    from: heic
+    to: jpeg
+    modes: [file]
+  - command: heic-png
+    from: heic
+    to: png
+    modes: [file]
+  - command: jpeg-png
+    from: jpeg
+    to: png
+    modes: [file]
+  - command: png-jpeg
+    from: png
+    to: jpeg
+    modes: [file]
+  - command: tiff-jpeg
+    from: tiff
+    to: jpeg
+    modes: [file]
+  - command: tiff-png
+    from: tiff
+    to: png
+    modes: [file]
+  - command: gif-png
+    from: gif
+    to: png
+    modes: [file]
+  - command: gif-jpeg
+    from: gif
+    to: jpeg
+    modes: [file]
+  - command: png-tiff
+    from: png
+    to: tiff
+    modes: [file]
+  - command: jpeg-tiff
+    from: jpeg
+    to: tiff
+    modes: [file]
+  - command: png-heic
+    from: png
+    to: heic
+    modes: [file]
+  - command: jpeg-heic
+    from: jpeg
+    to: heic
+    modes: [file]
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths: []
+  launchd: []

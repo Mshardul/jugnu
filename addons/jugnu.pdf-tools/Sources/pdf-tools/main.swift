@@ -25,6 +25,12 @@ enum Arg: Decodable {
 struct RunRequestJSON: Decodable {
     var command: String
     var args: [String: Arg]?
+    // `op: convert` (Convert addon) fields.
+    var op: String?
+    var from: String?
+    var to: String?
+    var path: String?
+    var out: String?
 }
 
 enum PDFToolsMain {
@@ -32,9 +38,19 @@ enum PDFToolsMain {
         let data = FileHandle.standardInput.readDataToEndOfFile()
         let request: RunRequestJSON
         if data.isEmpty {
-            request = RunRequestJSON(command: "pdf-unlock", args: nil)
+            request = RunRequestJSON(command: "pdf-unlock", args: nil, op: nil, from: nil, to: nil, path: nil, out: nil)
         } else {
             request = try JSONDecoder().decode(RunRequestJSON.self, from: data)
+        }
+        if request.op == "convert" {
+            reply(PDFConvert.run(
+                command: request.command,
+                from: request.from,
+                to: request.to,
+                path: request.path,
+                out: request.out
+            ))
+            return
         }
         let args = request.args ?? [:]
         if request.command != "pdf-unlock" {
@@ -76,7 +92,7 @@ enum PDFToolsMain {
     private static let fileCommands: Set<String> = [
         "bookmarks", "compress", "extract-pages", "extract-text", "flatten-forms", "grayscale",
         "info", "jpg-pdf", "merge", "organize", "page-count", "page-numbers", "pdf-jpg", "pdf-png",
-        "rotate", "split",
+        "png-pdf", "rotate", "split",
     ]
 
     private static func runFileCommand(_ command: String, args: [String: Arg]) {
@@ -101,7 +117,11 @@ enum PDFToolsMain {
         if files.isEmpty, !PDFToolsSession.isFollowUp(command: command, fields: fields, itemId: itemId) {
             files = pick(command: command)
             if files.isEmpty {
-                let message = command == "jpg-pdf" ? "No JPEG selected." : "No PDF selected."
+                let message = switch command {
+                case "jpg-pdf": "No JPEG selected."
+                case "png-pdf": "No PNG selected."
+                default: "No PDF selected."
+                }
                 reply("{\"message\":\"\(message)\",\"ok\":true}")
                 return
             }
@@ -150,11 +170,12 @@ enum PDFToolsMain {
         let panel = NSOpenPanel()
         panel.canChooseDirectories = false
         panel.canChooseFiles = true
-        if command == "jpg-pdf" {
-            panel.allowedContentTypes = [.jpeg]
+        if command == "jpg-pdf" || command == "png-pdf" {
+            let isJPEG = command == "jpg-pdf"
+            panel.allowedContentTypes = [isJPEG ? .jpeg : .png]
             panel.allowsMultipleSelection = true
             panel.prompt = "Create PDF"
-            panel.message = "Choose JPEG images, in the order you want the pages."
+            panel.message = "Choose \(isJPEG ? "JPEG" : "PNG") images, in the order you want the pages."
         } else if command == "merge" {
             panel.allowedContentTypes = [.pdf]
             panel.allowsMultipleSelection = true

@@ -38,8 +38,9 @@ select = ["E", "F", "I", "UP", "B"]
 [tool.codespell]
 skip = ".git,.venv,uv.lock,.mypy_cache,.ruff_cache,.pytest_cache,__pycache__,*/vendor/*"
 # jugnu = brand; rime = WMO weather label; iterm = iTerm app name;
-# inout = Swift keyword; wit/statics/pre-selected = correct words; assertin = test helper name
-ignore-words-list = "jugnu,crate,rime,iterm,assertin,inout,wit,statics,pre-selected,uptodate"
+# inout = Swift keyword; wit/statics/pre-selected = correct words; assertin = test helper name;
+# caf = Core Audio Format (audio file type)
+ignore-words-list = "jugnu,crate,rime,iterm,assertin,inout,wit,statics,pre-selected,uptodate,caf"
 
 [tool.pytest.ini_options]
 testpaths = ["addons"]

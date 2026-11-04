@@ -1,6 +1,6 @@
 id: jugnu.pdf-tools
 name: PDF Tools
-version: 1.0.0
+version: 1.1.0
 api: 1
 primary: pdf-unlock
 view_types: [fields, rows]
@@ -60,6 +60,10 @@ commands:
     title: JPG to PDF
     subtitle: Save a PDF made from JPEG images
     keywords: [jpg, jpeg, pdf]
+  - id: png-pdf
+    title: PNG to PDF
+    subtitle: Save a PDF made from PNG images
+    keywords: [png, pdf]
   - id: pdf-jpg
     title: PDF to JPG
     subtitle: Save each page as a JPEG
@@ -80,6 +84,19 @@ config:
   - key: show_in_finder_menu
     type: bool
     default: false
+converters:
+  - command: jpg-pdf
+    from: jpeg
+    to: pdf
+    modes: [file]
+  - command: png-pdf
+    from: png
+    to: pdf
+    modes: [file]
+  - command: extract-text
+    from: pdf
+    to: plain
+    modes: [file]
 entrypoint:
   kind: exec
   path: bin/run

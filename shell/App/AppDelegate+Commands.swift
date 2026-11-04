@@ -106,6 +106,12 @@ extension AppDelegate {
 
     func runCommand(_ cmd: IndexedCommand, args: [String: JSONValue] = [:]) {
         guard let model, let shellHost else { return }
+        if let block = HostedBlock.resolve(addonID: cmd.addonId, commandID: cmd.commandId) {
+            model.state.recordRecent(qualifiedId: cmd.qualifiedId)
+            try? model.stateStore.save(model.state)
+            openHostedBlock(block)
+            return
+        }
         guard let screen = shellHost.currentScreen ?? NSScreen.main else { return }
         shellHost.onCancelFollowUp = { [weak self] in self?.popOrDismiss() }
         let key = CommandKey(addonID: cmd.addonId, commandID: cmd.commandId)

@@ -158,6 +158,13 @@ public struct RunRequest: Codable, Sendable, Equatable {
     public var args: [String: JSONValue]
     public var context: [String: JSONValue]?
     public var config: [String: JSONValue]
+    /// `op: convert` only: source and target format ids and the text to convert.
+    public var from: String?
+    public var to: String?
+    public var text: String?
+    /// `op: convert` file mode: input path and the shell-reserved output path.
+    public var path: String?
+    public var out: String?
 
     public init(
         api: Int = 1,
@@ -165,7 +172,12 @@ public struct RunRequest: Codable, Sendable, Equatable {
         command: String,
         args: [String: JSONValue] = [:],
         context: [String: JSONValue]? = nil,
-        config: [String: JSONValue] = [:]
+        config: [String: JSONValue] = [:],
+        from: String? = nil,
+        to: String? = nil,
+        text: String? = nil,
+        path: String? = nil,
+        out: String? = nil
     ) {
         self.api = api
         self.op = op
@@ -173,6 +185,11 @@ public struct RunRequest: Codable, Sendable, Equatable {
         self.args = args
         self.context = context
         self.config = config
+        self.from = from
+        self.to = to
+        self.text = text
+        self.path = path
+        self.out = out
     }
 }
 
@@ -181,9 +198,22 @@ public struct RunResponse: Codable, Sendable, Equatable {
     public var message: String?
     public var error: String?
     public var ui: UIDescriptor?
+    /// `op: convert` result.
+    public var text: String?
+    /// `op: convert` file-mode result: the written output path.
+    public var path: String?
 
-    public init(ok: Bool, message: String? = nil, error: String? = nil, ui: UIDescriptor? = nil) {
+    public init(
+        ok: Bool,
+        message: String? = nil,
+        error: String? = nil,
+        ui: UIDescriptor? = nil,
+        text: String? = nil,
+        path: String? = nil
+    ) {
         self.ok = ok
+        self.text = text
+        self.path = path
         self.message = message
         self.error = error
         self.ui = ui

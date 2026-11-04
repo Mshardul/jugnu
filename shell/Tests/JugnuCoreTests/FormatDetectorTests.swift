@@ -54,8 +54,6 @@ final class FormatDetectorTests: XCTestCase {
         XCTAssertEqual(FormatDetector.detectText("  \n "), "plain")
     }
 
-    // MARK: files
-
     private func tempFile(_ name: String, bytes: [UInt8]) throws -> URL {
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)

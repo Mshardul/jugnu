@@ -88,7 +88,7 @@ public enum PDFToolsSession {
             return extractText(paths)
         case "compress":
             return compress(paths, fields: fields, state: stateDirectory)
-        case "jpg-pdf":
+        case "jpg-pdf", "png-pdf":
             return jpegPDF(paths)
         case "pdf-jpg":
             return export(paths, format: .jpeg, kind: "JPEGs")
@@ -447,12 +447,14 @@ public enum PDFToolsSession {
         return "Saved \(urls.count) \(kind) next to the original."
     }
 
-    private static func message(for error: PDFToolError, file: URL?) -> String {
+    static func message(for error: PDFToolError, file: URL?) -> String {
         let name = file?.lastPathComponent
         switch error {
         case .unreadable:
             if let name { return "Couldn’t open \(name)." }
             return "Couldn’t open that file."
+        case .noText:
+            return "That PDF has no text to extract."
         case .locked:
             if let name { return "\(name) is locked. Remove the password first." }
             return "That PDF is locked. Remove the password first."

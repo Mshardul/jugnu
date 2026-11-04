@@ -103,6 +103,7 @@ public struct AppNavigation: Equatable, Sendable {
     public var catalog: CatalogNavigation
     public var preferencesSection: PreferencesSection
     public var focusedOrigin: AppShellPage?
+    public var block: HostedBlock?
 
     public init(
         page: AppShellPage = .home,
@@ -112,7 +113,8 @@ public struct AppNavigation: Equatable, Sendable {
         editPanel: EditHomePanel = .library,
         catalog: CatalogNavigation = CatalogNavigation(),
         preferencesSection: PreferencesSection = .appearance,
-        focusedOrigin: AppShellPage? = nil
+        focusedOrigin: AppShellPage? = nil,
+        block: HostedBlock? = nil
     ) {
         self.page = page
         self.homeScroll = homeScroll
@@ -122,6 +124,7 @@ public struct AppNavigation: Equatable, Sendable {
         self.catalog = catalog
         self.preferencesSection = preferencesSection
         self.focusedOrigin = focusedOrigin
+        self.block = block
     }
 
     public static func freshHome() -> AppNavigation {
@@ -204,6 +207,7 @@ private func apply(_ effect: AppShellControlEffect, to navigation: AppNavigation
         next.isEditingHome = false
         next.editPanel = .library
         next.focusedOrigin = nil
+        next.block = nil
         return .visible(next)
     case .popDetailOrGoHome:
         guard navigation.catalog.detail != nil else {
@@ -217,6 +221,7 @@ private func apply(_ effect: AppShellControlEffect, to navigation: AppNavigation
         var next = navigation
         let origin = next.focusedOrigin
         next.focusedOrigin = nil
+        next.block = nil
         if let origin, origin != .focusedAddon {
             next.page = origin
         } else {

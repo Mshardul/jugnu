@@ -1,28 +1,37 @@
 import Foundation
 import Yams
 
-/// Cheap, in-process format detection for the Convert blocks. Never spawns an addon.
 public enum FormatDetector {
-    // MARK: text
-
-    /// Most specific format that parses, strict before loose: JSON, XML/HTML, Markdown table, TSV, CSV, YAML, plain.
-    /// Ambiguous text can guess wrong; the input override dropdown exists for that.
     public static func detectText(_ text: String) -> String {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return "plain" }
-        if isJSON(trimmed) { return "json" }
+        if isJSON(trimmed) {
+            return "json"
+        }
         if trimmed.hasPrefix("<") {
             let head = trimmed.prefix(64).lowercased()
-            if head.hasPrefix("<!doctype html") || head.hasPrefix("<html") { return "html" }
-            if isXML(trimmed) { return "xml" }
+            if head.hasPrefix("<!doctype html") || head.hasPrefix("<html") {
+                return "html"
+            }
+            if isXML(trimmed) {
+                return "xml"
+            }
         }
         let lines = trimmed.split(whereSeparator: \.isNewline).map(String.init)
         if lines.count >= 2 {
-            if isMarkdownTable(lines) { return "markdown-table" }
-            if isDelimited(lines, delimiter: "\t") { return "tsv" }
-            if isDelimited(lines, delimiter: ",") { return "csv" }
+            if isMarkdownTable(lines) {
+                return "markdown-table"
+            }
+            if isDelimited(lines, delimiter: "\t") {
+                return "tsv"
+            }
+            if isDelimited(lines, delimiter: ",") {
+                return "csv"
+            }
         }
-        if isYAMLCollection(trimmed) { return "yaml" }
+        if isYAMLCollection(trimmed) {
+            return "yaml"
+        }
         return "plain"
     }
 
@@ -43,7 +52,6 @@ public enum FormatDetector {
         return separator.allSatisfy { "|-: ".contains($0) }
     }
 
-    /// Every line has the same field count (>1), with commas inside double quotes not counted.
     private static func isDelimited(_ lines: [String], delimiter: Character) -> Bool {
         let counts = lines.map { fieldCount($0, delimiter: delimiter) }
         guard let first = counts.first, first > 1 else { return false }
@@ -54,7 +62,11 @@ public enum FormatDetector {
         var inQuotes = false
         var count = 1
         for ch in line {
-            if ch == "\"" { inQuotes.toggle() } else if ch == delimiter, !inQuotes { count += 1 }
+            if ch == "\"" {
+                inQuotes.toggle()
+            } else if ch == delimiter, !inQuotes {
+                count += 1
+            }
         }
         return count
     }
@@ -64,9 +76,6 @@ public enum FormatDetector {
         return loaded is [String: Any] || loaded is [Any]
     }
 
-    // MARK: files
-
-    /// Magic bytes win over the extension when both exist and disagree; the extension decides otherwise.
     public static func detectFile(at url: URL, formats: [FormatDecl]) -> String? {
         let ext = url.pathExtension.lowercased()
         let byExtension = ext.isEmpty ? nil : formats.first { $0.extensions.contains(ext) }?.id
@@ -86,7 +95,6 @@ public enum FormatDetector {
         Array(text.utf8)
     }
 
-    /// First match wins. Order matters only where signatures share a prefix (RIFF, ftyp).
     private static let signatures: [Signature] = [
         Signature(format: "png", bytes: [0x89, 0x50, 0x4E, 0x47]),
         Signature(format: "jpeg", bytes: [0xFF, 0xD8, 0xFF]),
@@ -108,7 +116,6 @@ public enum FormatDetector {
         Signature(format: "mp3", bytes: [0xFF, 0xFB])
     ]
 
-    /// A container prefix that must also be present before an offset signature counts.
     private static let containers: [String: (bytes: [UInt8], offset: Int)] = [
         "webp": (ascii("RIFF"), 0), "wav": (ascii("RIFF"), 0), "aiff": (ascii("FORM"), 0),
         "heic": (ascii("ftyp"), 4), "m4a": (ascii("ftyp"), 4)

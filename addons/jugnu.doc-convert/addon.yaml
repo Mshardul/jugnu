@@ -1,0 +1,148 @@
+id: jugnu.doc-convert
+name: Document Convert
+version: 1.0.0
+api: 1
+helpers:
+  - id: python-runtime
+    version: 1.0.0
+commands:
+  - id: docx-plain
+    title: DOCX to TXT
+    subtitle: Save the copied Word (DOCX) file as plain text, beside the original
+    keywords: [docx, plain, document, convert]
+  - id: docx-html
+    title: DOCX to HTML
+    subtitle: Save the copied Word (DOCX) file as HTML, beside the original
+    keywords: [docx, html, document, convert]
+  - id: docx-rtf
+    title: DOCX to RTF
+    subtitle: Save the copied Word (DOCX) file as RTF, beside the original
+    keywords: [docx, rtf, document, convert]
+  - id: docx-odt
+    title: DOCX to ODT
+    subtitle: Save the copied Word (DOCX) file as OpenDocument (ODT), beside the original
+    keywords: [docx, odt, document, convert]
+  - id: rtf-docx
+    title: RTF to DOCX
+    subtitle: Save the copied RTF file as Word (DOCX), beside the original
+    keywords: [rtf, docx, document, convert]
+  - id: rtf-plain
+    title: RTF to TXT
+    subtitle: Save the copied RTF file as plain text, beside the original
+    keywords: [rtf, plain, document, convert]
+  - id: rtf-html
+    title: RTF to HTML
+    subtitle: Save the copied RTF file as HTML, beside the original
+    keywords: [rtf, html, document, convert]
+  - id: odt-docx
+    title: ODT to DOCX
+    subtitle: Save the copied OpenDocument (ODT) file as Word (DOCX), beside the original
+    keywords: [odt, docx, document, convert]
+  - id: odt-plain
+    title: ODT to TXT
+    subtitle: Save the copied OpenDocument (ODT) file as plain text, beside the original
+    keywords: [odt, plain, document, convert]
+  - id: html-docx
+    title: HTML to DOCX
+    subtitle: Save the copied HTML file as Word (DOCX), beside the original
+    keywords: [html, docx, document, convert]
+  - id: html-rtf
+    title: HTML to RTF
+    subtitle: Save the copied HTML file as RTF, beside the original
+    keywords: [html, rtf, document, convert]
+  - id: html-plain
+    title: HTML to TXT
+    subtitle: Save the copied HTML file as plain text, beside the original
+    keywords: [html, plain, document, convert]
+  - id: plain-docx
+    title: TXT to DOCX
+    subtitle: Save the copied plain text file as Word (DOCX), beside the original
+    keywords: [plain, docx, document, convert]
+  - id: plain-rtf
+    title: TXT to RTF
+    subtitle: Save the copied plain text file as RTF, beside the original
+    keywords: [plain, rtf, document, convert]
+  - id: plain-html
+    title: TXT to HTML
+    subtitle: Save the copied plain text file as HTML, beside the original
+    keywords: [plain, html, document, convert]
+formats:
+  - id: docx
+    label: Word (DOCX)
+    extensions: [docx]
+    mime: application/vnd.openxmlformats-officedocument.wordprocessingml.document
+  - id: rtf
+    label: RTF
+    extensions: [rtf]
+    mime: application/rtf
+  - id: odt
+    label: OpenDocument (ODT)
+    extensions: [odt]
+    mime: application/vnd.oasis.opendocument.text
+converters:
+  - command: docx-plain
+    from: docx
+    to: plain
+    modes: [file]
+  - command: docx-html
+    from: docx
+    to: html
+    modes: [file]
+  - command: docx-rtf
+    from: docx
+    to: rtf
+    modes: [file]
+  - command: docx-odt
+    from: docx
+    to: odt
+    modes: [file]
+  - command: rtf-docx
+    from: rtf
+    to: docx
+    modes: [file]
+  - command: rtf-plain
+    from: rtf
+    to: plain
+    modes: [file]
+  - command: rtf-html
+    from: rtf
+    to: html
+    modes: [file]
+  - command: odt-docx
+    from: odt
+    to: docx
+    modes: [file]
+  - command: odt-plain
+    from: odt
+    to: plain
+    modes: [file]
+  - command: html-docx
+    from: html
+    to: docx
+    modes: [file]
+  - command: html-rtf
+    from: html
+    to: rtf
+    modes: [file]
+  - command: html-plain
+    from: html
+    to: plain
+    modes: [file]
+  - command: plain-docx
+    from: plain
+    to: docx
+    modes: [file]
+  - command: plain-rtf
+    from: plain
+    to: rtf
+    modes: [file]
+  - command: plain-html
+    from: plain
+    to: html
+    modes: [file]
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths: []
+  launchd: []

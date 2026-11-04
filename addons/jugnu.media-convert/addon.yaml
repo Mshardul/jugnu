@@ -1,0 +1,95 @@
+id: jugnu.media-convert
+name: Audio Convert
+version: 1.0.0
+api: 1
+helpers:
+  - id: python-runtime
+    version: 1.0.0
+commands:
+  - id: wav-aiff
+    title: WAV to AIFF
+    subtitle: Save the copied WAV file as AIFF, beside the original
+    keywords: [wav, aiff, audio, convert]
+  - id: aiff-wav
+    title: AIFF to WAV
+    subtitle: Save the copied AIFF file as WAV, beside the original
+    keywords: [aiff, wav, audio, convert]
+  - id: wav-m4a
+    title: WAV to M4A
+    subtitle: Save the copied WAV file as M4A, beside the original
+    keywords: [wav, m4a, audio, convert]
+  - id: aiff-m4a
+    title: AIFF to M4A
+    subtitle: Save the copied AIFF file as M4A, beside the original
+    keywords: [aiff, m4a, audio, convert]
+  - id: m4a-wav
+    title: M4A to WAV
+    subtitle: Save the copied M4A file as WAV, beside the original
+    keywords: [m4a, wav, audio, convert]
+  - id: m4a-aiff
+    title: M4A to AIFF
+    subtitle: Save the copied M4A file as AIFF, beside the original
+    keywords: [m4a, aiff, audio, convert]
+  - id: mp3-wav
+    title: MP3 to WAV
+    subtitle: Save the copied MP3 file as WAV, beside the original
+    keywords: [mp3, wav, audio, convert]
+  - id: mp3-m4a
+    title: MP3 to M4A
+    subtitle: Save the copied MP3 file as M4A, beside the original
+    keywords: [mp3, m4a, audio, convert]
+  - id: wav-caf
+    title: WAV to CAF
+    subtitle: Save the copied WAV file as CAF, beside the original
+    keywords: [wav, caf, audio, convert]
+  - id: caf-wav
+    title: CAF to WAV
+    subtitle: Save the copied CAF file as WAV, beside the original
+    keywords: [caf, wav, audio, convert]
+converters:
+  - command: wav-aiff
+    from: wav
+    to: aiff
+    modes: [file]
+  - command: aiff-wav
+    from: aiff
+    to: wav
+    modes: [file]
+  - command: wav-m4a
+    from: wav
+    to: m4a
+    modes: [file]
+  - command: aiff-m4a
+    from: aiff
+    to: m4a
+    modes: [file]
+  - command: m4a-wav
+    from: m4a
+    to: wav
+    modes: [file]
+  - command: m4a-aiff
+    from: m4a
+    to: aiff
+    modes: [file]
+  - command: mp3-wav
+    from: mp3
+    to: wav
+    modes: [file]
+  - command: mp3-m4a
+    from: mp3
+    to: m4a
+    modes: [file]
+  - command: wav-caf
+    from: wav
+    to: caf
+    modes: [file]
+  - command: caf-wav
+    from: caf
+    to: wav
+    modes: [file]
+entrypoint:
+  kind: exec
+  path: bin/run
+cleanup:
+  paths: []
+  launchd: []

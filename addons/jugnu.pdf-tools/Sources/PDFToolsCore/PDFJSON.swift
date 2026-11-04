@@ -48,6 +48,10 @@ enum PDFJSON {
         ["id": id, "kind": "text", "label": label, "value": value]
     }
 
+    static func encodeOK(path: String) -> String {
+        encode(["ok": true, "path": path])
+    }
+
     private static func encode(_ object: [String: Any]) -> String {
         guard JSONSerialization.isValidJSONObject(object),
               let data = try? JSONSerialization.data(withJSONObject: object, options: [.sortedKeys]),

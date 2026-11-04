@@ -208,27 +208,123 @@ commands:
     title: Paste as plain text
     subtitle: Strip rich text from the clipboard
     keywords: [paste, plain, clipboard]
+  - id: json-tsv
+    title: JSON to TSV
+    subtitle: Clipboard JSON array to TSV
+    keywords: [json, tsv]
+  - id: tsv-json
+    title: TSV to JSON
+    subtitle: Clipboard TSV to JSON
+    keywords: [tsv, json]
+  - id: csv-tsv
+    title: CSV to TSV
+    subtitle: Clipboard CSV to TSV
+    keywords: [csv, tsv]
+  - id: tsv-csv
+    title: TSV to CSV
+    subtitle: Clipboard TSV to CSV
+    keywords: [tsv, csv]
+  - id: json-xml
+    title: JSON to XML
+    subtitle: Clipboard JSON to XML
+    keywords: [json, xml]
+  - id: csv-markdown-table
+    title: CSV to Markdown table
+    subtitle: Clipboard CSV to a Markdown table
+    keywords: [csv, markdown, table]
+  - id: json-markdown-table
+    title: JSON to Markdown table
+    subtitle: Clipboard JSON array to a Markdown table
+    keywords: [json, markdown, table]
+  - id: markdown-table-csv
+    title: Markdown table to CSV
+    subtitle: Clipboard Markdown table to CSV
+    keywords: [markdown, table, csv]
+  - id: markdown-table-json
+    title: Markdown table to JSON
+    subtitle: Clipboard Markdown table to JSON
+    keywords: [markdown, table, json]
+  - id: markdown-html
+    title: Markdown to HTML
+    subtitle: Clipboard Markdown to HTML
+    keywords: [markdown, html]
+  - id: html-markdown
+    title: HTML to Markdown
+    subtitle: Clipboard HTML to Markdown
+    keywords: [html, markdown]
+  - id: html-plain
+    title: HTML to plain text
+    subtitle: Clipboard HTML to plain text
+    keywords: [html, text]
 converters:
   - command: json-csv
     from: json
     to: csv
-    modes: [text]
+    modes: [text, file]
   - command: csv-json
     from: csv
     to: json
-    modes: [text]
+    modes: [text, file]
   - command: xml-json
     from: xml
     to: json
-    modes: [text]
+    modes: [text, file]
   - command: yaml-json
     from: yaml
     to: json
-    modes: [text]
+    modes: [text, file]
   - command: json-yaml
     from: json
     to: yaml
-    modes: [text]
+    modes: [text, file]
+  - command: json-tsv
+    from: json
+    to: tsv
+    modes: [text, file]
+  - command: tsv-json
+    from: tsv
+    to: json
+    modes: [text, file]
+  - command: csv-tsv
+    from: csv
+    to: tsv
+    modes: [text, file]
+  - command: tsv-csv
+    from: tsv
+    to: csv
+    modes: [text, file]
+  - command: json-xml
+    from: json
+    to: xml
+    modes: [text, file]
+  - command: csv-markdown-table
+    from: csv
+    to: markdown-table
+    modes: [text, file]
+  - command: json-markdown-table
+    from: json
+    to: markdown-table
+    modes: [text, file]
+  - command: markdown-table-csv
+    from: markdown-table
+    to: csv
+    modes: [text, file]
+  - command: markdown-table-json
+    from: markdown-table
+    to: json
+    modes: [text, file]
+  - command: markdown-html
+    from: markdown
+    to: html
+    modes: [text, file]
+  - command: html-markdown
+    from: html
+    to: markdown
+    modes: [text, file]
+  - command: html-plain
+    from: html
+    to: plain
+    modes: [text, file]
 entrypoint:
   kind: exec
   path: bin/run

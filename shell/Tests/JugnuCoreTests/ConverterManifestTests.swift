@@ -180,8 +180,6 @@ final class ConverterManifestTests: XCTestCase {
         }
     }
 
-    // MARK: shell entrypoint
-
     private func shellManifest(id: String, extra: String = "") -> String {
         """
         id: \(id)
