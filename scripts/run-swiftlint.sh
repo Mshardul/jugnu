@@ -5,6 +5,7 @@ root=$(cd "$(dirname "$0")/.." && pwd)
 cd "$root"
 export DEVELOPER_DIR="${DEVELOPER_DIR:-/Applications/Xcode.app/Contents/Developer}"
 "$root/scripts/ensure-swift-tools.sh"
+export PATH="${JUGNU_SWIFT_TOOLS_BIN:-$HOME/.local/share/jugnu/swift-tools/bin}:$PATH"
 if [[ $# -gt 0 ]]; then
   swiftlint lint --config "$root/.swiftlint.yml" "$@"
 else

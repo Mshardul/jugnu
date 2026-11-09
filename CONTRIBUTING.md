@@ -30,11 +30,11 @@ make test
 make ci
 ```
 
-SwiftFormat and SwiftLint match CI. Install once (Homebrew), then lint or format:
+SwiftFormat 0.62.1 and SwiftLint 0.65.1 match CI. `make tools-swift` downloads those builds; a newer Homebrew bottle is not used.
 
 ```bash
-make tools-swift      # brew install swiftformat swiftlint if missing
-make lint-swift       # SwiftLint (installs via brew if missing)
+make tools-swift      # pinned SwiftFormat and SwiftLint
+make lint-swift       # SwiftLint (installs the pinned build if missing)
 make format-swift     # SwiftFormat in place (optional; not a pre-commit gate)
 ```
 

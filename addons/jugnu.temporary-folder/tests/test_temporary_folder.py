@@ -15,10 +15,37 @@ def _write_exec(path: Path, body: str) -> None:
     path.chmod(path.stat().st_mode | stat.S_IEXEC)
 
 
+# The addon asks osascript to parse the request and to trash files. CI has no osascript,
+# and a real one would put fixtures in the user's Trash, so the stub does both jobs.
+_OSASCRIPT = """#!/usr/bin/env python3
+import json
+import shutil
+import sys
+from pathlib import Path
+
+script = sys.stdin.read()
+payload = sys.argv[-1] if len(sys.argv) > 1 else ""
+if "trashItemAtURL" in script:
+    target = Path(payload)
+    if target.is_dir() and not target.is_symlink():
+        shutil.rmtree(target)
+    elif target.exists():
+        target.unlink()
+    print("ok")
+    raise SystemExit(0)
+obj = json.loads(payload)
+args = obj.get("args") or {}
+action = args.get("action") if isinstance(args.get("action"), str) else ""
+paths = [item for item in args.get("paths") or [] if isinstance(item, str) and item]
+sys.stdout.write("\\x1e".join([action, *paths]))
+"""
+
+
 def _run(tmp_path: Path, args: dict | None = None) -> subprocess.CompletedProcess[str]:
     bin_dir = tmp_path / "bin"
     bin_dir.mkdir(exist_ok=True)
     log = tmp_path / "open.log"
+    _write_exec(bin_dir / "osascript", _OSASCRIPT)
     _write_exec(
         bin_dir / "open",
         "#!/bin/bash\n" + f'printf "%s\\n" "$@" >> "{log}"\nexit 0\n',

@@ -53,7 +53,7 @@ Not published yet. When there is a download, install steps will live here.
 # once
 uv sync
 uv run pre-commit install   # or: make hooks
-make tools-swift            # brew install swiftformat swiftlint if missing
+make tools-swift            # pinned SwiftFormat 0.62.1 and SwiftLint 0.65.1
 
 make precommit   # local hooks on all files (Python + SwiftLint)
 make lint-swift  # SwiftLint (installs tools if missing)
