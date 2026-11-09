@@ -1,13 +1,48 @@
 [
   {
+    "id": "jugnu.audio-toggles",
+    "name": "Audio",
+    "version": "1.0.1",
+    "api": 1,
+    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.1.0/jugnu.audio-toggles-1.0.1.zip",
+    "sha256": "151d5799b6b47169fcb4c8802cab35fbdbcbe89310a5aa458d93f045462035bc",
+    "summary": "Audio",
+    "permissions": [],
+    "trust": "first-party",
+    "category": "Focus",
+    "tags": [
+      "toggle",
+      "recommended"
+    ],
+    "description": "Mic and mute-all status in one place \u2014 tap a tile to mute your input, or mute mic and speakers together and restore the volumes you had. Merges the former Mic Mute and Mute All addons.",
+    "commands": [
+      {
+        "id": "audio-toggles",
+        "title": "Audio",
+        "subtitle": "Mic and mute-all status \u2014 tap to toggle"
+      },
+      {
+        "id": "mute-mic",
+        "title": "Toggle microphone mute",
+        "subtitle": "Mute or unmute input"
+      },
+      {
+        "id": "mute-all",
+        "title": "Mute all",
+        "subtitle": "Mute mic and speakers, or restore the previous volumes"
+      }
+    ]
+  },
+  {
     "id": "jugnu.battery-eta",
     "name": "Battery ETA",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "api": 1,
-    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.battery-eta-1.0.0.zip",
-    "sha256": "78a8d11589ee4a99d6e5ad0a1f584b5fcb2a0bf09ae46fb273772a8e3e98ac0d",
+    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.1.0/jugnu.battery-eta-1.0.1.zip",
+    "sha256": "2b7d96af3d323b19547e98c54dc827682b49cecf9af78f177a7fe29419e12a6d",
     "summary": "Battery status",
     "permissions": [],
+    "trust": "first-party",
     "category": "System",
     "subcategory": "Monitoring",
     "tags": [
@@ -20,20 +55,20 @@
         "title": "Battery status",
         "subtitle": "Percent, charging state, and time remaining"
       }
-    ],
-    "trust": "first-party"
+    ]
   },
   {
     "id": "jugnu.brew-outdated",
     "name": "Brew Outdated",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "api": 1,
-    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.brew-outdated-1.0.0.zip",
-    "sha256": "7b4e4915ee9cca9b3c1f4b71674a0a30e27df7404e92b7995c015b2027ebdc3e",
+    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.1.0/jugnu.brew-outdated-1.0.1.zip",
+    "sha256": "fdf0a7b190722d1ad3469c4c7bfc7ecfddcd718087023edf0c2ee02221381256",
     "summary": "Outdated Homebrew packages",
     "permissions": [
       "network"
     ],
+    "trust": "first-party",
     "category": "System",
     "subcategory": "Dev Tools",
     "tags": [
@@ -48,20 +83,20 @@
         "title": "Outdated Homebrew packages",
         "subtitle": "Formulae and casks with updates available"
       }
-    ],
-    "trust": "first-party"
+    ]
   },
   {
     "id": "jugnu.clip-tools",
     "name": "Clip Tools",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "api": 1,
-    "url": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
-    "sha256": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
+    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.1.0/jugnu.clip-tools-1.2.1.zip",
+    "sha256": "2ddb6c71ceb4dacfd8466393a9b9183a6ac0de6f14fb4eeef63143c1d54eaaae",
     "summary": "Text stats",
     "permissions": [
       "clipboard"
     ],
+    "trust": "first-party",
     "category": "Clipboard",
     "tags": [
       "quick-glance",
@@ -379,22 +414,22 @@
         "title": "HTML to plain text",
         "subtitle": "Clipboard HTML to plain text"
       }
-    ],
-    "trust": "first-party"
+    ]
   },
   {
     "id": "jugnu.clipboard-history",
     "name": "Clipboard History",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "api": 1,
-    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.clipboard-history-1.0.0.zip",
-    "sha256": "dd0787bb0cbbc13b424f1d2226f6071f17b2b92f1536e22ce7887980a4ee43f1",
+    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.1.0/jugnu.clipboard-history-1.0.1.zip",
+    "sha256": "b65ba806e49290a541f3a56d410df544b9674994f50adb1476f932756fc7b674",
     "summary": "Clipboard history",
     "permissions": [
       "clipboard",
       "background"
     ],
     "primary": "list",
+    "trust": "first-party",
     "category": "Clipboard",
     "tags": [
       "background",
@@ -412,18 +447,139 @@
         "title": "Clipboard watcher",
         "subtitle": "Internal \u2014 records pasteboard changes"
       }
+    ]
+  },
+  {
+    "id": "jugnu.convert",
+    "name": "Convert",
+    "version": "1.1.1",
+    "api": 1,
+    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.1.0/jugnu.convert-1.1.1.zip",
+    "sha256": "d7d84a9f86b21c6d4f88b88535730c0a69ebf5a1a5e03c2d979e1761b5e429ba",
+    "summary": "Convert a file",
+    "permissions": [],
+    "trust": "first-party",
+    "category": "Converters",
+    "tags": [
+      "popup-ui"
     ],
-    "trust": "first-party"
+    "description": "Convert files and text between formats in one view. Pick or drop a file and get a new one beside it, or paste text and see the result side by side. Conversions come from your other installed addons (Clip Tools covers JSON, CSV, XML and YAML), so Convert adds options as you install more.",
+    "commands": [
+      {
+        "id": "convert-file",
+        "title": "Convert a file",
+        "subtitle": "Save a data file in another format, beside the original"
+      },
+      {
+        "id": "convert-text",
+        "title": "Convert text",
+        "subtitle": "Convert text side by side, JSON to CSV and more"
+      }
+    ]
+  },
+  {
+    "id": "jugnu.doc-convert",
+    "name": "Document Convert",
+    "version": "1.0.0",
+    "api": 1,
+    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.1.0/jugnu.doc-convert-1.0.0.zip",
+    "sha256": "b4cb5bc3a43fdfb38b61daec11cdba5aad9ea6e48126827ca78018b96cbe94b2",
+    "summary": "DOCX to TXT",
+    "permissions": [],
+    "trust": "first-party",
+    "category": "Converters",
+    "tags": [
+      "popup-ui"
+    ],
+    "description": "Convert documents between Word (DOCX), RTF, OpenDocument (ODT), HTML and plain text with the built-in macOS textutil. Pick a file in Convert, or copy documents in Finder and run a command from the palette. Remote images in a document are never fetched.",
+    "commands": [
+      {
+        "id": "docx-plain",
+        "title": "DOCX to TXT",
+        "subtitle": "Save the copied Word (DOCX) file as plain text, beside the original"
+      },
+      {
+        "id": "docx-html",
+        "title": "DOCX to HTML",
+        "subtitle": "Save the copied Word (DOCX) file as HTML, beside the original"
+      },
+      {
+        "id": "docx-rtf",
+        "title": "DOCX to RTF",
+        "subtitle": "Save the copied Word (DOCX) file as RTF, beside the original"
+      },
+      {
+        "id": "docx-odt",
+        "title": "DOCX to ODT",
+        "subtitle": "Save the copied Word (DOCX) file as OpenDocument (ODT), beside the original"
+      },
+      {
+        "id": "rtf-docx",
+        "title": "RTF to DOCX",
+        "subtitle": "Save the copied RTF file as Word (DOCX), beside the original"
+      },
+      {
+        "id": "rtf-plain",
+        "title": "RTF to TXT",
+        "subtitle": "Save the copied RTF file as plain text, beside the original"
+      },
+      {
+        "id": "rtf-html",
+        "title": "RTF to HTML",
+        "subtitle": "Save the copied RTF file as HTML, beside the original"
+      },
+      {
+        "id": "odt-docx",
+        "title": "ODT to DOCX",
+        "subtitle": "Save the copied OpenDocument (ODT) file as Word (DOCX), beside the original"
+      },
+      {
+        "id": "odt-plain",
+        "title": "ODT to TXT",
+        "subtitle": "Save the copied OpenDocument (ODT) file as plain text, beside the original"
+      },
+      {
+        "id": "html-docx",
+        "title": "HTML to DOCX",
+        "subtitle": "Save the copied HTML file as Word (DOCX), beside the original"
+      },
+      {
+        "id": "html-rtf",
+        "title": "HTML to RTF",
+        "subtitle": "Save the copied HTML file as RTF, beside the original"
+      },
+      {
+        "id": "html-plain",
+        "title": "HTML to TXT",
+        "subtitle": "Save the copied HTML file as plain text, beside the original"
+      },
+      {
+        "id": "plain-docx",
+        "title": "TXT to DOCX",
+        "subtitle": "Save the copied plain text file as Word (DOCX), beside the original"
+      },
+      {
+        "id": "plain-rtf",
+        "title": "TXT to RTF",
+        "subtitle": "Save the copied plain text file as RTF, beside the original"
+      },
+      {
+        "id": "plain-html",
+        "title": "TXT to HTML",
+        "subtitle": "Save the copied plain text file as HTML, beside the original"
+      }
+    ]
   },
   {
     "id": "jugnu.floating-note",
-    "name": "Floating Note",
-    "version": "1.0.0",
+    "name": "Temporary Note",
+    "version": "1.0.1",
     "api": 1,
-    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.floating-note-1.0.0.zip",
-    "sha256": "d48692ccca987c2581c0c0fbd0f2200cefaade37de547b0e748a25a59428b469",
-    "summary": "Open scratch note",
+    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.1.0/jugnu.floating-note-1.0.1.zip",
+    "sha256": "e110042d67f8fab882fb9ea1b25aec7a90d0dbec7ceabb04206ba6f3c0c6cbe7",
+    "summary": "Temporary note",
     "permissions": [],
+    "trust": "first-party",
     "category": "Notes",
     "tags": [
       "popup-ui",
@@ -436,18 +592,18 @@
         "title": "Temporary note",
         "subtitle": "Floating sticky kept on this Mac and restored next time"
       }
-    ],
-    "trust": "first-party"
+    ]
   },
   {
     "id": "jugnu.focus-toggle",
     "name": "Focus Toggle",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "api": 1,
-    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.focus-toggle-1.0.0.zip",
-    "sha256": "a4df92960fce7ef4f3edd9ab3f2ea24f331d39e1af7bf2da7dabbfaf4939025f",
+    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.1.0/jugnu.focus-toggle-1.0.1.zip",
+    "sha256": "a25ccfe88e6461eb3020c64deb37b9b0ca3de42f8bca26ee512210b1cca12985",
     "summary": "Toggle Focus",
     "permissions": [],
+    "trust": "first-party",
     "category": "Focus",
     "tags": [
       "toggle",
@@ -460,93 +616,97 @@
         "title": "Toggle Focus",
         "subtitle": "Switch Do Not Disturb / Focus on or off"
       }
-    ],
-    "trust": "first-party"
+    ]
   },
   {
-    "id": "jugnu.keep-awake",
-    "name": "Keep Awake",
+    "id": "jugnu.images",
+    "name": "Images",
     "version": "1.0.0",
     "api": 1,
-    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.keep-awake-1.0.0.zip",
-    "sha256": "30d6a2020a839dd80900d8b75157d91c622c5dd2893ef37e7e1b5d987fe70f8f",
-    "summary": "Keep awake",
-    "permissions": [
-      "background"
-    ],
-    "category": "System",
+    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.1.0/jugnu.images-1.0.0.zip",
+    "sha256": "0d11a2b34fa2e77bb1a7f264fdcc71e7da6d2e71cf05653418dc1c5bede49cb2",
+    "summary": "HEIC to JPEG",
+    "permissions": [],
+    "trust": "first-party",
+    "category": "Converters",
     "tags": [
-      "background",
       "popup-ui"
     ],
-    "description": "Keeps the Mac from idle-sleeping and leaves the display on for 15 minutes, an hour, two hours, or until you turn it off. Closing the lid can still sleep. Uses the macOS caffeinate tool already on the machine; no extra download.",
+    "description": "Convert HEIC, JPEG, PNG, TIFF and GIF images with the built-in macOS tools. Pick a file in Convert, or copy images in Finder and run a command from the palette. Each result is saved beside the original and never overwrites it.",
     "commands": [
       {
-        "id": "pick",
-        "title": "Keep awake",
-        "subtitle": "Stop the Mac from idle-sleeping for a while"
+        "id": "heic-jpeg",
+        "title": "HEIC to JPEG",
+        "subtitle": "Save the copied HEIC file as JPEG, beside the original"
       },
       {
-        "id": "stop",
-        "title": "Stop keep-awake",
-        "subtitle": "Allow idle sleep again"
+        "id": "heic-png",
+        "title": "HEIC to PNG",
+        "subtitle": "Save the copied HEIC file as PNG, beside the original"
       },
       {
-        "id": "status",
-        "title": "Keep-awake status",
-        "subtitle": "Whether a keep-awake session is running"
+        "id": "jpeg-png",
+        "title": "JPEG to PNG",
+        "subtitle": "Save the copied JPEG file as PNG, beside the original"
       },
       {
-        "id": "watch",
-        "title": "Keep-awake watcher",
-        "subtitle": "Internal \u2014 launchd-owned caffeinate"
+        "id": "png-jpeg",
+        "title": "PNG to JPEG",
+        "subtitle": "Save the copied PNG file as JPEG, beside the original"
+      },
+      {
+        "id": "tiff-jpeg",
+        "title": "TIFF to JPEG",
+        "subtitle": "Save the copied TIFF file as JPEG, beside the original"
+      },
+      {
+        "id": "tiff-png",
+        "title": "TIFF to PNG",
+        "subtitle": "Save the copied TIFF file as PNG, beside the original"
+      },
+      {
+        "id": "gif-png",
+        "title": "GIF to PNG",
+        "subtitle": "Save the copied GIF file as PNG, beside the original"
+      },
+      {
+        "id": "gif-jpeg",
+        "title": "GIF to JPEG",
+        "subtitle": "Save the copied GIF file as JPEG, beside the original"
+      },
+      {
+        "id": "png-tiff",
+        "title": "PNG to TIFF",
+        "subtitle": "Save the copied PNG file as TIFF, beside the original"
+      },
+      {
+        "id": "jpeg-tiff",
+        "title": "JPEG to TIFF",
+        "subtitle": "Save the copied JPEG file as TIFF, beside the original"
+      },
+      {
+        "id": "png-heic",
+        "title": "PNG to HEIC",
+        "subtitle": "Save the copied PNG file as HEIC, beside the original"
+      },
+      {
+        "id": "jpeg-heic",
+        "title": "JPEG to HEIC",
+        "subtitle": "Save the copied JPEG file as HEIC, beside the original"
       }
-    ],
-    "trust": "first-party"
-  },
-  {
-    "id": "jugnu.audio-toggles",
-    "name": "Audio",
-    "version": "1.0.0",
-    "api": 1,
-    "url": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
-    "sha256": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
-    "summary": "Mic and mute-all status \u2014 tap to toggle",
-    "permissions": [],
-    "category": "Focus",
-    "tags": [
-      "toggle",
-      "recommended"
-    ],
-    "description": "Mic and mute-all status in one place \u2014 tap a tile to mute your input, or mute mic and speakers together and restore the volumes you had. Merges the former Mic Mute and Mute All addons.",
-    "commands": [
-      {
-        "id": "audio-toggles",
-        "title": "Audio",
-        "subtitle": "Mic and mute-all status \u2014 tap to toggle"
-      },
-      {
-        "id": "mute-mic",
-        "title": "Toggle microphone mute",
-        "subtitle": "Mute or unmute input"
-      },
-      {
-        "id": "mute-all",
-        "title": "Mute all",
-        "subtitle": "Mute mic and speakers, or restore the previous volumes"
-      }
-    ],
-    "trust": "first-party"
+    ]
   },
   {
     "id": "jugnu.intervals",
     "name": "Intervals",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "api": 1,
-    "url": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
-    "sha256": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
+    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.1.0/jugnu.intervals-1.0.1.zip",
+    "sha256": "ebd24528e7aba0466141c1a031889eb9716c56a8e9bc2a8a5bca100d41a3d720",
     "summary": "Intervals",
     "permissions": [],
+    "primary": "manage",
+    "trust": "first-party",
     "category": "System",
     "tags": [
       "background",
@@ -614,19 +774,153 @@
         "title": "Phase chime",
         "subtitle": "Internal \u2014 fired by clock"
       }
+    ]
+  },
+  {
+    "id": "jugnu.keep-awake",
+    "name": "Keep Awake",
+    "version": "1.0.1",
+    "api": 1,
+    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.1.0/jugnu.keep-awake-1.0.1.zip",
+    "sha256": "4f42043f167c68220ba69ca2f053f4617648f19e0614b1317587bcb79c0d65eb",
+    "summary": "Keep awake",
+    "permissions": [
+      "background"
     ],
-    "trust": "first-party"
+    "trust": "first-party",
+    "category": "System",
+    "tags": [
+      "background",
+      "popup-ui"
+    ],
+    "description": "Keeps the Mac from idle-sleeping and leaves the display on for 15 minutes, an hour, two hours, or until you turn it off. Closing the lid can still sleep. Uses the macOS caffeinate tool already on the machine; no extra download.",
+    "commands": [
+      {
+        "id": "pick",
+        "title": "Keep awake",
+        "subtitle": "Stop the Mac from idle-sleeping for a while"
+      },
+      {
+        "id": "stop",
+        "title": "Stop keep-awake",
+        "subtitle": "Allow idle sleep again"
+      },
+      {
+        "id": "status",
+        "title": "Keep-awake status",
+        "subtitle": "Whether a keep-awake session is running"
+      },
+      {
+        "id": "watch",
+        "title": "Keep-awake watcher",
+        "subtitle": "Internal \u2014 launchd-owned caffeinate"
+      }
+    ]
+  },
+  {
+    "id": "jugnu.media-convert",
+    "name": "Audio Convert",
+    "version": "1.0.0",
+    "api": 1,
+    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.1.0/jugnu.media-convert-1.0.0.zip",
+    "sha256": "46efc256ff414f659c1174bc34c61093236c14069bdada0b2bf84a5a8233acbc",
+    "summary": "WAV to AIFF",
+    "permissions": [],
+    "trust": "first-party",
+    "category": "Converters",
+    "tags": [
+      "popup-ui"
+    ],
+    "description": "Convert audio between WAV, AIFF, M4A (AAC) and CAF, and read MP3, with the built-in macOS afconvert. Pick a file in Convert, or copy audio files in Finder and run a command from the palette. Results are saved beside the original.",
+    "commands": [
+      {
+        "id": "wav-aiff",
+        "title": "WAV to AIFF",
+        "subtitle": "Save the copied WAV file as AIFF, beside the original"
+      },
+      {
+        "id": "aiff-wav",
+        "title": "AIFF to WAV",
+        "subtitle": "Save the copied AIFF file as WAV, beside the original"
+      },
+      {
+        "id": "wav-m4a",
+        "title": "WAV to M4A",
+        "subtitle": "Save the copied WAV file as M4A, beside the original"
+      },
+      {
+        "id": "aiff-m4a",
+        "title": "AIFF to M4A",
+        "subtitle": "Save the copied AIFF file as M4A, beside the original"
+      },
+      {
+        "id": "m4a-wav",
+        "title": "M4A to WAV",
+        "subtitle": "Save the copied M4A file as WAV, beside the original"
+      },
+      {
+        "id": "m4a-aiff",
+        "title": "M4A to AIFF",
+        "subtitle": "Save the copied M4A file as AIFF, beside the original"
+      },
+      {
+        "id": "mp3-wav",
+        "title": "MP3 to WAV",
+        "subtitle": "Save the copied MP3 file as WAV, beside the original"
+      },
+      {
+        "id": "mp3-m4a",
+        "title": "MP3 to M4A",
+        "subtitle": "Save the copied MP3 file as M4A, beside the original"
+      },
+      {
+        "id": "wav-caf",
+        "title": "WAV to CAF",
+        "subtitle": "Save the copied WAV file as CAF, beside the original"
+      },
+      {
+        "id": "caf-wav",
+        "title": "CAF to WAV",
+        "subtitle": "Save the copied CAF file as WAV, beside the original"
+      }
+    ]
+  },
+  {
+    "id": "jugnu.open-terminal-here",
+    "name": "Open Terminal Here",
+    "version": "1.0.1",
+    "api": 1,
+    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.1.0/jugnu.open-terminal-here-1.0.1.zip",
+    "sha256": "4bed777775c12902638a8ca86e5d8e2f572c7fa7d334f5aef1602da5529e3177",
+    "summary": "Open Terminal here",
+    "permissions": [],
+    "trust": "first-party",
+    "category": "System",
+    "subcategory": "Dev Tools",
+    "tags": [
+      "dev-tool",
+      "quick-glance"
+    ],
+    "description": "Opens your last-picked terminal app at the folder showing in Finder. Default is Terminal. A chooser for iTerm, Warp, and friends comes later; until then the last picked app is the only switch.",
+    "commands": [
+      {
+        "id": "open",
+        "title": "Open Terminal here",
+        "subtitle": "Open the last-picked terminal in the front Finder folder"
+      }
+    ]
   },
   {
     "id": "jugnu.pdf-tools",
     "name": "PDF Tools",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "api": 1,
-    "url": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
-    "sha256": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
-    "summary": "PDF page tools",
+    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.1.0/jugnu.pdf-tools-1.1.1.zip",
+    "sha256": "5b229ae5c50dc44cbe0f3f8db167bf3ff898ac99f8d69d29101c6eb6e8c0bbfd",
+    "summary": "Remove PDF password",
     "permissions": [],
     "primary": "pdf-unlock",
+    "trust": "first-party",
     "category": "System",
     "tags": [
       "popup-ui"
@@ -723,43 +1017,18 @@
         "title": "Grayscale PDF",
         "subtitle": "Save a black and white copy"
       }
-    ],
-    "trust": "first-party"
-  },
-  {
-    "id": "jugnu.open-terminal-here",
-    "name": "Open Terminal Here",
-    "version": "1.0.0",
-    "api": 1,
-    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.open-terminal-here-1.0.0.zip",
-    "sha256": "fc24fe8f1251d2c21f12c1ac2bc03e182ddb932dc4edefbd5cfad30e0fbf1ca2",
-    "summary": "Open Terminal here",
-    "permissions": [],
-    "category": "System",
-    "subcategory": "Dev Tools",
-    "tags": [
-      "dev-tool",
-      "quick-glance"
-    ],
-    "description": "Opens your last-picked terminal app at the folder showing in Finder. Default is Terminal. A chooser for iTerm, Warp, and friends comes later; until then the last picked app is the only switch.",
-    "commands": [
-      {
-        "id": "open",
-        "title": "Open Terminal here",
-        "subtitle": "Open the last-picked terminal in the front Finder folder"
-      }
-    ],
-    "trust": "first-party"
+    ]
   },
   {
     "id": "jugnu.ports",
     "name": "Ports",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "api": 1,
-    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.ports-1.0.0.zip",
-    "sha256": "917271077806599be963de5283761d547c7e214127d52b4adc7c78802a066b06",
+    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.1.0/jugnu.ports-1.0.1.zip",
+    "sha256": "37043dc198c04fbbee5f044862f516087eb63afff7a5d2b170f2b28ab94f4d63",
     "summary": "Listening ports",
     "permissions": [],
+    "trust": "first-party",
     "category": "System",
     "subcategory": "Dev Tools",
     "tags": [
@@ -774,20 +1043,42 @@
         "title": "Listening ports",
         "subtitle": "List and kill processes on local ports"
       }
-    ],
-    "trust": "first-party"
+    ]
+  },
+  {
+    "id": "jugnu.temporary-folder",
+    "name": "Temporary Folder",
+    "version": "1.0.1",
+    "api": 1,
+    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.1.0/jugnu.temporary-folder-1.0.1.zip",
+    "sha256": "2af04aa5b46dafc4c096bb633e608b9aaad84eb2f4cc4904a887ea6e3f5dc49f",
+    "summary": "Temporary folder",
+    "permissions": [],
+    "primary": "temporary-folder",
+    "trust": "first-party",
+    "category": "System",
+    "tags": [],
+    "description": "Opens a menu-bar tray for ~/Temporary. Dropped files and folders are copied in. The folder is created if it is missing, and files already there are left in place.",
+    "commands": [
+      {
+        "id": "temporary-folder",
+        "title": "Temporary folder",
+        "subtitle": "Drop files into ~/Temporary"
+      }
+    ]
   },
   {
     "id": "jugnu.weather-bar",
     "name": "Weather",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "api": 1,
-    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.weather-bar-1.0.0.zip",
-    "sha256": "5e34e0cbdb8601256bdf1e4c8f9b5862638d46b44d2916582c03268cd0a68671",
+    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.1.0/jugnu.weather-bar-1.0.1.zip",
+    "sha256": "85bf9b08f726653fb866bb1dcd43b204f9d462dabc0b87ed2c497c0e5d7eef65",
     "summary": "Current weather",
     "permissions": [
       "network"
     ],
+    "trust": "first-party",
     "category": "Info",
     "tags": [
       "quick-glance"
@@ -799,18 +1090,18 @@
         "title": "Current weather",
         "subtitle": "Temperature and conditions for your location"
       }
-    ],
-    "trust": "first-party"
+    ]
   },
   {
     "id": "jugnu.world-clock",
     "name": "World Clock",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "api": 1,
-    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0/jugnu.world-clock-1.0.0.zip",
-    "sha256": "247051af176c2cd8e5a9d2cf8ff9b28709d016a7f3c4ae010ebeaeb1d4b8b4ba",
+    "url": "https://github.com/Mshardul/jugnu/releases/download/addons-v1.1.0/jugnu.world-clock-1.0.1.zip",
+    "sha256": "6b9ad10d212c0d83fca72e2209bbec96a1cb18ea6973c129edaad75775e1a8cc",
     "summary": "World clock",
     "permissions": [],
+    "trust": "first-party",
     "category": "Info",
     "tags": [
       "quick-glance",
@@ -823,296 +1114,6 @@
         "title": "World clock",
         "subtitle": "Current time across configured zones"
       }
-    ],
-    "trust": "first-party"
-  },
-  {
-    "id": "jugnu.temporary-folder",
-    "name": "Temporary Folder",
-    "version": "1.0.0",
-    "api": 1,
-    "url": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
-    "sha256": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
-    "summary": "Temporary folder",
-    "permissions": [],
-    "primary": "temporary-folder",
-    "category": "System",
-    "tags": [],
-    "description": "Opens a menu-bar tray for ~/Temporary. Dropped files and folders are copied in. The folder is created if it is missing, and files already there are left in place.",
-    "commands": [
-      {
-        "id": "temporary-folder",
-        "title": "Temporary folder",
-        "subtitle": "Drop files into ~/Temporary"
-      }
-    ],
-    "trust": "first-party"
-  },
-  {
-    "id": "jugnu.convert",
-    "name": "Convert",
-    "version": "1.0.0",
-    "api": 1,
-    "url": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
-    "sha256": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
-    "summary": "Convert a file",
-    "permissions": [],
-    "category": "Converters",
-    "tags": [
-      "popup-ui"
-    ],
-    "description": "Convert files and text between formats in one view. Pick or drop a file and get a new one beside it, or paste text and see the result side by side. Conversions come from your other installed addons (Clip Tools covers JSON, CSV, XML and YAML), so Convert adds options as you install more.",
-    "commands": [
-      {
-        "id": "convert-file",
-        "title": "Convert a file",
-        "subtitle": "Save a data file in another format, beside the original"
-      },
-      {
-        "id": "convert-text",
-        "title": "Convert text",
-        "subtitle": "Convert text side by side, JSON to CSV and more"
-      }
-    ],
-    "trust": "first-party"
-  },
-  {
-    "id": "jugnu.images",
-    "name": "Images",
-    "version": "1.0.0",
-    "api": 1,
-    "url": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
-    "sha256": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
-    "summary": "HEIC to JPEG",
-    "permissions": [],
-    "category": "Converters",
-    "tags": [
-      "popup-ui"
-    ],
-    "description": "Convert HEIC, JPEG, PNG, TIFF and GIF images with the built-in macOS tools. Pick a file in Convert, or copy images in Finder and run a command from the palette. Each result is saved beside the original and never overwrites it.",
-    "commands": [
-      {
-        "id": "heic-jpeg",
-        "title": "HEIC to JPEG",
-        "subtitle": "Save the copied HEIC file as JPEG, beside the original"
-      },
-      {
-        "id": "heic-png",
-        "title": "HEIC to PNG",
-        "subtitle": "Save the copied HEIC file as PNG, beside the original"
-      },
-      {
-        "id": "jpeg-png",
-        "title": "JPEG to PNG",
-        "subtitle": "Save the copied JPEG file as PNG, beside the original"
-      },
-      {
-        "id": "png-jpeg",
-        "title": "PNG to JPEG",
-        "subtitle": "Save the copied PNG file as JPEG, beside the original"
-      },
-      {
-        "id": "tiff-jpeg",
-        "title": "TIFF to JPEG",
-        "subtitle": "Save the copied TIFF file as JPEG, beside the original"
-      },
-      {
-        "id": "tiff-png",
-        "title": "TIFF to PNG",
-        "subtitle": "Save the copied TIFF file as PNG, beside the original"
-      },
-      {
-        "id": "gif-png",
-        "title": "GIF to PNG",
-        "subtitle": "Save the copied GIF file as PNG, beside the original"
-      },
-      {
-        "id": "gif-jpeg",
-        "title": "GIF to JPEG",
-        "subtitle": "Save the copied GIF file as JPEG, beside the original"
-      },
-      {
-        "id": "png-tiff",
-        "title": "PNG to TIFF",
-        "subtitle": "Save the copied PNG file as TIFF, beside the original"
-      },
-      {
-        "id": "jpeg-tiff",
-        "title": "JPEG to TIFF",
-        "subtitle": "Save the copied JPEG file as TIFF, beside the original"
-      },
-      {
-        "id": "png-heic",
-        "title": "PNG to HEIC",
-        "subtitle": "Save the copied PNG file as HEIC, beside the original"
-      },
-      {
-        "id": "jpeg-heic",
-        "title": "JPEG to HEIC",
-        "subtitle": "Save the copied JPEG file as HEIC, beside the original"
-      }
-    ],
-    "trust": "first-party"
-  },
-  {
-    "id": "jugnu.media-convert",
-    "name": "Audio Convert",
-    "version": "1.0.0",
-    "api": 1,
-    "url": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
-    "sha256": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
-    "summary": "WAV to AIFF",
-    "permissions": [],
-    "category": "Converters",
-    "tags": [
-      "popup-ui"
-    ],
-    "description": "Convert audio between WAV, AIFF, M4A (AAC) and CAF, and read MP3, with the built-in macOS afconvert. Pick a file in Convert, or copy audio files in Finder and run a command from the palette. Results are saved beside the original.",
-    "commands": [
-      {
-        "id": "wav-aiff",
-        "title": "WAV to AIFF",
-        "subtitle": "Save the copied WAV file as AIFF, beside the original"
-      },
-      {
-        "id": "aiff-wav",
-        "title": "AIFF to WAV",
-        "subtitle": "Save the copied AIFF file as WAV, beside the original"
-      },
-      {
-        "id": "wav-m4a",
-        "title": "WAV to M4A",
-        "subtitle": "Save the copied WAV file as M4A, beside the original"
-      },
-      {
-        "id": "aiff-m4a",
-        "title": "AIFF to M4A",
-        "subtitle": "Save the copied AIFF file as M4A, beside the original"
-      },
-      {
-        "id": "m4a-wav",
-        "title": "M4A to WAV",
-        "subtitle": "Save the copied M4A file as WAV, beside the original"
-      },
-      {
-        "id": "m4a-aiff",
-        "title": "M4A to AIFF",
-        "subtitle": "Save the copied M4A file as AIFF, beside the original"
-      },
-      {
-        "id": "mp3-wav",
-        "title": "MP3 to WAV",
-        "subtitle": "Save the copied MP3 file as WAV, beside the original"
-      },
-      {
-        "id": "mp3-m4a",
-        "title": "MP3 to M4A",
-        "subtitle": "Save the copied MP3 file as M4A, beside the original"
-      },
-      {
-        "id": "wav-caf",
-        "title": "WAV to CAF",
-        "subtitle": "Save the copied WAV file as CAF, beside the original"
-      },
-      {
-        "id": "caf-wav",
-        "title": "CAF to WAV",
-        "subtitle": "Save the copied CAF file as WAV, beside the original"
-      }
-    ],
-    "trust": "first-party"
-  },
-  {
-    "id": "jugnu.doc-convert",
-    "name": "Document Convert",
-    "version": "1.0.0",
-    "api": 1,
-    "url": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
-    "sha256": "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
-    "summary": "DOCX to TXT",
-    "permissions": [],
-    "category": "Converters",
-    "tags": [
-      "popup-ui"
-    ],
-    "description": "Convert documents between Word (DOCX), RTF, OpenDocument (ODT), HTML and plain text with the built-in macOS textutil. Pick a file in Convert, or copy documents in Finder and run a command from the palette. Remote images in a document are never fetched.",
-    "commands": [
-      {
-        "id": "docx-plain",
-        "title": "DOCX to TXT",
-        "subtitle": "Save the copied Word (DOCX) file as plain text, beside the original"
-      },
-      {
-        "id": "docx-html",
-        "title": "DOCX to HTML",
-        "subtitle": "Save the copied Word (DOCX) file as HTML, beside the original"
-      },
-      {
-        "id": "docx-rtf",
-        "title": "DOCX to RTF",
-        "subtitle": "Save the copied Word (DOCX) file as RTF, beside the original"
-      },
-      {
-        "id": "docx-odt",
-        "title": "DOCX to ODT",
-        "subtitle": "Save the copied Word (DOCX) file as OpenDocument (ODT), beside the original"
-      },
-      {
-        "id": "rtf-docx",
-        "title": "RTF to DOCX",
-        "subtitle": "Save the copied RTF file as Word (DOCX), beside the original"
-      },
-      {
-        "id": "rtf-plain",
-        "title": "RTF to TXT",
-        "subtitle": "Save the copied RTF file as plain text, beside the original"
-      },
-      {
-        "id": "rtf-html",
-        "title": "RTF to HTML",
-        "subtitle": "Save the copied RTF file as HTML, beside the original"
-      },
-      {
-        "id": "odt-docx",
-        "title": "ODT to DOCX",
-        "subtitle": "Save the copied OpenDocument (ODT) file as Word (DOCX), beside the original"
-      },
-      {
-        "id": "odt-plain",
-        "title": "ODT to TXT",
-        "subtitle": "Save the copied OpenDocument (ODT) file as plain text, beside the original"
-      },
-      {
-        "id": "html-docx",
-        "title": "HTML to DOCX",
-        "subtitle": "Save the copied HTML file as Word (DOCX), beside the original"
-      },
-      {
-        "id": "html-rtf",
-        "title": "HTML to RTF",
-        "subtitle": "Save the copied HTML file as RTF, beside the original"
-      },
-      {
-        "id": "html-plain",
-        "title": "HTML to TXT",
-        "subtitle": "Save the copied HTML file as plain text, beside the original"
-      },
-      {
-        "id": "plain-docx",
-        "title": "TXT to DOCX",
-        "subtitle": "Save the copied plain text file as Word (DOCX), beside the original"
-      },
-      {
-        "id": "plain-rtf",
-        "title": "TXT to RTF",
-        "subtitle": "Save the copied plain text file as RTF, beside the original"
-      },
-      {
-        "id": "plain-html",
-        "title": "TXT to HTML",
-        "subtitle": "Save the copied plain text file as HTML, beside the original"
-      }
-    ],
-    "trust": "first-party"
+    ]
   }
 ]
