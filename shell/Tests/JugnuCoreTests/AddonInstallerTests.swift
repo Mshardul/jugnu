@@ -41,7 +41,11 @@ final class AddonInstallerTests: XCTestCase {
         XCTAssertEqual(config.addons["echo-addon"]?.enabled, true)
 
         XCTAssertThrowsError(
-            try installer.installFromLocalZip(url: zipURL, expectedSHA256: "deadbeef", enable: false)
+            try installer.installFromLocalZip(
+                url: zipURL,
+                expectedSHA256: String(repeating: "ab", count: 32),
+                enable: false
+            )
         ) { error in
             guard case AddonInstallerError.sha256Mismatch = error else {
                 return XCTFail("expected sha256Mismatch, got \(error)")

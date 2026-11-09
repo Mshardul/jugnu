@@ -27,12 +27,29 @@ final class AppInstallerTests: XCTestCase {
         let zip = try makeAppZip(in: home, version: "0.2.0")
         let installer = AppInstaller(paths: JugnuPaths(home: home), downloads: TestFileDownloader())
         do {
-            _ = try await installer.stage(entry: entry(url: zip, sha256: "deadbeef", version: "0.2.0"))
+            _ = try await installer.stage(
+                entry: entry(url: zip, sha256: String(repeating: "ab", count: 32), version: "0.2.0")
+            )
             XCTFail("expected sha256Mismatch")
         } catch let error as AddonInstallerError {
             guard case .sha256Mismatch = error else {
                 return XCTFail("expected sha256Mismatch, got \(error)")
             }
+        }
+    }
+
+    func testStageRefusesMalformedHashBeforeDownloading() async throws {
+        let home = try scratch()
+        defer { try? FileManager.default.removeItem(at: home) }
+        let zip = try makeAppZip(in: home, version: "0.2.0")
+        let installer = AppInstaller(paths: JugnuPaths(home: home), downloads: RefusingDownloader())
+        do {
+            _ = try await installer.stage(
+                entry: entry(url: zip, sha256: String(repeating: "0", count: 64), version: "0.2.0")
+            )
+            XCTFail("expected sha256Required")
+        } catch let error as AddonInstallerError {
+            XCTAssertEqual(error, .sha256Required)
         }
     }
 
@@ -188,5 +205,12 @@ private struct TestFileDownloader: InstallDownloading {
             .appendingPathComponent("jugnu-test-\(UUID().uuidString).zip")
         try FileManager.default.copyItem(at: url, to: tmp)
         return tmp
+    }
+}
+
+private struct RefusingDownloader: InstallDownloading {
+    func download(_: URL) async throws -> URL {
+        XCTFail("download must not start")
+        throw AddonInstallerError.downloadFailed
     }
 }

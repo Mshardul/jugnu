@@ -94,4 +94,36 @@ final class Sha256RequiredTests: XCTestCase {
             XCTAssertEqual($0 as? AddonInstallerError, .sha256Required)
         }
     }
+
+    func testMalformedHashesAreTreatedAsMissing() throws {
+        let home = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: home, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: home) }
+        let emptyZip = home.appendingPathComponent("empty.zip")
+        try Data([0x50, 0x4B, 0x05, 0x06] + Data(count: 18)).write(to: emptyZip)
+        let installer = AddonInstaller(paths: JugnuPaths(home: home))
+
+        for bad in Self.malformed {
+            XCTAssertThrowsError(try installer.installFromLocalZip(url: emptyZip, expectedSHA256: bad, enable: false)) {
+                XCTAssertEqual($0 as? AddonInstallerError, .sha256Required, "accepted \(bad)")
+            }
+        }
+    }
+
+    func testWellFormedDigest() {
+        XCTAssertTrue(SHA256Digest.isWellFormed(String(repeating: "ab", count: 32)))
+        XCTAssertTrue(SHA256Digest.isWellFormed(String(repeating: "AB", count: 32)))
+        for bad in Self.malformed {
+            XCTAssertFalse(SHA256Digest.isWellFormed(bad), "accepted \(bad)")
+        }
+    }
+
+    static let malformed = [
+        "deadbeef",
+        String(repeating: "0", count: 64),
+        "PLACEHOLDER-run-scripts/build-registry.sh-to-fill-in",
+        String(repeating: "g", count: 64),
+        String(repeating: "a", count: 65),
+        String(repeating: "\u{FF21}", count: 64)
+    ]
 }

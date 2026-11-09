@@ -121,7 +121,9 @@ public struct CommandIndex: Sendable {
         }
         var result = commands
         for indexes in claimants.values {
-            if indexes.count == 1 { continue }
+            if indexes.count == 1 {
+                continue
+            }
             let firstParty = indexes.filter { commands[$0].addonId.hasPrefix("jugnu.") }
             let winner = firstParty.count == 1 ? firstParty.first : nil
             for i in indexes where i != winner {

@@ -234,7 +234,11 @@ def main() -> None:
             # Do not pass inject-only keys into ops
             op_args = {k: v for k, v in args.items() if k != "_text"}
         else:
-            text = clipboard.read_as_plain_text() if command in RAW_READ_COMMANDS else clipboard.read_text()
+            text = (
+                clipboard.read_as_plain_text()
+                if command in RAW_READ_COMMANDS
+                else clipboard.read_text()
+            )
             op_args = args
         new_text, message = handler(text, op_args)
         if not inject:

@@ -10,6 +10,10 @@ set -euo pipefail
 #
 # release-base-url is the GitHub Release download prefix, e.g.
 # https://github.com/Mshardul/jugnu/releases/download/addons-v1.0.0
+#
+# It must name a release that does not exist yet: published assets are immutable and a fresh
+# local zip never hashes the same as the uploaded one. The release workflow runs this, then
+# uploads exactly these zips under that tag.
 
 if [[ $# -ne 2 ]]; then
   echo "usage: $0 <dist-dir> <release-base-url>" >&2
@@ -17,7 +21,19 @@ if [[ $# -ne 2 ]]; then
 fi
 
 dist_dir=$1
-release_base_url=$2
+release_base_url=${2%/}
+
+case "$release_base_url" in
+  https://github.com/*/releases/download/*) ;;
+  *)
+    echo "$0: release-base-url must be a GitHub Release download prefix (https://github.com/<owner>/<repo>/releases/download/<tag>)" >&2
+    exit 1
+    ;;
+esac
+
+asset_status() {
+  curl -s -o /dev/null -I -w '%{http_code}' "$1" || echo 000
+}
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 repo_root="$(cd "$script_dir/.." && pwd)"
 registry_file="$repo_root/registry/addons.json"
@@ -104,9 +120,22 @@ for addon_dir in "$repo_root"/addons/*/; do
   summary=$(first_command_title "$manifest")
   permissions_json=$(manifest_permissions_json "$manifest")
   primary=$(manifest_value "$manifest" primary)
+  zip_name="${id}-${version}.zip"
+
+  status=$(asset_status "${release_base_url}/${zip_name}")
+  case "$status" in
+    404) ;;
+    200 | 302)
+      echo "$0: ${release_base_url}/${zip_name} is already published; use a new release tag" >&2
+      exit 1
+      ;;
+    *)
+      echo "$0: could not confirm ${release_base_url}/${zip_name} is unpublished (HTTP ${status})" >&2
+      exit 1
+      ;;
+  esac
 
   sha256=$("$script_dir/package-addon.sh" "$addon_dir" "$dist_dir" 2>/dev/null)
-  zip_name="${id}-${version}.zip"
 
   primary_json="null"
   [[ -n "$primary" ]] && primary_json="\"${primary}\""

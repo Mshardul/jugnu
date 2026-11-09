@@ -1,4 +1,3 @@
-import CryptoKit
 import Foundation
 
 public struct AddonInstaller: Sendable {
@@ -27,6 +26,7 @@ public struct AddonInstaller: Sendable {
         guard let remote = URL(string: entry.url), !entry.url.isEmpty else {
             throw AddonInstallerError.missingURL
         }
+        try SHA256Digest.requireWellFormed(entry.sha256)
         let tempURL = try await downloads.download(remote)
         let zipURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("\(entry.id)-\(UUID().uuidString).zip")
@@ -51,7 +51,7 @@ public struct AddonInstaller: Sendable {
         enable: Bool,
         addonId: String? = nil
     ) throws {
-        try requireSHA256(expectedSHA256, of: url)
+        try SHA256Digest.verify(expectedSHA256, file: url)
 
         let extractRoot = FileManager.default.temporaryDirectory
             .appendingPathComponent("jugnu-extract-\(UUID().uuidString)")
@@ -86,7 +86,7 @@ public struct AddonInstaller: Sendable {
         id: String,
         version: String
     ) throws {
-        try requireSHA256(expectedSHA256, of: url)
+        try SHA256Digest.verify(expectedSHA256, file: url)
 
         let extractRoot = FileManager.default.temporaryDirectory
             .appendingPathComponent("jugnu-helper-extract-\(UUID().uuidString)")
@@ -163,7 +163,7 @@ public struct AddonInstaller: Sendable {
         installedVersions: [String: String],
         confirmDependencies: ((DependencyPlan) async -> Bool)?
     ) async throws {
-        try requireSHA256(expectedSHA256, of: zipURL)
+        try SHA256Digest.verify(expectedSHA256, file: zipURL)
 
         let extractRoot = FileManager.default.temporaryDirectory
             .appendingPathComponent("jugnu-extract-\(UUID().uuidString)")
@@ -391,7 +391,7 @@ public struct AddonInstaller: Sendable {
         id: String,
         version: String
     ) throws -> URL {
-        try requireSHA256(expectedSHA256, of: url)
+        try SHA256Digest.verify(expectedSHA256, file: url)
 
         let extractRoot = FileManager.default.temporaryDirectory
             .appendingPathComponent("jugnu-helper-extract-\(UUID().uuidString)")
@@ -434,6 +434,7 @@ public struct AddonInstaller: Sendable {
         guard let remote = URL(string: entry.url), !entry.url.isEmpty else {
             throw AddonInstallerError.missingURL
         }
+        try SHA256Digest.requireWellFormed(entry.sha256)
         let tempURL = try await downloads.download(remote)
         let zipURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("\(entry.id)-\(UUID().uuidString).zip")
@@ -441,7 +442,7 @@ public struct AddonInstaller: Sendable {
         try FileManager.default.moveItem(at: tempURL, to: zipURL)
         defer { try? FileManager.default.removeItem(at: zipURL) }
 
-        try requireSHA256(entry.sha256, of: zipURL)
+        try SHA256Digest.verify(entry.sha256, file: zipURL)
         let extractRoot = FileManager.default.temporaryDirectory
             .appendingPathComponent("jugnu-extract-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: extractRoot, withIntermediateDirectories: true)
@@ -473,6 +474,7 @@ public struct AddonInstaller: Sendable {
         guard let remote = URL(string: entry.url), !entry.url.isEmpty else {
             throw AddonInstallerError.missingURL
         }
+        try SHA256Digest.requireWellFormed(entry.sha256)
         let zipURL: URL
         do {
             let tempURL = try await downloads.download(remote)
@@ -489,17 +491,6 @@ public struct AddonInstaller: Sendable {
             throw AddonInstallerError.helperUnreachable
         }
         return (entry, zipURL)
-    }
-
-    private func requireSHA256(_ expectedSHA256: String?, of url: URL) throws {
-        guard let expected = expectedSHA256?.lowercased(), !expected.isEmpty else {
-            throw AddonInstallerError.sha256Required
-        }
-        let data = try Data(contentsOf: url)
-        let actual = SHA256.hash(data: data).compactMap { String(format: "%02x", $0) }.joined()
-        guard actual == expected else {
-            throw AddonInstallerError.sha256Mismatch(expected: expected, actual: actual)
-        }
     }
 
     // transitional: an older published zip carries a bare `id: job` against a namespaced registry row

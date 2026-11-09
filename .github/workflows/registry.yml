@@ -1,0 +1,31 @@
+name: Registry
+
+# Every registry row must resolve to a published asset whose sha256 and packaged id/version match,
+# or the shell refuses the install. The weekly run catches assets that disappear after merge.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "registry/**"
+      - "scripts/verify-registry.py"
+      - "scripts/build-registry.sh"
+  pull_request:
+    paths:
+      - "registry/**"
+      - "scripts/verify-registry.py"
+      - "scripts/build-registry.sh"
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch: {}
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Self-test
+        run: python3 scripts/verify-registry.py --self-test
+
+      - name: Verify registry against published assets
+        run: python3 scripts/verify-registry.py

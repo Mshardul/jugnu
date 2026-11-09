@@ -75,7 +75,7 @@ final class CommandIndexTests: XCTestCase {
         var index = CommandIndex(paths: JugnuPaths(home: URL(fileURLWithPath: "/tmp")), config: JugnuConfig())
         index.replaceCommandsForTesting([
             command("jugnu.a", "mute-mic", "Mute microphone input"),
-            command("jugnu.b", "mute-all", "Quiet everything", alias: "Mute"),
+            command("jugnu.b", "mute-all", "Quiet everything", alias: "Mute")
         ])
         XCTAssertEqual(index.searchHits("mute").first?.command.commandId, "mute-all")
         XCTAssertEqual(index.searchHits("  MUTE ").first?.command.commandId, "mute-all")
@@ -86,7 +86,7 @@ final class CommandIndexTests: XCTestCase {
         var index = CommandIndex(paths: JugnuPaths(home: URL(fileURLWithPath: "/tmp")), config: JugnuConfig())
         index.replaceCommandsForTesting([
             command("jugnu.a", "mute-mic", "Mute microphone", alias: "mm"),
-            command("jugnu.b", "mute-all", "Mute all", alias: "mute-all"),
+            command("jugnu.b", "mute-all", "Mute all", alias: "mute-all")
         ])
         XCTAssertEqual(index.searchHits("mut").first?.command.commandId, "mute-all")
     }
@@ -97,7 +97,7 @@ final class CommandIndexTests: XCTestCase {
             command("acme.x", "one", "One", alias: "go"),
             command("jugnu.y", "two", "Two", alias: "go"),
             command("acme.p", "three", "Three", alias: "tie"),
-            command("beta.q", "four", "Four", alias: "tie"),
+            command("beta.q", "four", "Four", alias: "tie")
         ])
         let byId = Dictionary(uniqueKeysWithValues: index.all.map { ($0.commandId, $0.alias) })
         XCTAssertNil(byId["one"] ?? nil)

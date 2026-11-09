@@ -50,9 +50,7 @@ A registry entry must include the addon id, name, version, API version, release 
 
 After publishing:
 
-- Download the release asset from its public URL.
-- Recalculate SHA-256 and compare it with `registry/addons.json`.
-- Unpack into a temporary addon directory and verify the root layout.
+- Run `scripts/verify-registry.py`: it downloads every asset in `registry/addons.json`, `helpers.json`, and `jugnu-app.json`, recalculates SHA-256, and checks the root layout and packaged id/version. The release workflow runs it for addons before committing the registry.
 - Run a representative command and confirm a valid JSON response.
 - Verify that install, enable, disable, update, and uninstall behavior matches the manifest cleanup declarations.
 - Confirm the changelog and README links are current.

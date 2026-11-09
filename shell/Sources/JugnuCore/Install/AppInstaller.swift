@@ -1,4 +1,3 @@
-import CryptoKit
 import Foundation
 
 public struct AppInstaller: Sendable {
@@ -14,9 +13,10 @@ public struct AppInstaller: Sendable {
         guard let url = URL(string: entry.url) else {
             throw AppUpdateError.invalidRegistryURL
         }
+        try SHA256Digest.requireWellFormed(entry.sha256)
         let zipURL = try await downloads.download(url)
         defer { try? FileManager.default.removeItem(at: zipURL) }
-        try requireSHA256(entry.sha256, of: zipURL)
+        try SHA256Digest.verify(entry.sha256, file: zipURL)
 
         let staging = paths.appUpdateStagingDir.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: staging, withIntermediateDirectories: true)
@@ -28,16 +28,6 @@ public struct AppInstaller: Sendable {
         } catch {
             try? FileManager.default.removeItem(at: staging)
             throw error
-        }
-    }
-
-    private func requireSHA256(_ expectedSHA256: String, of url: URL) throws {
-        let expected = expectedSHA256.lowercased()
-        guard !expected.isEmpty else { throw AddonInstallerError.sha256Required }
-        let data = try Data(contentsOf: url)
-        let actual = SHA256.hash(data: data).compactMap { String(format: "%02x", $0) }.joined()
-        guard actual == expected else {
-            throw AddonInstallerError.sha256Mismatch(expected: expected, actual: actual)
         }
     }
 }
